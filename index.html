@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo Bank</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "modern-treasury": "https://aistudiocdn.com/modern-treasury@^3.3.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "recharts": "https://aistudiocdn.com/recharts@^3.2.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.19.0",
+    "recharts/": "https://aistudiocdn.com/recharts@^3.3.0/",
+    "chart.js": "https://aistudiocdn.com/chart.js@^4.5.1",
+    "react-chartjs-2": "https://aistudiocdn.com/react-chartjs-2@^5.3.1",
+    "@tanstack/react-query": "https://aistudiocdn.com/@tanstack/react-query@^5.90.10",
+    "uuid": "https://aistudiocdn.com/uuid@^13.0.0",
+    "react-icons/": "https://aistudiocdn.com/react-icons@^5.5.0/",
+    "vite": "https://aistudiocdn.com/vite@^7.2.4",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "path": "https://aistudiocdn.com/path@^0.12.7",
+    "plaid": "https://aistudiocdn.com/plaid@^20.0.0",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
+    "@mui/x-data-grid": "https://aistudiocdn.com/@mui/x-data-grid@^8.20.0",
+    "@mui/material": "https://aistudiocdn.com/@mui/material@^7.3.6",
+    "@google/generative-ai": "https://aistudiocdn.com/@google/generative-ai@^0.24.1",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.10.0",
+    "@mui/material/": "https://aistudiocdn.com/@mui/material@^7.3.6/",
+    "@chakra-ui/react": "https://aistudiocdn.com/@chakra-ui/react@^3.30.0",
+    "@chakra-ui/icons": "https://aistudiocdn.com/@chakra-ui/icons@^2.2.4",
+    "class-variance-authority": "https://aistudiocdn.com/class-variance-authority@^0.7.1",
+    "tailwind-merge": "https://aistudiocdn.com/tailwind-merge@^3.4.0",
+    "clsx": "https://aistudiocdn.com/clsx@^2.1.1",
+    "@nestjs/common": "https://aistudiocdn.com/@nestjs/common@^11.1.9",
+    "xml2js": "https://aistudiocdn.com/xml2js@^0.6.2",
+    "axios": "https://aistudiocdn.com/axios@^1.13.2",
+    "@mui/icons-material": "https://aistudiocdn.com/@mui/icons-material@^7.3.6",
+    "primereact/": "https://aistudiocdn.com/primereact@^10.9.7/",
+    "zustand": "https://aistudiocdn.com/zustand@^5.0.9",
+    "@mui/icons-material/": "https://aistudiocdn.com/@mui/icons-material@^7.3.6/",
+    "react-beautiful-dnd": "https://aistudiocdn.com/react-beautiful-dnd@^13.1.1",
+    "react-hook-form": "https://aistudiocdn.com/react-hook-form@^7.67.0",
+    "inversify": "https://aistudiocdn.com/inversify@^7.10.5",
+    "react-bootstrap": "https://aistudiocdn.com/react-bootstrap@^2.10.10",
+    "@tanstack/react-table": "https://aistudiocdn.com/@tanstack/react-table@^8.21.3",
+    "@stripe/stripe-js": "https://aistudiocdn.com/@stripe/stripe-js@^8.5.3",
+    "zustand/": "https://aistudiocdn.com/zustand@^5.0.9/",
+    "dotenv": "https://aistudiocdn.com/dotenv@^17.2.3",
+    "zod": "https://aistudiocdn.com/zod@^4.1.13",
+    "fs": "https://aistudiocdn.com/fs@^0.0.1-security",
+    "framer-motion": "https://aistudiocdn.com/framer-motion@^12.23.25",
+    "notistack": "https://aistudiocdn.com/notistack@^3.0.2",
+    "date-fns": "https://aistudiocdn.com/date-fns@^4.1.0",
+    "fast-xml-parser": "https://aistudiocdn.com/fast-xml-parser@^5.3.2",
+    "react-plaid-link": "https://aistudiocdn.com/react-plaid-link@^4.1.1",
+    "js-yaml": "https://aistudiocdn.com/js-yaml@^4.1.1",
+    "styled-components": "https://aistudiocdn.com/styled-components@^6.1.19",
+    "antd": "https://aistudiocdn.com/antd@^6.0.1",
+    "react-query": "https://aistudiocdn.com/react-query@^3.39.3",
+    "@ant-design/icons": "https://aistudiocdn.com/@ant-design/icons@^6.1.0",
+    "@radix-ui/react-progress": "https://aistudiocdn.com/@radix-ui/react-progress@^1.1.8",
+    "cmdk": "https://aistudiocdn.com/cmdk@^1.1.1",
+    "@radix-ui/react-separator": "https://aistudiocdn.com/@radix-ui/react-separator@^1.1.8",
+    "@radix-ui/react-label": "https://aistudiocdn.com/@radix-ui/react-label@^2.1.8",
+    "jspdf-autotable": "https://aistudiocdn.com/jspdf-autotable@^5.0.2",
+    "jspdf": "https://aistudiocdn.com/jspdf@^3.0.4",
+    "@heroicons/react/": "https://aistudiocdn.com/@heroicons/react@^2.2.0/",
+    "express": "https://aistudiocdn.com/express@^5.2.1",
+    "url": "https://aistudiocdn.com/url@^0.11.4",
+    "reactflow/": "https://aistudiocdn.com/reactflow@^11.11.4/",
+    "reactflow": "https://aistudiocdn.com/reactflow@^11.11.4",
+    "@hookform/resolvers/": "https://aistudiocdn.com/@hookform/resolvers@^5.2.2/",
+    "sonner": "https://aistudiocdn.com/sonner@^2.0.7",
+    "@radix-ui/react-select": "https://aistudiocdn.com/@radix-ui/react-select@^2.2.6",
+    "@radix-ui/react-slot": "https://aistudiocdn.com/@radix-ui/react-slot@^1.2.4",
+    "@radix-ui/react-dialog": "https://aistudiocdn.com/@radix-ui/react-dialog@^1.1.15",
+    "stripe": "https://aistudiocdn.com/stripe@^20.0.0",
+    "antd/": "https://aistudiocdn.com/antd@^6.0.1/",
+    "react-dropzone": "https://aistudiocdn.com/react-dropzone@^14.3.8",
+    "react-circular-progressbar/": "https://aistudiocdn.com/react-circular-progressbar@^2.2.0/",
+    "react-circular-progressbar": "https://aistudiocdn.com/react-circular-progressbar@^2.2.0",
+    "chartjs-adapter-date-fns": "https://aistudiocdn.com/chartjs-adapter-date-fns@^3.0.0",
+    "react-select": "https://aistudiocdn.com/react-select@^5.10.2",
+    "@rjsf/core": "https://aistudiocdn.com/@rjsf/core@^6.1.2",
+    "@stripe/react-stripe-js": "https://aistudiocdn.com/@stripe/react-stripe-js@^5.4.1",
+    "json-schema": "https://aistudiocdn.com/json-schema@^0.4.0",
+    "@radix-ui/react-popover": "https://aistudiocdn.com/@radix-ui/react-popover@^1.1.15",
+    "react-simple-maps": "https://aistudiocdn.com/react-simple-maps@^3.0.0",
+    "@rjsf/validator-ajv8": "https://aistudiocdn.com/@rjsf/validator-ajv8@^6.1.2"
+  }
+}
+</script>
+  </head>
+
+  <body class="bg-gray-900">
+    <div id="root"></div>
+
+    <!-- No API key, nothing injected, nothing global -->
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

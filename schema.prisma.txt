@@ -1,0 +1,110 @@
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  name            String?
+  role            String    @default("USER")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  accounts        Account[]
+  budgets         Budget[]
+  goals           Goal[]
+  apiKeys         ApiKey[]
+  settings        Settings?
+}
+
+model Account {
+  id              String        @id @default(uuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  plaidAccountId  String?
+  name            String
+  type            String        // CHECKING, SAVINGS, CREDIT, INVESTMENT
+  balance         Float
+  currency        String        @default("USD")
+  transactions    Transaction[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Transaction {
+  id              String    @id @default(uuid())
+  accountId       String
+  account         Account   @relation(fields: [accountId], references: [id])
+  amount          Float
+  type            String    // CREDIT, DEBIT
+  category        String?
+  description     String?
+  date            DateTime
+  status          String    @default("PENDING")
+  merchantName    String?
+  createdAt       DateTime  @default(now())
+}
+
+model Budget {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  category        String
+  limit           Float
+  spent           Float     @default(0)
+  period          String    // MONTHLY, WEEKLY
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Goal {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  name            String
+  targetAmount    Float
+  currentAmount   Float     @default(0)
+  deadline        DateTime?
+  status          String    @default("IN_PROGRESS")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model ApiKey {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  service         String    // PLAID, STRIPE, GEMINI
+  keyHash         String
+  lastUsed        DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+model Settings {
+  id              String    @id @default(uuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id])
+  theme           String    @default("sovereign")
+  notifications   Boolean   @default(true)
+  aiEnabled       Boolean   @default(true)
+  privacyLevel    String    @default("standard")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// WebDriver Automation Log
+model AutomationLog {
+  id              String    @id @default(uuid())
+  taskId          String
+  status          String    // SUCCESS, FAILED, RUNNING
+  details         String?
+  timestamp       DateTime  @default(now())
+}

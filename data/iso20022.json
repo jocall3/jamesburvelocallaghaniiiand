@@ -1,0 +1,14 @@
+
+{
+  "definitions": {
+    "ExternalPurpose1Code": {
+      "type": "string",
+      "description": "Specifies the underlying reason for the payment transaction.\n\r\nThe list of valid codes is an external code list published separately. \r\nExternal code sets can be downloaded from www.iso20022.org.\n*`BONU`-Bonus Payment.\n*`CASH`-Cash Management Transfer.\n*`DIVI`-Dividend.",
+      "enum": [
+        "BONU",
+        "CASH",
+        "DIVI"
+      ]
+    }
+  }
+}
