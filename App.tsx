@@ -1,4 +1,3 @@
-
 import React, { useState, useContext, useEffect } from 'react';
 import { HashRouter as Router, Route, Routes, Outlet, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -187,6 +186,15 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   render() { return this.state.hasError ? <h1>Something went wrong.</h1> : this.props.children; }
 }
 
+// --- Protected Route ---
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated } = useContext(AuthContext)!;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
+};
+
 // --- Layout ---
 const SAppLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -349,9 +357,72 @@ const SAppLayout = () => {
             {/* New Educational Views */}
             {activeView === View.TheBook && <TheBookView />}
             {activeView === View.KnowledgeBase && <KnowledgeBaseView />}
-            
-            {/* Render component based on route if not covered by activeView switch (fallback) */}
-            <Outlet />
+
+            {/* --- ADDITIONAL VIEWS --- */}
+            {activeView === View.AccountDetails && <AccountDetails />}
+            {activeView === View.AccountList && <AccountList />}
+            {activeView === View.AccountsDashboardView && <AccountsDashboardView />}
+            {activeView === View.AccountStatementGrid && <AccountStatementGrid />}
+            {activeView === View.ACHDetailsDisplay && <ACHDetailsDisplay />}
+            {activeView === View.AICommandLog && <AICommandLog />}
+            {activeView === View.AIPredictionWidget && <AIPredictionWidget />}
+            {activeView === View.AssetCatalog && <AssetCatalog />}
+            {activeView === View.AutomatedSweepRules && <AutomatedSweepRules />}
+            {activeView === View.BalanceReportChart && <BalanceReportChart />}
+            {activeView === View.BalanceTransactionTable && <BalanceTransactionTable />}
+            {activeView === View.CardDesignVisualizer && <CardDesignVisualizer />}
+            {activeView === View.ChargeList && <ChargeList />}
+            {activeView === View.ComplianceAlertCard && <ComplianceAlertCard />}
+            {activeView === View.ConductorConfigurationView && <ConductorConfigurationView />}
+            {activeView === View.CounterpartyDetails && <CounterpartyDetails />}
+            {activeView === View.CounterpartyForm && <CounterpartyForm />}
+            {activeView === View.CounterpartyList && <CounterpartyList />}
+            {activeView === View.DealFlow && <DealFlow />}
+            {activeView === View.DisruptionIndexMeter && <DisruptionIndexMeter />}
+            {activeView === View.DocumentUploader && <DocumentUploader />}
+            {activeView === View.EarlyFraudWarningFeed && <EarlyFraudWarningFeed />}
+            {activeView === View.ElectionChoiceForm && <ElectionChoiceForm />}
+            {activeView === View.EventNotificationCard && <EventNotificationCard />}
+            {activeView === View.ExpectedPaymentsTable && <ExpectedPaymentsTable />}
+            {activeView === View.ExternalAccountCard && <ExternalAccountCard />}
+            {activeView === View.ExternalAccountForm && <ExternalAccountForm />}
+            {activeView === View.ExternalAccountsTable && <ExternalAccountsTable />}
+            {activeView === View.FinancialAccountCard && <FinancialAccountCard />}
+            {activeView === View.GlobalMarketMap && <GlobalMarketMap />}
+            {activeView === View.IdentityView && <IdentityView />}
+            {activeView === View.ImpactTracker && <ImpactTracker />}
+            {activeView === View.IncomingPaymentDetailList && <IncomingPaymentDetailList />}
+            {activeView === View.InvestmentForm && <InvestmentForm />}
+            {activeView === View.InvestmentPortfolio && <InvestmentPortfolio />}
+            {activeView === View.InvoiceFinancingRequest && <InvoiceFinancingRequest />}
+            {activeView === View.PaymentInitiationForm && <PaymentInitiationForm />}
+            {activeView === View.PaymentMethodDetails && <PaymentMethodDetails />}
+            {activeView === View.PaymentOrderForm && <PaymentOrderForm />}
+            {activeView === View.PayoutsDashboard && <PayoutsDashboard />}
+            {activeView === View.PnLChart && <PnLChart />}
+            {activeView === View.PortfolioCompanyDetails && <PortfolioCompanyDetails />}
+            {activeView === View.PortfolioCompanyList && <PortfolioCompanyList />}
+            {activeView === View.RecentTransactions && <RecentTransactions />}
+            {activeView === View.RefundForm && <RefundForm />}
+            {activeView === View.RemittanceInfoEditor && <RemittanceInfoEditor />}
+            {activeView === View.ReportingView && <ReportingView />}
+            {activeView === View.ReportRunGenerator && <ReportRunGenerator />}
+            {activeView === View.ReportStatusIndicator && <ReportStatusIndicator />}
+            {activeView === View.SpendingAnalysisChart && <SpendingAnalysisChart />}
+            {activeView === View.SsiEditorForm && <SsiEditorForm />}
+            {activeView === View.StrategyEditor && <StrategyEditor />}
+            {activeView === View.StripeStatusBadge && <StripeStatusBadge />}
+            {activeView === View.StructuredPurposeInput && <StructuredPurposeInput />}
+            {activeView === View.SubscriptionList && <SubscriptionList />}
+            {activeView === View.TimeSeriesChart && <TimeSeriesChart />}
+            {activeView === View.TransactionFilter && <TransactionFilter />}
+            {activeView === View.TransactionList && <TransactionList />}
+            {activeView === View.TreasuryTransactionList && <TreasuryTransactionList />}
+            {activeView === View.UniversalObjectInspector && <UniversalObjectInspector />}
+            {activeView === View.VirtualAccountForm && <VirtualAccountForm />}
+            {activeView === View.VirtualAccountsTable && <VirtualAccountsTable />}
+            {activeView === View.WealthTimeline && <WealthTimeline />}
+            {activeView === View.WebhookSimulator && <WebhookSimulator />}
         </main>
       </div>
       
