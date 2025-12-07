@@ -1,34 +1,28 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import type Stripe from 'stripe';
-
 import {
   ArrowDownCircleIcon,
   ArrowUpCircleIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
 } from '@heroicons/react/24/outline';
-import {
-  List,
-  ListItem,
-  ListItemDescription,
-  ListItemTitle,
-} from '../../list';
-import {Amount} from '../../Amount';
-import {Badge} from '../../Badge';
-import {Expandable} from '../../Expandable';
-import {ResourceLink} from '../../ResourceLink';
-import {Timestamp} from '../../Timestamp';
-import {KeyValue, KeyValueGroup} from '../../KeyValue';
 
-const getStatusColor = (status: Stripe.Treasury.Transaction.Status) => {
+import { Amount } from './shared/Amount';
+import { Badge } from './ui/badge';
+import { NexusLink } from './shared/NexusLink';
+import { Timestamp } from './shared/Timestamp';
+import { DetailItem } from './shared/DetailItem';
+
+const getStatusVariant = (status: Stripe.Treasury.Transaction.Status) => {
   switch (status) {
     case 'open':
-      return 'blue';
+      return 'default';
     case 'posted':
-      return 'green';
+      return 'success';
     case 'void':
-      return 'gray';
+      return 'secondary';
     default:
-      return 'gray';
+      return 'secondary';
   }
 };
 
@@ -38,57 +32,137 @@ const TransactionDetails = ({
   transaction: Stripe.Treasury.Transaction;
 }) => {
   return (
-    <KeyValueGroup>
-      <KeyValue label="Transaction ID" value={<ResourceLink id={transaction.id} />} />
-      <KeyValue
-        label="Financial Account"
-        value={<ResourceLink id={transaction.financial_account} />}
-      />
-      {transaction.flow && (
-        <KeyValue
-          label="Flow"
-          value={
-            <div className="flex items-center space-x-2">
-              <ResourceLink id={transaction.flow} />
-              <Badge color="blue">{transaction.flow_type}</Badge>
+    <div className="border-t border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <DetailItem label="Transaction ID">
+          <NexusLink id={transaction.id} />
+        </DetailItem>
+        <DetailItem label="Financial Account">
+          <NexusLink id={transaction.financial_account} />
+        </DetailItem>
+        {transaction.flow && (
+          <DetailItem label="Flow">
+            <div className="flex items-center gap-2">
+              <NexusLink id={transaction.flow} />
+              <Badge variant="outline">{transaction.flow_type}</Badge>
             </div>
-          }
-        />
-      )}
-      <KeyValue label="Status" value={<Badge color={getStatusColor(transaction.status)}>{transaction.status}</Badge>} />
-      <KeyValue label="Created" value={<Timestamp timestamp={transaction.created} />} />
-      {transaction.status_transitions.posted_at && (
-        <KeyValue
-          label="Posted at"
-          value={<Timestamp timestamp={transaction.status_transitions.posted_at} />}
-        />
-      )}
-       {transaction.status_transitions.void_at && (
-        <KeyValue
-          label="Void at"
-          value={<Timestamp timestamp={transaction.status_transitions.void_at} />}
-        />
-      )}
-      <KeyValue label="Balance Impact">
-        <div className="mt-2 space-y-1 rounded bg-slate-50 p-2 dark:bg-slate-800/50">
-          <KeyValue
-            inline
-            label="Cash"
-            value={<Amount amount={transaction.balance_impact.cash} currency={transaction.currency} />}
-          />
-          <KeyValue
-            inline
-            label="Inbound Pending"
-            value={<Amount amount={transaction.balance_impact.inbound_pending} currency={transaction.currency} />}
-          />
-          <KeyValue
-            inline
-            label="Outbound Pending"
-            value={<Amount amount={transaction.balance_impact.outbound_pending} currency={transaction.currency} />}
-          />
+          </DetailItem>
+        )}
+        <DetailItem label="Status">
+          <Badge variant={getStatusVariant(transaction.status)}>
+            {transaction.status}
+          </Badge>
+        </DetailItem>
+        <DetailItem label="Created">
+          <Timestamp timestamp={transaction.created} />
+        </DetailItem>
+        {transaction.status_transitions.posted_at && (
+          <DetailItem label="Posted at">
+            <Timestamp timestamp={transaction.status_transitions.posted_at} />
+          </DetailItem>
+        )}
+        {transaction.status_transitions.void_at && (
+          <DetailItem label="Void at">
+            <Timestamp timestamp={transaction.status_transitions.void_at} />
+          </DetailItem>
+        )}
+        <div className="col-span-1 sm:col-span-2">
+          <DetailItem label="Balance Impact">
+            <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="rounded-md border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  Cash
+                </span>
+                <div className="mt-1">
+                  <Amount
+                    amount={transaction.balance_impact.cash}
+                    currency={transaction.currency}
+                  />
+                </div>
+              </div>
+              <div className="rounded-md border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  Inbound Pending
+                </span>
+                <div className="mt-1">
+                  <Amount
+                    amount={transaction.balance_impact.inbound_pending}
+                    currency={transaction.currency}
+                  />
+                </div>
+              </div>
+              <div className="rounded-md border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  Outbound Pending
+                </span>
+                <div className="mt-1">
+                  <Amount
+                    amount={transaction.balance_impact.outbound_pending}
+                    currency={transaction.currency}
+                  />
+                </div>
+              </div>
+            </div>
+          </DetailItem>
         </div>
-      </KeyValue>
-    </KeyValueGroup>
+      </div>
+    </div>
+  );
+};
+
+const ExpandableListItem = ({
+  transaction,
+}: {
+  transaction: Stripe.Treasury.Transaction;
+}) => {
+  const [expanded, setExpanded] = useState(false);
+  const isCredit = transaction.amount >= 0;
+
+  return (
+    <li>
+      <div
+        className="flex cursor-pointer items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <div className="flex items-center gap-4">
+          <div className="flex-shrink-0">
+            {isCredit ? (
+              <ArrowDownCircleIcon className="h-8 w-8 text-emerald-500" />
+            ) : (
+              <ArrowUpCircleIcon className="h-8 w-8 text-gray-400" />
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+              {transaction.description}
+            </p>
+            <div className="mt-1 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <Badge variant={getStatusVariant(transaction.status)}>
+                {transaction.status}
+              </Badge>
+              <span>{transaction.flow_type}</span>
+              <span>&middot;</span>
+              <Timestamp timestamp={transaction.created} format="relative" />
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <Amount
+            amount={transaction.amount}
+            currency={transaction.currency}
+            className={`text-sm font-medium ${
+              isCredit ? 'text-emerald-600' : 'text-gray-900'
+            } dark:text-white`}
+          />
+          {expanded ? (
+            <ChevronDownIcon className="h-5 w-5 text-gray-400" />
+          ) : (
+            <ChevronRightIcon className="h-5 w-5 text-gray-400" />
+          )}
+        </div>
+      </div>
+      {expanded && <TransactionDetails transaction={transaction} />}
+    </li>
   );
 };
 
@@ -103,57 +177,29 @@ export const TreasuryTransactionList = ({
 }) => {
   if (!transactions || transactions.length === 0) {
     return (
-      <div className="px-6 py-4">
-        <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">{title}</h3>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{emptyMessage}</p>
+      <div className="rounded-lg border border-gray-200 bg-white p-6 text-center dark:border-gray-700 dark:bg-gray-800">
+        <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+          {title}
+        </h3>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          {emptyMessage}
+        </p>
       </div>
     );
   }
 
   return (
-    <List>
-      {transactions.map((transaction) => {
-        const isCredit = transaction.amount >= 0;
-        return (
-          <ListItem key={transaction.id}>
-            <Expandable
-              header={
-                <div className="flex w-full items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div>
-                      {isCredit ? (
-                        <ArrowDownCircleIcon className="h-7 w-7 text-green-500" />
-                      ) : (
-                        <ArrowUpCircleIcon className="h-7 w-7 text-red-500" />
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <ListItemTitle>{transaction.description}</ListItemTitle>
-                      <ListItemDescription>
-                        <div className="flex items-center space-x-2">
-                          <Badge color={getStatusColor(transaction.status)}>{transaction.status}</Badge>
-                          <span>{transaction.flow_type}</span>
-                          <span>&middot;</span>
-                          <Timestamp timestamp={transaction.created} format="relative" />
-                        </div>
-                      </ListItemDescription>
-                    </div>
-                  </div>
-                  <div className="ml-4 flex-shrink-0 text-right">
-                    <Amount
-                      amount={transaction.amount}
-                      currency={transaction.currency}
-                      className="text-sm font-medium text-gray-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-              }
-            >
-              <TransactionDetails transaction={transaction} />
-            </Expandable>
-          </ListItem>
-        );
-      })}
-    </List>
+    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow dark:border-gray-700 dark:bg-gray-800">
+      <div className="border-b border-gray-200 px-4 py-4 dark:border-gray-700 sm:px-6">
+        <h3 className="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+          {title}
+        </h3>
+      </div>
+      <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+        {transactions.map((transaction) => (
+          <ExpandableListItem key={transaction.id} transaction={transaction} />
+        ))}
+      </ul>
+    </div>
   );
 };
