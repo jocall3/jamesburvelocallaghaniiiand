@@ -26,21 +26,31 @@ import {
   IconButton,
   Flex,
 } from '@chakra-ui/react';
-import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 
-// Define TypeScript types based on the ISO 20022 schema structure, focusing on relevant codes for sweep rules
-// These are placeholders derived from the available External codes, assuming some relate to 'Purpose' or 'BalanceType'
+// Inline SVG icons for Add and Delete
+const AddSVG = (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M8 4a.5.5 0 0 1 .5.5V7.5H11a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V8.5H5a.5.5 0 0 1 0-1h2.5V4.5A.5.5 0 0 1 8 4z"/>
+  </svg>
+);
 
+const DeleteSVG = (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M5.5 5.5A.5.5 0 0 1 6 5h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5zm1 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm-1 2a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5z"/>
+  </svg>
+);
+
+// Define TypeScript types
 type SweepRule = {
   id: number;
-  purposeCode: string; // Corresponds to ExternalPurpose1Code (e.g., ZABA, SWEP, TOPG)
-  balanceTypeCode: string; // Corresponds to ExternalBalanceType1Code or ExternalSystemBalanceType1Code
+  purposeCode: string;
+  balanceTypeCode: string;
   threshold: number;
   currency: string;
   isActive: boolean;
 };
 
-// Mock data and code lists derived/inferred from the schema for UI
+// Mock data/code lists
 const MOCK_PURPOSE_CODES = [
   { value: 'ZABA', label: 'Zero Balance Account (ZABA)' },
   { value: 'SWEP', label: 'Sweep (SWEP)' },
@@ -55,22 +65,8 @@ const MOCK_BALANCE_TYPE_CODES = [
 ];
 
 const MOCK_INITIAL_RULES: SweepRule[] = [
-  {
-    id: 1,
-    purposeCode: 'SWEP',
-    balanceTypeCode: 'CLAV',
-    threshold: 10000,
-    currency: 'EUR',
-    isActive: true,
-  },
-  {
-    id: 2,
-    purposeCode: 'TOPG',
-    balanceTypeCode: 'OPAV',
-    threshold: 50000,
-    currency: 'USD',
-    isActive: false,
-  },
+  { id: 1, purposeCode: 'SWEP', balanceTypeCode: 'CLAV', threshold: 10000, currency: 'EUR', isActive: true },
+  { id: 2, purposeCode: 'TOPG', balanceTypeCode: 'OPAV', threshold: 50000, currency: 'USD', isActive: false },
 ];
 
 const AutomatedSweepRules: React.FC = () => {
@@ -82,12 +78,12 @@ const AutomatedSweepRules: React.FC = () => {
     currency: 'EUR',
   });
   const [isNewRuleActive, setIsNewRuleActive] = useState(true);
-
   const toast = useToast();
+
   const nextId = useMemo(() => rules.reduce((max, rule) => Math.max(max, rule.id), 0) + 1, [rules]);
 
   const handleNewRuleChange = useCallback((key: keyof typeof newRule, value: any) => {
-    setNewRule((prev) => ({ ...prev, [key]: value }));
+    setNewRule(prev => ({ ...prev, [key]: value }));
   }, []);
 
   const handleAddRule = useCallback(() => {
@@ -102,13 +98,9 @@ const AutomatedSweepRules: React.FC = () => {
       return;
     }
 
-    const ruleToAdd: SweepRule = {
-      ...newRule,
-      id: nextId,
-      isActive: isNewRuleActive,
-    };
+    const ruleToAdd: SweepRule = { ...newRule, id: nextId, isActive: isNewRuleActive };
+    setRules(prev => [...prev, ruleToAdd]);
 
-    setRules((prevRules) => [...prevRules, ruleToAdd]);
     toast({
       title: 'Rule Added',
       description: `Sweep rule for ${ruleToAdd.purposeCode} added successfully.`,
@@ -116,12 +108,12 @@ const AutomatedSweepRules: React.FC = () => {
       duration: 3000,
       isClosable: true,
     });
-    // Reset new rule state (keeping currency for convenience)
-    setNewRule((prev) => ({ ...prev, threshold: 0, balanceTypeCode: MOCK_BALANCE_TYPE_CODES[0].value }));
+
+    setNewRule(prev => ({ ...prev, threshold: 0, balanceTypeCode: MOCK_BALANCE_TYPE_CODES[0].value }));
   }, [newRule, nextId, isNewRuleActive, toast]);
 
   const handleDeleteRule = useCallback((id: number) => {
-    setRules((prevRules) => prevRules.filter((rule) => rule.id !== id));
+    setRules(prev => prev.filter(r => r.id !== id));
     toast({
       title: 'Rule Deleted',
       description: `Sweep rule ID ${id} has been removed.`,
@@ -132,17 +124,13 @@ const AutomatedSweepRules: React.FC = () => {
   }, [toast]);
 
   const handleToggleActive = useCallback((id: number) => {
-    setRules((prevRules) =>
-      prevRules.map((rule) =>
-        rule.id === id ? { ...rule, isActive: !rule.isActive } : rule
-      )
-    );
+    setRules(prev => prev.map(r => r.id === id ? { ...r, isActive: !r.isActive } : r));
     toast({
-        title: 'Rule Updated',
-        description: `Rule ID ${id} active status toggled.`,
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
+      title: 'Rule Updated',
+      description: `Rule ID ${id} active status toggled.`,
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
     });
   }, [toast]);
 
@@ -163,7 +151,7 @@ const AutomatedSweepRules: React.FC = () => {
       <Td>
         <IconButton
           aria-label="Delete rule"
-          icon={<DeleteIcon />}
+          icon={DeleteSVG}
           size="sm"
           colorScheme="red"
           onClick={() => handleDeleteRule(rule.id)}
@@ -176,37 +164,33 @@ const AutomatedSweepRules: React.FC = () => {
     <VStack spacing={4} p={4} borderWidth="1px" borderRadius="md" bg="gray.50">
       <Text fontSize="lg" fontWeight="bold">Add New Sweep Rule</Text>
       <HStack w="100%" spacing={4}>
-        <FormControl id="new-purpose" isRequired>
+        <FormControl isRequired>
           <FormLabel>Purpose</FormLabel>
           <Select
             value={newRule.purposeCode}
-            onChange={(e) => handleNewRuleChange('purposeCode', e.target.value)}
+            onChange={e => handleNewRuleChange('purposeCode', e.target.value)}
           >
-            {MOCK_PURPOSE_CODES.map(code => (
-              <option key={code.value} value={code.value}>{code.label}</option>
-            ))}
+            {MOCK_PURPOSE_CODES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
           </Select>
         </FormControl>
 
-        <FormControl id="new-balance-type" isRequired>
+        <FormControl isRequired>
           <FormLabel>Balance Type</FormLabel>
           <Select
             value={newRule.balanceTypeCode}
-            onChange={(e) => handleNewRuleChange('balanceTypeCode', e.target.value)}
+            onChange={e => handleNewRuleChange('balanceTypeCode', e.target.value)}
           >
-            {MOCK_BALANCE_TYPE_CODES.map(code => (
-              <option key={code.value} value={code.value}>{code.label}</option>
-            ))}
+            {MOCK_BALANCE_TYPE_CODES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
           </Select>
         </FormControl>
       </HStack>
 
       <HStack w="100%" spacing={4}>
-        <FormControl id="new-threshold" isRequired>
+        <FormControl isRequired>
           <FormLabel>Threshold Amount</FormLabel>
           <NumberInput
             value={newRule.threshold}
-            onChange={(value) => handleNewRuleChange('threshold', parseFloat(value) || 0)}
+            onChange={value => handleNewRuleChange('threshold', parseFloat(value) || 0)}
             min={0}
             precision={2}
           >
@@ -218,11 +202,11 @@ const AutomatedSweepRules: React.FC = () => {
           </NumberInput>
         </FormControl>
 
-        <FormControl id="new-currency" isRequired>
+        <FormControl isRequired>
           <FormLabel>Currency</FormLabel>
           <Input
             value={newRule.currency}
-            onChange={(e) => handleNewRuleChange('currency', e.target.value.toUpperCase())}
+            onChange={e => handleNewRuleChange('currency', e.target.value.toUpperCase())}
             maxLength={3}
           />
         </FormControl>
@@ -234,12 +218,13 @@ const AutomatedSweepRules: React.FC = () => {
           <Switch
             id="new-active-switch"
             isChecked={isNewRuleActive}
-            onChange={() => setIsNewRuleActive((prev) => !prev)}
+            onChange={() => setIsNewRuleActive(prev => !prev)}
             colorScheme="green"
           />
         </FormControl>
+
         <Button
-          leftIcon={<AddIcon />}
+          leftIcon={AddSVG}
           colorScheme="blue"
           onClick={handleAddRule}
         >
@@ -263,18 +248,16 @@ const AutomatedSweepRules: React.FC = () => {
             <Thead>
               <Tr bg="gray.100">
                 <Th>ID</Th>
-                <Th>Purpose Code (ExternalPurpose1Code)</Th>
-                <Th>Balance Type (ExternalBalanceType1Code)</Th>
+                <Th>Purpose Code</Th>
+                <Th>Balance Type</Th>
                 <Th>Currency</Th>
-                <Th isNumeric>Threshold Amount</Th>
+                <Th isNumeric>Threshold</Th>
                 <Th>Active</Th>
                 <Th>Actions</Th>
               </Tr>
             </Thead>
             <Tbody>
-              {rules.length > 0 ? (
-                rules.map(renderRuleRow)
-              ) : (
+              {rules.length > 0 ? rules.map(renderRuleRow) : (
                 <Tr>
                   <Td colSpan={7} textAlign="center" color="gray.500">
                     No sweep rules configured yet.
@@ -282,17 +265,13 @@ const AutomatedSweepRules: React.FC = () => {
                 </Tr>
               )}
             </Tbody>
-            <Tfoot>
-                {/* Optional: Summary Tfoot */}
-            </Tfoot>
+            <Tfoot>{/* Optional summary */}</Tfoot>
           </Table>
         </Box>
       </VStack>
 
       <Flex justifyContent="flex-end" mt={6}>
-        <Button colorScheme="green" size="lg">
-          Save Configuration
-        </Button>
+        <Button colorScheme="green" size="lg">Save Configuration</Button>
       </Flex>
     </Box>
   );
