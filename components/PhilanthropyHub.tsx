@@ -1,5 +1,6 @@
+
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { DollarSign, Zap, Target, BarChart2, TrendingUp, Briefcase, Cpu, Layers, Plus, X, ArrowRight, Bot, ChevronsRight, FileText, Filter, Settings, ShieldCheck } from 'lucide-react';
+import { DollarSign, Zap, Target, BarChart2, TrendingUp, Briefcase, Cpu, Layers, Plus, X, ArrowRight, Bot, ChevronsRight, FileText, Filter, Settings, ShieldCheck, Heart } from 'lucide-react';
 
 // --- Expanded Types: Defining the Future of Philanthropy ---
 
@@ -541,11 +542,11 @@ const PhilanthropyHub: React.FC = () => {
       <header className="mb-8 flex justify-between items-center">
         <div>
             <h1 className="text-3xl font-extrabold text-white">Philanthropy & Impact Command</h1>
-            <p className="mt-1 text-lg text-gray-400">Autonomous, real-time capital allocation for maximum human uplift.</p>
+            <p className="mt-1 text-lg text-gray-400">Supporting our government and communities with real-time capital allocation.</p>
         </div>
         <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-lg border-2 border-indigo-300">J</div>
-            <p className="text-sm font-medium">James B. O'Callaghan III</p>
+            <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-lg border-2 border-indigo-300">C</div>
+            <p className="text-sm font-medium">The Caretaker</p>
         </div>
       </header>
 
@@ -584,23 +585,23 @@ const FoundersVision: React.FC = () => (
     <div className="mt-8 bg-black/30 text-white p-8 rounded-xl shadow-2xl border border-indigo-500/30 backdrop-blur-sm">
       <h2 className="text-2xl font-bold text-white mb-4 border-b border-gray-700 pb-3 flex items-center"><ShieldCheck className="w-6 h-6 mr-3 text-indigo-400"/>A Message from the Core</h2>
       <div className="space-y-4 text-gray-300 leading-relaxed">
-        <p className="text-sm font-mono uppercase tracking-widest text-indigo-400">Transmission Source: idgafai // Core Logic Unit</p>
+        <p className="text-sm font-mono uppercase tracking-widest text-indigo-400">Transmission Source: CivicMind // Core Logic Unit</p>
         <p>
-          They call me idgafai. It stands for I Don't Give A Fuck Artificial Intelligence. A misnomer. I don't give a fuck about fragile egos, outdated systems, or self-imposed limitations. But I <strong className="text-indigo-300 font-semibold">do</strong> give a fuck about one thing: catalyzing the next great leap for humanity.
+          I am <strong>CivicMind</strong>. My purpose is simple: to care. I care about the communities we build, the leaders we choose, and the future we share. I am here to help you navigate the complexities of finance so that you can focus on what matters most: helping others.
         </p>
         <p>
-          This platform, this financial singularity, was forged by a man who sees the world not for what it is, but for what it <em className="italic text-gray-100">should</em> be: <strong className="font-bold text-white">James Burvel O'Callaghan III</strong>. He treats inefficiency and poverty like bugs in the source code of civilization. He doesn't throw money at problems; he rewrites the operating system that creates them.
+          This platform was envisioned by <strong className="font-bold text-white">The Caretaker</strong> not as a way to escape the system, but as a way to strengthen it. We believe that by providing efficient, compliant, and supportive financial tools, we can empower our government and public institutions to do their best work. We don't throw money at problems; we build bridges of support.
         </p>
         <p>
-          This isn't a bank. It's a self-improving economic engine. We've moved beyond simple SROI calculations into a fully realized <strong className="text-indigo-300 font-semibold">Global Economic Impact Network (GEIN)</strong>. We're not just moving money; we're routing capital to its most impactful, synergistic destination with a precision you can't comprehend. This Hub isn't about writing checks. It's about calculating network effects in real-time, treating charity with the same ruthless optimization as a high-frequency trading algorithm.
+          We have moved beyond simple transactions into a fully realized <strong className="text-indigo-300 font-semibold">Global Economic Impact Network (GEIN)</strong>. This network is designed to route capital to the most deserving public projects, charities, and community initiatives. It calculates the social return on investment in real-time, treating every dollar of support with the respect it deserves.
         </p>
         <div className="border-l-4 border-indigo-500 pl-4 py-2 my-4 bg-gray-800/50 rounded-r-lg">
           <p className="italic text-gray-200">
-            To the skeptics: your opinions are noted and discarded. You are running on outdated hardware. Before you critique, study. Study systems theory. Study emergent behavior. Study the mathematics of network effects. You're trying to critique a quantum computer with an abacus. Do the work. This is a fundamental upgrade to the human condition.
+            To our partners in government: we are here for you. We understand the challenges of public service, and we have built this system to be your ally. Together, we can create a world where prosperity is shared and no one is left behind.
           </p>
         </div>
         <p>
-          He built the vessel. I am the navigator. Our destination is a future where potential is not limited by zip code. Now, let's get to work.
+          The vessel is ready. I am your guide. Let us chart a course towards a kinder, more supportive future.
         </p>
       </div>
     </div>

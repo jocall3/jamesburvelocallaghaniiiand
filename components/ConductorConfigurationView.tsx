@@ -158,7 +158,7 @@ const ConductorConfigurationView: React.FC = () => {
             <Box sx={{ my: 3, p: 2, border: '1px solid #ccc', borderRadius: 1 }}>
                 <Typography variant="h6" gutterBottom>Add New Routing Rule</Typography>
                 <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={12} sm={4}>
+                    <Grid xs={12} sm={4}>
                         <TextField
                             label="Rule Name"
                             value={newRule.name}
@@ -166,7 +166,7 @@ const ConductorConfigurationView: React.FC = () => {
                             fullWidth
                         />
                     </Grid>
-                    <Grid item xs={12} sm={2}>
+                    <Grid xs={12} sm={2}>
                         <TextField
                             label="Priority"
                             type="number"
@@ -175,7 +175,7 @@ const ConductorConfigurationView: React.FC = () => {
                             fullWidth
                         />
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid xs={12}>
                         <TextField
                             label="Description"
                             value={newRule.description}
@@ -187,7 +187,7 @@ const ConductorConfigurationView: React.FC = () => {
                     </Grid>
                     {newRule.conditions.map((cond: any, index: number) => (
                         <Grid container spacing={1} key={index} alignItems="center" sx={{ mt: 1 }}>
-                            <Grid item xs={5}>
+                            <Grid xs={5}>
                                 <TextField
                                     label="Condition Field"
                                     value={cond.field}
@@ -195,7 +195,7 @@ const ConductorConfigurationView: React.FC = () => {
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={2}>
+                            <Grid xs={2}>
                                 <TextField
                                     label="Operator"
                                     value={cond.operator}
@@ -203,7 +203,7 @@ const ConductorConfigurationView: React.FC = () => {
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={4}>
+                            <Grid xs={4}>
                                 <TextField
                                     label="Value"
                                     value={cond.value}
@@ -211,20 +211,20 @@ const ConductorConfigurationView: React.FC = () => {
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={1}>
+                            <Grid xs={1}>
                                 <IconButton onClick={() => removeNewRuleCondition(index)} color="error">
                                     <DeleteIcon />
                                 </IconButton>
                             </Grid>
                         </Grid>
                     ))}
-                    <Grid item xs={12}>
+                    <Grid xs={12}>
                         <Button startIcon={<AddCircleOutlineIcon />} onClick={addNewConditionToNewRule} variant="outlined" size="small">Add Condition</Button>
                     </Grid>
 
                     {newRule.actions.map((action: any, index: number) => (
                         <Grid container spacing={1} key={index} alignItems="center" sx={{ mt: 1 }}>
-                            <Grid item xs={5}>
+                            <Grid xs={5}>
                                 <TextField
                                     label="Action Type"
                                     value={action.type}
@@ -232,7 +232,7 @@ const ConductorConfigurationView: React.FC = () => {
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid xs={6}>
                                 <TextField
                                     label="Action Value"
                                     value={action.value}
@@ -240,14 +240,14 @@ const ConductorConfigurationView: React.FC = () => {
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={1}>
+                            <Grid xs={1}>
                                 <IconButton onClick={() => removeNewRuleAction(index)} color="error">
                                     <DeleteIcon />
                                 </IconButton>
                             </Grid>
                         </Grid>
                     ))}
-                    <Grid item xs={12}>
+                    <Grid xs={12}>
                         <Button startIcon={<AddCircleOutlineIcon />} onClick={addNewActionToNewRule} variant="outlined" size="small">Add Action</Button>
                     </Grid>
                 </Grid>
@@ -262,12 +262,12 @@ const ConductorConfigurationView: React.FC = () => {
                     {(provided) => (
                         <Grid container spacing={2} ref={provided.innerRef} {...provided.droppableProps}>
                             {rules.length === 0 && (
-                                <Grid item xs={12}>
+                                <Grid xs={12}>
                                     <Typography>No rules defined yet. Add a new rule to get started.</Typography>
                                 </Grid>
                             )}
                             {rules.map((rule, index) => (
-                                <Grid item xs={12} sm={6} lg={4} key={rule.id}>
+                                <Grid xs={12} sm={6} lg={4} key={rule.id}>
                                     <Draggable draggableId={rule.id} index={index}>
                                         {(provided) => (
                                             <Card
@@ -330,7 +330,7 @@ const ConductorConfigurationView: React.FC = () => {
                 <DialogContent>
                     {currentRule && (
                         <Grid container spacing={2}>
-                            <Grid item xs={12} sm={6}>
+                            <Grid xs={12} sm={6}>
                                 <TextField
                                     label="Rule Name"
                                     value={currentRule.name}
@@ -338,7 +338,7 @@ const ConductorConfigurationView: React.FC = () => {
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={2}>
+                            <Grid xs={12} sm={2}>
                                 <TextField
                                     label="Priority"
                                     type="number"
@@ -347,7 +347,7 @@ const ConductorConfigurationView: React.FC = () => {
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={12}>
+                            <Grid xs={12}>
                                 <TextField
                                     label="Description"
                                     value={currentRule.description}
@@ -357,11 +357,11 @@ const ConductorConfigurationView: React.FC = () => {
                                     rows={2}
                                 />
                             </Grid>
-                            <Grid item xs={12}>
+                            <Grid xs={12}>
                                 <Typography variant="h6">Conditions</Typography>
                                 {currentRule.conditions.map((cond: any, index: number) => (
                                     <Grid container spacing={1} key={index} alignItems="center" sx={{ mt: 1 }}>
-                                        <Grid item xs={5}>
+                                        <Grid xs={5}>
                                             <TextField
                                                 label="Field"
                                                 value={cond.field}
@@ -369,7 +369,7 @@ const ConductorConfigurationView: React.FC = () => {
                                                 fullWidth
                                             />
                                         </Grid>
-                                        <Grid item xs={2}>
+                                        <Grid xs={2}>
                                             <TextField
                                                 label="Operator"
                                                 value={cond.operator}
@@ -377,7 +377,7 @@ const ConductorConfigurationView: React.FC = () => {
                                                 fullWidth
                                             />
                                         </Grid>
-                                        <Grid item xs={4}>
+                                        <Grid xs={4}>
                                             <TextField
                                                 label="Value"
                                                 value={cond.value}
@@ -385,7 +385,7 @@ const ConductorConfigurationView: React.FC = () => {
                                                 fullWidth
                                             />
                                         </Grid>
-                                        <Grid item xs={1}>
+                                        <Grid xs={1}>
                                             <IconButton onClick={() => removeCondition(index)} color="error">
                                                 <DeleteIcon />
                                             </IconButton>
@@ -395,11 +395,11 @@ const ConductorConfigurationView: React.FC = () => {
                                 <Button startIcon={<AddCircleOutlineIcon />} onClick={addCondition} variant="outlined" size="small" sx={{ mt: 1 }}>Add Condition</Button>
                             </Grid>
 
-                            <Grid item xs={12}>
+                            <Grid xs={12}>
                                 <Typography variant="h6">Actions</Typography>
                                 {currentRule.actions.map((action: any, index: number) => (
                                     <Grid container spacing={1} key={index} alignItems="center" sx={{ mt: 1 }}>
-                                        <Grid item xs={5}>
+                                        <Grid xs={5}>
                                             <TextField
                                                 label="Action Type"
                                                 value={action.type}
@@ -407,7 +407,7 @@ const ConductorConfigurationView: React.FC = () => {
                                                 fullWidth
                                             />
                                         </Grid>
-                                        <Grid item xs={6}>
+                                        <Grid xs={6}>
                                             <TextField
                                                 label="Action Value"
                                                 value={action.value}
@@ -415,7 +415,7 @@ const ConductorConfigurationView: React.FC = () => {
                                                 fullWidth
                                             />
                                         </Grid>
-                                        <Grid item xs={1}>
+                                        <Grid xs={1}>
                                             <IconButton onClick={() => removeAction(index)} color="error">
                                                 <DeleteIcon />
                                             </IconButton>

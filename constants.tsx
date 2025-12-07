@@ -1,8 +1,6 @@
 
-
-// FIX: Moved icon imports to the top of the file to ensure they are available when NAV_ITEMS is defined.
 import React from 'react';
-import { Bot, FileText, Shuffle, PiggyBank, Target, Shield, TrendingUp, Gem, Code, Globe, Cuboid, Home, Palette, Percent, Rocket, Briefcase, Calculator, Scroll, Building, Landmark, Link, Users, Megaphone, Network, ShoppingBag, User, FileCog, Settings, Eye, CreditCard, Lock, Leaf, Activity, Cpu, AlertTriangle, Gift, Layers, Zap, Database, Server, Clipboard, Atom, Repeat, DollarSign, Sparkles, Terminal, BarChart2, PieChart, Box as BoxIcon, LifeBuoy, Grid, CheckCircle, Scale, LayoutDashboard, Mic } from 'lucide-react';
+import { Bot, FileText, Shuffle, PiggyBank, Target, Shield, TrendingUp, Gem, Code, Globe, Cuboid, Home, Palette, Percent, Rocket, Briefcase, Calculator, Scroll, Building, Landmark, Link, Users, Megaphone, Network, ShoppingBag, User, FileCog, Settings, Eye, CreditCard, Lock, Leaf, Activity, Cpu, AlertTriangle, Gift, Layers, Zap, Database, Server, Clipboard, Atom, Repeat, DollarSign, Sparkles, Terminal, BarChart2, PieChart, Box as BoxIcon, LifeBuoy, Grid, CheckCircle, Scale, LayoutDashboard, Mic, Book, Library } from 'lucide-react';
 import { View } from './types';
 
 
@@ -16,9 +14,9 @@ export const banks = [
 
 export const NAV_ITEMS = [
     {
-        group: 'Personal Command',
+        group: 'Intelligence Command',
         items: [
-            { view: View.Dashboard, title: 'Executive Dashboard', icon: Bot },
+            { view: View.Dashboard, title: 'Foundation Dashboard', icon: Bot },
             { view: View.Transactions, title: 'FlowMatrix (Transactions)', icon: FileText },
             { view: View.SendMoney, title: 'Quantum Pay', icon: Shuffle },
             { view: View.Budgets, title: 'Capital Allocation', icon: PiggyBank },
@@ -29,7 +27,14 @@ export const NAV_ITEMS = [
         ]
     },
     {
-        group: 'Sovereign Wealth',
+        group: 'The 527 Protocol',
+        items: [
+            { view: View.TheBook, title: 'The Blueprint (527 Pages)', icon: Book },
+            { view: View.KnowledgeBase, title: 'The Academy', icon: Library },
+        ]
+    },
+    {
+        group: 'Infinite Wealth',
         items: [
             { view: View.Investments, title: 'Portfolio Overview', icon: TrendingUp },
             { view: View.Crypto, title: 'Web3 & Crypto', icon: Gem },
@@ -41,9 +46,9 @@ export const NAV_ITEMS = [
             { view: View.DerivativesDesk, title: 'Derivatives', icon: Percent },
             { view: View.VentureCapital, title: 'Venture Capital', icon: Rocket },
             { view: View.PrivateEquity, title: 'Private Equity', icon: Briefcase },
-            { view: View.TaxOptimization, title: 'Tax Optimization', icon: Calculator },
+            { view: View.TaxOptimization, title: 'Civic Contribution', icon: Calculator },
             { view: View.LegacyBuilder, title: 'Legacy Architect', icon: Scroll },
-            { view: View.SovereignWealth, title: 'Sovereign Wealth Sim', icon: Landmark },
+            { view: View.SovereignWealth, title: 'Wealth Simulation', icon: Landmark },
             { view: View.QuantumAssets, title: 'Quantum Assets', icon: Atom },
         ]
     },

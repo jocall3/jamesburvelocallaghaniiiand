@@ -166,7 +166,7 @@ const CashPositionSummary: React.FC<{ positions: CashPosition[], loading: boolea
 
     return (
         <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} md={4}>
+            <Grid xs={12} md={4}>
                 <BalanceCard
                     title="Total Available Cash (USD Equivalent)"
                     amount={totalCash}
@@ -174,7 +174,7 @@ const CashPositionSummary: React.FC<{ positions: CashPosition[], loading: boolea
                     isLoading={loading}
                 />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid xs={12} md={4}>
                 <BalanceCard
                     title="USD Closing Book Balance"
                     amount={usdPosition?.closingBalance || 0}
@@ -182,7 +182,7 @@ const CashPositionSummary: React.FC<{ positions: CashPosition[], loading: boolea
                     isLoading={loading}
                 />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid xs={12} md={4}>
                 <BalanceCard
                     title="USD Available Balance"
                     amount={usdPosition?.availableBalance || 0}
@@ -208,15 +208,15 @@ const StatementsDetail: React.FC<{ statements: Statement[] | null, loading: bool
         <Box>
             <Typography variant="h6" gutterBottom>Statement Details ({statement.currency})</Typography>
             <Grid container spacing={2} mb={3}>
-                <Grid item xs={6} md={3}>
+                <Grid xs={6} md={3}>
                     <Typography variant="body2">Statement Date:</Typography>
                     <Typography fontWeight="bold">{format(parseISO(statement.creationDateTime), 'PPP')}</Typography>
                 </Grid>
-                <Grid item xs={6} md={3}>
+                <Grid xs={6} md={3}>
                     <Typography variant="body2">Opening Balance:</Typography>
                     <Typography fontWeight="bold">{new Intl.NumberFormat('en-US', { style: 'currency', currency: statement.currency }).format(statement.openingBalance)}</Typography>
                 </Grid>
-                <Grid item xs={6} md={3}>
+                <Grid xs={6} md={3}>
                     <Typography variant="body2">Closing Balance:</Typography>
                     <Typography fontWeight="bold">{new Intl.NumberFormat('en-US', { style: 'currency', currency: statement.currency }).format(statement.closingBalance)}</Typography>
                 </Grid>
@@ -226,25 +226,25 @@ const StatementsDetail: React.FC<{ statements: Statement[] | null, loading: bool
             <Paper sx={{ overflowX: 'auto' }}>
                 <Box minWidth={800}>
                     <Grid container sx={{ borderBottom: '1px solid #ccc', py: 1, px: 2, fontWeight: 'bold' }}>
-                        <Grid item xs={1}>ID</Grid>
-                        <Grid item xs={1.5}>Booking Date</Grid>
-                        <Grid item xs={1.5}>Value Date</Grid>
-                        <Grid item xs={1}>Status</Grid>
-                        <Grid item xs={1.5} sx={{ textAlign: 'right' }}>Amount</Grid>
-                        <Grid item xs={2}>Related Party</Grid>
-                        <Grid item xs={3.5}>Description</Grid>
+                        <Grid xs={1}>ID</Grid>
+                        <Grid xs={1.5}>Booking Date</Grid>
+                        <Grid xs={1.5}>Value Date</Grid>
+                        <Grid xs={1}>Status</Grid>
+                        <Grid xs={1.5} sx={{ textAlign: 'right' }}>Amount</Grid>
+                        <Grid xs={2}>Related Party</Grid>
+                        <Grid xs={3.5}>Description</Grid>
                     </Grid>
                     {statement.entries.map((entry) => (
                         <Grid container key={entry.id} sx={{ py: 1, px: 2, borderBottom: '1px dotted #eee' }}>
-                            <Grid item xs={1} sx={{ fontSize: '0.8rem' }}>{entry.id}</Grid>
-                            <Grid item xs={1.5} sx={{ fontSize: '0.8rem' }}>{format(parseISO(entry.bookingDate), 'MMM d, yy')}</Grid>
-                            <Grid item xs={1.5} sx={{ fontSize: '0.8rem' }}>{format(parseISO(entry.valueDate), 'MMM d, yy')}</Grid>
-                            <Grid item xs={1} sx={{ fontSize: '0.8rem', color: entry.status === 'PDNG' ? 'warning.main' : 'success.main' }}>{entry.status}</Grid>
-                            <Grid item xs={1.5} sx={{ textAlign: 'right', fontWeight: 'bold', color: entry.amount < 0 ? 'error.main' : 'success.main', fontSize: '0.9rem' }}>
+                            <Grid xs={1} sx={{ fontSize: '0.8rem' }}>{entry.id}</Grid>
+                            <Grid xs={1.5} sx={{ fontSize: '0.8rem' }}>{format(parseISO(entry.bookingDate), 'MMM d, yy')}</Grid>
+                            <Grid xs={1.5} sx={{ fontSize: '0.8rem' }}>{format(parseISO(entry.valueDate), 'MMM d, yy')}</Grid>
+                            <Grid xs={1} sx={{ fontSize: '0.8rem', color: entry.status === 'PDNG' ? 'warning.main' : 'success.main' }}>{entry.status}</Grid>
+                            <Grid xs={1.5} sx={{ textAlign: 'right', fontWeight: 'bold', color: entry.amount < 0 ? 'error.main' : 'success.main', fontSize: '0.9rem' }}>
                                 {new Intl.NumberFormat('en-US', { style: 'currency', currency: entry.currency, minimumFractionDigits: 2 }).format(entry.amount)}
                             </Grid>
-                            <Grid item xs={2} sx={{ fontSize: '0.8rem' }}>{entry.relatedParty}</Grid>
-                            <Grid item xs={3.5} sx={{ fontSize: '0.8rem' }}>{entry.description}</Grid>
+                            <Grid xs={2} sx={{ fontSize: '0.8rem' }}>{entry.relatedParty}</Grid>
+                            <Grid xs={3.5} sx={{ fontSize: '0.8rem' }}>{entry.description}</Grid>
                         </Grid>
                     ))}
                 </Box>
@@ -371,7 +371,7 @@ const ModernTreasuryView: React.FC = () => {
             <CashPositionSummary positions={positions || []} loading={positionsLoading} />
 
             <Grid container spacing={3}>
-                <Grid item xs={12} md={4}>
+                <Grid xs={12} md={4}>
                     {positionsLoading ? (
                         <Paper elevation={3} sx={{ p: 2, height: 400, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                             <CircularProgress />
@@ -385,7 +385,7 @@ const ModernTreasuryView: React.FC = () => {
                     )}
                 </Grid>
 
-                <Grid item xs={12} md={8}>
+                <Grid xs={12} md={8}>
                     <Paper elevation={3} sx={{ p: 3, minHeight: 400 }}>
                         <Typography variant="h5" gutterBottom>
                             {selectedAccount ? positions?.find(p => p.accountId === selectedAccount)?.accountName : 'Select an Account'}

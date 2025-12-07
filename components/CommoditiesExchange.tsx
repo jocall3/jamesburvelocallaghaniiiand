@@ -1,5 +1,8 @@
 
 
+
+
+
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 // --- Types & Interfaces ---
@@ -145,14 +148,15 @@ export default function CommoditiesExchange() {
   // Live simulation ticker
   useEffect(() => {
     const interval = setInterval(() => {
-      setPrices(prevHistory => {
+      setPrices((prevHistory: { [key: string]: PricePoint[] }) => {
         const newHistory = { ...prevHistory };
         const newCurrent: { [key: string]: number } = {};
         const now = Date.now();
 
         COMMODITIES.forEach(c => {
           const currentHistory = prevHistory[c.id] || [];
-          const lastPrice = currentHistory[currentHistory.length - 1]?.price || c.basePrice;
+          
+          const lastPrice = (currentHistory[currentHistory.length - 1]?.price ?? c.basePrice) as number;
           
           // Random Walk simulation
           const sentiment = Math.random() > 0.5 ? 1 : -1;

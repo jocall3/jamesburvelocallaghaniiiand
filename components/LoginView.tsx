@@ -1,305 +1,203 @@
 
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { 
-    Terminal, Cpu, Globe, Shield, Zap, Activity, 
-    Lock, ChevronRight, Command, GitBranch, 
-    Database, Layers, Key, Code, Search, 
-    Layout, Box, Server, ArrowRight, Brain // Brain imported here
-} from 'lucide-react';
+import { Scan, Shield, Lock, ArrowRight, AlertTriangle, Fingerprint, Eye, Terminal, UserPlus, User, Infinity } from 'lucide-react';
+import { db } from '../lib/SovereignDatabase';
 
-// --- Animated Background Grid ---
-const BackgroundGrid = () => (
-    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute w-[200%] h-[200%] -top-[50%] -left-[50%] animate-spin-slow opacity-5 bg-[radial-gradient(circle_800px_at_50%_50%,#00f3ff,transparent)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20" />
-    </div>
-);
-
-// --- Terminal Component ---
-const TerminalWindow = () => {
-    const [lines, setLines] = useState<string[]>([
-        "> INITIALIZING SOVEREIGN KERNEL...",
-        "> LOADING MODULES: [QUANTUM_LEDGER, NEURAL_NET, HFT_ENGINE]",
-        "> ESTABLISHING SECURE HANDSHAKE WITH CITIBANK GATEWAY...",
-        "> VERIFYING PLAID LINK TOKENS...",
-        "> SYNCING STRIPE WEBHOOKS...",
-        "> MARQETA JIT FUNDING: ACTIVE",
-        "> SYSTEM READY."
-    ]);
+export const LoginView: React.FC = () => {
+    const { loginWithCredentials, loginWithBiometrics, isAuthenticated, isLoading } = useContext(AuthContext)!;
+    const navigate = useNavigate();
+    const [email, setEmail] = useState('visionary@sovereign-ai-nexus.io');
+    const [password, setPassword] = useState('');
+    const [isBiometricScanning, setIsBiometricScanning] = useState(false);
+    const [scanProgress, setScanProgress] = useState(0);
+    const [authMethod, setAuthMethod] = useState<'credentials' | 'biometric' | 'register'>('biometric');
+    
+    // Registration State
+    const [regName, setRegName] = useState('');
+    const [regEmail, setRegEmail] = useState('');
+    const [regPassword, setRegPassword] = useState('');
+    const [regError, setRegError] = useState('');
 
     useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/dashboard');
+        }
+    }, [isAuthenticated, navigate]);
+
+    // Simulate Biometric Scan
+    const handleBiometricAuth = async () => {
+        if (isBiometricScanning) return;
+        setIsBiometricScanning(true);
+        let progress = 0;
         const interval = setInterval(() => {
-            const newLogs = [
-                `> [${new Date().toLocaleTimeString()}] INGESTING MARKET DATA FEED...`,
-                `> [${new Date().toLocaleTimeString()}] OPTIMIZING ROUTING TABLE...`,
-                `> [${new Date().toLocaleTimeString()}] DETECTED ARBITRAGE OPPORTUNITY (ETH/USD)...`,
-                `> [${new Date().toLocaleTimeString()}] REBALANCING PORTFOLIO CLUSTER...`
-            ];
-            const randomLog = newLogs[Math.floor(Math.random() * newLogs.length)];
-            setLines(prev => [...prev.slice(-8), randomLog]);
-        }, 2500);
-        return () => clearInterval(interval);
-    }, []);
+            progress += Math.random() * 15;
+            if (progress > 100) progress = 100;
+            setScanProgress(progress);
+            if (progress === 100) {
+                clearInterval(interval);
+                loginWithBiometrics().finally(() => setIsBiometricScanning(false));
+            }
+        }, 150);
+    };
 
-    return (
-        <div className="bg-[#0d1117] rounded-lg border border-gray-700 shadow-2xl font-mono text-xs p-4 h-64 w-full max-w-md opacity-80 flex flex-col">
-            <div className="flex gap-2 mb-4 border-b border-gray-800 pb-2">
-                <div className="w-3 h-3 rounded-full bg-red-500" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                <div className="w-3 h-3 rounded-full bg-green-500" />
-                <span className="ml-2 text-gray-500">bash — idgafai-core</span>
-            </div>
-            <div className="flex-1 overflow-hidden flex flex-col justify-end space-y-1">
-                {lines.map((line, i) => (
-                    <div key={i} className="text-green-400 truncate">{line}</div>
-                ))}
-                <div className="flex items-center text-green-400">
-                    <span className="mr-2">$</span>
-                    <span className="w-2 h-4 bg-green-400 animate-pulse" />
-                </div>
-            </div>
-        </div>
-    );
-};
+    const handleCredentialAuth = (e: React.FormEvent) => {
+        e.preventDefault();
+        loginWithCredentials(email, password);
+    };
 
-// --- Feature Card ---
-const FeatureCard: React.FC<{ icon: React.ElementType, title: string, desc: string }> = ({ icon: Icon, title, desc }) => (
-    <div className="p-6 rounded-xl bg-gray-900/50 border border-gray-800 hover:border-cyan-500/50 transition-all duration-300 group">
-        <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center mb-4 group-hover:bg-cyan-900/20 transition-colors">
-            <Icon className="w-6 h-6 text-gray-400 group-hover:text-cyan-400" />
-        </div>
-        <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-        <p className="text-sm text-gray-400 leading-relaxed">{desc}</p>
-    </div>
-);
+    const handleRegister = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setRegError('');
+        
+        if (!regName || !regEmail || !regPassword) {
+            setRegError('All fields are required.');
+            return;
+        }
 
-const LoginView: React.FC = () => {
-    const authContext = useContext(AuthContext);
-    const { loginWithCredentials, isLoading } = authContext || {};
-    const [email, setEmail] = useState('visionary@sovereign-ai-nexus.io');
-    const [password, setPassword] = useState('password');
-    const [isFocused, setIsFocused] = useState(false);
-
-    const handleLogin = async (e?: React.FormEvent) => {
-        e?.preventDefault();
-        if (loginWithCredentials) {
-            await loginWithCredentials(email, password);
+        try {
+            // Register via local DB
+            db.registerUser(regName, regEmail, regPassword);
+            
+            // Auto-login after registration
+            const success = await loginWithCredentials(regEmail, regPassword);
+            if (!success) {
+                setRegError('Registration successful, but auto-login failed. Please log in manually.');
+                setAuthMethod('credentials');
+            }
+        } catch (error: any) {
+            setRegError(error.message || 'Registration failed.');
         }
     };
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-cyan-500/30 relative overflow-x-hidden">
-            <BackgroundGrid />
-            
-            {/* Navbar */}
-            <nav className="relative z-50 border-b border-white/10 backdrop-blur-md bg-black/50">
-                <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded flex items-center justify-center font-bold text-black">
-                            S
-                        </div>
-                        <span className="font-bold text-xl tracking-tight">SOVEREIGN<span className="text-cyan-400">OS</span></span>
-                    </div>
-                    <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
-                        <a href="#" className="hover:text-white transition-colors">Platform</a>
-                        <a href="#" className="hover:text-white transition-colors">Developers</a>
-                        <a href="#" className="hover:text-white transition-colors">Compliance</a>
-                        <a href="#" className="hover:text-white transition-colors">Pricing</a>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <span className="text-xs font-mono text-green-500 hidden sm:inline-block">● SYSTEM OPERATIONAL</span>
-                        <button className="text-sm font-bold px-4 py-2 bg-white/5 hover:bg-white/10 rounded-md border border-white/10 transition-all">
-                            Documentation
-                        </button>
-                    </div>
-                </div>
-            </nav>
+        <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans text-gray-100">
+            {/* Ambient Background */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-20%] left-[-20%] w-[80vw] h-[80vw] bg-cyan-900/10 rounded-full blur-[100px] animate-pulse" />
+                <div className="absolute bottom-[-20%] right-[-20%] w-[80vw] h-[80vw] bg-purple-900/10 rounded-full blur-[100px] animate-pulse delay-700" />
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
+                {/* Grid Overlay */}
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.03)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+            </div>
 
-            {/* Main Hero Area */}
-            <div className="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-32 lg:flex lg:items-center lg:gap-20">
-                
-                {/* Left Column: Copy & Value Prop */}
-                <div className="lg:w-1/2 space-y-8">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/30 border border-cyan-800/50 text-cyan-400 text-xs font-mono mb-4">
-                        <GitBranch className="w-3 h-3" /> v4.2.0-RELEASE: QUANTUM_ENTANGLEMENT_ENABLED
-                    </div>
+            {/* Login Card */}
+            <div className="w-full max-w-md z-10 relative perspective-1000">
+                <div className="bg-black/60 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 hover:shadow-cyan-500/20 hover:border-cyan-500/50">
                     
-                    <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter leading-[1.1]">
-                        The Financial <br/>
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600">
-                            Singularity
-                        </span>
-                    </h1>
-                    
-                    <p className="text-lg text-gray-400 max-w-xl leading-relaxed">
-                        The world's first AI-native banking operating system. Integrate banking, treasury, payments, and crypto into a single, programmable interface. Built by James Burvel O'Callaghan III for the post-fiat era.
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                        <button className="px-8 py-4 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2">
-                            Start Building <ArrowRight className="w-4 h-4" />
-                        </button>
-                        <button className="px-8 py-4 bg-transparent border border-gray-700 text-white font-bold rounded-lg hover:bg-white/5 transition-colors flex items-center justify-center gap-2 font-mono">
-                            <Terminal className="w-4 h-4 text-gray-500" /> npm install @sovereign/sdk
-                        </button>
-                    </div>
-
-                    <div className="pt-12 grid grid-cols-3 gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-                        {/* Fake Logos for Trust */}
-                        <div className="flex items-center gap-2"><Globe className="w-6 h-6" /><span className="font-bold">CITI</span></div>
-                        <div className="flex items-center gap-2"><Layers className="w-6 h-6" /><span className="font-bold">PLAID</span></div>
-                        <div className="flex items-center gap-2"><Code className="w-6 h-6" /><span className="font-bold">STRIPE</span></div>
-                    </div>
-                </div>
-
-                {/* Right Column: Login & Interactive Elements */}
-                <div className="lg:w-1/2 mt-16 lg:mt-0 relative">
-                    {/* Decorative background glow */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/20 rounded-full blur-[100px] pointer-events-none" />
-
-                    <div className="relative flex flex-col gap-6">
-                        {/* Terminal floating behind/above */}
-                        <div className="transform lg:translate-x-12 lg:-translate-y-12 shadow-2xl">
-                            <TerminalWindow />
+                    {/* Header */}
+                    <div className="p-8 pb-0 text-center">
+                        <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-indigo-500/30 mb-6">
+                            <Infinity className="w-8 h-8 text-white" />
                         </div>
+                        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 tracking-tight mb-2">
+                            Infinite Intelligence
+                        </h1>
+                        <p className="text-sm text-gray-500 uppercase tracking-widest font-mono">Foundation Access Terminal</p>
+                    </div>
 
-                        {/* Login Card */}
-                        <div className={`bg-[#161b22] border border-gray-700 rounded-xl p-8 shadow-2xl relative z-20 transform transition-all duration-300 ${isFocused ? 'scale-[1.02] border-cyan-500/50 ring-1 ring-cyan-500/20' : ''}`}>
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-xl font-bold text-white">Console Access</h2>
-                                <Lock className="w-4 h-4 text-gray-500" />
-                            </div>
-
-                            <form onSubmit={handleLogin} className="space-y-4">
-                                <div>
-                                    <label className="block text-xs font-mono text-gray-500 uppercase mb-1">Identity Principal</label>
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <UserIcon className="h-4 w-4 text-gray-500" />
-                                        </div>
-                                        <input 
-                                            type="email" 
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            onFocus={() => setIsFocused(true)}
-                                            onBlur={() => setIsFocused(false)}
-                                            className="w-full bg-[#0d1117] border border-gray-700 rounded-md py-2.5 pl-10 pr-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 font-mono"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-mono text-gray-500 uppercase mb-1">Secure Token / Password</label>
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <Key className="h-4 w-4 text-gray-500" />
-                                        </div>
-                                        <input 
-                                            type="password" 
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            onFocus={() => setIsFocused(true)}
-                                            onBlur={() => setIsFocused(false)}
-                                            className="w-full bg-[#0d1117] border border-gray-700 rounded-md py-2.5 pl-10 pr-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 font-mono"
-                                        />
-                                    </div>
-                                </div>
-
-                                <button 
-                                    type="submit" 
-                                    disabled={isLoading}
-                                    className="w-full py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    {/* Auth Methods */}
+                    <div className="p-8 space-y-6">
+                        
+                        {/* Biometric Scanner */}
+                        {authMethod === 'biometric' && (
+                            <div className="flex flex-col items-center justify-center space-y-6 py-4 animate-in fade-in zoom-in duration-300">
+                                <div 
+                                    className="relative w-32 h-32 cursor-pointer group"
+                                    onClick={handleBiometricAuth}
                                 >
-                                    {isLoading ? (
-                                        <Cpu className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                        <>
-                                            <Zap className="w-4 h-4 fill-current" /> Initialize Session
-                                        </>
-                                    )}
+                                    <div className={`absolute inset-0 rounded-full border-2 border-cyan-500/30 ${isBiometricScanning ? 'animate-ping' : ''}`} />
+                                    <div className={`absolute inset-2 rounded-full border border-cyan-400/20 ${isBiometricScanning ? 'animate-spin-slow' : ''}`} />
+                                    <div className="absolute inset-0 flex items-center justify-center rounded-full bg-cyan-950/50 border border-cyan-500/50 group-hover:bg-cyan-900/50 transition-colors">
+                                        {isBiometricScanning ? <Scan className="w-12 h-12 text-cyan-400 animate-pulse" /> : <Fingerprint className="w-12 h-12 text-cyan-600 group-hover:text-cyan-400 transition-colors" />}
+                                    </div>
+                                </div>
+                                {isBiometricScanning ? (
+                                    <div className="w-full space-y-2">
+                                        <div className="flex justify-between text-xs font-mono text-cyan-400"><span>VERIFYING IDENTITY...</span><span>{Math.round(scanProgress)}%</span></div>
+                                        <div className="h-1 bg-gray-800 rounded-full overflow-hidden"><div className="h-full bg-cyan-500 transition-all duration-200" style={{ width: `${scanProgress}%` }} /></div>
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-gray-400 animate-pulse">Touch sensor to verify identity</p>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Credential Form */}
+                        {authMethod === 'credentials' && (
+                            <form onSubmit={handleCredentialAuth} className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-mono text-gray-500 uppercase">Identity Hash / Email</label>
+                                    <div className="relative group">
+                                        <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-gray-800/50 border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-cyan-500 transition-all pl-10" placeholder="identity@foundation.io" disabled={isLoading} />
+                                        <Terminal className="w-4 h-4 text-gray-500 absolute left-3 top-3.5" />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-mono text-gray-500 uppercase">Security Key</label>
+                                    <div className="relative group">
+                                        <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-gray-800/50 border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-cyan-500 transition-all pl-10" placeholder="••••••••••••" disabled={isLoading} />
+                                        <Lock className="w-4 h-4 text-gray-500 absolute left-3 top-3.5" />
+                                    </div>
+                                </div>
+                                <button type="submit" disabled={isLoading} className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 mt-4 disabled:opacity-50">
+                                    {isLoading ? 'Authenticating...' : 'Authenticate'} <ArrowRight className="w-4 h-4" />
                                 </button>
                             </form>
+                        )}
 
-                            <div className="mt-6 pt-6 border-t border-gray-800 flex justify-between items-center text-xs text-gray-500">
-                                <a href="#" className="hover:text-cyan-400">Recover Identity</a>
-                                <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> SSO Enabled</span>
-                            </div>
+                        {/* Registration Form */}
+                        {authMethod === 'register' && (
+                            <form onSubmit={handleRegister} className="space-y-4 animate-in fade-in slide-in-from-left-4 duration-300">
+                                {regError && <div className="p-3 bg-red-900/30 border border-red-500/50 rounded-lg text-xs text-red-300">{regError}</div>}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-mono text-gray-500 uppercase">Full Name</label>
+                                    <div className="relative">
+                                        <input type="text" value={regName} onChange={e => setRegName(e.target.value)} className="w-full bg-gray-800/50 border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-cyan-500 transition-all pl-10" placeholder="John Doe" required />
+                                        <User className="w-4 h-4 text-gray-500 absolute left-3 top-3.5" />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-mono text-gray-500 uppercase">Email Address</label>
+                                    <div className="relative">
+                                        <input type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)} className="w-full bg-gray-800/50 border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-cyan-500 transition-all pl-10" placeholder="you@example.com" required />
+                                        <Terminal className="w-4 h-4 text-gray-500 absolute left-3 top-3.5" />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-mono text-gray-500 uppercase">Create Password</label>
+                                    <div className="relative">
+                                        <input type="password" value={regPassword} onChange={e => setRegPassword(e.target.value)} className="w-full bg-gray-800/50 border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-cyan-500 transition-all pl-10" placeholder="••••••••••••" required />
+                                        <Lock className="w-4 h-4 text-gray-500 absolute left-3 top-3.5" />
+                                    </div>
+                                </div>
+                                <button type="submit" disabled={isLoading} className="w-full bg-cyan-600 text-white font-bold py-3 rounded-lg hover:bg-cyan-500 transition-colors flex items-center justify-center gap-2 mt-4 disabled:opacity-50">
+                                    {isLoading ? 'Processing...' : 'Apply for Membership'} <UserPlus className="w-4 h-4" />
+                                </button>
+                            </form>
+                        )}
+
+                        {/* Footer Controls */}
+                        <div className="pt-6 border-t border-gray-800 flex justify-between text-xs font-mono text-gray-500">
+                            {authMethod !== 'register' ? (
+                                <>
+                                    <button onClick={() => setAuthMethod(authMethod === 'biometric' ? 'credentials' : 'biometric')} className="hover:text-cyan-400 transition-colors flex items-center gap-2">
+                                        {authMethod === 'biometric' ? <><Lock className="w-3 h-3"/> Use Password</> : <><Eye className="w-3 h-3"/> Use Biometrics</>}
+                                    </button>
+                                    <button onClick={() => setAuthMethod('register')} className="hover:text-cyan-400 transition-colors flex items-center gap-2">
+                                        Create Account <ArrowRight className="w-3 h-3"/>
+                                    </button>
+                                </>
+                            ) : (
+                                <button onClick={() => setAuthMethod('credentials')} className="hover:text-cyan-400 transition-colors flex items-center gap-2">
+                                    <ArrowRight className="w-3 h-3 rotate-180"/> Back to Login
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
-
-            {/* Feature Grid Section */}
-            <div className="relative z-10 bg-black/50 border-t border-white/5 py-24">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold mb-4">Engineered for the <span className="text-purple-400">Next Epoch</span></h2>
-                        <p className="text-gray-400 max-w-2xl mx-auto">
-                            Replace fragmented legacy systems with a single, sovereign core. Experience the convergence of TradFi liquidity and DeFi composability.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <FeatureCard 
-                            icon={Database}
-                            title="Universal Ledger"
-                            desc="Real-time reconciliation across Citi, Stripe, and 100+ localized payment rails. Single source of truth for all asset classes."
-                        />
-                        <FeatureCard 
-                            icon={Brain}
-                            title="Generative Finance"
-                            desc="idgafAI (Gemini 2.5 Pro) actively manages risk, optimizes tax vectors, and executes high-frequency arbitrage strategies autonomously."
-                        />
-                        <FeatureCard 
-                            icon={Layout}
-                            title="Composable UI"
-                            desc="Build bespoke financial workflows with our React-based component library. Drag, drop, and deploy capital in milliseconds."
-                        />
-                        <FeatureCard 
-                            icon={Search}
-                            title="Deep Observability"
-                            desc="Full-stack visibility into every transaction lifecycle. Trace funds from origin to settlement with quantum-resistant audit logs."
-                        />
-                        <FeatureCard 
-                            icon={Server}
-                            title="Edge Infrastructure"
-                            desc="Distributed across 40+ zones. Sub-millisecond latency for algorithmic trading and real-time payment settlements."
-                        />
-                        <FeatureCard 
-                            icon={Command}
-                            title="Developer First"
-                            desc="SDKs for TypeScript, Python, and Go. CLI tools for pipeline management. If you can code it, you can bank it."
-                        />
-                    </div>
-                </div>
-            </div>
-
-            {/* Footer */}
-            <footer className="relative z-10 bg-black border-t border-white/10 py-12 px-6 text-sm text-gray-500">
-                <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-white/10 rounded flex items-center justify-center text-white font-bold">S</div>
-                        <span>© 2025 Sovereign Systems Inc.</span>
-                    </div>
-                    <div className="flex gap-8">
-                        <a href="#" className="hover:text-white">Status</a>
-                        <a href="#" className="hover:text-white">Security</a>
-                        <a href="#" className="hover:text-white">Terms</a>
-                        <a href="#" className="hover:text-white">Privacy</a>
-                    </div>
-                    <div className="font-mono text-xs text-cyan-900">
-                        ID: SYSTEM_ROOT_ACCESS_GRANTED
-                    </div>
-                </div>
-            </footer>
         </div>
     );
 };
-
-// Simple Icon wrapper to avoid cluttering imports with 'User' vs 'UserIcon' naming conflicts if any
-const UserIcon = (props: any) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-);
-
-export default LoginView;

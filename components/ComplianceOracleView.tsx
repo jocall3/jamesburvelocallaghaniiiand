@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   AppBar,
@@ -245,21 +244,21 @@ export const ComplianceOracleView = () => {
         <Container maxWidth={false} sx={{ py: 3, flexGrow: 1, overflowY: 'auto' }}>
           <Grid container spacing={3}>
             {/* KPIs */}
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid xs={12} sm={6} md={3}>
               <KpiCard title="Total Messages (24h)" value={totalMessages.toLocaleString()} icon={<AllInboxIcon color="primary"/>} />
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid xs={12} sm={6} md={3}>
               <KpiCard title="High-Risk Alerts (24h)" value={highRiskAlertsToday.toLocaleString()} icon={<GppBadIcon color="error"/>} />
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid xs={12} sm={6} md={3}>
               <KpiCard title="Avg. Resolution Time" value="45 min" icon={<HourglassTopIcon color="info"/>} />
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid xs={12} sm={6} md={3}>
               <KpiCard title="Sanction Hit Rate" value="0.02%" icon={<SyncProblemIcon color="warning"/>} />
             </Grid>
 
             {/* Message Flow Chart */}
-            <Grid item xs={12} lg={8}>
+            <Grid xs={12} lg={8}>
               <Paper sx={{ p: 2, height: '400px' }}>
                  <Typography variant="h6" gutterBottom>Real-Time Message Flow</Typography>
                 <ResponsiveContainer width="100%" height="90%">
@@ -271,129 +270,4 @@ export const ComplianceOracleView = () => {
                     <Legend />
                     <Line type="monotone" dataKey="pacs008" name="pacs.008 (Payments)" stroke="#82ca9d" strokeWidth={2} dot={false} />
                     <Line type="monotone" dataKey="pacs009" name="pacs.009 (FI Credit)" stroke="#8884d8" strokeWidth={2} dot={false} />
-                    <Line type="monotone" dataKey="camt053" name="camt.053 (Statements)" stroke="#ffc658" strokeWidth={2} dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </Paper>
-            </Grid>
-            
-            {/* Compliance Status */}
-            <Grid item xs={12} lg={4}>
-                <Paper sx={{ p: 2, height: '400px' }}>
-                    <Typography variant="h6" gutterBottom>Regulatory Compliance Status</Typography>
-                    <Box sx={{ mt: 2 }}>
-                        {[
-                            { name: 'BSA/AML Reporting', status: 'Compliant' },
-                            { name: 'OFAC Sanctions Screening', status: 'Compliant' },
-                            { name: 'MiFID II Transaction Reporting', status: 'Compliant' },
-                            { name: 'GDPR Data Privacy', status: 'Compliant' },
-                            { name: 'FATF Travel Rule', status: 'Monitoring' },
-                        ].map((reg) => (
-                        <Box key={reg.name} sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                            {reg.status === 'Compliant' ? <CheckCircleIcon color="success" /> : <SpeedIcon color="warning"/> }
-                            <Typography sx={{ ml: 2, flexGrow: 1 }}>{reg.name}</Typography>
-                            <Chip label={reg.status} color={reg.status === 'Compliant' ? 'success' : 'warning'} size="small" />
-                        </Box>
-                        ))}
-                    </Box>
-                </Paper>
-            </Grid>
-
-            {/* Risk Alerts Table */}
-            <Grid item xs={12} lg={7}>
-              <Paper sx={{ height: '500px', display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="h6" sx={{ p: 2, pb: 0 }}>Recent High-Risk Alerts</Typography>
-                <TableContainer sx={{ flexGrow: 1 }}>
-                  <Table stickyHeader size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Transaction ID</TableCell>
-                        <TableCell>Timestamp</TableCell>
-                        <TableCell>Reason</TableCell>
-                        <TableCell>Amount</TableCell>
-                        <TableCell align="center">Risk Score</TableCell>
-                        <TableCell>Status</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {riskAlerts.map((alert) => (
-                        <TableRow hover key={alert.id}>
-                          <TableCell>{alert.id}</TableCell>
-                          <TableCell>{new Date(alert.timestamp).toLocaleString()}</TableCell>
-                          <TableCell>{alert.reason}</TableCell>
-                          <TableCell>{alert.amount}</TableCell>
-                          <TableCell align="center">
-                             <Chip 
-                                label={alert.riskScore.toString()} 
-                                size="small"
-                                sx={{ backgroundColor: getRiskScoreColor(alert.riskScore), color: '#000', fontWeight: 'bold' }} 
-                             />
-                          </TableCell>
-                          <TableCell>
-                            <Chip label={alert.status} color={getRiskChipColor(alert.status)} size="small" />
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Paper>
-            </Grid>
-
-            {/* Geographical Risk Map */}
-            <Grid item xs={12} lg={5}>
-              <Paper sx={{ p: 2, height: '500px' }}>
-                <Typography variant="h6" gutterBottom>Geographical Risk Flow</Typography>
-                 <ComposableMap
-                    projectionConfig={{ scale: 130 }}
-                    style={{ width: "100%", height: "90%" }}
-                  >
-                    <Geographies geography={geoDataUrl}>
-                      {({ geographies }) =>
-                        geographies.map((geo: any) => (
-                          <Geography
-                            key={geo.rsmKey}
-                            geography={geo}
-                            fill="#333"
-                            stroke="#555"
-                            style={{
-                                default: { outline: "none" },
-                                hover: { outline: "none" },
-                                pressed: { outline: "none" },
-                            }}
-                          />
-                        ))
-                      }
-                    </Geographies>
-                    {highRiskTransactions.map(({ fromCoords, toCoords }, i) => (
-                        <MapLine
-                            key={`line-${i}`}
-                            from={fromCoords as [number, number]}
-                            to={toCoords as [number, number]}
-                            stroke="#f44336"
-                            strokeWidth={2}
-                            strokeOpacity={0.6}
-                        />
-                    ))}
-                    {markers.map(({ name, coordinates, markerOffset }) => (
-                        <Marker key={name} coordinates={coordinates as [number, number]}>
-                            <circle r={4} fill="#76ff03" stroke="#fff" strokeWidth={1} />
-                            <text
-                                textAnchor="middle"
-                                y={markerOffset}
-                                style={{ fill: "#e0e0e0", fontSize: "10px" }}
-                            >
-                                {name}
-                            </text>
-                        </Marker>
-                    ))}
-                  </ComposableMap>
-              </Paper>
-            </Grid>
-
-          </Grid>
-        </Container>
-      </Box>
-    </ThemeProvider>
-  );
-};
+                    <Line type="monotone" dataKey="camt053" name="camt.053 (Statements)" stroke="#ff

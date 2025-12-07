@@ -9,11 +9,10 @@ interface SidebarProps {
     setIsOpen: (isOpen: boolean) => void;
 }
 
-const DemoBankLogo: React.FC<{className?: string}> = ({className}) => (
+const InfiniteIntelligenceLogo: React.FC<{className?: string}> = ({className}) => (
      <svg className={className} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="48" stroke="currentColor" strokeWidth="4"/>
-        <path d="M30 70V30H55C65 30 65 40 55 40H30" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M55 70V30" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M20,50 C20,20 80,20 80,50 C80,80 20,80 20,50" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+        <path d="M20,50 C20,80 80,80 80,50 C80,20 20,20 20,50" stroke="currentColor" strokeWidth="6" strokeLinecap="round" opacity="0.5" />
     </svg>
 );
 
@@ -41,8 +40,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 {/* Header */}
                 <div className="flex items-center justify-between h-16 px-4 border-b border-gray-700/50">
                     <div className="flex items-center">
-                        <DemoBankLogo className="h-8 w-8 text-cyan-400" />
-                        <span className="ml-3 text-xl font-semibold text-white">Sovereign AI</span>
+                        <InfiniteIntelligenceLogo className="h-8 w-8 text-cyan-400" />
+                        <span className="ml-3 text-lg font-bold text-white tracking-tight">Infinite Intelligence</span>
                     </div>
                     <button onClick={() => setIsOpen(false)} className="lg:hidden text-gray-400 hover:text-white">
                         {/* Close Icon */}
@@ -53,7 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 </div>
                 
                 {/* Navigation */}
-                <nav className="flex-1 px-2 py-4 space-y-2 overflow-y-auto">
+                <nav className="flex-1 px-2 py-4 space-y-2 overflow-y-auto custom-scrollbar">
                     {NAV_ITEMS.map((item, index) => (
                         <div key={index}>
                             {item.group && <h3 className="px-2 pt-4 pb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">{item.group}</h3>}
@@ -65,12 +64,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                                         onClick={() => handleNavClick(subItem.view)}
                                         className={`flex items-center w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors duration-150 ${
                                             isActive
-                                                ? 'bg-cyan-500/20 text-cyan-300'
-                                                : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
+                                                ? 'bg-cyan-500/20 text-cyan-300 border-l-2 border-cyan-500'
+                                                : 'text-gray-300 hover:bg-gray-700/50 hover:text-white border-l-2 border-transparent'
                                         }`}
                                     >
-                                        {subItem.icon && <subItem.icon />}
-                                        <span className="ml-3">{subItem.title}</span>
+                                        {subItem.icon && <subItem.icon className="w-5 h-5 mr-3"/>}
+                                        <span>{subItem.title}</span>
                                     </button>
                                 );
                             })}

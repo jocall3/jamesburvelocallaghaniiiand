@@ -10,6 +10,13 @@ import {
     DataSharingPolicy, APIKey, TrustedContact, SecurityAwarenessModule, ThreatAlert, AuditLogEntry, SecurityScoreMetric,
     MarqetaCardProduct, TransactionRule
 } from '../types';
+import {
+    MOCK_TRANSACTIONS, MOCK_ASSETS, MOCK_BUDGETS, MOCK_CREDIT_SCORE,
+    MOCK_UPCOMING_BILLS, MOCK_SAVINGS_GOALS, MOCK_MARKET_MOVERS,
+    MOCK_NOTIFICATIONS, MOCK_API_STATUS,
+    MOCK_PAYMENT_ORDERS, MOCK_INVOICES, MOCK_COMPLIANCE_CASES,
+    MOCK_CORPORATE_TRANSACTIONS, MOCK_SUBSCRIPTIONS
+} from '../data/mockData';
 
 interface DataContextType {
     // --- App State ---
@@ -206,8 +213,37 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // --- AI-Powered Mock Data Generation ---
     useEffect(() => {
         const generateInitialData = async () => {
+            // NOTE: Even if API Key is present, we wrap in try/catch and use fallback
+            // data if the AI service fails (e.g. 429 Quota Exceeded).
+            
+            // Fallback function to populate with static data
+            const loadFallbackData = () => {
+                console.warn("Using static fallback data for initialization.");
+                setTransactions(MOCK_TRANSACTIONS);
+                setAssets(MOCK_ASSETS);
+                setBudgets(MOCK_BUDGETS);
+                setCreditScore(MOCK_CREDIT_SCORE);
+                setUpcomingBills(MOCK_UPCOMING_BILLS);
+                setSavingsGoals(MOCK_SAVINGS_GOALS);
+                setMarketMovers(MOCK_MARKET_MOVERS);
+                setNotifications(MOCK_NOTIFICATIONS);
+                setPaymentOrders(MOCK_PAYMENT_ORDERS);
+                setInvoices(MOCK_INVOICES);
+                setComplianceCases(MOCK_COMPLIANCE_CASES);
+                setCorporateTransactions(MOCK_CORPORATE_TRANSACTIONS);
+                setApiStatus(MOCK_API_STATUS);
+                setSubscriptions(MOCK_SUBSCRIPTIONS);
+                
+                // Initialize default Financial Goals if not provided
+                if (financialGoals.length === 0) {
+                     setFinancialGoals([]);
+                }
+            };
+
             if (!geminiApiKey) {
-                setError("Gemini API key is not configured. Cannot generate mock data for the dashboard.");
+                console.log("No Gemini API Key found. Loading fallback data.");
+                loadFallbackData();
+                initializeStaticData(); // Load other static data
                 setIsLoading(false);
                 return;
             }
@@ -288,30 +324,35 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 setCorporateTransactions(data.corporateTransactions || []);
                 setApiStatus(data.apiStatus || []);
                 setSubscriptions(data.subscriptions || []); // Added
-
-                // Initialize mock security data
-                setSecurityMetrics([{ metricName: 'OverallSecurityScore', currentValue: '0.85' }]);
-                setAuditLogs([{ id: 'log-1', timestamp: new Date().toISOString(), userId: 'user-1', action: 'LOGIN', targetResource: 'System', success: true }]);
-                setThreatAlerts([]);
-                setDataSharingPolicies([{ policyId: 'pol-1', policyName: 'Default Privacy', scope: 'Global', isActive: true, lastReviewed: new Date().toISOString() }]);
-                setApiKeys([{ id: 'key-1', keyName: 'Default Key', creationDate: new Date().toISOString(), scopes: ['read'] }]);
-                setTrustedContacts([]);
-                setSecurityAwarenessModules([]);
-                setTransactionRules([]);
-
-                // Initialize mock crypto data
-                setCryptoAssets([{ ticker: 'BTC', name: 'Bitcoin', value: 45000, amount: 1.5, color: '#F7931A' }]);
-                setNftAssets([]);
-                setWalletInfo({ balance: 1.5, address: '0x123...abc' });
-
+                
+                initializeStaticData();
 
             } catch (e) {
-                console.error("Failed to generate initial mock data:", e);
-                setError("Failed to generate initial app data from AI. The simulation cannot proceed. Please check your Gemini API key.");
+                console.error("Failed to generate initial mock data via AI:", e);
+                // Fallback to static data on error (e.g., quota exceeded)
+                loadFallbackData();
+                initializeStaticData();
             } finally {
                 setIsLoading(false);
             }
         };
+        
+        const initializeStaticData = () => {
+             // Initialize mock security data
+             setSecurityMetrics([{ metricName: 'OverallSecurityScore', currentValue: '0.85' }]);
+             setAuditLogs([{ id: 'log-1', timestamp: new Date().toISOString(), userId: 'user-1', action: 'LOGIN', targetResource: 'System', success: true }]);
+             setThreatAlerts([]);
+             setDataSharingPolicies([{ policyId: 'pol-1', policyName: 'Default Privacy', scope: 'Global', isActive: true, lastReviewed: new Date().toISOString() }]);
+             setApiKeys([{ id: 'key-1', keyName: 'Default Key', creationDate: new Date().toISOString(), scopes: ['read'] }]);
+             setTrustedContacts([]);
+             setSecurityAwarenessModules([]);
+             setTransactionRules([]);
+
+             // Initialize mock crypto data
+             setCryptoAssets([{ ticker: 'BTC', name: 'Bitcoin', value: 45000, amount: 1.5, color: '#F7931A' }]);
+             setNftAssets([]);
+             setWalletInfo({ balance: 1.5, address: '0x123...abc' });
+        }
 
         generateInitialData();
     }, [geminiApiKey]);

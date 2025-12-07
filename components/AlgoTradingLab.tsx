@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useMemo } from 'react';
 import { 
   RefreshCw, Play, Save, History, Code, Settings, TrendingUp, DollarSign, X, User, LogOut,
@@ -830,7 +831,7 @@ const AppSidebar = ({ onNavigate, activeView }: any) => {
             </div>
 
             <nav className="flex-grow overflow-y-auto p-3 space-y-1 custom-scrollbar">
-                {Object.entries(groupedNavItems).map(([category, items]) => (
+                {Object.entries(groupedNavItems).map(([category, items]: [string, typeof NAV_ITEMS]) => (
                     <div key={category}>
                         {!isCollapsed && <h3 className="px-3 pt-4 pb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">{category}</h3>}
                         {items.map((item) => {

@@ -2,18 +2,19 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { DataContext } from '../context/DataContext';
 import { View, Notification } from '../types';
+import { Infinity } from 'lucide-react'; // Conceptual icon
 
 /**
  * @description A dynamic widget to show the simulated real-time status of the "Heuristic API".
  */
 const HeuristicAPIStatus: React.FC = () => {
     const messages = [
-        "Heuristic API: Actively analyzing portfolio...",
-        "Heuristic API: Monitoring market data...",
-        "Heuristic API: Identified 2 potential savings...",
-        "Heuristic API: All systems nominal.",
-        "Heuristic API: Cross-referencing spending patterns...",
-        "Heuristic API: Compiling weekly insights..."
+        "Intelligence Core: Actively analyzing portfolio...",
+        "Intelligence Core: Monitoring market data...",
+        "Intelligence Core: Identified 2 potential opportunities...",
+        "Intelligence Core: All systems nominal.",
+        "Intelligence Core: Cross-referencing patterns...",
+        "Intelligence Core: Compiling weekly insights..."
     ];
 
     const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
@@ -72,7 +73,9 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
         </button>
-        <h1 className="text-lg sm:text-xl font-semibold text-white tracking-wider uppercase">James Burvel oCallaghan III                                              Citibank Demo Business Inc</h1>
+        <h1 className="text-lg sm:text-xl font-semibold text-white tracking-wider uppercase flex items-center gap-2">
+            <span className="text-cyan-400 font-bold"><Infinity className="w-5 h-5" /></span> Infinite Intelligence Foundation
+        </h1>
       </div>
       <div className="flex items-center space-x-3">
         <HeuristicAPIStatus />
@@ -105,11 +108,9 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         <div className="relative">
             <button onClick={() => setIsProfileOpen(prev => !prev)} className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center border-2 border-cyan-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+                    <span className="font-bold text-white">II</span>
                 </div>
-                <span className="hidden sm:block font-medium text-white">The Visionary</span>
+                <span className="hidden sm:block font-medium text-white">The Caretaker</span>
             </button>
             {isProfileOpen && (
                  <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50">

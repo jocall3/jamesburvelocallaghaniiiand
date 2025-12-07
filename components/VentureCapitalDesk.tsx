@@ -1,5 +1,9 @@
 
 
+
+
+
+
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -433,10 +437,10 @@ const DeepDiveModal: React.FC<DetailModalProps> = ({ startup, onClose, onInvest 
                                         <div key={key}>
                                             <div className='flex justify-between text-sm text-gray-300 capitalize mb-1'>
                                                 <span>{key} Threat</span>
-                                                <span className={value > 50 ? 'text-red-400' : (value as number) > 25 ? 'text-yellow-400' : 'text-green-400'}>{value}%</span>
+                                                <span className={(value as number) > 50 ? 'text-red-400' : (value as number) > 25 ? 'text-yellow-400' : 'text-green-400'}>{value}%</span>
                                             </div>
                                             <div className="w-full h-2 bg-gray-700 rounded">
-                                                <div className={`h-2 rounded ${value > 50 ? 'bg-red-500' : (value as number) > 25 ? 'bg-yellow-500' : 'bg-green-500'}`} style={{ width: `${value}%` }}></div>
+                                                <div className={`h-2 rounded ${(value as number) > 50 ? 'bg-red-500' : (value as number) > 25 ? 'bg-yellow-500' : 'bg-green-500'}`} style={{ width: `${value}%` }}></div>
                                             </div>
                                         </div>
                                     ))}
