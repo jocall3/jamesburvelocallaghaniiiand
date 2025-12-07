@@ -15,7 +15,6 @@ import {
   NumberIncrementStepper,
   NumberDecrementStepper,
   Switch,
-  useToast,
   Table,
   Thead,
   Tbody,
@@ -27,7 +26,7 @@ import {
   Flex,
 } from '@chakra-ui/react';
 
-// Inline SVG icons for Add and Delete
+// Inline SVG icons
 const AddSVG = (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
     <path d="M8 4a.5.5 0 0 1 .5.5V7.5H11a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V8.5H5a.5.5 0 0 1 0-1h2.5V4.5A.5.5 0 0 1 8 4z"/>
@@ -40,7 +39,6 @@ const DeleteSVG = (
   </svg>
 );
 
-// Define TypeScript types
 type SweepRule = {
   id: number;
   purposeCode: string;
@@ -50,7 +48,6 @@ type SweepRule = {
   isActive: boolean;
 };
 
-// Mock data/code lists
 const MOCK_PURPOSE_CODES = [
   { value: 'ZABA', label: 'Zero Balance Account (ZABA)' },
   { value: 'SWEP', label: 'Sweep (SWEP)' },
@@ -78,9 +75,8 @@ const AutomatedSweepRules: React.FC = () => {
     currency: 'EUR',
   });
   const [isNewRuleActive, setIsNewRuleActive] = useState(true);
-  const toast = useToast();
 
-  const nextId = useMemo(() => rules.reduce((max, rule) => Math.max(max, rule.id), 0) + 1, [rules]);
+  const nextId = useMemo(() => rules.reduce((max, r) => Math.max(max, r.id), 0) + 1, [rules]);
 
   const handleNewRuleChange = useCallback((key: keyof typeof newRule, value: any) => {
     setNewRule(prev => ({ ...prev, [key]: value }));
@@ -88,51 +84,26 @@ const AutomatedSweepRules: React.FC = () => {
 
   const handleAddRule = useCallback(() => {
     if (newRule.threshold <= 0) {
-      toast({
-        title: 'Invalid Threshold',
-        description: 'Threshold must be greater than zero.',
-        status: 'warning',
-        duration: 3000,
-        isClosable: true,
-      });
+      console.warn('Threshold must be greater than zero.');
       return;
     }
 
     const ruleToAdd: SweepRule = { ...newRule, id: nextId, isActive: isNewRuleActive };
     setRules(prev => [...prev, ruleToAdd]);
-
-    toast({
-      title: 'Rule Added',
-      description: `Sweep rule for ${ruleToAdd.purposeCode} added successfully.`,
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    });
+    console.log('Rule added:', ruleToAdd);
 
     setNewRule(prev => ({ ...prev, threshold: 0, balanceTypeCode: MOCK_BALANCE_TYPE_CODES[0].value }));
-  }, [newRule, nextId, isNewRuleActive, toast]);
+  }, [newRule, nextId, isNewRuleActive]);
 
   const handleDeleteRule = useCallback((id: number) => {
     setRules(prev => prev.filter(r => r.id !== id));
-    toast({
-      title: 'Rule Deleted',
-      description: `Sweep rule ID ${id} has been removed.`,
-      status: 'info',
-      duration: 3000,
-      isClosable: true,
-    });
-  }, [toast]);
+    console.log(`Rule ID ${id} deleted`);
+  }, []);
 
   const handleToggleActive = useCallback((id: number) => {
     setRules(prev => prev.map(r => r.id === id ? { ...r, isActive: !r.isActive } : r));
-    toast({
-      title: 'Rule Updated',
-      description: `Rule ID ${id} active status toggled.`,
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    });
-  }, [toast]);
+    console.log(`Rule ID ${id} toggled`);
+  }, []);
 
   const renderRuleRow = (rule: SweepRule) => (
     <Tr key={rule.id} opacity={rule.isActive ? 1 : 0.5}>
@@ -160,87 +131,79 @@ const AutomatedSweepRules: React.FC = () => {
     </Tr>
   );
 
-  const renderNewRuleForm = () => (
-    <VStack spacing={4} p={4} borderWidth="1px" borderRadius="md" bg="gray.50">
-      <Text fontSize="lg" fontWeight="bold">Add New Sweep Rule</Text>
-      <HStack w="100%" spacing={4}>
-        <FormControl isRequired>
-          <FormLabel>Purpose</FormLabel>
-          <Select
-            value={newRule.purposeCode}
-            onChange={e => handleNewRuleChange('purposeCode', e.target.value)}
-          >
-            {MOCK_PURPOSE_CODES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-          </Select>
-        </FormControl>
-
-        <FormControl isRequired>
-          <FormLabel>Balance Type</FormLabel>
-          <Select
-            value={newRule.balanceTypeCode}
-            onChange={e => handleNewRuleChange('balanceTypeCode', e.target.value)}
-          >
-            {MOCK_BALANCE_TYPE_CODES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-          </Select>
-        </FormControl>
-      </HStack>
-
-      <HStack w="100%" spacing={4}>
-        <FormControl isRequired>
-          <FormLabel>Threshold Amount</FormLabel>
-          <NumberInput
-            value={newRule.threshold}
-            onChange={value => handleNewRuleChange('threshold', parseFloat(value) || 0)}
-            min={0}
-            precision={2}
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        </FormControl>
-
-        <FormControl isRequired>
-          <FormLabel>Currency</FormLabel>
-          <Input
-            value={newRule.currency}
-            onChange={e => handleNewRuleChange('currency', e.target.value.toUpperCase())}
-            maxLength={3}
-          />
-        </FormControl>
-      </HStack>
-
-      <HStack w="100%" justifyContent="space-between" pt={2}>
-        <FormControl display="flex" alignItems="center" w="auto">
-          <FormLabel htmlFor="new-active-switch" mb="0">Active?</FormLabel>
-          <Switch
-            id="new-active-switch"
-            isChecked={isNewRuleActive}
-            onChange={() => setIsNewRuleActive(prev => !prev)}
-            colorScheme="green"
-          />
-        </FormControl>
-
-        <Button
-          leftIcon={AddSVG}
-          colorScheme="blue"
-          onClick={handleAddRule}
-        >
-          Add Rule
-        </Button>
-      </HStack>
-    </VStack>
-  );
-
   return (
     <Box p={8} maxW="5xl" mx="auto">
       <Text fontSize="2xl" fontWeight="bold" mb={6}>Automated Sweep Rules Configuration</Text>
 
-      {/* New Rule Entry */}
-      {renderNewRuleForm()}
+      {/* New Rule Form */}
+      <VStack spacing={4} p={4} borderWidth="1px" borderRadius="md" bg="gray.50">
+        <Text fontSize="lg" fontWeight="bold">Add New Sweep Rule</Text>
 
+        <HStack w="100%" spacing={4}>
+          <FormControl isRequired>
+            <FormLabel>Purpose</FormLabel>
+            <Select
+              value={newRule.purposeCode}
+              onChange={e => handleNewRuleChange('purposeCode', e.target.value)}
+            >
+              {MOCK_PURPOSE_CODES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+            </Select>
+          </FormControl>
+
+          <FormControl isRequired>
+            <FormLabel>Balance Type</FormLabel>
+            <Select
+              value={newRule.balanceTypeCode}
+              onChange={e => handleNewRuleChange('balanceTypeCode', e.target.value)}
+            >
+              {MOCK_BALANCE_TYPE_CODES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+            </Select>
+          </FormControl>
+        </HStack>
+
+        <HStack w="100%" spacing={4}>
+          <FormControl isRequired>
+            <FormLabel>Threshold Amount</FormLabel>
+            <NumberInput
+              value={newRule.threshold}
+              onChange={value => handleNewRuleChange('threshold', parseFloat(value) || 0)}
+              min={0}
+              precision={2}
+            >
+              <NumberInputField />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </FormControl>
+
+          <FormControl isRequired>
+            <FormLabel>Currency</FormLabel>
+            <Input
+              value={newRule.currency}
+              onChange={e => handleNewRuleChange('currency', e.target.value.toUpperCase())}
+              maxLength={3}
+            />
+          </FormControl>
+        </HStack>
+
+        <HStack w="100%" justifyContent="space-between" pt={2}>
+          <FormControl display="flex" alignItems="center" w="auto">
+            <FormLabel htmlFor="new-active-switch" mb="0">Active?</FormLabel>
+            <Switch
+              id="new-active-switch"
+              isChecked={isNewRuleActive}
+              onChange={() => setIsNewRuleActive(prev => !prev)}
+              colorScheme="green"
+            />
+          </FormControl>
+
+          <Button leftIcon={AddSVG} colorScheme="blue" onClick={handleAddRule}>Add Rule</Button>
+        </HStack>
+      </VStack>
+
+      {/* Rules Table */}
       <VStack spacing={4} mt={8} align="stretch">
         <Text fontSize="xl" fontWeight="semibold">Configured Sweep Rules</Text>
         <Box overflowX="auto">
@@ -259,9 +222,7 @@ const AutomatedSweepRules: React.FC = () => {
             <Tbody>
               {rules.length > 0 ? rules.map(renderRuleRow) : (
                 <Tr>
-                  <Td colSpan={7} textAlign="center" color="gray.500">
-                    No sweep rules configured yet.
-                  </Td>
+                  <Td colSpan={7} textAlign="center" color="gray.500">No sweep rules configured yet.</Td>
                 </Tr>
               )}
             </Tbody>
