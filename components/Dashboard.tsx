@@ -1,4 +1,3 @@
-
 import React, { useContext, useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import BalanceSummary from './BalanceSummary';
 import RecentTransactions from './RecentTransactions';
@@ -11,7 +10,7 @@ import { GamificationState, Subscription, CreditScore, SavingsGoal, MarketMover,
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, Legend, AreaChart, Area } from 'recharts';
 import PlaidLinkButton from './PlaidLinkButton';
 import { GoogleGenAI, Type } from '@google/genai';
-import { Bot, Camera, Eye, MessageSquare, X, Send, RefreshCw, Maximize2, ScanEye } from 'lucide-react';
+import { Bot, Camera, Eye, MessageSquare, X, Send, RefreshCw, Maximize2, Minimize2, ScanEye } from 'lucide-react';
 
 // ================================================================================================
 // AI VISION & CHAT COMPONENTS
@@ -916,6 +915,9 @@ const Dashboard: React.FC<DashboardProps> = () => {
     const context = useContext(DataContext);
     const [modal, setModal] = useState<{ type: string; data: any } | null>(null);
     const [isChatOpen, setIsChatOpen] = useState(false);
+    
+    // State to toggle full-screen mode for the iframe
+    const [isIframeExpanded, setIsIframeExpanded] = useState(false);
 
     if (!context) {
         throw new Error("Dashboard must be wrapped in a DataProvider.");
@@ -980,8 +982,26 @@ const Dashboard: React.FC<DashboardProps> = () => {
                 )}
 
                 {/* Iframe Container for External Banking App */}
-                <Card className="border-cyan-500/30 p-0 overflow-hidden h-[600px] relative bg-black">
+                {/* Dynamically expanding container based on state */}
+                <div 
+                    className={`transition-all duration-300 ease-in-out border border-cyan-500/30 bg-black overflow-hidden relative
+                        ${isIframeExpanded 
+                            ? 'fixed inset-0 z-[2000] w-screen h-screen rounded-none' // Expanded Styles
+                            : 'w-full h-[600px] rounded-xl' // Default Styles
+                        }`}
+                >
+                     {/* Button Group (Top Right) */}
                      <div className="absolute top-4 right-4 z-10 flex gap-2">
+                        {/* Expand/Minimize Button */}
+                        <button 
+                            onClick={() => setIsIframeExpanded(!isIframeExpanded)}
+                            className="bg-gray-800/80 hover:bg-gray-700 text-white p-2 rounded-full shadow-lg border border-gray-600 transition-all hover:scale-110 backdrop-blur-sm"
+                            title={isIframeExpanded ? "Minimize View" : "Expand View"}
+                        >
+                            {isIframeExpanded ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
+                        </button>
+
+                        {/* Chat Button */}
                         <button 
                             onClick={() => setIsChatOpen(!isChatOpen)}
                             className="bg-cyan-600 hover:bg-cyan-500 text-white p-2 rounded-full shadow-lg shadow-cyan-500/50 transition-all hover:scale-110"
@@ -990,14 +1010,17 @@ const Dashboard: React.FC<DashboardProps> = () => {
                             {isChatOpen ? <X size={20} /> : <Bot size={20} />}
                         </button>
                      </div>
+                    
                     <iframe
                         src="https://admin08077-inventions.static.hf.space"
                         className="w-full h-full border-0"
                         title="External Banking App"
                         sandbox="allow-same-origin allow-scripts allow-forms allow-popups" // Adjust sandbox permissions carefully
                     />
+                    
+                    {/* Chat rendered inside container so it stays visible when expanded */}
                     {isChatOpen && <AIVisionChat onClose={() => setIsChatOpen(false)} onSyncData={handleSyncData} />}
-                </Card>
+                </div>
 
 
                 {hasLinkedAccounts && (
