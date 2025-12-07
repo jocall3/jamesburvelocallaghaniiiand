@@ -1,7 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Select, Button, Space, Row, Col, Typography } from 'antd';
-import { useForm } from 'antd/es/form/util';
 import {
     ExternalClearingSystemIdentification1Code,
     ExternalAccountIdentification1Code,
@@ -14,10 +12,12 @@ const SsiEditorForm: React.FC<{
     onSubmit: (values: any) => void;
     onCancel: () => void;
 }> = ({ initialValues, onSubmit, onCancel }) => {
-    const [form] = useForm();
+    const [form] = Form.useForm(); // ✅ Correct
+
     const [clearingSystemOptions, setClearingSystemOptions] = useState<
         { value: ExternalClearingSystemIdentification1Code; label: string }[]
     >([]);
+
     const [accountIdentificationOptions, setAccountIdentificationOptions] = useState<
         { value: ExternalAccountIdentification1Code; label: string }[]
     >([]);
@@ -47,12 +47,7 @@ const SsiEditorForm: React.FC<{
     };
 
     return (
-        <Form
-            form={form}
-            layout="vertical"
-            onFinish={onFinish}
-            initialValues={initialValues}
-        >
+        <Form form={form} layout="vertical" onFinish={onFinish} initialValues={initialValues}>
             <Title level={4}>SSI Details</Title>
             <Row gutter={16}>
                 <Col span={12}>
@@ -94,10 +89,14 @@ const SsiEditorForm: React.FC<{
                     </Form.Item>
                 </Col>
             </Row>
-             <Form.Item>
+            <Form.Item>
                 <Space>
-                    <Button type="primary" htmlType="submit">Submit</Button>
-                    <Button htmlType="button" onClick={onCancel}>Cancel</Button>
+                    <Button type="primary" htmlType="submit">
+                        Submit
+                    </Button>
+                    <Button htmlType="button" onClick={onCancel}>
+                        Cancel
+                    </Button>
                 </Space>
             </Form.Item>
         </Form>
