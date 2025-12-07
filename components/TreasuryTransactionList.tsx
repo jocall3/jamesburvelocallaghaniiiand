@@ -34,76 +34,67 @@ const TransactionDetails = ({
   return (
     <div className="border-t border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <DetailItem label="Transaction ID">
-          <NexusLink id={transaction.id} />
-        </DetailItem>
-        <DetailItem label="Financial Account">
-          <NexusLink id={transaction.financial_account} />
-        </DetailItem>
+        <DetailItem title="Transaction ID" value={<NexusLink to={`/treasury/transactions/${transaction.id}`}>{transaction.id}</NexusLink>} />
+        <DetailItem title="Financial Account" value={<NexusLink to={`/treasury/financial_accounts/${transaction.financial_account}`}>{transaction.financial_account}</NexusLink>} />
         {transaction.flow && (
-          <DetailItem label="Flow">
+          <DetailItem title="Flow" value={
             <div className="flex items-center gap-2">
-              <NexusLink id={transaction.flow} />
+              <NexusLink to={`/treasury/flows/${transaction.flow}`}>{transaction.flow}</NexusLink>
               <Badge variant="outline">{transaction.flow_type}</Badge>
             </div>
-          </DetailItem>
+          } />
         )}
-        <DetailItem label="Status">
+        <DetailItem title="Status" value={
           <Badge variant={getStatusVariant(transaction.status)}>
             {transaction.status}
           </Badge>
-        </DetailItem>
-        <DetailItem label="Created">
-          <Timestamp timestamp={transaction.created} />
-        </DetailItem>
+        } />
+        <DetailItem title="Created" value={<Timestamp ts={transaction.created} />} />
         {transaction.status_transitions.posted_at && (
-          <DetailItem label="Posted at">
-            <Timestamp timestamp={transaction.status_transitions.posted_at} />
-          </DetailItem>
+          <DetailItem title="Posted at" value={<Timestamp ts={transaction.status_transitions.posted_at} />} />
         )}
         {transaction.status_transitions.void_at && (
-          <DetailItem label="Void at">
-            <Timestamp timestamp={transaction.status_transitions.void_at} />
-          </DetailItem>
+          <DetailItem title="Void at" value={<Timestamp ts={transaction.status_transitions.void_at} />} />
         )}
         <div className="col-span-1 sm:col-span-2">
-          <DetailItem label="Balance Impact">
-            <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div className="rounded-md border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                  Cash
-                </span>
-                <div className="mt-1">
-                  <Amount
-                    amount={transaction.balance_impact.cash}
-                    currency={transaction.currency}
-                  />
+          <div className="py-1">
+             <span className="text-gray-400 text-sm block mb-2">Balance Impact</span>
+             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div className="rounded-md border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
+                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    Cash
+                  </span>
+                  <div className="mt-1">
+                    <Amount
+                      amount={transaction.balance_impact.cash}
+                      currency={transaction.currency}
+                    />
+                  </div>
+                </div>
+                <div className="rounded-md border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
+                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    Inbound Pending
+                  </span>
+                  <div className="mt-1">
+                    <Amount
+                      amount={transaction.balance_impact.inbound_pending}
+                      currency={transaction.currency}
+                    />
+                  </div>
+                </div>
+                <div className="rounded-md border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
+                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    Outbound Pending
+                  </span>
+                  <div className="mt-1">
+                    <Amount
+                      amount={transaction.balance_impact.outbound_pending}
+                      currency={transaction.currency}
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="rounded-md border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                  Inbound Pending
-                </span>
-                <div className="mt-1">
-                  <Amount
-                    amount={transaction.balance_impact.inbound_pending}
-                    currency={transaction.currency}
-                  />
-                </div>
-              </div>
-              <div className="rounded-md border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                  Outbound Pending
-                </span>
-                <div className="mt-1">
-                  <Amount
-                    amount={transaction.balance_impact.outbound_pending}
-                    currency={transaction.currency}
-                  />
-                </div>
-              </div>
-            </div>
-          </DetailItem>
+          </div>
         </div>
       </div>
     </div>
@@ -142,7 +133,7 @@ const ExpandableListItem = ({
               </Badge>
               <span>{transaction.flow_type}</span>
               <span>&middot;</span>
-              <Timestamp timestamp={transaction.created} format="relative" />
+              <Timestamp ts={transaction.created} />
             </div>
           </div>
         </div>
