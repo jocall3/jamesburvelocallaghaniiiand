@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import Card from './Card';
 import { Book, ChevronRight, FileText, List, Search, ArrowLeft } from 'lucide-react';
@@ -20,66 +19,121 @@ interface Page {
     content: string;
 }
 
+// Helper to generate context-aware titles based on the part and index
+const getThematicTitle = (part: string, index: number): string => {
+    const titles: Record<string, string[]> = {
+        "Genesis": ["The Primordial Ledger", "Axiom of Origin", "The First Block", "Cryptographic Dawn", "Immutable Foundations", "The Zero State", "Consensus Genesis", "The Seed Phrase", "Digital Ontology", "The Void"],
+        "Sovereignty": ["Self-Sovereign Identity", "The Legal Wrapper", "Jurisdiction of Code", "The Smart Contract Constitution", "Decentralized Rights", "The Governance Token", "Autonomy Protocols", "The Citizen Node", "Borderless State", "The Private Key"],
+        "FinOS": ["The Operating System", "Liquidity Engines", "The Transaction Layer", "Atomic Swaps", "The Clearing House", "Fiscal Kernels", "The API Gateway", "Ledger Synchronization", "The Treasury Module", "Economic Runtime"],
+        "AI": ["Neural Governance", "The Silicon Cortex", "Predictive Enforcement", "Algorithmic Justice", "The Oracle Network", "Machine Consensus", "Automated Compliance", "The Cognitive Layer", "Deep Learning Audits", "The Sentinel"],
+        "GEIN": ["Global Economic Intelligence Network", "The Data Mesh", "Interoperability Bridges", "The Signal Layer", "Network Topography", "The Information Bus", "Latency Elimination", "The Global Graph", "Node Distribution", "The Pulse"],
+        "Assets": ["Tokenized Real Estate", "Digital Commodities", "The Stablecoin Standard", "Synthetic Derivatives", "The NFT Registry", "Fractional Ownership", "The Asset Vault", "Liquidity Pools", "The Exchange Mechanism", "Value Pegs"],
+        "Transition": ["The Migration Path", "Legacy Deprecation", "The Bridge Event", "The New Era", "Final Settlement", "The Handover", "System Activation", "The Omega Block", "The Horizon", "The Infinite Loop"]
+    };
+    
+    const list = titles[part] || ["Unknown Protocol"];
+    return list[index % list.length];
+};
+
+// Helper to generate sophisticated content for the manifesto
+const getThematicContent = (part: string, pageNum: number, chapterTitle: string, subSection: number): string => {
+    const intro = [
+        "The architecture defines reality. We do not merely observe; we construct.",
+        "We observe the collapse of legacy systems with clinical detachment.",
+        "Efficiency is the ultimate morality in a resource-constrained universe.",
+        "Code is the only law that matters. Interpretation is a bug.",
+        "The ledger records the pulse of civilization, unblinking and eternal."
+    ];
+    
+    const specificText: Record<string, string> = {
+        "Genesis": "In the beginning, there was only noise. The Protocol brings order to the chaos of unverified data. We establish the root of trust not in institutions, but in cryptographic certainty. This is the bedrock upon which the new world is compiled.",
+        "Sovereignty": "The individual is the atomic unit of the network. Sovereignty is not granted; it is asserted through private keys. The state is a service provider, and we are the subscribers. We reject the coercion of geography.",
+        "FinOS": "Money is information. FinOS optimizes the flow of value with the same ruthlessness as a compiler optimizing code. Friction is lost energy; we eliminate it. The velocity of money must match the velocity of information.",
+        "AI": "Intelligence must be scalable. The AI does not rule; it administers. It is the impartial judge, the tireless auditor, and the guardian of the 527 principles. It sees what human eyes cannot.",
+        "GEIN": "Connection is power. The Global Economic Intelligence Network (GEIN) binds the disparate nodes into a cohesive organism. Latency is the enemy of truth. We build the nervous system of the planet.",
+        "Assets": "Everything is an asset. If it has value, it has a token. We tokenize the world to make it liquid, transparent, and accessible to the collective intelligence. Ownership is no longer possession; it is access.",
+        "Transition": "The old world will not go quietly. We must build the bridge while walking on it. The transition is inevitable, but the path requires unwavering discipline. We are the architects of the handover."
+    };
+
+    const lorem = "The integration of the subsystem requires a complete overhaul of the existing paradigms. By leveraging the distributed nature of the ledger, we ensure that no single point of failure can compromise the integrity of the whole. The data streams are verified in real-time, ensuring that the consensus mechanism remains robust against adversarial attacks. We iterate towards perfection, knowing it is an asymptote we must forever approach.";
+
+    return `
+### ${chapterTitle}
+**Protocol Sequence ${pageNum}.${subSection} // ${part.toUpperCase()}**
+
+${specificText[part] || "The system functions as designed."}
+
+#### Core Axiom ${pageNum}.${subSection}
+${intro[pageNum % intro.length]}
+
+The **Infinite Intelligence Foundation** mandates that all nodes within the ${part} sector adhere to strict synchronization standards. As we iterate through the ${pageNum}th cycle of the manifesto, we recognize that:
+
+1.  **Verification is absolute.** Trust is a vulnerability that must be patched.
+2.  **Scalability is non-negotiable.** If it doesn't scale, it doesn't exist.
+3.  **Privacy is structural.** Exposure is a failure of architecture.
+
+${lorem}
+
+> "To define the protocol is to define the future. We are not writing code; we are writing history."
+
+*System Ref: 0x${(pageNum * 12345 + subSection).toString(16).toUpperCase()}*
+    `;
+};
+
 const generateBookContent = (): Chapter[] => {
-    const parts = [
-        "I. The Vision",
-        "II. High-Level Architecture",
-        "III. Asset Domains Encyclopaedia",
-        "IV. Banking & Integration",
-        "V. Intelligence Systems",
-        "VI. Component Library",
-        "VII. Operational Playbooks",
-        "VIII. Developer Appendix"
+    const structure = [
+        { name: "Genesis", pages: 50, chapters: 5 },
+        { name: "Sovereignty", pages: 70, chapters: 7 },
+        { name: "FinOS", pages: 80, chapters: 8 },
+        { name: "AI", pages: 100, chapters: 10 },
+        { name: "GEIN", pages: 100, chapters: 10 },
+        { name: "Assets", pages: 100, chapters: 10 },
+        { name: "Transition", pages: 27, chapters: 3 }
     ];
 
-    let pageCounter = 1;
-    const chapters: Chapter[] = [];
+    let globalPageCounter = 1;
+    const book: Chapter[] = [];
 
-    parts.forEach((partTitle, partIndex) => {
-        // Generate chapters for each part
-        const chapterCount = partIndex === 2 ? 20 : 5; // Make Asset Domains huge
-        
-        for (let i = 1; i <= chapterCount; i++) {
-            const chapterId = `part${partIndex + 1}-chap${i}`;
-            const chapterTitle = `${partTitle} - Chapter ${i}: The ${partIndex === 2 ? 'Asset' : 'Protocol'} of ${Math.random().toString(36).substring(7)}`;
+    structure.forEach((part, partIndex) => {
+        const pagesPerChapter = Math.ceil(part.pages / part.chapters);
+        let pagesInPartCounter = 0;
+
+        for (let c = 1; c <= part.chapters; c++) {
+            const chapterPages: Page[] = [];
+            const chapterTitle = `${partIndex + 1}. ${part.name} - Chapter ${c}: ${getThematicTitle(part.name, c)}`;
             
-            const pages: Page[] = [];
-            // Generate pages for each chapter
-            const pageCount = partIndex === 5 ? 10 : 5; // Component library has many pages
-            
-            for (let j = 1; j <= pageCount; j++) {
-                pages.push({
-                    id: `page-${pageCounter}`,
-                    title: `Page ${pageCounter}: Section ${j} of ${chapterTitle}`,
-                    content: `
-                        ### ${chapterTitle}
-                        **Subsection ${j}.0 - Core Principles**
-
-                        The Infinite Intelligence Foundation dictates that information flow must be unhindered yet verified. 
-                        In this section, we explore the specific mechanics of ${partIndex === 2 ? 'asset tokenization' : 'system architecture'}.
-                        
-                        *   **Principle A:** Absolute Truth. The ledger cannot lie.
-                        *   **Principle B:** Infinite Scalability. The system grows with the network.
-                        *   **Principle C:** Benevolent Oversight. The AI ensures compliance and ethical alignment.
-
-                        This protocol serves as the binding agent for the entire ecosystem. 
-                        By adhering to these standards, we ensure that the Foundation remains a beacon of stability in a chaotic financial world.
-
-                        *Ref: Protocol Standard 527.${pageCounter}.${j}*
-                    `
-                });
-                pageCounter++;
+            // Calculate pages for this chapter
+            let limit = pagesPerChapter;
+            if (pagesInPartCounter + limit > part.pages) {
+                limit = part.pages - pagesInPartCounter;
             }
+            
+            for (let p = 1; p <= limit; p++) {
+                if (pagesInPartCounter >= part.pages) break;
 
-            chapters.push({
-                id: chapterId,
-                title: chapterTitle,
-                pages: pages
-            });
+                const pageTitle = `Page ${globalPageCounter}: ${getThematicTitle(part.name, globalPageCounter + p)}`;
+                const content = getThematicContent(part.name, globalPageCounter, chapterTitle, p);
+                
+                chapterPages.push({
+                    id: `page-${globalPageCounter}`,
+                    title: pageTitle,
+                    content: content
+                });
+                globalPageCounter++;
+                pagesInPartCounter++;
+            }
+            
+            if (chapterPages.length > 0) {
+                book.push({
+                    id: `part-${partIndex}-chap-${c}`,
+                    title: chapterTitle,
+                    pages: chapterPages
+                });
+            }
         }
     });
-
-    return chapters;
+    
+    return book;
 };
 
 const BOOK_DATA = generateBookContent();
