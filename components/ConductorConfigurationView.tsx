@@ -4,7 +4,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { DragDropContext, Droppable, Draggable } from '/@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 const ConductorConfigurationView: React.FC = () => {
     const [rules, setRules] = useState<any[]>([]);
