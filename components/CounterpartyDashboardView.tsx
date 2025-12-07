@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -6,30 +5,26 @@ import {
   Button,
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  Input,
+  CardActions,
+  Typography,
+  TextField,
   Table,
   TableBody,
   TableCell,
   TableHead,
-  TableHeader,
   TableRow,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from './ui';
+  TableContainer,
+  Paper,
+  Menu,
+  MenuItem,
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Box
+} from '@mui/material';
 import { MoreHorizontal, PlusCircle } from 'lucide-react';
 
 // NOTE: In a real application, the API layer and type definitions would be in separate files.
@@ -89,6 +84,30 @@ const deleteCounterparty = async (id: string): Promise<void> => {
     return;
 }
 
+const RowActions = ({ counterparty, navigate, onDelete }: { counterparty: Counterparty, navigate: any, onDelete: (c: Counterparty) => void }) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <>
+      <IconButton onClick={handleClick} size="small">
+        <MoreHorizontal className="h-4 w-4" />
+      </IconButton>
+      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+        <MenuItem onClick={() => { handleClose(); navigate(`/counterparties/${counterparty.id}`); }}>View Details</MenuItem>
+        <MenuItem onClick={() => { handleClose(); navigate(`/counterparties/${counterparty.id}/edit`); }}>Edit</MenuItem>
+        <MenuItem onClick={handleClose}>Collect Account</MenuItem>
+        <MenuItem onClick={() => { handleClose(); onDelete(counterparty); }} sx={{ color: 'error.main' }}>Delete</MenuItem>
+      </Menu>
+    </>
+  );
+};
 
 export function CounterpartyDashboardView() {
   const navigate = useNavigate();
@@ -163,154 +182,133 @@ export function CounterpartyDashboardView() {
     <div className="p-4 md:p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Counterparties</h1>
-          <p className="text-muted-foreground">Search, view, and manage all counterparties.</p>
+          <Typography variant="h4" fontWeight="bold" gutterBottom>Counterparties</Typography>
+          <Typography color="textSecondary">Search, view, and manage all counterparties.</Typography>
         </div>
-        <Button onClick={() => navigate('/counterparties/new')}>
-          <PlusCircle className="mr-2 h-4 w-4" />
+        <Button 
+            variant="contained" 
+            onClick={() => navigate('/counterparties/new')}
+            startIcon={<PlusCircle className="h-4 w-4" />}
+        >
           New Counterparty
         </Button>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>All Counterparties</CardTitle>
-          <CardDescription>
+        <Box p={3}>
+          <Typography variant="h6">All Counterparties</Typography>
+          <Typography variant="body2" color="textSecondary" gutterBottom>
             Filter and manage your list of counterparties.
-          </CardDescription>
+          </Typography>
           <div className="flex items-center space-x-4 pt-4">
-            <Input
+            <TextField
               placeholder="Filter by name..."
               value={nameFilter}
               onChange={(e) => setNameFilter(e.target.value)}
+              size="small"
               className="max-w-sm"
             />
-            <Input
+            <TextField
               placeholder="Filter by email..."
               value={emailFilter}
               onChange={(e) => setEmailFilter(e.target.value)}
+              size="small"
               className="max-w-sm"
             />
           </div>
-        </CardHeader>
+        </Box>
         <CardContent>
-          <div className="rounded-md border">
+          <TableContainer component={Paper} variant="outlined">
             <Table>
-              <TableHeader>
+              <TableHead>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Created At</TableHead>
-                  <TableHead>Remittance Advice</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Email</TableCell>
+                  <TableCell>Created At</TableCell>
+                  <TableCell>Remittance Advice</TableCell>
+                  <TableCell align="right">Actions</TableCell>
                 </TableRow>
-              </TableHeader>
+              </TableHead>
               <TableBody>
                 {isLoading ? (
-                  Array.from({ length: 10 }).map((_, i) => (
-                    <TableRow key={i}>
-                       <TableCell colSpan={5} className="h-12 text-center">
-                        <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  <TableRow>
+                     <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                        Loading...
+                     </TableCell>
+                  </TableRow>
                 ) : isError ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-red-500 py-10">
+                    <TableCell colSpan={5} align="center" sx={{ color: 'error.main', py: 4 }}>
                       Error fetching data: {error.message}
                     </TableCell>
                   </TableRow>
                 ) : data?.data.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
+                    <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
                       No counterparties found.
                     </TableCell>
                   </TableRow>
                 ) : (
                   data?.data.map((counterparty) => (
-                    <TableRow key={counterparty.id} className={isFetching ? 'opacity-50' : ''}>
-                      <TableCell className="font-medium">{counterparty.name || 'N/A'}</TableCell>
+                    <TableRow key={counterparty.id} sx={{ opacity: isFetching ? 0.5 : 1 }}>
+                      <TableCell sx={{ fontWeight: 'medium' }}>{counterparty.name || 'N/A'}</TableCell>
                       <TableCell>{counterparty.email || 'N/A'}</TableCell>
                       <TableCell>{formatDateTime(counterparty.created_at)}</TableCell>
                       <TableCell>{counterparty.send_remittance_advice ? 'Yes' : 'No'}</TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">Open menu</span>
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => navigate(`/counterparties/${counterparty.id}`)}>
-                                View Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => navigate(`/counterparties/${counterparty.id}/edit`)}>
-                                Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                Collect Account
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              className="text-red-600 focus:text-red-600"
-                              onClick={() => handleInitiateDelete(counterparty)}
-                            >
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                      <TableCell align="right">
+                        <RowActions counterparty={counterparty} navigate={navigate} onDelete={handleInitiateDelete} />
                       </TableCell>
                     </TableRow>
                   ))
                 )}
               </TableBody>
             </Table>
-          </div>
+          </TableContainer>
         </CardContent>
-        <CardFooter className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
+        <CardActions sx={{ justifyContent: 'space-between', p: 2 }}>
+            <Typography variant="body2" color="textSecondary">
                 Page {currentPage + 1}
-            </div>
-            <div className="space-x-2">
+            </Typography>
+            <Box>
                 <Button 
-                    variant="outline" 
+                    variant="outlined" 
                     onClick={handlePreviousPage}
                     disabled={currentPage === 0 || isFetching}
+                    sx={{ mr: 1 }}
                 >
                     Previous
                 </Button>
                 <Button 
-                    variant="outline" 
+                    variant="outlined" 
                     onClick={handleNextPage}
                     disabled={!data?.next_cursor || isFetching}
                 >
                     Next
                 </Button>
-            </div>
-        </CardFooter>
+            </Box>
+        </CardActions>
       </Card>
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-            <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete the counterparty
-                    "{selectedCounterparty?.name}" and all associated data.
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction 
-                    onClick={handleConfirmDelete}
-                    disabled={deleteMutation.isLoading}
-                    className="bg-red-600 hover:bg-red-700"
-                >
-                    {deleteMutation.isLoading ? 'Deleting...' : 'Delete'}
-                </AlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Dialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)}>
+        <DialogTitle>Are you absolutely sure?</DialogTitle>
+        <DialogContent>
+            <DialogContentText>
+                This action cannot be undone. This will permanently delete the counterparty
+                "{selectedCounterparty?.name}" and all associated data.
+            </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+            <Button onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
+            <Button 
+                onClick={handleConfirmDelete}
+                disabled={deleteMutation.isLoading}
+                color="error"
+                variant="contained"
+            >
+                {deleteMutation.isLoading ? 'Deleting...' : 'Delete'}
+            </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
