@@ -31,7 +31,7 @@
     "@chakra-ui/react": "^3.30.0",
     "@emotion/react": "^11.12.1",
     "@emotion/styled": "^11.12.0",
-    "@chakra-ui/icons": "^2.2.4",
+    "@chakra-ui/icons": "^3.0.0",
     "class-variance-authority": "^0.7.1",
     "tailwind-merge": "^3.4.0",
     "clsx": "^2.1.1",
