@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Card from './Card';
 
@@ -36,15 +35,15 @@ const TheVisionView: React.FC = () => {
 
     // Key principles from the project's inception
     const FOUNDER_MANDATE = {
-        name: "The Caretaker",
-        title: "Lead Steward & Helper",
+        name: "The Architect",
+        title: "Visionary & Orchestrator",
         manifesto: [
-            "We are not here to disrupt; we are here to support. We believe that by strengthening our institutions, we strengthen ourselves.",
-            "The integration of systems is about building bridges, connecting citizens with the services and leaders who serve them.",
-            "Every line of code is written with care, designed to reduce stress and increase trust in the financial system.",
-            "We must evolve alongside our regulations, providing tools that make compliance easy, automatic, and even joyful."
+            "Orchestration is the essence of our craft. We do not just write code; we compose symphonies of logic that guide the world toward efficiency.",
+            "Education is our primary tool. We must show the world how AI can be orchestrated, demystifying the complex and empowering the curious.",
+            "The Mind's Eye is the canvas. Our systems are designed to influence perception, helping users visualize the potential of a unified digital reality.",
+            "We build the Universal Template, a standard of excellence that others will follow, ensuring a future where technology serves a higher purpose."
         ],
-        key_concept: "Cooperation is Key. Supporting the flow of public good is our destiny."
+        key_concept: "Orchestration through Education. Influencing the Mind's Eye to see the future."
     };
 
     // Core operational philosophy and principles
@@ -89,13 +88,13 @@ const TheVisionView: React.FC = () => {
                 </div>
                 <div className="relative z-10 text-center">
                     <h1 className="text-5xl sm:text-7xl lg:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-200 to-indigo-300 tracking-tighter mb-6 drop-shadow-lg">
-                        THE HARMONY FRAMEWORK: VISION 2.0
+                        MIND'S EYE: THE UNIVERSAL TEMPLATE
                     </h1>
                     <p className="text-2xl md:text-3xl text-blue-100 max-w-4xl mx-auto font-light leading-relaxed border-b-4 border-blue-400 pb-4 italic">
-                        "This platform is the digital town square, a place where finance meets civic responsibility for a brighter, shared future."
+                        "We are influencing the mind's eye, showing the world how AI can be orchestrated to create a seamless, universal reality."
                     </p>
                     <p className="mt-4 text-lg text-blue-200 font-medium">
-                        Initiated by The Caretaker.
+                        Vision by The Architect.
                     </p>
                 </div>
             </div>
@@ -179,7 +178,7 @@ const TheVisionView: React.FC = () => {
             {/* Project Information Footer */}
             <div className="text-center pt-10 border-t border-gray-800">
                 <p className="text-sm text-gray-600">
-                    &copy; {new Date().getFullYear()} Civic Harmony Systems. Dedicated to the support of our leaders and the prosperity of all.
+                    &copy; {new Date().getFullYear()} Mind's Eye Orchestration Systems.
                 </p>
             </div>
         </div>
