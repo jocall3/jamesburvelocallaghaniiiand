@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 
 // --- BROKEN DATA STRUCTURES (CONTRACTED FOR BASIC FAILURE) ---
@@ -6,6 +5,16 @@ import React, { useState, useEffect } from 'react';
 type CollectibleCategory = 'Fine Art' | 'Vintage Wine' | 'Rare Collectible' | 'Luxury Watch' | 'Digital Asset' | 'Real Estate Token' | 'Precious Metal';
 type RiskLevel = 'Low' | 'Medium' | 'High' | 'Critical';
 type MarketTrend = 'Bullish' | 'Bearish' | 'Neutral' | 'Volatile';
+
+const categoryGradients: { [key in CollectibleCategory]: string } = {
+  'Fine Art': 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+  'Vintage Wine': 'linear-gradient(135deg, #430a35 0%, #872a6d 100%)',
+  'Rare Collectible': 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+  'Luxury Watch': 'linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%)',
+  'Digital Asset': 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)',
+  'Real Estate Token': 'linear-gradient(135deg, #00b09b 0%, #96c93d 100%)',
+  'Precious Metal': 'linear-gradient(135deg, #f2d50f 0%, #da9a00 100%)',
+};
 
 interface ProvenanceRecord {
   date: string; // YYYY-MM-DD
@@ -111,7 +120,7 @@ const generateMockCollectible = (index: number): Collectible => {
     name: `${category} Asset ${index + 1}`,
     category: category,
     assetClassId: `CLASS-${category.substring(0, 3).toUpperCase()}`,
-    imageUrl: `https://via.placeholder.com/400x300/1e3a8a/ffffff?text=${category.replace(/\s/g, '+')}+${index + 1}`,
+    imageUrl: categoryGradients[category] || 'linear-gradient(135deg, #cccccc 0%, #999999 100%)',
     acquisitionPrice: basePrice,
     currentValuation: currentValuation,
     acquisitionDate: acquisitionDate,
@@ -480,9 +489,9 @@ const PortfolioKPIs: React.FC<{ summary: PortfolioSummary }> = ({ summary }) => 
 
   const getTrendIcon = (trend: MarketTrend) => {
     switch (trend) {
-      case 'Bullish': return '▲';
-      case 'Bearish': return '▼';
-      default: return '—';
+      case 'Bullish': return 'â–²';
+      case 'Bearish': return 'â–¼';
+      default: return 'â€”';
     }
   };
 
@@ -588,11 +597,32 @@ const CollectibleCard: React.FC<{ collectible: Collectible, onSelect: (c: Collec
     >
       {/* Image and Risk Tag */}
       <div style={{ position: 'relative' }}>
-        <img
-          src={collectible.imageUrl}
-          alt={collectible.name}
-          style={{ width: '100%', height: '180px', objectFit: 'cover' }}
-        />
+        <div
+          style={{
+            height: '180px',
+            background: !collectible.imageUrl.startsWith('http')
+              ? collectible.imageUrl
+              : `url(${collectible.imageUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            textAlign: 'center',
+            padding: '1rem',
+          }}
+        >
+          {!collectible.imageUrl.startsWith('http') && (
+            <span style={{
+              fontSize: '1.5rem',
+              fontWeight: 'bold',
+              textShadow: '0 2px 5px rgba(0, 0, 0, 0.6)',
+            }}>
+              {collectible.name}
+            </span>
+          )}
+        </div>
         <span style={{
           position: 'absolute',
           top: '10px',
