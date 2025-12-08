@@ -176,18 +176,18 @@ const EnhancedLandingPage = () => {
     const features = [
         {
             icon: <Cpu className="w-8 h-8 text-cyan-400" />,
-            title: "Wisdom-Guided Quests",
-            description: "Use our friendly guide to navigate life's challenges and discover paths to providing for your family.",
+            title: "Interactive AI Modules",
+            description: "Learn complex topics like algorithmic trading, DeFi, and risk modeling through hands-on, AI-guided simulations.",
         },
         {
             icon: <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>,
-            title: "Your Family's Sanctuary",
-            description: "Your progress and dreams are kept safe and sound, just for you and your family.",
+            title: "Your Personal AI Tutor",
+            description: "Our AI adapts to your learning style, explaining concepts from basic budgeting to quantum financial modeling.",
         },
         {
             icon: <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M2 8c0-2.2.7-4.3 2-6"></path><path d="M22 8c0-2.2-.7-4.3-2-6"></path></svg>,
-            title: "Learn from Everyone",
-            description: "Connect your real-life progress to learn from the shared wisdom of families everywhere.",
+            title: "Real-World Application",
+            description: "Connect what you learn to real-time market data and see how AI-driven decisions impact financial outcomes.",
         },
     ];
 
@@ -207,10 +207,10 @@ const EnhancedLandingPage = () => {
             <div className="z-10 text-center max-w-5xl flex flex-col items-center">
                 <Cpu className="w-20 h-20 md:w-24 md:h-24 text-cyan-400 mb-6 animate-pulse" />
                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">
-                    The Provider's Journey
+                    AI Banking University
                 </h1>
                 <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl">
-                    Boundless Wisdom. Family Prosperity. The game that teaches you how to provide.
+                    Master the future of finance. A learning experience more powerful than any classroom.
                 </p>
                 
                 {isAuthenticated ? (
