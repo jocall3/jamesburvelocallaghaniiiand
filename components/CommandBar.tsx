@@ -94,7 +94,7 @@ const CommandBar: React.FC<CommandBarProps> = ({
             type="text"
             value={command}
             onChange={(e) => setCommand(e.target.value)}
-            placeholder={`Ask your Guide... e.g., "${placeholder}"`}
+            placeholder={`Ask Sovereign AI... e.g., "${placeholder}"`}
             disabled={isLoading}
             className="w-full rounded-full border border-gray-700 bg-gray-800 py-3 pl-12 pr-14 text-white placeholder-gray-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-70"
             autoComplete="off"
