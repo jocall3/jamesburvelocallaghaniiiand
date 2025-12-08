@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Box,
@@ -22,7 +22,6 @@ import {
   InsightsOutlined,
   NotificationsActiveOutlined,
 } from '@mui/icons-material';
-import { usePlaidClient } from '../../hooks/usePlaidClient'; // Assuming this hook exists for API calls
 
 interface PlaidMetricCardProps {
   title: string;
@@ -65,14 +64,41 @@ const PlaidMetricCard: React.FC<PlaidMetricCardProps> = ({ title, value, icon, l
 );
 
 const PlaidMainDashboard: React.FC = () => {
-  const {
-    isLoading: clientLoading,
-    error: clientError,
-    data: clientData,
-    fetchItemGet,
-    fetchConsentEventsGet,
-    fetchItemActivityList,
-  } = usePlaidClient(); // Assuming usePlaidClient provides these functions/data
+  // Mock implementation replacing usePlaidClient
+  const clientLoading = false;
+  const clientError = null;
+  const clientData = { apiVersion: '2020-09-14' };
+
+  const fetchItemGet = useCallback(async () => {
+    // This is a mock function. In a real scenario, it would fetch item data.
+    return Promise.resolve();
+  }, []);
+
+  const fetchConsentEventsGet = useCallback(async (/*args*/) => {
+    // Mock implementation
+    return Promise.resolve({
+      consent_events: [
+        {
+          event_type: 'GRANTED',
+          timestamp: new Date().toISOString(),
+          consent_id: 'consent_123',
+        },
+      ],
+    });
+  }, []);
+
+  const fetchItemActivityList = useCallback(async (/*args*/) => {
+    // Mock implementation
+    return Promise.resolve({
+      activities: [
+        {
+          event_type: 'WEBHOOK_UPDATE_ACKNOWLEDGED',
+          timestamp: new Date().toISOString(),
+          item_id: 'mock_item_id',
+        },
+      ],
+    });
+  }, []);
 
   const [linkedItemsCount, setLinkedItemsCount] = useState<number | undefined>(undefined);
   const [recentWebhookActivity, setRecentWebhookActivity] = useState<string | undefined>(undefined);
