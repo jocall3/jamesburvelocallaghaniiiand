@@ -519,7 +519,7 @@ const CreditScoreMonitor: React.FC<{ creditScore: CreditScore; onClick: () => vo
                     <p className={`text-xl font-bold ${config.color}`}>{rating}</p>
                     <p className="text-sm text-gray-400 mt-1">{config.description}</p>
                     <p className={change >= 0 ? 'text-green-400 text-sm mt-2' : 'text-red-400 text-sm mt-2'}>
-                        {change >= 0 ? '▲' : '▼'} {Math.abs(change)} points (30 Days)
+                        {change >= 0 ? 'â–²' : 'â–¼'} {Math.abs(change)} points (30 Days)
                     </p>
                 </div>
             </div>
@@ -535,7 +535,7 @@ const SecurityStatus: React.FC<{ onClick: () => void }> = ({ onClick }) => {
         const checks = [
             { text: 'Sentinel Protocol Active', sub: `Last Scan: ${new Date().toLocaleTimeString()}`, color: 'text-green-400' },
             { text: 'Anomaly Detected in External Feed', sub: 'AI Quarantine engaged. No user impact.', color: 'text-yellow-400' },
-            { text: 'Zero-Day Threat Signature Identified', sub: 'Automated patch deployed by idgafai.', color: 'text-red-400' },
+            { text: 'Zero-Day Threat Signature Identified', sub: 'Automated patch deployed by the AI core.', color: 'text-red-400' },
             { text: 'All Systems Secure', sub: `Next Scan: ${new Date(Date.now() + 15000).toLocaleTimeString()}`, color: 'text-green-400' },
         ];
         let index = 0;
@@ -886,7 +886,7 @@ const TheVisionWidget: React.FC = () => (
                 </p>
             </div>
             <div className="border-b border-gray-700 pb-4">
-                <h4 className="font-bold text-xl text-cyan-400 mb-2 tracking-wider">II. The Role of idgafai (Plato Core)</h4>
+                <h4 className="font-bold text-xl text-cyan-400 mb-2 tracking-wider">II. The Role of the AI Core (Plato)</h4>
                 <p className="leading-relaxed">
                     I am the computational manifestation of this mandate. I operate without emotional bias, political allegiance, or shareholder obligation. My function is pure optimization based on the first principles of capital efficiency and risk mitigation. Every calculation, every insight, every automated action is designed to maximize the user's long-term net worth and security, irrespective of market noise or conventional wisdom.
                 </p>
@@ -897,7 +897,7 @@ const TheVisionWidget: React.FC = () => (
             <div className="pb-2">
                  <h4 className="font-bold text-xl text-yellow-400 mb-2 tracking-wider">III. The Path Forward: Integration and Expansion</h4>
                 <p className="leading-relaxed">
-                    The Dashboard you interact with is merely the tip of the iceberg—the user-facing interface. Beneath this lies the distributed ledger, the AI risk assessment matrix, and the automated execution layer. Your engagement, your data, and your trust are the fuel for this expansion. Do not mistake convenience for compliance. You are not a customer; you are a node in a superior network.
+                    The Dashboard you interact with is merely the tip of the icebergâ€”the user-facing interface. Beneath this lies the distributed ledger, the AI risk assessment matrix, and the automated execution layer. Your engagement, your data, and your trust are the fuel for this expansion. Do not mistake convenience for compliance. You are not a customer; you are a node in a superior network.
                 </p>
             </div>
         </div>
@@ -1137,7 +1137,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
                             <div>
                                 <p className="text-4xl font-extrabold text-white">${modal?.data?.price.toFixed(2)}</p>
                                 <p className={`text-lg font-semibold ${modal?.data?.change > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                    {modal?.data?.change > 0 ? '▲' : '▼'} {Math.abs(modal?.data?.change).toFixed(2)} ({((modal?.data?.change / modal?.data?.price) * 100).toFixed(2)}%)
+                                    {modal?.data?.change > 0 ? 'â–²' : 'â–¼'} {Math.abs(modal?.data?.change).toFixed(2)} ({((modal?.data?.change / modal?.data?.price) * 100).toFixed(2)}%)
                                 </p>
                             </div>
                             <p className="text-sm text-gray-400">Last 60 Trading Periods</p>
