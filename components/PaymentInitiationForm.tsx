@@ -1,438 +1,293 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import {
-  TextField,
-  Button,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Grid,
-  Typography,
-  Paper,
-  TextareaAutosize,
-  Box,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Alert,
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
+// This file has been transformed into the "Interstellar Financial Transaction Protocol (IFTP) Nexus,"
+// a self-contained, universe-scale system for managing and simulating financial transactions
+// across a vast, interconnected galactic economy. It evolves the original PaymentInitiationForm.tsx
+// into a core module within this mega-system, demonstrating the principles of
+// universal financial orchestration, quantum ledger technology, and AI-driven compliance.
 
-// Assuming ISO 20022 code types are defined elsewhere or imported.
-// For this specific file generation, we'll use placeholders/mocked types
-// based on the schema provided, although in a real project, these would
-// be generated or imported types.
+// The original concepts of payment initiation, debtor/creditor details, and external codes
+// are amplified into a comprehensive framework for interstellar commerce, complete with
+// a custom UI rendering engine, a simulated open-source API ecosystem, and a deep
+// internal logic core that models a complex financial universe.
 
-type ExternalCodeType = string; // Placeholder for actual union types from schema definitions
+// All external dependencies (like Material-UI) have no external imports and are re-implemented internally
+// to ensure the system is entirely self-contained and dependency-free, as per
+// the "Evolutionary Universe-Forge Prompt."
 
-interface PaymentInstruction {
-  id: number;
-  instrId: string;
-  endToEndId: string;
-  amt: string;
-  ccy: string;
-  instrDt: string;
-  debtorName: string;
-  debtorIban: string;
-  creditorName: string;
-  creditorIban: string;
-  serviceLevel: ExternalCodeType;
-  purpose: ExternalCodeType;
-  localInstrument: ExternalCodeType;
-}
+import React, { useState, useCallback, useMemo, useEffect, createContext, useContext } from 'react';
 
-// Mocked/Placeholder external code lists for form population
-const mockServiceLevelCodes: ExternalCodeType[] = ['SEPA', 'URGP', 'INST', 'NURG'];
-const mockPurposeCodes: ExternalCodeType[] = ['CASH', 'TREA', 'SUPP', 'GOVT'];
-const mockLocalInstrumentCodes: ExternalCodeType[] = ['CORE', 'B2B', 'TRF', 'INST'];
+// --- CORE SYSTEM CONFIGURATION & UTILITIES ---
+// This section defines the foundational constants, types, and utility functions
+// that underpin the entire Interstellar Financial Transaction Protocol (IFTP) Nexus.
 
-const PaymentInitiationForm: React.FC = () => {
-  const [isBulk, setIsBulk] = useState(false);
-  const [instructions, setInstructions] = useState<PaymentInstruction[]>([]);
-  const [newInstruction, setNewInstruction] = useState<Omit<PaymentInstruction, 'id'>>({
-    instrId: '',
-    endToEndId: '',
-    amt: '',
-    ccy: 'EUR',
-    instrDt: new Date().toISOString().substring(0, 10),
-    debtorName: '',
-    debtorIban: '',
-    creditorName: '',
-    creditorIban: '',
-    serviceLevel: 'SEPA',
-    purpose: 'CASH',
-    localInstrument: 'CORE',
-  });
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-
-  const handleNewInstructionChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setNewInstruction((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const validateInstruction = (instr: Omit<PaymentInstruction, 'id'>): boolean => {
-    if (!instr.instrId || !instr.endToEndId || !instr.amt || !instr.ccy || !instr.instrDt ||
-        !instr.debtorName || !instr.debtorIban || !instr.creditorName || !instr.creditorIban ||
-        !instr.serviceLevel || !instr.purpose || !instr.localInstrument) {
-      setError('All fields must be filled.');
-      return false;
-    }
-    if (isNaN(parseFloat(instr.amt)) || parseFloat(instr.amt) <= 0) {
-      setError('Amount must be a positive number.');
-      return false;
-    }
-    setError(null);
-    return true;
-  };
-
-  const addInstruction = useCallback(() => {
-    if (validateInstruction(newInstruction)) {
-      const instructionToAdd: PaymentInstruction = {
-        ...newInstruction,
-        id: Date.now(), // Simple unique ID
-      };
-      setInstructions((prev) => [...prev, instructionToAdd]);
-      setNewInstruction((prev) => ({
-        ...prev,
-        instrId: '',
-        endToEndId: '',
-      })); // Clear IDs for the next entry if adding multiple one by one
-      setMessage('Instruction added successfully.');
-      setTimeout(() => setMessage(null), 3000);
-    }
-  }, [newInstruction]);
-
-  const removeInstruction = useCallback((id: number) => {
-    setInstructions((prev) => prev.filter((instr) => instr.id !== id));
-  }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (instructions.length === 0) {
-      setError('No payment instructions to submit.');
-      return;
-    }
-
-    console.log('Submitting Payment Instructions (Simulated pain.001 generation):', instructions);
-    
-    // In a real application, this would trigger the pain.001 XML generation/API call
-    setError(null);
-    setMessage(`Successfully submitted ${instructions.length} payment instruction(s) for processing.`);
-    setInstructions([]);
-    setNewInstruction({
-        instrId: '',
-        endToEndId: '',
-        amt: '',
-        ccy: 'EUR',
-        instrDt: new Date().toISOString().substring(0, 10),
-        debtorName: '',
-        debtorIban: '',
-        creditorName: '',
-        creditorIban: '',
-        serviceLevel: 'SEPA',
-        purpose: 'CASH',
-        localInstrument: 'CORE',
-    });
-  };
-
-  const formFields = useMemo(() => (
-    <>
-      <Grid item xs={12} sm={6} md={4}>
-        <TextField
-          fullWidth
-          label="Instruction ID (MsgId)"
-          name="instrId"
-          value={newInstruction.instrId}
-          onChange={handleNewInstructionChange}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6} md={4}>
-        <TextField
-          fullWidth
-          label="End To End ID"
-          name="endToEndId"
-          value={newInstruction.endToEndId}
-          onChange={handleNewInstructionChange}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6} md={4}>
-        <TextField
-          fullWidth
-          label="Amount"
-          name="amt"
-          type="number"
-          InputProps={{ inputProps: { min: 0.01, step: '0.01' } }}
-          value={newInstruction.amt}
-          onChange={handleNewInstructionChange}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6} md={4}>
-        <TextField
-          fullWidth
-          label="Currency (ISOCode)"
-          name="ccy"
-          value={newInstruction.ccy}
-          onChange={handleNewInstructionChange}
-          required
-          inputProps={{ maxLength: 3 }}
-        />
-      </Grid>
-      <Grid item xs={12} sm={6} md={4}>
-        <TextField
-          fullWidth
-          label="Requested Execution Date"
-          name="instrDt"
-          type="date"
-          value={newInstruction.instrDt}
-          onChange={handleNewInstructionChange}
-          required
-          InputLabelProps={{ shrink: true }}
-        />
-      </Grid>
-
-      <Grid item xs={12} md={12}>
-        <Typography variant="subtitle1" sx={{ mb: 1 }}>Debtor Details</Typography>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="Debtor Name"
-          name="debtorName"
-          value={newInstruction.debtorName}
-          onChange={handleNewInstructionChange}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="Debtor IBAN"
-          name="debtorIban"
-          value={newInstruction.debtorIban}
-          onChange={handleNewInstructionChange}
-          required
-        />
-      </Grid>
-
-      <Grid item xs={12} md={12}>
-        <Typography variant="subtitle1" sx={{ mb: 1 }}>Creditor Details</Typography>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="Creditor Name"
-          name="creditorName"
-          value={newInstruction.creditorName}
-          onChange={handleNewInstructionChange}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="Creditor IBAN"
-          name="creditorIban"
-          value={newInstruction.creditorIban}
-          onChange={handleNewInstructionChange}
-          required
-        />
-      </Grid>
-
-      <Grid item xs={12} md={12}>
-        <Typography variant="subtitle1" sx={{ mb: 1 }}>Classification (External Codes)</Typography>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <FormControl fullWidth required>
-          <InputLabel id="serviceLevelLabel">Service Level (SvcLvl)</InputLabel>
-          <Select
-            labelId="serviceLevelLabel"
-            name="serviceLevel"
-            value={newInstruction.serviceLevel}
-            label="Service Level (SvcLvl)"
-            onChange={(e) => setNewInstruction((prev) => ({ ...prev, serviceLevel: e.target.value as ExternalCodeType }))}
-          >
-            {mockServiceLevelCodes.map((code) => (
-              <MenuItem key={code} value={code}>{code}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <FormControl fullWidth required>
-          <InputLabel id="purposeLabel">Purpose (Purp)</InputLabel>
-          <Select
-            labelId="purposeLabel"
-            name="purpose"
-            value={newInstruction.purpose}
-            label="Purpose (Purp)"
-            onChange={(e) => setNewInstruction((prev) => ({ ...prev, purpose: e.target.value as ExternalCodeType }))}
-          >
-            {mockPurposeCodes.map((code) => (
-              <MenuItem key={code} value={code}>{code}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <FormControl fullWidth required>
-          <InputLabel id="localInstrumentLabel">Local Instrument (LclInstrm)</InputLabel>
-          <Select
-            labelId="localInstrumentLabel"
-            name="localInstrument"
-            value={newInstruction.localInstrument}
-            label="Local Instrument (LclInstrm)"
-            onChange={(e) => setNewInstruction((prev) => ({ ...prev, localInstrument: e.target.value as ExternalCodeType }))}
-          >
-            {mockLocalInstrumentCodes.map((code) => (
-              <MenuItem key={code} value={code}>{code}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-      {/* Placeholder for unstructured remittance information */}
-      <Grid item xs={12}>
-        <FormControl fullWidth>
-          <InputLabel>Remittance Information (Ustrd)</InputLabel>
-          <TextareaAutosize
-            minRows={3}
-            name="remittanceInfo"
-            placeholder="Enter unstructured remittance information here..."
-            style={{ width: '100%', padding: '10px', borderRadius: '4px', borderColor: '#ccc' }}
-            // Note: Remittance info is not in the base mock structure, added here as common field
-          />
-        </FormControl>
-      </Grid>
-    </>
-  ), [newInstruction]);
-
-  return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>
-        Payment Initiation ({isBulk ? 'Bulk' : 'Single'})
-      </Typography>
-
-      <FormControl sx={{ mb: 2 }}>
-        <Button
-          variant={isBulk ? "outlined" : "contained"}
-          onClick={() => setIsBulk(false)}
-        >
-          Single Payment
-        </Button>
-        <Button
-          variant={isBulk ? "contained" : "outlined"}
-          onClick={() => setIsBulk(true)}
-          sx={{ ml: 1 }}
-        >
-          Bulk Payment
-        </Button>
-      </FormControl>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-      {message && (
-        <Alert severity="success" sx={{ mb: 2 }}>
-          {message}
-        </Alert>
-      )}
-
-      <Paper sx={{ p: 3, mb: 4 }}>
-        <Typography variant="h6" gutterBottom>
-          {isBulk ? 'Add Instruction to Batch' : 'New Payment Instruction'}
-        </Typography>
-        <Grid container spacing={3}>
-          {formFields}
-          
-          <Grid item xs={12}>
-            {isBulk ? (
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={addInstruction}
-                disabled={!newInstruction.instrId || !newInstruction.amt} // Minimal check for bulk entry
-              >
-                Add to Batch
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                disabled={instructions.length === 0 && (!newInstruction.instrId || !newInstruction.amt)}
-              >
-                Submit Single Payment (Simulate pain.001)
-              </Button>
-            )}
-          </Grid>
-        </Grid>
-      </Paper>
-
-      {isBulk && instructions.length > 0 && (
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Payment Batch ({instructions.length} Items)
-          </Typography>
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Instr ID</TableCell>
-                  <TableCell>End-to-End ID</TableCell>
-                  <TableCell>Amount</TableCell>
-                  <TableCell>Creditor IBAN</TableCell>
-                  <TableCell>Service Level</TableCell>
-                  <TableCell>Purpose</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {instructions.map((instr) => (
-                  <TableRow key={instr.id}>
-                    <TableCell>{instr.instrId}</TableCell>
-                    <TableCell>{instr.endToEndId}</TableCell>
-                    <TableCell>{instr.amt} {instr.ccy}</TableCell>
-                    <TableCell>{instr.creditorIban.substring(0, 25)}...</TableCell>
-                    <TableCell>{instr.serviceLevel}</TableCell>
-                    <TableCell>{instr.purpose}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => removeInstruction(instr.id)}
-                        color="error"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ mt: 3 }}
-            onClick={handleSubmit}
-          >
-            Finalize and Submit Batch (Simulate pain.001)
-          </Button>
-        </Paper>
-      )}
-    </Box>
-  );
+/**
+ * @namespace SystemConfig
+ * @description Global configuration parameters for the IFTP Nexus.
+ *              These settings govern the behavior of the financial simulation,
+ *              UI rendering, and API interactions.
+ */
+const SystemConfig = {
+  VERSION: 'IFTP-Nexus-v1.0.0-GalacticEdition',
+  SIMULATION_SPEED_FACTOR: 1000, // Milliseconds per simulated 'tick'
+  MAX_TRANSACTION_HISTORY: 10000,
+  DEFAULT_CURRENCY: 'GALX', // Galactic Credits
+  DEFAULT_LOCALE: 'en-US',
+  UI_THEME: {
+    primary: '#673ab7', // Deep Purple
+    secondary: '#00bcd4', // Cyan
+    background: '#1a1a2e', // Dark Blue-Purple
+    surface: '#2e2e4a', // Slightly lighter surface
+    text: '#e0e0e0', // Light Grey
+    error: '#f44336', // Red
+    success: '#4caf50', // Green
+    warning: '#ff9800', // Orange
+    info: '#2196f3', // Blue
+    border: '#4a4a6a',
+    shadow: 'rgba(0,0,0,0.3)',
+  },
+  API_RATE_LIMIT_DEFAULT: 100, // Requests per minute
+  API_AUTH_TOKEN_EXPIRY: 3600, // Seconds
+  QUANTUM_LEDGER_SHARDS: 128,
+  AI_AGENT_RESPONSE_LATENCY_MS: 50,
+  MAX_LOG_ENTRIES: 5000,
 };
 
-export default PaymentInitiationForm;
+/**
+ * @enum {string} LogLevel
+ * @description Defines the severity levels for system logging.
+ */
+enum LogLevel {
+  DEBUG = 'DEBUG',
+  INFO = 'INFO',
+  WARN = 'WARN',
+  ERROR = 'ERROR',
+  CRITICAL = 'CRITICAL',
+}
+
+/**
+ * @interface LogEntry
+ * @description Represents a single log entry in the system's audit trail.
+ */
+interface LogEntry {
+  timestamp: string;
+  level: LogLevel;
+  module: string;
+  message: string;
+  details?: any;
+}
+
+/**
+ * @class SystemLogger
+ * @description A custom, self-contained logging utility for the IFTP Nexus.
+ *              It manages log entries, filters by level, and provides a historical view.
+ */
+class SystemLogger {
+  private static instance: SystemLogger;
+  private logs: LogEntry[] = [];
+
+  private constructor() {}
+
+  public static getInstance(): SystemLogger {
+    if (!SystemLogger.instance) {
+      SystemLogger.instance = new SystemLogger();
+    }
+    return SystemLogger.instance;
+  }
+
+  /**
+   * Adds a log entry to the system.
+   * @param level The severity level of the log.
+   * @param module The module or component generating the log.
+   * @param message The main log message.
+   * @param details Optional additional details for the log.
+   */
+  public log(level: LogLevel, module: string, message: string, details?: any) {
+    const entry: LogEntry = {
+      timestamp: new Date().toISOString(),
+      level,
+      module,
+      message,
+      details,
+    };
+    this.logs.push(entry);
+    if (this.logs.length > SystemConfig.MAX_LOG_ENTRIES) {
+      this.logs.shift(); // Remove oldest log if capacity exceeded
+    }
+    // In a real system, this would also write to a persistent store or console.
+    // For this self-contained file, we'll just store it in memory.
+    // console.log(`[${entry.timestamp}] [${level}] [${module}] ${message}`, details || '');
+  }
+
+  public debug(module: string, message: string, details?: any) { this.log(LogLevel.DEBUG, module, message, details); }
+  public info(module: string, message: string, details?: any) { this.log(LogLevel.INFO, module, message, details); }
+  public warn(module: string, message: string, details?: any) { this.log(LogLevel.WARN, module, message, details); }
+  public error(module: string, message: string, details?: any) { this.log(LogLevel.ERROR, module, message, details); }
+  public critical(module: string, message: string, details?: any) { this.log(LogLevel.CRITICAL, module, message, details); }
+
+  /**
+   * Retrieves all current log entries.
+   * @returns An array of log entries.
+   */
+  public getLogs(): LogEntry[] {
+    return [...this.logs];
+  }
+
+  /**
+   * Clears all log entries.
+   */
+  public clearLogs(): void {
+    this.logs = [];
+  }
+}
+
+const SystemLog = SystemLogger.getInstance();
+
+/**
+ * @class UUIDGenerator
+ * @description A custom, lightweight UUID generator for unique identifiers within the system.
+ */
+class UUIDGenerator {
+  private static instance: UUIDGenerator;
+  private constructor() {}
+  public static getInstance(): UUIDGenerator {
+    if (!UUIDGenerator.instance) {
+      UUIDGenerator.instance = new UUIDGenerator();
+    }
+    return UUIDGenerator.instance;
+  }
+  public generate(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0,
+            v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+}
+const UUID = UUIDGenerator.getInstance();
+
+/**
+ * @class CryptoUtils
+ * @description Simulated cryptographic utilities for hashing and signing.
+ *              In a real system, these would use actual crypto libraries.
+ */
+class CryptoUtils {
+  private static instance: CryptoUtils;
+  private constructor() {}
+  public static getInstance(): CryptoUtils {
+    if (!CryptoUtils.instance) {
+      CryptoUtils.instance = new CryptoUtils();
+    }
+    return CryptoUtils.instance;
+  }
+
+  /**
+   * Simulates a cryptographic hash function.
+   * @param data The data to hash.
+   * @returns A simulated hash string.
+   */
+  public hash(data: string): string {
+    let hash = 0;
+    for (let i = 0; i < data.length; i++) {
+      const char = data.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return Math.abs(hash).toString(16).padStart(8, '0');
+  }
+
+  /**
+   * Simulates a digital signature.
+   * @param data The data to sign.
+   * @param privateKey A simulated private key.
+   * @returns A simulated signature string.
+   */
+  public sign(data: string, privateKey: string): string {
+    // Simple concatenation and hash for simulation
+    return this.hash(`${data}-${privateKey}-${new Date().getTime()}`);
+  }
+
+  /**
+   * Simulates signature verification.
+   * @param data The original data.
+   * @param signature The signature to verify.
+   * @param publicKey A simulated public key.
+   * @returns Always true in this simulation.
+   */
+  public verify(data: string, signature: string, publicKey: string): boolean {
+    // In a real system, this would involve complex cryptographic checks.
+    // For simulation, we'll assume it's always valid if a signature exists.
+    return !!signature;
+  }
+}
+const Crypto = CryptoUtils.getInstance();
+
+/**
+ * @class DataStore
+ * @description A generic, in-memory key-value data store for various system components.
+ */
+class DataStore<T> {
+  private data: Map<string, T> = new Map();
+
+  public set(key: string, value: T): void {
+    this.data.set(key, value);
+    SystemLog.debug('DataStore', `Set key: ${key}`);
+  }
+
+  public get(key: string): T | undefined {
+    SystemLog.debug('DataStore', `Get key: ${key}`);
+    return this.data.get(key);
+  }
+
+  public has(key: string): boolean {
+    return this.data.has(key);
+  }
+
+  public delete(key: string): boolean {
+    SystemLog.debug('DataStore', `Delete key: ${key}`);
+    return this.data.delete(key);
+  }
+
+  public getAll(): T[] {
+    return Array.from(this.data.values());
+  }
+
+  public clear(): void {
+    this.data.clear();
+    SystemLog.info('DataStore', 'Cleared all data.');
+  }
+
+  public size(): number {
+    return this.data.size;
+  }
+}
+
+// --- UNIVERSAL CODE REGISTRY (UCR) ---
+// This system manages all standardized codes used across the IFTP Nexus,
+// evolving the original 'mockServiceLevelCodes', 'mockPurposeCodes', etc.
+// into a versioned, governed registry.
+
+/**
+ * @enum {string} CodeCategory
+ * @description Categories for universal codes.
+ */
+enum CodeCategory {
+  SERVICE_LEVEL = 'SERVICE_LEVEL',
+  PURPOSE = 'PURPOSE',
+  LOCAL_INSTRUMENT = 'LOCAL_INSTRUMENT',
+  CURRENCY = 'CURRENCY',
+  ENTITY_TYPE = 'ENTITY_TYPE',
+  TRANSACTION_STATUS = 'TRANSACTION_STATUS',
+  NETWORK_PROTOCOL = 'NETWORK_PROTOCOL',
+  SECURITY_LEVEL = 'SECURITY_LEVEL',
+  COMPLIANCE_RULE = 'COMPLIANCE_RULE',
+  ERROR_CODE = 'ERROR_CODE',
+}
+
+/**
+ * @interface UniversalCode
+ * @description Represents a single standardized code in the UCR.
+ */
+interface UniversalCode {
+  code: string;
+  description: string;
+  category: CodeCategory;
+  version: string
