@@ -26,7 +26,7 @@ interface ChatMessage {
 const AIVisionChat: React.FC<{ onClose: () => void; onSyncData: (data: any) => void }> = ({ onClose, onSyncData }) => {
     const context = useContext(DataContext);
     const [messages, setMessages] = useState<ChatMessage[]>([
-        { id: 'init', role: 'model', text: "I am Family Vision AI, connected to the visual cortex. I can see the external banking app. Ask me about your balances, transactions, or click 'Sync' to extract data." }
+        { id: 'init', role: 'model', text: "I am connected to the visual cortex. I can see the external banking app. Ask me about your balances, transactions, or click 'Sync' to extract data." }
     ]);
     const [input, setInput] = useState('');
     const [isCapturing, setIsCapturing] = useState(false);
@@ -177,7 +177,7 @@ const AIVisionChat: React.FC<{ onClose: () => void; onSyncData: (data: any) => v
             <div className="p-4 border-b border-gray-700 bg-gray-900/95 backdrop-blur flex justify-between items-center">
                 <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="font-bold text-white text-sm tracking-wider">Family Vision AI</span>
+                    <span className="font-bold text-white text-sm tracking-wider">Sovereign Vision AI</span>
                 </div>
                 <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors"><X size={18} /></button>
             </div>
@@ -392,7 +392,7 @@ const GamificationProfile: React.FC<{ gamification: GamificationState; onClick: 
     };
 
     return (
-        <Card title="Family Trust Score (FTS)" className="h-full border-indigo-500/30" variant="interactive" onClick={onClick}>
+        <Card title="Sovereign Score Index (SSI)" className="h-full border-indigo-500/30" variant="interactive" onClick={onClick}>
             <div className="flex flex-col justify-between h-full p-2">
                 <div className="relative flex items-center justify-center h-40">
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
@@ -519,7 +519,7 @@ const CreditScoreMonitor: React.FC<{ creditScore: CreditScore; onClick: () => vo
                     <p className={`text-xl font-bold ${config.color}`}>{rating}</p>
                     <p className="text-sm text-gray-400 mt-1">{config.description}</p>
                     <p className={change >= 0 ? 'text-green-400 text-sm mt-2' : 'text-red-400 text-sm mt-2'}>
-                        {change >= 0 ? 'Ã¢â€“Â²' : 'Ã¢â€“Â¼'} {Math.abs(change)} points (30 Days)
+                        {change >= 0 ? '▲' : '▼'} {Math.abs(change)} points (30 Days)
                     </p>
                 </div>
             </div>
@@ -897,7 +897,7 @@ const TheVisionWidget: React.FC = () => (
             <div className="pb-2">
                  <h4 className="font-bold text-xl text-yellow-400 mb-2 tracking-wider">III. The Path Forward: Integration and Expansion</h4>
                 <p className="leading-relaxed">
-                    The Dashboard you interact with is merely the tip of the icebergÃ¢â‚¬â€ the user-facing interface. Beneath this lies the distributed ledger, the AI risk assessment matrix, and the automated execution layer. Your engagement, your data, and your trust are the fuel for this expansion. Do not mistake convenience for compliance. You are not a customer; you are a node in a superior network.
+                    The Dashboard you interact with is merely the tip of the iceberg—the user-facing interface. Beneath this lies the distributed ledger, the AI risk assessment matrix, and the automated execution layer. Your engagement, your data, and your trust are the fuel for this expansion. Do not mistake convenience for compliance. You are not a customer; you are a node in a superior network.
                 </p>
             </div>
         </div>
