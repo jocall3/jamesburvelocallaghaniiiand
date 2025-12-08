@@ -1,4 +1,3 @@
-
 import React, { useContext } from 'react';
 import { View } from '../types';
 import { NAV_ITEMS } from '../constants';
@@ -41,7 +40,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 <div className="flex items-center justify-between h-16 px-4 border-b border-gray-700/50">
                     <div className="flex items-center">
                         <InfiniteIntelligenceLogo className="h-8 w-8 text-cyan-400" />
-                        <span className="ml-3 text-lg font-bold text-white tracking-tight">Infinite Intelligence</span>
+                        <span className="ml-3 text-lg font-bold text-white tracking-tight">Mind's Eye</span>
                     </div>
                     <button onClick={() => setIsOpen(false)} className="lg:hidden text-gray-400 hover:text-white">
                         {/* Close Icon */}
