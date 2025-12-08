@@ -24,6 +24,9 @@ import Dashboard from './components/Dashboard';
 import { LoginView } from './components/LoginView';
 import SSOView from './components/SSOView';
 import CitiAuthGate from './components/CitiAuthGate';
+import ResourceGraphView from './components/ResourceGraphView';
+import ComplianceOracleView from './components/ComplianceOracleView';
+import ComponentLibraryView from './components/ComponentLibraryView';
 
 // --- Component Registry & Dynamic Loading ---
 const modules = import.meta.glob('./components/*.tsx', { eager: true });
@@ -405,6 +408,10 @@ function SApp() {
                       <Route path="/account-list" element={Wrapper(AccountList, { accounts: [] })} />
                       <Route path="/accounts-dashboard" element={<AccountsDashboardView />} />
                       
+                      <Route path="/resource-graph" element={<ResourceGraphView />} />
+                      <Route path="/compliance-oracle" element={<ComplianceOracleView />} />
+                      <Route path="/component-library" element={<ComponentLibraryView />} />
+
                       <Route path="*" element={<Dashboard />} />
                     </Route>
                   </Routes>
