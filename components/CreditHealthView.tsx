@@ -1,4 +1,3 @@
-
 import React, { useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { DataContext } from '../context/DataContext';
 import Card from './Card';
@@ -50,7 +49,7 @@ const CreditScoreDisplay: React.FC<CreditScoreDisplayProps> = React.memo(({ scor
     const Icon = ratingInfo.icon;
 
     return (
-        <Card title="Civic Credit Index (CCI)" className={`relative overflow-hidden transition-all duration-500 ${ratingInfo.glow}`}>
+        <Card title="Family Trust Score (FTS)" className={`relative overflow-hidden transition-all duration-500 ${ratingInfo.glow}`}>
             <div className={`absolute top-0 right-0 p-4 opacity-10`}>
                 <Icon className={`w-24 h-24 ${ratingInfo.color}`} />
             </div>
@@ -124,7 +123,7 @@ const AIInsightEngine: React.FC<AIInsightEngineProps> = React.memo(({ score, fac
     const [generationConfig, setGenerationConfig] = useState({ temperature: 0.4, topK: 40, topP: 0.8 });
 
     const generateContentPayload = useCallback(() => {
-        const systemInstruction = `You are CivicMind, a supportive and helpful financial assistant.
+        const systemInstruction = `You are the Family Guide, a supportive and helpful financial assistant.
         
         Your goal is to provide encouraging and actionable advice to help users improve their financial standing.
         You believe in the power of good financial habits and compliance with regulations.
@@ -195,7 +194,7 @@ const AIInsightEngine: React.FC<AIInsightEngineProps> = React.memo(({ score, fac
     }, []); // Run only on mount
 
     return (
-        <Card title="Civic Advisor Insight" className="h-full flex flex-col">
+        <Card title="Family Guide's Insight" className="h-full flex flex-col">
             <div className="flex justify-between items-center mb-3 border-b border-gray-700 pb-2">
                 <h3 className="text-lg font-semibold text-indigo-300 flex items-center gap-2"><Cpu className="w-5 h-5"/> Helpful Advice</h3>
                 <button onClick={getAIInsight} disabled={isLoadingInsight} className="flex items-center gap-1 text-sm text-gray-400 hover:text-white disabled:opacity-50 transition duration-200 p-1 rounded hover:bg-gray-700" aria-label="Refresh AI Insight">
@@ -345,7 +344,7 @@ const CreditHealthView: React.FC = () => {
             <header className="pb-4 border-b border-indigo-800/50">
                 <h1 className="text-5xl font-extrabold tracking-tighter flex items-center gap-3">
                     <BarChart3 className="w-10 h-10 text-indigo-400"/>
-                    Credit Health Overview
+                    Family Trust Overview
                 </h1>
                 <p className="text-gray-400 mt-1 text-lg">Understanding and improving your financial standing.</p>
             </header>
@@ -378,7 +377,7 @@ const CreditHealthView: React.FC = () => {
 
             <footer className="text-center pt-6 border-t border-gray-800">
                 <p className="text-xs text-gray-600 font-mono">
-                    Civic Credit System v1.0 | Data Latency: Low | AI Core: CivicMind
+                    Family Trust System v1.0 | Data Latency: Low | AI Core: Family Guide
                 </p>
             </footer>
         </div>
