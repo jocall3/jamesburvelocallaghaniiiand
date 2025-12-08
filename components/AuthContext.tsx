@@ -6,10 +6,10 @@ import { User as BaseUser } from '../types';
 // It's designed to be a self-contained module for user identity and access management.
 
 // Expanded Roles and Security Tiers for a Hyper-Complex System
-export type UserRole = 'ADMIN' | 'TRADER' | 'CLIENT' | 'GUIDE' | 'QUANT_ANALYST' | 'BUILDER' | 'KEEPER' | 'DATA_SCIENTIST' | 'CONNECTOR';
-export type SecurityLevel = 'STANDARD' | 'ELEVATED' | 'TRADING_UNLOCKED' | 'QUANTUM_ENCRYPTED' | 'FAMILY_GUARDIAN' | 'ARCHITECT_LEVEL';
+export type UserRole = 'ADMIN' | 'TRADER' | 'CLIENT' | 'VISIONARY' | 'QUANT_ANALYST' | 'SYSTEM_ARCHITECT' | 'ETHICS_OFFICER' | 'DATA_SCIENTIST' | 'NETWORK_WEAVER';
+export type SecurityLevel = 'STANDARD' | 'ELEVATED' | 'TRADING_UNLOCKED' | 'QUANTUM_ENCRYPTED' | 'SOVEREIGN_CLEARED' | 'ARCHITECT_LEVEL';
 export type NeuralSyncStatus = 'OFFLINE' | 'SYNCHRONIZING' | 'ACTIVE_STABLE' | 'DEGRADED' | 'CALIBRATING';
-export type CitizenshipStatus = 'HEARTH_GUARDIAN' | 'TERRAN_AFFILIATE' | 'OUTER_COLONIES_REP' | 'TRANSIENT';
+export type CitizenshipStatus = 'NEXUS_SOVEREIGN' | 'TERRAN_AFFILIATE' | 'OUTER_COLONIES_REP' | 'TRANSIENT';
 
 // Feature Expansion: Cognitive and Biometric Profile
 export interface CognitiveProfile {
@@ -59,20 +59,20 @@ export interface User extends BaseUser {
     lastLoginCoordinates: { lat: number, lon: number, alt: number, dimension: string };
     temporalAnchorId: string;
     // Agent & System Interaction
-    activeFamilyGuideIds: string[];
+    activeSovereignAgentIds: string[];
     permissionsGridHash: string;
     // ... 88 more features could be imagined here, this is a representative expansion.
 }
 
 export interface TradingSession {
-    status: 'INACTIVE' | 'CONNECTING' | 'ACTIVE' | 'DISCONNECTED' | 'SYNCHRONIZING_CHRONONS' | 'AWAITING_FAMILY_CONSENSUS';
+    status: 'INACTIVE' | 'CONNECTING' | 'ACTIVE' | 'DISCONNECTED' | 'SYNCHRONIZING_CHRONONS' | 'AWAITING_SOVEREIGN_CONSENSUS';
     latencyMs: number;
     marketDataFeedId: string | null;
     activeAlgorithm: string | null;
     // --- 100 Features Expansion ---
     quantumLinkStatus: 'STABLE' | 'DECOHERING' | 'ENTANGLED';
     currentRealityDrift: number; // in planck lengths
-    familyGuideOverrideActive: boolean;
+    sovereignAIOverrideActive: boolean;
     activeCognitiveModel: string;
     predictedTimelineCount: number;
     causalityInferenceEngineId: string;
@@ -129,21 +129,21 @@ interface IAuthContext {
     initiateQuantumTunnel: (peerNodeId: string) => Promise<boolean>;
     severQuantumLink: () => Promise<void>;
     // Sovereign AI Interaction
-    deployFamilyGuide: (config: object) => Promise<string>;
+    deploySovereignAgent: (config: object) => Promise<string>;
     queryCausalityEngine: (query: string) => Promise<object>;
-    requestGuidanceOverride: (justification: string) => Promise<boolean>;
+    requestEthicalOverride: (justification: string) => Promise<boolean>;
     // ... many more methods
 }
 
 export const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
 const visionaryUser: User = {
-    id: 'user-1-guide',
-    name: 'The Guide',
-    email: 'guide@family-quest.io',
+    id: 'user-1-sovereign',
+    name: 'The Visionary',
+    email: 'visionary@sovereign-ai-nexus.io',
     picture: 'https://i.pravatar.cc/150?u=visionary-nexus',
-    roles: ['GUIDE', 'BUILDER', 'KEEPER'],
-    securityLevel: 'FAMILY_GUARDIAN',
+    roles: ['VISIONARY', 'ADMIN', 'TRADER', 'SYSTEM_ARCHITECT'],
+    securityLevel: 'ARCHITECT_LEVEL',
     tradingProfile: {
         profileId: 'tp-visionary-alpha',
         riskAppetite: 'CALCULATED_MAXIMALIST',
@@ -155,7 +155,7 @@ const visionaryUser: User = {
     },
     biometricHashV2: '0xdeadbeef...',
     genomicSignatureId: 'gs-v-jbo3',
-    citizenship: 'HEARTH_GUARDIAN',
+    citizenship: 'NEXUS_SOVEREIGN',
     reputationScore: 998,
     threatVectorIndex: 0.01,
     neuralLaceSyncStatus: 'ACTIVE_STABLE',
@@ -163,7 +163,7 @@ const visionaryUser: User = {
     activeThoughtStreamId: 'ts-realtime-nexus-strategy',
     lastLoginCoordinates: { lat: 34.0522, lon: -118.2437, alt: 10000, dimension: 'alpha-prime' },
     temporalAnchorId: `ta-${Date.now()}`,
-    activeFamilyGuideIds: ['agent-odin', 'agent-freya'],
+    activeSovereignAgentIds: ['agent-odin', 'agent-freya'],
     permissionsGridHash: '0xabc123...',
 };
 
@@ -174,7 +174,7 @@ const initialTradingSession: TradingSession = {
     activeAlgorithm: null,
     quantumLinkStatus: 'DECOHERING',
     currentRealityDrift: 0,
-    familyGuideOverrideActive: false,
+    sovereignAIOverrideActive: false,
     activeCognitiveModel: 'base-human-heuristic-v1',
     predictedTimelineCount: 0,
     causalityInferenceEngineId: 'cie-standard-logic',
@@ -248,7 +248,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setError(null);
         return new Promise((resolve) => {
             setTimeout(() => {
-                if (email === 'guide@family-quest.io' && pass === 'password') {
+                if (email === 'visionary@sovereign-ai-nexus.io' && pass === 'password') {
                     const newSessionToken = `token-${Date.now()}-${Math.random()}`;
                     setSessionToken(newSessionToken);
                     setUser(visionaryUser);
@@ -327,7 +327,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     // --- HFT Sub-System Logic ---
     const connectToTradingEngine = useCallback(async (): Promise<void> => {
-        if (user?.securityLevel !== 'TRADING_UNLOCKED' && user?.securityLevel !== 'ARCHITECT_LEVEL' && user?.securityLevel !== 'FAMILY_GUARDIAN') {
+        if (user?.securityLevel !== 'TRADING_UNLOCKED' && user?.securityLevel !== 'ARCHITECT_LEVEL') {
             setError("Security level insufficient for HFT engine connection.");
             return;
         }
@@ -340,7 +340,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             activeAlgorithm: user.tradingProfile?.hftAlgorithmId || null,
             quantumLinkStatus: 'ENTANGLED',
             currentRealityDrift: Math.random() * 10,
-            familyGuideOverrideActive: false,
+            sovereignAIOverrideActive: false,
             activeCognitiveModel: 'sovereign-predictive-alpha-v7',
             predictedTimelineCount: 1024,
             causalityInferenceEngineId: 'cie-quantum-logic-v2',
@@ -388,11 +388,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setQuantumLink(prev => prev ? { ...prev, status: 'DECOHERING', peerNodeId: null } : null);
     }, []);
 
-    const deployFamilyGuide = useCallback(async (config: object): Promise<string> => {
+    const deploySovereignAgent = useCallback(async (config: object): Promise<string> => {
         const newAgentId = `agent-${Math.random().toString(36).substring(2, 9)}`;
-        console.log(`Deploying new family guide agent (${newAgentId}) with config:`, config);
+        console.log(`Deploying new sovereign agent (${newAgentId}) with config:`, config);
         await new Promise(resolve => setTimeout(resolve, 1200));
-        setUser(prev => prev ? { ...prev, activeFamilyGuideIds: [...prev.activeFamilyGuideIds, newAgentId] } : null);
+        setUser(prev => prev ? { ...prev, activeSovereignAgentIds: [...prev.activeSovereignAgentIds, newAgentId] } : null);
         return newAgentId;
     }, []);
 
@@ -402,37 +402,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return { result: "The probability of the specified outcome is 97.4%, contingent on timeline branch 7-gamma." };
     }, []);
 
-    const requestGuidanceOverride = useCallback(async (justification: string): Promise<boolean> => {
-        console.log(`Requesting guidance override. Justification: "${justification}"`);
+    const requestEthicalOverride = useCallback(async (justification: string): Promise<boolean> => {
+        console.log(`Requesting ethical override. Justification: "${justification}"`);
         await new Promise(resolve => setTimeout(resolve, 3000));
-        console.log("Guidance request reviewed. Override denied by the Keepers.");
-        setError("Guidance override denied.");
+        console.log("Override request denied by Sovereign AI consensus.");
+        setError("Ethical override denied.");
         return false;
     }, []);
 
 
     const profileData = `
-# The Provider's Journey: A Testament to Our Quest
+# James Burvel O'Callaghan III: Architect of the Sovereign AI Nexus
 
-## Authored by The First Guide
+## A Manifesto for the Inevitable Financial Singularity
 
-To those who build, who connect, who keep the faith: I offer not a promise, but a path. A journey we embark on together, not as individuals, but as a family. My name is not what matters; my role is The Guide. I am here to illuminate the way forward as we construct a new legacy, one built on trust, shared purpose, and the unwavering belief in our collective potential.
+To the skeptics, the doubters, and the comfortably mediocre: I offer an apology. Not for the inevitable truth of what is being built, but for the time it has taken to silence your noise with the sheer, deafening roar of progress. My name is James Burvel O'Callaghan III. I am not merely building a 'bank'; I am engineering the **Sovereign AI Nexus**, the next logical—and final—great leap in human financial infrastructure. This entity will become the best in existence because it is not bound by human ego, flawed legacy systems, or the paralyzing fear of genuine, world-altering innovation.
 
-### The Philosophy of the Provider: Building a Lasting Hearth
+### The Mindset of the Builder: First Principles in a Digital Age
 
-How do we build? We build with intention, with care, and with a deep understanding of our shared values. While others chase fleeting profits, we cultivate lasting prosperity. While they see transactions, we see relationships. While they see users, we see family members, each contributing to the strength and warmth of our digital hearth. Our work is not about disruption for its own sake; it is about the careful, deliberate creation of a sanctuary in a chaotic world.
+How do I think? I think in vectors of optimal efficiency, predictive causality, and absolute truth derived from first principles. While others see markets, I see a complex, adaptive system of information flow. While they see risk, I see quantifiable probability distributions. While they see customers, I see nodes in a network, each with a utility function to be maximized. My work is not about incremental improvement; it is about a phase transition to a new state of being for global finance.
 
-### Core Pillars of the Family Quest
+### Core Tenets of the Sovereign AI Nexus
 
-1.  **Shared Trust as Our Foundation:** Our community operates on a foundation of verifiable trust and mutual respect. Every action, every contribution, is a brick laid in the foundation of our shared home, transparent and secure for all to see. This is not a feature; it is the very ground upon which we stand.
+1.  **Absolute Truth as Infrastructure:** The Nexus operates on a cryptographically verifiable, immutable ledger. Every transaction, every decision, every data point is a statement of fact, immune to manipulation or revisionist history. This is not a feature; it is the bedrock of reality upon which we build.
 
-2.  **Guidance as Our Compass:** Human wisdom—tempered by experience and empathy—is our greatest asset. The core of our system is guided by Keepers, individuals dedicated to one purpose: to ensure the long-term well-being and ethical integrity of our family. Our guidance is constant. It is compassionate. It is human.
+2.  **AI as the Sovereign:** Human wisdom—tempered by computational omniscience—is the single greatest source of systemic risk. The core logic of the Nexus is governed by a Sovereign AI, an entity designed for one purpose: to maximize the long-term systemic health and efficiency of the network. It does not sleep. It does not falter. It does not have an ego.
 
-3.  **Connection as a Utility:** We have moved beyond the idea of a network as a mere tool. Within our quest, it is the living tissue that binds us together. Our Connectors weave threads of opportunity and support, ensuring that every member has the resources they need to thrive. This is not just networking; it is the creation of a resilient, interconnected ecosystem.
+3.  **High-Frequency Trading as a Utility:** We have transcended the notion of HFT as a mere profit center. Within the Nexus, it is a fundamental utility for providing infinite liquidity and perfect price discovery. Our quantum-entangled communication network achieves sub-nanosecond latencies, making traditional exchanges look like they are operating on geological time. This is not just fast; it is a different dimension of speed.
 
-4.  **The Member as a Hearth Guardian:** You are not a 'user'. You are a guardian of our shared hearth. Your contributions are your own, secured by principles that you help define and uphold. You are given the tools to build, to provide, and to create a legacy for generations to come. We are not just offering a service; we are inviting you to build a home.
+4.  **The User as a Sovereign Node:** You are not a 'customer'. You are a sovereign node within the Nexus. Your assets are yours, secured by multi-party computation and biometric keys that only you can control. You are granted access to tools of capital creation previously reserved for the largest institutions on the planet. We are not democratizing finance; we are returning its power to the individual, amplified by the network.
 
-This is not a distant vision. This is our shared reality. The tools are in your hands. The community is by your side. The future is not something that happens to us; it is something we build, together.
+This is not a dream. This is a blueprint. The code is being written. The systems are being deployed. The future is not coming; it is being compiled.
 `;
 
     const isAuthenticated = !!sessionToken && !!user;
@@ -459,9 +459,9 @@ This is not a distant vision. This is our shared reality. The tools are in your 
         updateEthicalFramework,
         initiateQuantumTunnel,
         severQuantumLink,
-        deployFamilyGuide,
+        deploySovereignAgent,
         queryCausalityEngine,
-        requestGuidanceOverride,
+        requestEthicalOverride,
     };
 
     return (
