@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import Card from './Card';
 import { GoogleGenAI } from "@google/genai";
@@ -7,7 +6,7 @@ import { DataContext } from '../context/DataContext';
 const AIAdvisorView: React.FC = () => {
     const context = useContext(DataContext);
     const [input, setInput] = useState('');
-    const [response, setResponse] = useState('I am your AI Financial Advisor. How can I help you today?');
+    const [response, setResponse] = useState('Welcome to your personal AI Financial Advisor. I can help you understand complex financial topics, analyze your portfolio, or simulate investment strategies. What would you like to learn about today? For example, you could ask "Explain dollar-cost averaging" or "Analyze my risk tolerance".');
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSend = async () => {
