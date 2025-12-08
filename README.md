@@ -1,4 +1,3 @@
-[![committers.top badge](https://user-badge.committers.top/united_states/jocall3.svg)](https://user-badge.committers.top/united_states/jocall3)
 
 # The Sovereign AI Nexus: A Blueprint for a Type I Financial Civilization
 
