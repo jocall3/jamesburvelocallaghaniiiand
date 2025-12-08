@@ -172,24 +172,94 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 // --- Enhanced Landing Page ---
 const EnhancedLandingPage = () => {
     const navigate = useNavigate();
+    const { isAuthenticated } = useContext(AuthContext)!;
+
+    const features = [
+        {
+            icon: <Cpu className="w-8 h-8 text-cyan-400" />,
+            title: "AI-Powered Orchestration",
+            description: "Leverage a hyper-intelligent core to automate complex financial workflows and generate predictive insights.",
+        },
+        {
+            icon: <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>,
+            title: "Sovereign Grade Security",
+            description: "Built on a foundation of zero-trust architecture, ensuring data integrity and privacy at every layer.",
+        },
+        {
+            icon: <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M2 8c0-2.2.7-4.3 2-6"></path><path d="M22 8c0-2.2-.7-4.3-2-6"></path></svg>,
+            title: "Global Data Aggregation",
+            description: "Seamlessly connect and normalize data from thousands of sources, from global banks to Web3 protocols.",
+        },
+    ];
+
     return (
-        <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black z-0"></div>
-            <div className="z-10 text-center px-4 max-w-4xl flex flex-col items-center">
-                <Cpu className="w-24 h-24 text-cyan-400 mb-8 animate-pulse" />
-                <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-600">
+        <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center relative overflow-hidden p-4">
+            {/* Background Grid */}
+            <div className="absolute inset-0 z-0 opacity-10" style={{
+                backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)',
+                backgroundSize: '2rem 2rem',
+            }}></div>
+            
+            {/* Animated Gradient Blobs */}
+            <div className="absolute top-0 -left-1/4 w-96 h-96 bg-purple-600 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-blob"></div>
+            <div className="absolute top-0 -right-1/4 w-96 h-96 bg-cyan-600 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+            <div className="absolute -bottom-8 left-1/4 w-96 h-96 bg-pink-600 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+
+            <div className="z-10 text-center max-w-5xl flex flex-col items-center">
+                <Cpu className="w-20 h-20 md:w-24 md:h-24 text-cyan-400 mb-6 animate-pulse" />
+                <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">
                     The 527 Protocol
                 </h1>
-                <p className="text-xl md:text-2xl text-gray-300 mb-10 max-w-2xl">
+                <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl">
                     Infinite Intelligence. Sovereign Wealth. The future of financial orchestration.
                 </p>
-                <button 
-                    onClick={() => navigate('/login')}
-                    className="px-10 py-4 bg-cyan-600 hover:bg-cyan-500 text-white text-lg font-bold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-cyan-500/50"
-                >
-                    Get Started
-                </button>
+                
+                {isAuthenticated ? (
+                    <button 
+                        onClick={() => navigate('/dashboard')}
+                        className="px-10 py-4 bg-cyan-600 hover:bg-cyan-500 text-white text-lg font-bold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-cyan-500/50"
+                    >
+                        Enter Dashboard
+                    </button>
+                ) : (
+                    <button 
+                        onClick={() => navigate('/login')}
+                        className="px-10 py-4 bg-cyan-600 hover:bg-cyan-500 text-white text-lg font-bold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-cyan-500/50"
+                    >
+                        Access The Protocol
+                    </button>
+                )}
+
+                {/* Feature Highlights */}
+                <div className="mt-16 md:mt-24 grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
+                    {features.map((feature, index) => (
+                        <div key={index} className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700/50 flex flex-col items-center text-center transform transition-all hover:scale-105 hover:border-cyan-400/50">
+                            <div className="mb-4 p-3 bg-gray-800 rounded-full">
+                                {feature.icon}
+                            </div>
+                            <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
+                            <p className="text-gray-400 text-sm">{feature.description}</p>
+                        </div>
+                    ))}
+                </div>
             </div>
+            <style>{`
+                .animate-blob {
+                    animation: blob 7s infinite;
+                }
+                .animation-delay-2000 {
+                    animation-delay: -2s;
+                }
+                .animation-delay-4000 {
+                    animation-delay: -4s;
+                }
+                @keyframes blob {
+                    0% { transform: translate(0px, 0px) scale(1); }
+                    33% { transform: translate(30px, -50px) scale(1.1); }
+                    66% { transform: translate(-20px, 20px) scale(0.9); }
+                    100% { transform: translate(0px, 0px) scale(1); }
+                }
+            `}</style>
         </div>
     );
 };
