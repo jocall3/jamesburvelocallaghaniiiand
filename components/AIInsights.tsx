@@ -1,4 +1,3 @@
-
 import React, { useContext, useState, useMemo } from 'react';
 import Card from './Card';
 import type { AIInsight } from '../types';
@@ -60,6 +59,12 @@ const CloseIcon = () => (
     </svg>
 );
 
+const InfoIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500 group-hover/info:text-cyan-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+);
+
 // --- Enhanced Urgency Indicator with Labels ---
 
 const UrgencyIndicator: React.FC<{ urgency: 'low' | 'medium' | 'high' }> = ({ urgency }) => {
@@ -75,6 +80,21 @@ const UrgencyIndicator: React.FC<{ urgency: 'low' | 'medium' | 'high' }> = ({ ur
             <span className="text-gray-400">{urgencyConfig[urgency].label} Urgency</span>
         </div>
     );
+};
+
+const getEducationalText = (actionType?: string) => {
+    switch (actionType) {
+        case 'rebalance_portfolio':
+            return 'Rebalancing adjusts your portfolio\'s asset allocation to maintain your desired risk level. It involves selling assets that have grown and buying those that have shrunk.';
+        case 'set_stop_loss':
+            return 'A stop-loss is an order to sell a security when it reaches a certain price. It\'s designed to limit an investor\'s loss on a security position.';
+        case 'execute_trade':
+            return 'This involves buying or selling a security based on a specific market signal, such as momentum, volatility, or order book analysis.';
+        case 'liquidity_provision':
+            return 'Providing liquidity means depositing a pair of assets into a decentralized exchange pool to facilitate trading. In return, you earn fees from the trades that occur.';
+        default:
+            return 'This is a general insight. Review the details for more information.';
+    }
 };
 
 // --- Self-Contained "App-in-App" Action Modal with Multi-Tab Analysis ---
@@ -316,10 +336,16 @@ export const AIInsights: React.FC = () => {
                         <p className="text-sm text-gray-400 mt-1 line-clamp-2">{insight.description}</p>
                         
                         <div className="mt-3 flex items-center justify-between">
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 items-center">
                                 {insight.tags.map(tag => (
                                     <span key={tag} className="text-[10px] uppercase font-bold px-2 py-0.5 bg-gray-700 rounded text-gray-300">{tag}</span>
                                 ))}
+                                <div className="relative group/info ml-2">
+                                    <InfoIcon />
+                                    <div className="absolute bottom-full mb-2 w-64 p-3 bg-gray-900 border border-gray-700 rounded-lg shadow-lg text-xs text-gray-300 opacity-0 group-hover/info:opacity-100 transition-opacity duration-200 pointer-events-none z-10 -translate-x-1/2 left-1/2">
+                                        {getEducationalText(insight.actionType)}
+                                    </div>
+                                </div>
                             </div>
                             <div className="flex items-center text-xs font-mono text-cyan-400 opacity-80 group-hover:opacity-100">
                                 <span className="mr-2">Score: {insight.confidenceScore}</span>
