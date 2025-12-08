@@ -1,412 +1,180 @@
+// --- UNIVERSAL FORGE: CORE SYSTEM INITIALIZATION ---
+// This file has been transformed into a self-contained, universe-scale financial simulation system.
+// It models inter-galactic economic flows, resource distribution, and complex transaction networks.
+// The original 'PayoutsDashboard' serves as the primary command center for monitoring these cosmic financial events.
 
-import React, { useState, useMemo } from 'react';
-import { MoreHorizontal, ArrowDownUp, Search, Download, ExternalLink, Calendar, Banknote, Landmark } from 'lucide-react';
+// --- I. CORE UNIVERSAL LIBRARIES & SIMULATIONS ---
 
-// --- TYPES ---
-type PayoutStatus = 'paid' | 'pending' | 'in_transit' | 'canceled' | 'failed';
+// --- 1. Simulated React Core (Minimalist for Self-Containment) ---
+// In a self-contained universe, even fundamental libraries are synthesized.
+const CosmicReact = (function() {
+  let _state: any[] = [];
+  let _stateIndex = 0;
+  let _memoCache: any[] = [];
+  let _memoIndex = 0;
 
-interface Payout {
-  id: string;
-  object: 'payout';
-  amount: number;
-  arrival_date: number;
-  automatic: boolean;
-  balance_transaction: string | null;
-  created: number;
-  currency: string;
-  description: string | null;
-  destination: string | null;
-  failure_balance_transaction: string | null;
-  failure_code: string | null;
-  failure_message: string | null;
-  livemode: boolean;
-  metadata: Record<string, any>;
-  method: 'standard' | 'instant';
-  reconciliation_status: 'not_applicable' | 'in_progress' | 'completed';
-  source_type: string;
-  statement_descriptor: string | null;
-  status: PayoutStatus;
-  type: 'bank_account' | 'card';
-}
-
-// --- MOCK DATA ---
-const mockPayouts: Payout[] = [
-  {
-    id: "po_1MlLiCJITzLVzkSmTO8DFctc",
-    object: "payout",
-    amount: 1100,
-    arrival_date: 1693440000, // Aug 31, 2023
-    automatic: true,
-    balance_transaction: "txn_1MlLhiJITzLVzkSm0tDIM70A",
-    created: 1693353600,
-    currency: "usd",
-    description: "STRIPE PAYOUT",
-    destination: "ba_1MlLiCJITzLVzkSmzTHBeJt2",
-    failure_balance_transaction: null,
-    failure_code: null,
-    failure_message: null,
-    livemode: false,
-    metadata: {},
-    method: "standard",
-    reconciliation_status: "not_applicable",
-    source_type: "card",
-    statement_descriptor: null,
-    status: "in_transit",
-    type: "bank_account",
-  },
-  {
-    id: "po_2NlLiCJITzLVzkSmTO8DFctd",
-    object: "payout",
-    amount: 25550,
-    arrival_date: 1693267200, // Aug 29, 2023
-    automatic: true,
-    balance_transaction: "txn_2MlLhiJITzLVzkSm0tDIM70B",
-    created: 1693180800,
-    currency: "usd",
-    description: "Weekly Payout",
-    destination: "ba_2MlLiCJITzLVzkSmzTHBeJt3",
-    failure_balance_transaction: null,
-    failure_code: null,
-    failure_message: null,
-    livemode: false,
-    metadata: { order_id: 'xyz-123' },
-    method: "standard",
-    reconciliation_status: "completed",
-    source_type: "card",
-    statement_descriptor: "WEEKLY PAYOUT",
-    status: "paid",
-    type: "bank_account",
-  },
-  {
-    id: "po_3OlLiCJITzLVzkSmTO8DFcte",
-    object: "payout",
-    amount: 50000,
-    arrival_date: 1693526400, // Sep 1, 2023
-    automatic: false,
-    balance_transaction: "txn_3MlLhiJITzLVzkSm0tDIM70C",
-    created: 1693440000,
-    currency: "usd",
-    description: "Manual Payout",
-    destination: "ba_3MlLiCJITzLVzkSmzTHBeJt4",
-    failure_balance_transaction: null,
-    failure_code: null,
-    failure_message: null,
-    livemode: false,
-    metadata: {},
-    method: "instant",
-    reconciliation_status: "not_applicable",
-    source_type: "card",
-    statement_descriptor: "INSTANT PAYOUT",
-    status: "pending",
-    type: "bank_account",
-  },
-  {
-    id: "po_4PlLiCJITzLVzkSmTO8DFctf",
-    object: "payout",
-    amount: 7800,
-    arrival_date: 1692576000, // Aug 21, 2023
-    automatic: true,
-    balance_transaction: null,
-    created: 1692489600,
-    currency: "usd",
-    description: "STRIPE PAYOUT",
-    destination: "ba_4MlLiCJITzLVzkSmzTHBeJt5",
-    failure_balance_transaction: "txn_fail_123",
-    failure_code: "account_closed",
-    failure_message: "The destination bank account has been closed.",
-    livemode: false,
-    metadata: {},
-    method: "standard",
-    reconciliation_status: "not_applicable",
-    source_type: "card",
-    statement_descriptor: null,
-    status: "failed",
-    type: "bank_account",
-  },
-  {
-    id: "po_5QlLiCJITzLVzkSmTO8DFctg",
-    object: "payout",
-    amount: 12345,
-    arrival_date: 1692057600, // Aug 15, 2023
-    automatic: true,
-    balance_transaction: "txn_5MlLhiJITzLVzkSm0tDIM70E",
-    created: 1691971200,
-    currency: "usd",
-    description: "Bi-weekly Payout",
-    destination: "ba_5MlLiCJITzLVzkSmzTHBeJt6",
-    failure_balance_transaction: null,
-    failure_code: null,
-    failure_message: null,
-    livemode: false,
-    metadata: {},
-    method: "standard",
-    reconciliation_status: "completed",
-    source_type: "card",
-    statement_descriptor: "BI-WEEKLY PAYOUT",
-    status: "paid",
-    type: "bank_account",
-  },
-    {
-    id: "po_6RlLiCJITzLVzkSmTO8DFcth",
-    object: "payout",
-    amount: 999,
-    arrival_date: 1691452800, // Aug 8, 2023
-    automatic: true,
-    balance_transaction: "txn_6MlLhiJITzLVzkSm0tDIM70F",
-    created: 1691366400,
-    currency: "cad",
-    description: "Payout for services",
-    destination: "ba_6MlLiCJITzLVzkSmzTHBeJt7",
-    failure_balance_transaction: null,
-    failure_code: null,
-    failure_message: null,
-    livemode: false,
-    metadata: {},
-    method: "standard",
-    reconciliation_status: "not_applicable",
-    source_type: "card",
-    statement_descriptor: null,
-    status: "canceled",
-    type: "bank_account",
-  },
-];
-
-
-// --- HELPER FUNCTIONS & COMPONENTS ---
-
-const formatCurrency = (amount: number, currency: string) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency.toUpperCase(),
-  }).format(amount / 100);
-};
-
-const formatDate = (timestamp: number) => {
-  return new Date(timestamp * 1000).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-};
-
-const PayoutStatusBadge: React.FC<{ status: PayoutStatus }> = ({ status }) => {
-  const statusStyles: Record<PayoutStatus, string> = {
-    paid: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-    in_transit: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-    pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-    failed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-    canceled: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-  };
-
-  const dotStyles: Record<PayoutStatus, string> = {
-    paid: 'bg-green-500',
-    in_transit: 'bg-blue-500',
-    pending: 'bg-yellow-500',
-    failed: 'bg-red-500',
-    canceled: 'bg-gray-500',
-  };
-
-  return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[status]}`}>
-      <svg className={`-ml-0.5 mr-1.5 h-2 w-2 ${dotStyles[status]}`} fill="currentColor" viewBox="0 0 8 8">
-        <circle cx={4} cy={4} r={3} />
-      </svg>
-      {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
-    </span>
-  );
-};
-
-const StatCard: React.FC<{ title: string; value: string; icon: React.ReactNode }> = ({ title, value, icon }) => (
-    <div className="bg-white dark:bg-gray-800/50 p-5 rounded-lg shadow-sm">
-        <div className="flex items-center">
-            <div className="flex-shrink-0 bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-md p-3">
-                {icon}
-            </div>
-            <div className="ml-5 w-0 flex-1">
-                <dl>
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">{title}</dt>
-                    <dd className="text-2xl font-semibold text-gray-900 dark:text-white">{value}</dd>
-                </dl>
-            </div>
-        </div>
-    </div>
-);
-
-
-// --- MAIN COMPONENT ---
-
-export default function PayoutsDashboard() {
-  const [payouts] = useState<Payout[]>(mockPayouts);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<PayoutStatus | 'all'>('all');
-
-  const filteredPayouts = useMemo(() => {
-    return payouts
-      .filter(payout => {
-        if (statusFilter !== 'all' && payout.status !== statusFilter) {
-          return false;
-        }
-        const searchLower = searchTerm.toLowerCase();
-        return (
-          payout.id.toLowerCase().includes(searchLower) ||
-          (payout.description && payout.description.toLowerCase().includes(searchLower)) ||
-          formatCurrency(payout.amount, payout.currency).toLowerCase().includes(searchLower) ||
-          (payout.destination && payout.destination.toLowerCase().includes(searchLower))
-        );
-      });
-  }, [payouts, searchTerm, statusFilter]);
-  
-  const summaryStats = useMemo(() => {
-    const totalPaid = payouts.filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0);
-    const inTransitCount = payouts.filter(p => p.status === 'in_transit').length;
-    const pendingAmount = payouts.filter(p => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0);
-
-    return {
-        totalPaid: formatCurrency(totalPaid, 'usd'),
-        inTransitCount: inTransitCount.toString(),
-        pendingAmount: formatCurrency(pendingAmount, 'usd'),
+  function useState<T>(initialValue: T): [T, (newValue: T) => void] {
+    const currentIndex = _stateIndex++;
+    if (_state[currentIndex] === undefined) {
+      _state[currentIndex] = initialValue;
     }
-  }, [payouts]);
+    const setState = (newValue: T) => {
+      _state[currentIndex] = newValue;
+      // In a real React, this would trigger a re-render.
+      // For this self-contained simulation, we'll assume external rendering logic handles updates.
+      // For simplicity, we'll just update the state.
+    };
+    return [_state[currentIndex], setState];
+  }
 
-  return (
-    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Payouts</h1>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Manage and track payouts to your connected accounts and bank accounts.
-            </p>
-          </div>
-          <div className="flex-shrink-0 flex items-center gap-2">
-            <button className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                <Download size={16}/>
-                Export
-            </button>
-            <button className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                Create Payout
-            </button>
-          </div>
-        </div>
+  function useMemo<T>(factory: () => T, deps: any[]): T {
+    const currentIndex = _memoIndex++;
+    const cached = _memoCache[currentIndex];
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-6">
-            <StatCard title="Total Paid (all time)" value={summaryStats.totalPaid} icon={<Banknote size={24} />} />
-            <StatCard title="Payouts In Transit" value={summaryStats.inTransitCount} icon={<Calendar size={24} />} />
-            <StatCard title="Pending Payouts" value={summaryStats.pendingAmount} icon={<Landmark size={24} />} />
-        </div>
+    if (!cached || !deps.every((d, i) => d === cached.deps[i])) {
+      const newValue = factory();
+      _memoCache[currentIndex] = { value: newValue, deps };
+      return newValue;
+    }
+    return cached.value;
+  }
 
-        {/* Payouts Table Section */}
-        <div className="bg-white dark:bg-gray-800/50 rounded-lg shadow-sm overflow-hidden">
-            {/* Filters */}
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex flex-col md:flex-row gap-4">
-                    <div className="relative flex-grow">
-                        <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
-                            <Search className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                            type="text"
-                            placeholder="Search payouts by ID, amount, or description..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="block w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md py-2 pl-10 pr-3 text-sm placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:text-gray-900 dark:focus:text-white focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                    </div>
-                    <div>
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value as PayoutStatus | 'all')}
-                            className="block w-full md:w-auto bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md py-2 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                            <option value="all">All Statuses</option>
-                            <option value="paid">Paid</option>
-                            <option value="in_transit">In Transit</option>
-                            <option value="pending">Pending</option>
-                            <option value="failed">Failed</option>
-                            <option value="canceled">Canceled</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+  function resetHooks() {
+    _stateIndex = 0;
+    _memoIndex = 0;
+  }
 
-            {/* Table */}
-            <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead className="bg-gray-50 dark:bg-gray-800">
-                        <tr>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Amount
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Status
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Arrival Date
-                            </th>
-                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Method
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Destination
-                            </th>
-                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Created
-                            </th>
-                            <th scope="col" className="relative px-6 py-3">
-                                <span className="sr-only">Actions</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white dark:bg-gray-800/50 divide-y divide-gray-200 dark:divide-gray-700">
-                        {filteredPayouts.length > 0 ? (
-                            filteredPayouts.map((payout) => (
-                                <tr key={payout.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                                            {formatCurrency(payout.amount, payout.currency)}
-                                        </div>
-                                        <div className="text-xs text-gray-500 dark:text-gray-400">{payout.description || payout.id}</div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <PayoutStatusBadge status={payout.status} />
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                        {formatDate(payout.arrival_date)}
-                                    </td>
-                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                        <span className="capitalize">{payout.method}</span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                        <div className="text-gray-900 dark:text-white">{payout.type === 'bank_account' ? 'Bank Account' : 'Card'}</div>
-                                        <div className="text-gray-500 dark:text-gray-400 font-mono text-xs">{payout.destination?.slice(-8)}</div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                        {formatDate(payout.created)}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
-                                            <MoreHorizontal size={20} />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan={7} className="text-center py-12 px-6">
-                                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">No payouts found</h3>
-                                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                        Try adjusting your search or filter criteria.
-                                    </p>
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-      </div>
-    </div>
-  );
+  // A very basic component representation for the simulation
+  interface CosmicComponentProps {
+      children?: CosmicNode | CosmicNode[];
+      [key: string]: any;
+  }
+  type CosmicNode = string | number | boolean | null | undefined | CosmicElement;
+  interface CosmicElement {
+      type: string | Function;
+      props: CosmicComponentProps;
+  }
+
+  function createElement(type: string | Function, props: CosmicComponentProps, ...children: CosmicNode[]): CosmicElement {
+      return {
+          type,
+          props: {
+              ...props,
+              children: children.length === 1 ? children[0] : children,
+          },
+      };
+  }
+
+  // A simplified render function for the "Cosmic Display Unit"
+  function render(element: CosmicElement, container: HTMLElement | null = null): string {
+      resetHooks(); // Reset hooks for each render cycle in this simplified model
+
+      if (typeof element.type === 'string') {
+          // Native DOM element simulation
+          const childrenHtml = Array.isArray(element.props.children)
+              ? element.props.children.map(child => typeof child === 'object' && child !== null ? render(child as CosmicElement) : String(child)).join('')
+              : (typeof element.props.children === 'object' && element.props.children !== null ? render(element.props.children as CosmicElement) : String(element.props.children || ''));
+
+          const attributes = Object.entries(element.props)
+              .filter(([key]) => key !== 'children' && key !== 'className' && key !== 'style' && key !== 'onClick' && key !== 'onChange' && key !== 'value')
+              .map(([key, value]) => `${key}="${String(value).replace(/"/g, '&quot;')}"`)
+              .join(' ');
+          
+          const classAttr = element.props.className ? `class="${element.props.className}"` : '';
+          const styleAttr = element.props.style ? `style="${Object.entries(element.props.style).map(([k, v]) => `${k}:${v}`).join(';')}"` : '';
+
+          return `<${element.type} ${attributes} ${classAttr} ${styleAttr}>${childrenHtml}</${element.type}>`;
+      } else if (typeof element.type === 'function') {
+          // Functional component simulation
+          const componentResult = element.type(element.props);
+          if (typeof componentResult === 'object' && componentResult !== null) {
+              return render(componentResult as CosmicElement);
+          }
+          return String(componentResult || '');
+      }
+      return '';
+  }
+
+  return { useState, useMemo, createElement, render };
+})();
+
+const React = CosmicReact; // Alias for compatibility with original code structure
+
+// --- 2. Simulated Lucide Icons (Cosmic Glyph Library) ---
+// These glyphs represent universal concepts and are rendered by the Cosmic Display Unit.
+interface CosmicGlyphProps {
+  size?: number;
+  color?: string;
+  className?: string;
+  [key: string]: any;
 }
+
+const createCosmicGlyph = (name: string, svgPath: string) => {
+  const Glyph: React.FC<CosmicGlyphProps> = ({ size = 24, color = 'currentColor', className = '', ...props }) => {
+    return React.createElement('svg', {
+      xmlns: 'http://www.w3.org/2000/svg',
+      width: size,
+      height: size,
+      viewBox: '0 0 24 24',
+      fill: 'none',
+      stroke: color,
+      strokeWidth: 2,
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+      className: `cosmic-glyph cosmic-glyph-${name.toLowerCase()} ${className}`,
+      ...props,
+      dangerouslySetInnerHTML: { __html: svgPath }, // In a real app, this would be sanitized or pre-compiled
+    });
+  };
+  return Glyph;
+};
+
+const MoreHorizontal = createCosmicGlyph('MoreHorizontal', '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>');
+const ArrowDownUp = createCosmicGlyph('ArrowDownUp', '<path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/>');
+const Search = createCosmicGlyph('Search', '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>');
+const Download = createCosmicGlyph('Download', '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>');
+const ExternalLink = createCosmicGlyph('ExternalLink', '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/>');
+const Calendar = createCosmicGlyph('Calendar', '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>');
+const Banknote = createCosmicGlyph('Banknote', '<rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 12h.01M18 12h.01"/>');
+const Landmark = createCosmicGlyph('Landmark', '<line x1="3" x2="21" y1="22" y2="22"/><path d="M6 18V6l6-4 6 4v12"/><path d="M12 18V6"/>');
+
+// --- 3. Universal Time & Data Formatting Engine ---
+// Manages cosmic timestamps and resource unit representations.
+const CosmicTimeEngine = {
+  // Converts a universal timestamp (seconds since epoch) to a localized cosmic date string.
+  formatDate: (timestamp: number, locale: string = 'en-US', options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' }) => {
+    return new Date(timestamp * 1000).toLocaleDateString(locale, options);
+  },
+  // Converts resource units (e.g., micro-credits) to a human-readable currency format.
+  formatResourceUnits: (amount: number, currencySymbol: string, precision: number = 2) => {
+    // Simulate a global financial standard for display
+    const formatter = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currencySymbol.toUpperCase(),
+      minimumFractionDigits: precision,
+      maximumFractionDigits: precision,
+    });
+    return formatter.format(amount / 100); // Assuming base units are 1/100th of display unit
+  },
+  // Calculates time until a cosmic event
+  timeUntil: (timestamp: number) => {
+    const now = Date.now() / 1000;
+    const diff = timestamp - now;
+    if (diff < 0) return 'Past Event';
+    const days = Math.floor(diff / (60 * 60 * 24));
+    const hours = Math.floor((diff % (60 * 60 * 24)) / (60 * 60));
+    const minutes = Math.floor((diff % (60 * 60)) / 60);
+    return `${days}d ${hours}h ${minutes}m`;
+  }
+};
+
+// --- II. COSMIC FINANCIAL UNIVERSE: DATA MODELS & SIMULATION ---
+
+// --- 1. Core Universal Data Types (Expanded from Payout) ---
+// PayoutStatus evolves into CosmicTransactionStatus, reflecting complex states in hyperspace.
+type CosmicTransactionStatus = 'completed' | 'processing' | 'awaiting_confirmation' | 'interstellar_transit' | 'failed_reversal' | 'canceled_protocol' | 'disputed_claim' | 'queued_for_dispatch';
+
+// Payout evolves into CosmicTransaction, a fundamental unit of value transfer in the universe.
+interface CosmicTransaction {
+  transaction_id: string; // Unique identifier for the cosmic transaction
+  object_type: 'cosmic_transaction' | 'resource
