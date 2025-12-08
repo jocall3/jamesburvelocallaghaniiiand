@@ -1,343 +1,235 @@
+// --- GLOBAL UNIVERSE CONFIGURATION & UTILITIES ---
 
-import React, { useState, useEffect, useCallback } from 'react';
+/**
+ * @module UniverseConfig
+ * @description Central configuration for the entire simulated universe.
+ * Defines global constants, system parameters, and initial states.
+ */
+namespace UniverseConfig {
+  export const UNIVERSE_NAME = "OmniLedger Nexus";
+  export const UNIVERSE_VERSION = "1.0.0-alpha";
+  export const INITIAL_SIMULATION_DATE = "2023-01-01T00:00:00Z";
+  export const MAX_TRANSACTION_HISTORY_DEPTH = 10000; // Max entries in ledger
+  export const DEFAULT_CURRENCY = "USD";
+  export const SIMULATION_TICK_INTERVAL_MS = 1000; // How often the simulation advances
+  export const API_RATE_LIMIT_DEFAULT_REQUESTS = 100;
+  export const API_RATE_LIMIT_DEFAULT_WINDOW_MS = 60000; // 1 minute
 
-// NOTE: This component assumes a UI library like Material-UI is installed and configured.
-// e.g., `import { TextField, Button } from '@mui/material';`
-// For brevity, component types are aliased to standard HTML elements or placeholder types.
+  export enum LogLevel {
+    DEBUG = 0,
+    INFO = 1,
+    WARN = 2,
+    ERROR = 3,
+    CRITICAL = 4,
+  }
 
-// --- UI Component Placeholders ---
-const Box: React.FC<any> = ({ component: Component = 'div', ...props }) => <Component {...props} />;
-const Typography: React.FC<any> = (props) => <h5 {...props} />;
-const Grid: React.FC<any> = (props) => <div {...props} />;
-const TextField: React.FC<any> = (props) => <input {...props} />;
-const Button: React.FC<any> = (props) => <button {...props} />;
-const Select: React.FC<any> = ({ children, ...props }) => <select {...props}>{children}</select>;
-const MenuItem: React.FC<any> = (props) => <option {...props} />;
-const FormControl: React.FC<any> = (props) => <div {...props} />;
-const InputLabel: React.FC<any> = (props) => <label {...props} />;
-const IconButton: React.FC<any> = (props) => <button {...props} />;
-const Switch: React.FC<any> = (props) => <input type="checkbox" {...props} />;
-const FormControlLabel: React.FC<any> = ({ control, label }) => <label>{control}{label}</label>;
-const Accordion: React.FC<any> = (props) => <details {...props} />;
-const AccordionSummary: React.FC<any> = (props) => <summary {...props} />;
-const AccordionDetails: React.FC<any> = (props) => <div {...props} />;
-const AddCircleOutline: React.FC<any> = () => <span>+</span>;
-const RemoveCircleOutline: React.FC<any> = () => <span>-</span>;
-const ExpandMore: React.FC<any> = () => <span>v</span>;
-// --- End UI Component Placeholders ---
+  export const CURRENT_LOG_LEVEL = LogLevel.INFO;
 
-// --- Type Definitions ---
-interface Account {
-  id: string;
-  name: string;
-  currency: string;
+  export const SYSTEM_ACCOUNTS = {
+    FEE_COLLECTION: "sys_fee_collector_001",
+    INTEREST_ACCRUAL: "sys_interest_accrual_001",
+    RESERVE_POOL: "sys_reserve_pool_001",
+  };
+
+  export const PAYMENT_RAIL_LATENCY_MS = {
+    ach: { min: 1000, max: 5000 }, // 1-5 seconds simulated processing
+    wire: { min: 500, max: 2000 }, // 0.5-2 seconds
+    rtp: { min: 50, max: 200 },    // 50-200 ms
+    check: { min: 5000, max: 15000 }, // 5-15 seconds
+    book: { min: 10, max: 50 },    // 10-50 ms
+    eft: { min: 1000, max: 3000 },
+    sepa: { min: 2000, max: 7000 },
+    bacs: { min: 3000, max: 8000 },
+    au_becs: { min: 2000, max: 6000 },
+    interac: { min: 100, max: 500 },
+    sen: { min: 50, max: 200 },
+    signet: { min: 50, max: 200 },
+    provexchange: { min: 100, max: 500 },
+  };
+
+  export const TRANSACTION_FEES_CENTS = {
+    ach: 25,
+    wire: 1500,
+    rtp: 10,
+    check: 500,
+    book: 0,
+    eft: 30,
+    sepa: 50,
+    bacs: 40,
+    au_becs: 35,
+    interac: 15,
+    sen: 5,
+    signet: 5,
+    provexchange: 15,
+  };
 }
 
-interface LineItem {
-  amount: number; // in cents
-  description: string;
-  metadata?: { [key: string]: string };
+/**
+ * @module UniverseUtils
+ * @description Collection of general-purpose utility functions for the universe.
+ */
+namespace UniverseUtils {
+  /**
+   * Generates a unique identifier (UUID v4 style).
+   * @returns {string} A UUID string.
+   */
+  export function generateUUID(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0,
+            v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  /**
+   * Formats a date string to YYYY-MM-DD.
+   * @param {Date | string} date - The date object or string.
+   * @returns {string} Formatted date string.
+   */
+  export function formatDate(date: Date | string): string {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day = d.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  /**
+   * Converts cents to dollars.
+   * @param {number} cents - Amount in cents.
+   * @returns {number} Amount in dollars.
+   */
+  export function centsToDollars(cents: number): number {
+    return cents / 100;
+  }
+
+  /**
+   * Converts dollars to cents.
+   * @param {number} dollars - Amount in dollars.
+   * @returns {number} Amount in cents.
+   */
+  export function dollarsToCents(dollars: number): number {
+    return Math.round(dollars * 100);
+  }
+
+  /**
+   * Simple logger for the universe.
+   * @param {UniverseConfig.LogLevel} level - The log level.
+   * @param {string} message - The log message.
+   * @param {any[]} args - Additional arguments to log.
+   */
+  export function log(level: UniverseConfig.LogLevel, message: string, ...args: any[]): void {
+    if (level >= UniverseConfig.CURRENT_LOG_LEVEL) {
+      const timestamp = new Date().toISOString();
+      const levelStr = UniverseConfig.LogLevel[level];
+      console.log(`[${timestamp}] [${levelStr}] ${message}`, ...args);
+    }
+  }
+
+  /**
+   * Deep clones an object.
+   * @param {T} obj - The object to clone.
+   * @returns {T} A deep clone of the object.
+   */
+  export function deepClone<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  /**
+   * Simulates a delay.
+   * @param {number} ms - Milliseconds to delay.
+   * @returns {Promise<void>} A promise that resolves after the delay.
+   */
+  export function delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Generates a random integer within a range.
+   * @param {number} min - Minimum value (inclusive).
+   * @param {number} max - Maximum value (inclusive).
+   * @returns {number} A random integer.
+   */
+  export function getRandomInt(min: number, max: number): number {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
 }
 
-interface PaymentOrderFormData {
-  id?: string;
-  type: 'ach' | 'wire' | 'rtp' | 'check' | 'book' | 'eft' | 'sepa' | 'bacs' | 'au_becs' | 'interac' | 'sen' | 'signet' | 'provexchange' | '';
-  subtype?: 'CCD' | 'PPD' | 'IAT' | 'CTX' | 'WEB' | 'CIE' | 'TEL' | '';
-  amount: number; // in dollars
-  direction: 'credit' | 'debit' | '';
-  priority: 'normal' | 'high' | '';
-  originating_account_id: string;
-  receiving_account_id: string;
-  currency: string;
-  effective_date: string; // YYYY-MM-DD
-  description: string;
-  statement_descriptor: string;
-  remittance_information: string;
-  purpose: string;
-  metadata: { key: string; value: string }[];
-  line_items: LineItem[];
-  send_remittance_advice: boolean;
-  nsf_protected: boolean;
-  charge_bearer?: 'shared' | 'sender' | 'receiver' | '';
-  ultimate_originating_party_name: string;
-  ultimate_receiving_party_name: string;
-}
+// --- REACT-LIKE CORE (Minimalist Implementation) ---
+// This section provides a bare-bones, self-contained implementation
+// of React-like hooks and component rendering for the universe's UI.
+// It replaces the external 'react' dependency.
 
-const initialFormData: PaymentOrderFormData = {
-  type: '',
-  subtype: '',
-  amount: 0,
-  direction: '',
-  priority: 'normal',
-  originating_account_id: '',
-  receiving_account_id: '',
-  currency: 'USD',
-  effective_date: new Date().toISOString().split('T')[0],
-  description: '',
-  statement_descriptor: '',
-  remittance_information: '',
-  purpose: '',
-  metadata: [],
-  line_items: [{ amount: 0, description: '' }],
-  send_remittance_advice: false,
-  nsf_protected: false,
-  charge_bearer: '',
-  ultimate_originating_party_name: '',
-  ultimate_receiving_party_name: '',
-};
+namespace ReactLike {
+  type ComponentFunction<P extends object = {}> = (props: P) => VNode;
+  type VNode = {
+    type: string | ComponentFunction;
+    props: { children?: VNode | VNode[] | string | number | null; [key: string]: any };
+    _key?: string | number | null;
+  };
 
-interface PaymentOrderFormProps {
-  initialData?: Partial<PaymentOrderFormData>;
-  onSubmit: (data: any) => void;
-  onCancel: () => void;
-  internalAccounts: Account[];
-  externalAccounts: Account[];
-}
+  let currentComponent: ComponentFunction | null = null;
+  let hookIndex: number = 0;
+  const componentStates = new Map<ComponentFunction, any[]>();
+  const componentEffects = new Map<ComponentFunction, Array<[() => (() => void) | void, any[]]>>();
 
-const paymentTypes = ['ach', 'wire', 'rtp', 'check', 'book', 'eft', 'sepa', 'bacs', 'au_becs', 'interac', 'sen', 'signet', 'provexchange'];
-const achSubtypes = ['CCD', 'PPD', 'IAT', 'CTX', 'WEB', 'CIE', 'TEL'];
-const currencies = ['USD', 'CAD', 'EUR', 'GBP', 'AUD'];
-
-const PaymentOrderForm: React.FC<PaymentOrderFormProps> = ({
-  initialData,
-  onSubmit,
-  onCancel,
-  internalAccounts,
-  externalAccounts,
-}) => {
-  const [formData, setFormData] = useState<PaymentOrderFormData>(initialFormData);
-
-  useEffect(() => {
-    if (initialData) {
-        // When editing, convert amount from cents to dollars for the form
-        const populatedData = { ...initialFormData, ...initialData };
-        if (typeof populatedData.amount === 'number') {
-            populatedData.amount = populatedData.amount / 100;
-        }
-        setFormData(populatedData);
-    } else {
-      setFormData(initialFormData);
+  /**
+   * Creates a virtual DOM node.
+   * @param {string | ComponentFunction} type - The HTML tag name or component function.
+   * @param {object | null} props - The properties of the element.
+   * @param {...(VNode | string | number | null)[]} children - Child nodes.
+   * @returns {VNode} A virtual DOM node.
+   */
+  export function createElement(
+    type: string | ComponentFunction,
+    props: object | null,
+    ...children: (VNode | string | number | null)[]
+  ): VNode {
+    const processedProps = { ...props };
+    if (children.length > 0) {
+      processedProps.children = children.length === 1 ? children[0] : children.flat();
     }
-  }, [initialData]);
+    return { type, props: processedProps };
+  }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    if (type === 'checkbox') {
-      setFormData(prev => ({ ...prev, [name]: (e.target as HTMLInputElement).checked }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+  /**
+   * Renders a VNode into a real DOM element.
+   * @param {VNode} vnode - The virtual DOM node to render.
+   * @returns {HTMLElement | Text} The rendered DOM element.
+   */
+  function renderVNode(vnode: VNode): HTMLElement | Text {
+    if (typeof vnode === 'string' || typeof vnode === 'number' || vnode === null || vnode === undefined) {
+      return document.createTextNode(String(vnode));
     }
-  };
-  
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value);
-    const newAmount = isNaN(value) ? 0 : value;
-    setFormData(prev => ({
-      ...prev,
-      amount: newAmount,
-      line_items: prev.line_items.length === 1 ? [{ ...prev.line_items[0], amount: Math.round(newAmount * 100) }] : prev.line_items
-    }));
-  };
 
-  const handleMetadataChange = (index: number, field: 'key' | 'value', value: string) => {
-    const newMetadata = [...formData.metadata];
-    newMetadata[index] = { ...newMetadata[index], [field]: value };
-    setFormData(prev => ({ ...prev, metadata: newMetadata }));
-  };
-
-  const addMetadataField = () => {
-    setFormData(prev => ({ ...prev, metadata: [...prev.metadata, { key: '', value: '' }] }));
-  };
-
-  const removeMetadataField = (index: number) => {
-    setFormData(prev => ({ ...prev, metadata: prev.metadata.filter((_, i) => i !== index) }));
-  };
-
-  const handleLineItemChange = (index: number, field: 'description' | 'amount', value: string | number) => {
-    const newLineItems = [...formData.line_items];
-    const item = { ...newLineItems[index] };
-    if (field === 'amount') {
-      const amountValue = typeof value === 'string' ? parseFloat(value) : value;
-      item.amount = isNaN(amountValue) ? 0 : Math.round(amountValue * 100);
-    } else {
-      item.description = value as string;
+    if (typeof vnode.type === 'function') {
+      currentComponent = vnode.type;
+      hookIndex = 0;
+      const componentVNode = vnode.type(vnode.props);
+      currentComponent = null;
+      return renderVNode(componentVNode);
     }
-    newLineItems[index] = item;
-    setFormData(prev => ({ ...prev, line_items: newLineItems }));
-  };
 
-  const addLineItem = () => {
-    setFormData(prev => ({ ...prev, line_items: [...prev.line_items, { amount: 0, description: '' }] }));
-  };
-
-  const removeLineItem = (index: number) => {
-    if (formData.line_items.length > 1) {
-      setFormData(prev => ({ ...prev, line_items: prev.line_items.filter((_, i) => i !== index) }));
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const submissionData = {
-      ...formData,
-      amount: Math.round(formData.amount * 100), // Convert to cents
-    };
-    onSubmit(submissionData);
-  };
-
-  const totalLineItemAmount = useCallback(() => {
-    return formData.line_items.reduce((sum, item) => sum + item.amount, 0);
-  }, [formData.line_items]);
-
-  return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ p: 3, border: '1px solid #ddd', borderRadius: 2 }}>
-      <Typography variant="h5" gutterBottom>
-        {formData.id ? 'Edit Payment Order' : 'Create Payment Order'}
-      </Typography>
-
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={4}>
-          <FormControl fullWidth required>
-            <InputLabel>Payment Type</InputLabel>
-            <Select name="type" value={formData.type} label="Payment Type" onChange={handleChange}>
-              <MenuItem value=""><em>Select Type</em></MenuItem>
-              {paymentTypes.map(type => <MenuItem key={type} value={type}>{type.toUpperCase()}</MenuItem>)}
-            </Select>
-          </FormControl>
-        </Grid>
-        {formData.type === 'ach' && (
-          <Grid item xs={12} sm={4}>
-            <FormControl fullWidth>
-              <InputLabel>ACH Subtype</InputLabel>
-              <Select name="subtype" value={formData.subtype} label="ACH Subtype" onChange={handleChange}>
-                <MenuItem value=""><em>None</em></MenuItem>
-                {achSubtypes.map(type => <MenuItem key={type} value={type}>{type}</MenuItem>)}
-              </Select>
-            </FormControl>
-          </Grid>
-        )}
-        <Grid item xs={12} sm={4}>
-          <FormControl fullWidth required>
-            <InputLabel>Direction</InputLabel>
-            <Select name="direction" value={formData.direction} label="Direction" onChange={handleChange}>
-              <MenuItem value=""><em>Select Direction</em></MenuItem>
-              <MenuItem value="credit">Credit</MenuItem>
-              <MenuItem value="debit">Debit</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField name="amount" label="Amount" type="number" value={formData.amount} onChange={handleAmountChange} fullWidth required inputProps={{ step: "0.01" }} />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth required>
-            <InputLabel>Currency</InputLabel>
-            <Select name="currency" value={formData.currency} label="Currency" onChange={handleChange}>
-              {currencies.map(c => <MenuItem key={c} value={c}>{c}</MenuItem>)}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12}>
-          <TextField name="description" label="Description (Internal)" value={formData.description} onChange={handleChange} fullWidth multiline rows={2} />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth required>
-            <InputLabel>Originating Account</InputLabel>
-            <Select name="originating_account_id" value={formData.originating_account_id} label="Originating Account" onChange={handleChange}>
-              <MenuItem value=""><em>Select Account</em></MenuItem>
-              {internalAccounts.map(acc => <MenuItem key={acc.id} value={acc.id}>{acc.name} ({acc.currency})</MenuItem>)}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth required>
-            <InputLabel>Receiving Account</InputLabel>
-            <Select name="receiving_account_id" value={formData.receiving_account_id} label="Receiving Account" onChange={handleChange}>
-              <MenuItem value=""><em>Select Account</em></MenuItem>
-              {[...internalAccounts, ...externalAccounts].map(acc => <MenuItem key={acc.id} value={acc.id}>{acc.name} ({acc.currency})</MenuItem>)}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField name="effective_date" label="Effective Date" type="date" value={formData.effective_date} onChange={handleChange} fullWidth required InputLabelProps={{ shrink: true }} />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel>Priority</InputLabel>
-            <Select name="priority" value={formData.priority} label="Priority" onChange={handleChange}>
-              <MenuItem value="normal">Normal</MenuItem>
-              <MenuItem value="high">High</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="h6" gutterBottom>Line Items</Typography>
-          {formData.line_items.map((item, index) => (
-            <Grid container spacing={2} key={index} alignItems="center" sx={{ mb: 1 }}>
-              <Grid item xs={7}>
-                <TextField label={`Line Item ${index + 1} Description`} value={item.description} onChange={(e: any) => handleLineItemChange(index, 'description', e.target.value)} fullWidth />
-              </Grid>
-              <Grid item xs={4}>
-                <TextField label="Amount" type="number" value={item.amount / 100} onChange={(e: any) => handleLineItemChange(index, 'amount', e.target.value)} fullWidth inputProps={{ step: "0.01" }} />
-              </Grid>
-              <Grid item xs={1}>
-                <IconButton onClick={() => removeLineItem(index)} disabled={formData.line_items.length <= 1}><RemoveCircleOutline /></IconButton>
-              </Grid>
-            </Grid>
-          ))}
-          <Button onClick={addLineItem} startIcon={<AddCircleOutline />}>Add Line Item</Button>
-          {Math.round(formData.amount * 100) !== totalLineItemAmount() && (
-            <Typography color="error" variant="caption" display="block" sx={{ mt: 1 }}>Total of line items (${(totalLineItemAmount() / 100).toFixed(2)}) does not match payment amount (${formData.amount.toFixed(2)}).</Typography>
-          )}
-        </Grid>
-        <Grid item xs={12}>
-          <Accordion>
-            <AccordionSummary expandIcon={<ExpandMore />}><Typography>Optional Fields</Typography></AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}><TextField name="statement_descriptor" label="Statement Descriptor" value={formData.statement_descriptor} onChange={handleChange} fullWidth /></Grid>
-                <Grid item xs={12} sm={6}><TextField name="remittance_information" label="Remittance Information" value={formData.remittance_information} onChange={handleChange} fullWidth /></Grid>
-                {formData.type === 'wire' && (
-                  <Grid item xs={12} sm={6}>
-                    <FormControl fullWidth>
-                      <InputLabel>Charge Bearer</InputLabel>
-                      <Select name="charge_bearer" value={formData.charge_bearer} label="Charge Bearer" onChange={handleChange}>
-                        <MenuItem value=""><em>None</em></MenuItem>
-                        <MenuItem value="shared">Shared (SHA)</MenuItem>
-                        <MenuItem value="sender">Sender (OUR)</MenuItem>
-                        <MenuItem value="receiver">Receiver (BEN)</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                )}
-                <Grid item xs={12} sm={6}><FormControlLabel control={<Switch checked={formData.send_remittance_advice} onChange={handleChange} name="send_remittance_advice" />} label="Send Remittance Advice" /></Grid>
-                <Grid item xs={12} sm={6}><FormControlLabel control={<Switch checked={formData.nsf_protected} onChange={handleChange} name="nsf_protected" />} label="NSF Protected" /></Grid>
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
-        </Grid>
-        <Grid item xs={12}>
-          <Accordion>
-            <AccordionSummary expandIcon={<ExpandMore />}><Typography>Metadata</Typography></AccordionSummary>
-            <AccordionDetails>
-              {formData.metadata.map((meta, index) => (
-                <Grid container spacing={2} key={index} sx={{ mb: 1 }}>
-                  <Grid item xs={5}><TextField label="Key" value={meta.key} onChange={(e: any) => handleMetadataChange(index, 'key', e.target.value)} fullWidth /></Grid>
-                  <Grid item xs={6}><TextField label="Value" value={meta.value} onChange={(e: any) => handleMetadataChange(index, 'value', e.target.value)} fullWidth /></Grid>
-                  <Grid item xs={1}><IconButton onClick={() => removeMetadataField(index)}><RemoveCircleOutline /></IconButton></Grid>
-                </Grid>
-              ))}
-              <Button onClick={addMetadataField} startIcon={<AddCircleOutline />}>Add Metadata</Button>
-            </AccordionDetails>
-          </Accordion>
-        </Grid>
-      </Grid>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-        <Button onClick={onCancel} sx={{ mr: 1 }}>Cancel</Button>
-        <Button type="submit" variant="contained" color="primary">{formData.id ? 'Update Payment Order' : 'Create Payment Order'}</Button>
-      </Box>
-    </Box>
-  );
-};
-
-export default PaymentOrderForm;
+    const element = document.createElement(vnode.type);
+    for (const propName in vnode.props) {
+      if (propName === 'children') {
+        const children = Array.isArray(vnode.props.children) ? vnode.props.children : [vnode.props.children];
+        children.forEach(child => {
+          if (child !== null && child !== undefined) {
+            element.appendChild(renderVNode(child as VNode));
+          }
+        });
+      } else if (propName.startsWith('on') && typeof vnode.props[propName] === 'function') {
+        const eventName = propName.toLowerCase().substring(2);
+        element.addEventListener(eventName, vnode.props[propName]);
+      } else if (propName === 'className') {
+        element.setAttribute('class', vnode.props[propName]);
+      } else if (propName === 'style' && typeof vnode.props[propName] === 'object') {
+        Object.assign(element.style, vnode.props[propName]);
+      } else if (propName === 'htmlFor') {
+        element.setAttribute('for', vnode.props[propName]);
+      } else if (propName === 'inputProps' && typeof vnode.props[propName] === 'object') {
+        for (const inputProp in vnode.props[propName]) {
+          element.setAttribute(inputProp, vnode.props[propName][inputProp]);
