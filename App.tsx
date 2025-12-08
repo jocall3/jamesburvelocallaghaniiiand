@@ -94,7 +94,6 @@ const getComponentForView = (view: string) => {
         [View.CitibankAccountProxy]: 'CitibankAccountProxyView',
         [View.CitibankAccounts]: 'CitibankAccountsView',
         [View.QuantumAssets]: 'QuantumAssets',
-        [View.SovereignWealth]: 'SovereignWealth',
         [View.LegacyBuilder]: 'LegacyBuilder',
         [View.DerivativesDesk]: 'DerivativesDesk',
         [View.ArtCollectibles]: 'ArtCollectibles',
@@ -177,18 +176,18 @@ const EnhancedLandingPage = () => {
     const features = [
         {
             icon: <Cpu className="w-8 h-8 text-cyan-400" />,
-            title: "AI-Powered Orchestration",
-            description: "Leverage a hyper-intelligent core to automate complex financial workflows and generate predictive insights.",
+            title: "Wisdom-Guided Quests",
+            description: "Use our friendly guide to navigate life's challenges and discover paths to providing for your family.",
         },
         {
             icon: <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>,
-            title: "Sovereign Grade Security",
-            description: "Built on a foundation of zero-trust architecture, ensuring data integrity and privacy at every layer.",
+            title: "Your Family's Sanctuary",
+            description: "Your progress and dreams are kept safe and sound, just for you and your family.",
         },
         {
             icon: <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M2 8c0-2.2.7-4.3 2-6"></path><path d="M22 8c0-2.2-.7-4.3-2-6"></path></svg>,
-            title: "Global Data Aggregation",
-            description: "Seamlessly connect and normalize data from thousands of sources, from global banks to Web3 protocols.",
+            title: "Learn from Everyone",
+            description: "Connect your real-life progress to learn from the shared wisdom of families everywhere.",
         },
     ];
 
@@ -208,10 +207,10 @@ const EnhancedLandingPage = () => {
             <div className="z-10 text-center max-w-5xl flex flex-col items-center">
                 <Cpu className="w-20 h-20 md:w-24 md:h-24 text-cyan-400 mb-6 animate-pulse" />
                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">
-                    The 527 Protocol
+                    The Provider's Journey
                 </h1>
                 <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl">
-                    Infinite Intelligence. Sovereign Wealth. The future of financial orchestration.
+                    Boundless Wisdom. Family Prosperity. The game that teaches you how to provide.
                 </p>
                 
                 {isAuthenticated ? (
@@ -226,7 +225,7 @@ const EnhancedLandingPage = () => {
                         onClick={() => navigate('/login')}
                         className="px-10 py-4 bg-cyan-600 hover:bg-cyan-500 text-white text-lg font-bold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-cyan-500/50"
                     >
-                        Access The Protocol
+                        Start Your Journey
                     </button>
                 )}
 
@@ -280,8 +279,8 @@ const SAppLayout = () => {
     return (
         <div className="h-screen w-screen flex flex-col items-center justify-center bg-gray-950 text-white gap-4">
             <Cpu className="w-16 h-16 text-cyan-400 animate-pulse" />
-            <h1 className="text-2xl font-bold tracking-wider">INITIALIZING INFINITE INTELLIGENCE...</h1>
-            <p className="text-gray-400 font-mono">Loading The 527 Protocol...</p>
+            <h1 className="text-2xl font-bold tracking-wider">AWAKENING ANCIENT WISDOM...</h1>
+            <p className="text-gray-400 font-mono">Preparing Your Journey...</p>
             <div className="w-64 h-2 bg-gray-800 rounded-full overflow-hidden mt-2">
                 <div className="h-2 bg-gradient-to-r from-cyan-500 to-purple-500 animate-pulse-fast-x"></div>
             </div>
