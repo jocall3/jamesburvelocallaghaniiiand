@@ -1,152 +1,246 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-    Book, Users, Globe, Shield, Activity, Brain, 
-    ArrowRight, Star, Heart, CheckCircle, Lock,
-    ChevronRight, GraduationCap, Building, Radio, Cpu,
-    Infinity, Library
+    Brain, Layers, Zap, Globe, Cpu, BookOpen, Eye,
+    ArrowRight, CheckCircle, Lock, ChevronRight,
+    Activity, Shield, Server, Database, Network,
+    Code, Terminal, Layout, Box
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Card from './Card'; 
 
-// --- Landing Page Types ---
-type Tab = 'MISSION' | 'ACADEMY' | 'PLATFORM' | 'MANIFESTO';
+type Tab = 'CURRICULUM' | 'ORCHESTRATION' | 'SIMULATION' | 'SOURCE';
 
 const LandingPage: React.FC<{ onLoginClick?: () => void }> = ({ onLoginClick }) => {
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
-    const [activeTab, setActiveTab] = useState<Tab>('MISSION');
+    const [activeTab, setActiveTab] = useState<Tab>('CURRICULUM');
 
-    const handleJoin = () => onLoginClick ? onLoginClick() : navigate('/login');
+    const handleEnterClass = (path: string) => {
+        if (isAuthenticated) {
+            navigate(path);
+        } else {
+            if (onLoginClick) onLoginClick();
+            else navigate('/login');
+        }
+    };
 
     const renderContent = () => {
         switch(activeTab) {
-            case 'MISSION':
-                return (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className="space-y-6">
-                            <h2 className="text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 leading-tight">
-                                Infinite Intelligence <br/> Foundation
-                            </h2>
-                            <p className="text-xl text-gray-300 leading-relaxed">
-                                We are the architects of a new era. We leverage the 527 Protocol to disseminate knowledge, empower communities, and build a single source of truth for economic prosperity.
-                            </p>
-                            <div className="flex gap-4 pt-4">
-                                <button onClick={handleJoin} className="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all transform hover:scale-105 flex items-center gap-2">
-                                    <Infinity size={20} /> Access The Foundation
-                                </button>
-                                <button onClick={() => setActiveTab('MANIFESTO')} className="px-8 py-4 bg-gray-800 hover:bg-gray-700 text-white font-bold rounded-xl border border-gray-700 transition-all flex items-center gap-2">
-                                    <Book size={20} /> The 527 Protocol
-                                </button>
-                            </div>
-                        </div>
-                        <div className="relative">
-                            <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/20 to-purple-500/20 rounded-3xl blur-3xl"></div>
-                            <div className="relative bg-gray-900/80 backdrop-blur-xl border border-gray-700 rounded-3xl p-8 shadow-2xl">
-                                <div className="flex items-center gap-3 mb-6 border-b border-gray-700 pb-4">
-                                    <Radio className="w-6 h-6 text-green-500 animate-pulse" />
-                                    <span className="text-sm font-mono text-gray-400">FOUNDATION SIGNAL // ONLINE</span>
-                                </div>
-                                <div className="space-y-4">
-                                    <div className="p-4 bg-gray-800 rounded-lg border-l-4 border-cyan-500">
-                                        <h4 className="font-bold text-white mb-1">Teaching & Education</h4>
-                                        <p className="text-sm text-gray-400">Empowering the public through deep financial literacy.</p>
-                                    </div>
-                                    <div className="p-4 bg-gray-800 rounded-lg border-l-4 border-purple-500">
-                                        <h4 className="font-bold text-white mb-1">Community Support</h4>
-                                        <p className="text-sm text-gray-400">Direct allocation of resources to civic projects.</p>
-                                    </div>
-                                    <div className="p-4 bg-gray-800 rounded-lg border-l-4 border-green-500">
-                                        <h4 className="font-bold text-white mb-1">Infinite Intelligence</h4>
-                                        <p className="text-sm text-gray-400">A perpetually learning system for global good.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                );
-            case 'ACADEMY':
-                return (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-                        <div className="text-center max-w-3xl mx-auto">
-                            <h2 className="text-3xl font-bold text-white mb-4">The Foundation Academy</h2>
-                            <p className="text-gray-400">Access our vast library of knowledge. From macro-economics to algorithmic governance, we provide the tools to understand the machine.</p>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {[
-                                { title: "Protocol 527", desc: "Understanding the legal framework of influence.", icon: Book, color: "text-blue-400" },
-                                { title: "Algorithmic Governance", desc: "How code dictates policy in the digital age.", icon: Cpu, color: "text-purple-400" },
-                                { title: "Civic Engineering", desc: "Building the infrastructure of tomorrow.", icon: Building, color: "text-red-400" },
-                            ].map((course, i) => (
-                                <Card key={i} className="hover:border-cyan-500 transition-colors cursor-pointer group">
-                                    <div className={`w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center mb-4 ${course.color} group-hover:scale-110 transition-transform`}>
-                                        <course.icon size={24} />
-                                    </div>
-                                    <h3 className="text-xl font-bold text-white mb-2">{course.title}</h3>
-                                    <p className="text-sm text-gray-400">{course.desc}</p>
-                                    <div className="mt-4 flex items-center text-sm text-cyan-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Enter Archive <ChevronRight size={16} />
-                                    </div>
-                                </Card>
-                            ))}
-                        </div>
-                    </div>
-                );
-            case 'PLATFORM':
+            case 'CURRICULUM':
                 return (
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className="text-center mb-10">
-                            <h2 className="text-3xl font-bold text-white mb-4">The Foundation Platform</h2>
-                            <p className="text-gray-400">A unified operating system for the modern citizen-financier.</p>
+                        <div className="text-center max-w-3xl mx-auto mb-8">
+                            <h2 className="text-3xl font-bold text-white mb-4">Study Modules</h2>
+                            <p className="text-gray-400">
+                                Explore the functional modules of the Mind's Eye. Each section represents a core competency of the modern financial stack, mapped to an educational curriculum.
+                            </p>
                         </div>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800 relative overflow-hidden">
-                                <div className="absolute top-0 right-0 p-4 opacity-10">
-                                    <Activity size={100} className="text-white" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <Card className="hover:border-cyan-500 transition-all cursor-pointer group bg-gray-900/50 border-gray-800" onClick={() => handleEnterClass('/dashboard/crypto')}>
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="p-3 rounded-lg bg-purple-500/10 text-purple-400">
+                                        <Cpu size={24} />
+                                    </div>
+                                    <span className="text-xs font-mono text-gray-500">CLASS 101</span>
                                 </div>
-                                <h3 className="text-2xl font-bold text-white mb-4">FlowMatrix Transaction Engine</h3>
-                                <p className="text-gray-400 mb-6">Analyze every cent. Our AI categorizes and scrutinizes all financial activity to ensure alignment with your strategic goals.</p>
-                                <ul className="space-y-2 text-sm text-gray-300">
-                                    <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-500"/> Real-time anomaly detection</li>
-                                    <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-500"/> Automatic tax harvesting</li>
-                                    <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-500"/> Privacy-first architecture</li>
-                                </ul>
+                                <h3 className="text-xl font-bold text-white mb-2">Quantum Ledger Dynamics</h3>
+                                <p className="text-sm text-gray-400 mb-4">
+                                    An introduction to decentralized asset management and cryptographic verification.
+                                </p>
+                                <div className="flex items-center text-cyan-400 text-sm font-medium group-hover:translate-x-2 transition-transform">
+                                    Begin Module <ChevronRight size={16} />
+                                </div>
+                            </Card>
+
+                            <Card className="hover:border-cyan-500 transition-all cursor-pointer group bg-gray-900/50 border-gray-800" onClick={() => handleEnterClass('/dashboard/hft')}>
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="p-3 rounded-lg bg-green-500/10 text-green-400">
+                                        <Activity size={24} />
+                                    </div>
+                                    <span className="text-xs font-mono text-gray-500">CLASS 202</span>
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">High Frequency Trading</h3>
+                                <p className="text-sm text-gray-400 mb-4">
+                                    Advanced algorithmic execution and market microstructure analysis.
+                                </p>
+                                <div className="flex items-center text-cyan-400 text-sm font-medium group-hover:translate-x-2 transition-transform">
+                                    Begin Module <ChevronRight size={16} />
+                                </div>
+                            </Card>
+
+                            <Card className="hover:border-cyan-500 transition-all cursor-pointer group bg-gray-900/50 border-gray-800" onClick={() => handleEnterClass('/dashboard/treasury')}>
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="p-3 rounded-lg bg-blue-500/10 text-blue-400">
+                                        <Shield size={24} />
+                                    </div>
+                                    <span className="text-xs font-mono text-gray-500">CLASS 303</span>
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">Sovereign Treasury</h3>
+                                <p className="text-sm text-gray-400 mb-4">
+                                    Resource allocation, risk management, and long-term capital preservation.
+                                </p>
+                                <div className="flex items-center text-cyan-400 text-sm font-medium group-hover:translate-x-2 transition-transform">
+                                    Begin Module <ChevronRight size={16} />
+                                </div>
+                            </Card>
+
+                            <Card className="hover:border-cyan-500 transition-all cursor-pointer group bg-gray-900/50 border-gray-800" onClick={() => handleEnterClass('/dashboard')}>
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="p-3 rounded-lg bg-orange-500/10 text-orange-400">
+                                        <Layout size={24} />
+                                    </div>
+                                    <span className="text-xs font-mono text-gray-500">CLASS 404</span>
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">System Architecture</h3>
+                                <p className="text-sm text-gray-400 mb-4">
+                                    Overview of the Mind's Eye dashboard and integrated systems.
+                                </p>
+                                <div className="flex items-center text-cyan-400 text-sm font-medium group-hover:translate-x-2 transition-transform">
+                                    Begin Module <ChevronRight size={16} />
+                                </div>
+                            </Card>
+                        </div>
+                    </div>
+                );
+            case 'ORCHESTRATION':
+                return (
+                    <div className="space-y-12 animate-in fade-in slide-in-from-right-4 duration-500">
+                        <div className="text-center">
+                            <h2 className="text-3xl font-bold text-white mb-4">The Orchestration Layer</h2>
+                            <p className="text-gray-400 max-w-2xl mx-auto">
+                                How the Mind's Eye connects disparate data sources into a unified cognitive model.
+                            </p>
+                        </div>
+
+                        <div className="relative bg-gray-900/50 border border-gray-800 rounded-2xl p-8 md:p-12 overflow-hidden">
+                            {/* Visual Representation */}
+                            <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+                                {/* Sources */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg border border-gray-700 w-48">
+                                        <Database size={20} className="text-blue-400" />
+                                        <span className="text-sm font-mono text-gray-300">Stripe API</span>
+                                    </div>
+                                    <div className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg border border-gray-700 w-48">
+                                        <Server size={20} className="text-green-400" />
+                                        <span className="text-sm font-mono text-gray-300">Plaid Connect</span>
+                                    </div>
+                                    <div className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg border border-gray-700 w-48">
+                                        <Globe size={20} className="text-purple-400" />
+                                        <span className="text-sm font-mono text-gray-300">Market Data</span>
+                                    </div>
+                                </div>
+
+                                {/* Connection Lines (Visual only, simplified for CSS) */}
+                                <div className="hidden md:flex flex-col gap-2 items-center justify-center opacity-50">
+                                    <div className="w-16 h-0.5 bg-gradient-to-r from-gray-700 to-cyan-500"></div>
+                                    <div className="w-16 h-0.5 bg-gradient-to-r from-gray-700 to-cyan-500"></div>
+                                    <div className="w-16 h-0.5 bg-gradient-to-r from-gray-700 to-cyan-500"></div>
+                                </div>
+
+                                {/* The Brain */}
+                                <div className="relative">
+                                    <div className="absolute inset-0 bg-cyan-500/20 blur-3xl rounded-full"></div>
+                                    <div className="w-32 h-32 bg-gray-950 border-2 border-cyan-500/50 rounded-full flex items-center justify-center shadow-2xl shadow-cyan-500/20 relative z-10">
+                                        <Brain size={48} className="text-cyan-400 animate-pulse" />
+                                    </div>
+                                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                                        <span className="text-xs font-mono text-cyan-400">GEMINI CORE</span>
+                                    </div>
+                                </div>
+
+                                {/* Output */}
+                                <div className="hidden md:flex items-center opacity-50">
+                                    <div className="w-16 h-0.5 bg-gradient-to-r from-cyan-500 to-gray-700"></div>
+                                </div>
+
+                                <div className="p-6 bg-gray-800/50 border border-gray-700 rounded-xl text-center w-48">
+                                    <Layers size={32} className="text-white mx-auto mb-2" />
+                                    <span className="text-sm font-bold text-white">Unified UI</span>
+                                </div>
                             </div>
-                            <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800 relative overflow-hidden">
-                                <div className="absolute top-0 right-0 p-4 opacity-10">
-                                    <Brain size={100} className="text-white" />
-                                </div>
-                                <h3 className="text-2xl font-bold text-white mb-4">CivicMind AI Core</h3>
-                                <p className="text-gray-400 mb-6">Your personal advisor for compliance, growth, and community support. It doesn't just answer; it guides.</p>
-                                <ul className="space-y-2 text-sm text-gray-300">
-                                    <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-500"/> Proactive regulatory alerts</li>
-                                    <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-500"/> Opportunity scanning</li>
-                                    <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-500"/> Narrative verification</li>
-                                </ul>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
+                                <Zap className="text-yellow-400 mb-4" size={24} />
+                                <h4 className="font-bold text-white mb-2">Real-time Ingestion</h4>
+                                <p className="text-sm text-gray-400">Webhooks and websocket connections stream data directly into the context window.</p>
+                            </div>
+                            <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
+                                <Brain className="text-cyan-400 mb-4" size={24} />
+                                <h4 className="font-bold text-white mb-2">Cognitive Processing</h4>
+                                <p className="text-sm text-gray-400">LLMs analyze patterns, detect anomalies, and suggest optimizations.</p>
+                            </div>
+                            <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
+                                <Eye className="text-purple-400 mb-4" size={24} />
+                                <h4 className="font-bold text-white mb-2">Visual Synthesis</h4>
+                                <p className="text-sm text-gray-400">Complex data is rendered into intuitive dashboards for human decision making.</p>
                             </div>
                         </div>
                     </div>
                 );
-            case 'MANIFESTO':
+            case 'SIMULATION':
+                return (
+                    <div className="max-w-4xl mx-auto text-center space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="inline-flex items-center justify-center p-4 bg-yellow-500/10 rounded-full mb-4">
+                            <Terminal size={48} className="text-yellow-500" />
+                        </div>
+                        <h2 className="text-4xl font-bold text-white">This is a Simulation</h2>
+                        <div className="prose prose-invert prose-lg mx-auto text-gray-300">
+                            <p>
+                                You are viewing a <strong>Demo Environment</strong>. The data you see—balances, transactions, and market movements—is simulated for educational purposes.
+                            </p>
+                            <p>
+                                This platform is designed as a <strong>Living Textbook</strong>. It demonstrates how modern financial applications are architected, how they handle state, and how they integrate with AI.
+                            </p>
+                            <p>
+                                While the code is production-grade, the environment is a sandbox. Feel free to explore, click, and experiment. You cannot break the simulation.
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto mt-8">
+                            <div className="p-4 border border-gray-800 rounded-lg bg-gray-900/50">
+                                <h4 className="font-bold text-white mb-1">Safe Environment</h4>
+                                <p className="text-xs text-gray-500">No real funds are at risk.</p>
+                            </div>
+                            <div className="p-4 border border-gray-800 rounded-lg bg-gray-900/50">
+                                <h4 className="font-bold text-white mb-1">Interactive Learning</h4>
+                                <p className="text-xs text-gray-500">Learn by doing, not just reading.</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            case 'SOURCE':
                 return (
                     <div className="max-w-4xl mx-auto bg-gray-900 border border-gray-800 rounded-2xl p-8 md:p-12 animate-in fade-in duration-500 relative">
-                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-indigo-500 to-cyan-500"></div>
-                         <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-8 font-serif">The Foundation Mandate</h2>
-                         <div className="prose prose-invert prose-lg text-gray-300 leading-relaxed">
-                             <p>
-                                 The Infinite Intelligence Foundation operates as a perpetual 527 organization. Our mission is not merely financial; it is cognitive.
-                             </p>
-                             <p>
-                                 We exist to disseminate accurate information, correct market inefficiencies caused by misinformation, and support leadership that aligns with the principles of infinite growth and stability.
-                             </p>
-                             <p>
-                                 This platform serves as the Single Source of Truth. Through our Academy, our Tools, and our Community, we are building a legacy that transcends individual wealth.
-                             </p>
-                             <div className="mt-8 p-4 bg-black/30 border-l-4 border-cyan-500 italic text-cyan-200">
-                                 "We build the future by educating the present." — The Caretaker
-                             </div>
-                         </div>
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-cyan-500"></div>
+                        <div className="flex items-center gap-3 mb-8">
+                            <BookOpen className="text-cyan-400" size={32} />
+                            <h2 className="text-3xl font-bold text-white">Foundational Texts</h2>
+                        </div>
+                        
+                        <div className="space-y-8">
+                            <div className="prose prose-invert prose-lg text-gray-300">
+                                <h3 className="text-xl font-bold text-white">The Physics of Value</h3>
+                                <p>
+                                    Value is not static; it is a vector quantity, possessing both magnitude and direction. In the digital age, value flows like energy through a circuit. 
+                                    To harness it, we must understand the resistance (regulation), the voltage (demand), and the current (liquidity).
+                                </p>
+                                <p>
+                                    Mind's Eye Orchestration provides the schematics for this new physics. It is a tool for visualizing the invisible forces that shape our economy.
+                                </p>
+                            </div>
+
+                            <div className="p-6 bg-black/30 rounded-xl border-l-4 border-cyan-500">
+                                <h4 className="font-bold text-white mb-2">Core Axioms</h4>
+                                <ul className="space-y-2 text-sm text-gray-400">
+                                    <li>1. Information Asymmetry is the root of all profit and loss.</li>
+                                    <li>2. Automation is the only hedge against complexity.</li>
+                                    <li>3. The interface is the product; the code is the truth.</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 );
         }
@@ -158,18 +252,25 @@ const LandingPage: React.FC<{ onLoginClick?: () => void }> = ({ onLoginClick }) 
             <nav className="fixed top-0 w-full z-50 bg-gray-950/80 backdrop-blur-md border-b border-gray-800">
                 <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-xl shadow-lg shadow-indigo-500/20">
-                            <Infinity size={24} className="text-white"/>
+                        <div className="w-10 h-10 bg-cyan-900/30 rounded-lg flex items-center justify-center border border-cyan-500/30">
+                            <Eye size={24} className="text-cyan-400"/>
                         </div>
-                        <span className="font-bold tracking-widest text-lg">INFINITE<span className="text-cyan-400">.FOUNDATION</span></span>
+                        <div>
+                            <h1 className="font-bold tracking-wider text-lg leading-none">MIND'S EYE</h1>
+                            <span className="text-[10px] tracking-[0.2em] text-gray-500 uppercase">Orchestration</span>
+                        </div>
                     </div>
                     
-                    <div className="hidden md:flex gap-8 text-sm font-medium text-gray-400">
-                        {['MISSION', 'ACADEMY', 'PLATFORM', 'MANIFESTO'].map((tab) => (
+                    <div className="hidden md:flex gap-1 p-1 bg-gray-900 rounded-xl border border-gray-800">
+                        {(['CURRICULUM', 'ORCHESTRATION', 'SIMULATION', 'SOURCE'] as Tab[]).map((tab) => (
                             <button 
                                 key={tab}
-                                onClick={() => setActiveTab(tab as Tab)}
-                                className={`hover:text-white transition-colors uppercase tracking-wide ${activeTab === tab ? 'text-white border-b-2 border-cyan-500' : ''}`}
+                                onClick={() => setActiveTab(tab)}
+                                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+                                    activeTab === tab 
+                                    ? 'bg-gray-800 text-white shadow-sm' 
+                                    : 'text-gray-500 hover:text-gray-300'
+                                }`}
                             >
                                 {tab}
                             </button>
@@ -177,49 +278,58 @@ const LandingPage: React.FC<{ onLoginClick?: () => void }> = ({ onLoginClick }) 
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <button onClick={handleJoin} className="text-sm font-bold text-cyan-400 hover:text-cyan-300">
+                        <button onClick={() => onLoginClick ? onLoginClick() : navigate('/login')} className="text-sm font-bold text-gray-400 hover:text-white transition-colors">
                             Log In
                         </button>
-                        <button onClick={handleJoin} className="bg-white text-black px-5 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 transition-colors">
-                            Join Now
+                        <button onClick={() => onLoginClick ? onLoginClick() : navigate('/login')} className="bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2 rounded-lg text-sm font-bold transition-colors shadow-lg shadow-cyan-500/20">
+                            Enter Demo
                         </button>
                     </div>
                 </div>
             </nav>
 
+            {/* Mobile Nav (Simplified) */}
+            <div className="md:hidden fixed bottom-0 w-full bg-gray-900 border-t border-gray-800 z-50 px-4 py-3 flex justify-between overflow-x-auto">
+                 {(['CURRICULUM', 'ORCHESTRATION', 'SIMULATION', 'SOURCE'] as Tab[]).map((tab) => (
+                    <button 
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`flex flex-col items-center gap-1 px-2 ${activeTab === tab ? 'text-cyan-400' : 'text-gray-500'}`}
+                    >
+                        {tab === 'CURRICULUM' && <BookOpen size={16} />}
+                        {tab === 'ORCHESTRATION' && <Layers size={16} />}
+                        {tab === 'SIMULATION' && <Zap size={16} />}
+                        {tab === 'SOURCE' && <Code size={16} />}
+                        <span className="text-[10px] font-bold">{tab.substring(0, 4)}</span>
+                    </button>
+                ))}
+            </div>
+
+            {/* Header / Hero Section */}
+            <header className="pt-32 pb-12 px-6 text-center">
+                <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 mb-4 tracking-tight">
+                    Mind's Eye Orchestration
+                </h1>
+                <p className="text-xl text-cyan-400 font-mono tracking-widest uppercase opacity-80">
+                    The Template for the Future
+                </p>
+            </header>
+
             {/* Main Content */}
-            <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto min-h-screen flex flex-col justify-center">
+            <main className="pb-32 px-6 max-w-7xl mx-auto min-h-[60vh]">
                 {renderContent()}
             </main>
 
             {/* Footer */}
             <footer className="border-t border-gray-800 bg-black py-12 px-6">
-                <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
-                    <div className="col-span-2">
-                        <h4 className="text-2xl font-bold text-white mb-4">Infinite Intelligence Foundation</h4>
-                        <p className="text-gray-500 max-w-sm">
-                            A perpetual 527 organization dedicated to education, truth, and community empowerment.
-                        </p>
+                <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div className="flex items-center gap-2">
+                        <Eye size={20} className="text-gray-600" />
+                        <span className="font-bold text-gray-400">Mind's Eye Orchestration</span>
                     </div>
-                    <div>
-                        <h5 className="font-bold text-white mb-4">The Academy</h5>
-                        <ul className="space-y-2 text-sm text-gray-500">
-                            <li className="hover:text-cyan-400 cursor-pointer">Curriculum</li>
-                            <li className="hover:text-cyan-400 cursor-pointer">Faculty</li>
-                            <li className="hover:text-cyan-400 cursor-pointer">Research</li>
-                        </ul>
+                    <div className="text-xs text-gray-600 font-mono">
+                        COPYRIGHT © 2025 MIND'S EYE ORCHESTRATION.
                     </div>
-                    <div>
-                        <h5 className="font-bold text-white mb-4">Network</h5>
-                        <ul className="space-y-2 text-sm text-gray-500">
-                            <li className="hover:text-cyan-400 cursor-pointer">Login</li>
-                            <li className="hover:text-cyan-400 cursor-pointer">Register</li>
-                            <li className="hover:text-cyan-400 cursor-pointer">Contact</li>
-                        </ul>
-                    </div>
-                </div>
-                <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-900 text-center text-xs text-gray-600 font-mono">
-                    COPYRIGHT © 2025 INFINITE INTELLIGENCE FOUNDATION.
                 </div>
             </footer>
         </div>
