@@ -12,6 +12,59 @@ import PlaidLinkButton from './PlaidLinkButton';
 import { GoogleGenAI, Type } from '@google/genai';
 import { Bot, Camera, Eye, MessageSquare, X, Send, RefreshCw, Maximize2, Minimize2, ScanEye } from 'lucide-react';
 
+const LearningModuleWidget: React.FC<{ setActiveView: (view: View) => void }> = ({ setActiveView }) => {
+    const concepts = [
+        {
+            title: "Algorithmic Trading Lab",
+            description: "Explore how AI uses market data to execute trades. Learn about strategies like momentum trading and mean reversion in a simulated environment.",
+            actionText: "Enter Trading Lab",
+            actionView: View.AlgoTradingLab,
+        },
+        {
+            title: "Credit Score Dynamics",
+            description: "Understand the factors that influence your credit score. Run simulations to see how different financial decisions could impact your future borrowing power.",
+            actionText: "Analyze Credit Health",
+            actionView: View.CreditHealth,
+        },
+        {
+            title: "Budgeting & Cash Flow AI",
+            description: "Discover how the AI core analyzes your spending habits to create an optimized budget. Learn to identify and eliminate financial drag.",
+            actionText: "Optimize Budgets",
+            actionView: View.Budgets,
+        },
+        {
+            title: "Investment Portfolio Theory",
+            description: "Learn the principles of diversification and risk management. Explore how AI constructs portfolios to maximize returns for a given risk tolerance.",
+            actionText: "View Investment Strategies",
+            actionView: View.Investments,
+        }
+    ];
+
+    const [selectedConcept] = useState(() => {
+        const randomIndex = Math.floor(Math.random() * concepts.length);
+        return concepts[randomIndex];
+    });
+
+    if (!selectedConcept) return null;
+
+    return (
+        <Card title="Sovereign Learning Module" variant="default" className="border-yellow-500/30">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="flex-1">
+                    <h3 className="text-xl font-bold text-yellow-300 mb-2">{selectedConcept.title}</h3>
+                    <p className="text-gray-300 text-sm mb-4">{selectedConcept.description}</p>
+                </div>
+                <button
+                    onClick={() => setActiveView(selectedConcept.actionView)}
+                    className="w-full md:w-auto flex-shrink-0 px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-bold rounded-lg shadow-lg transition-transform hover:scale-[1.02]"
+                >
+                    {selectedConcept.actionText}
+                </button>
+            </div>
+        </Card>
+    );
+};
+
 // ================================================================================================
 // AI VISION & CHAT COMPONENTS
 // ================================================================================================
@@ -519,7 +572,7 @@ const CreditScoreMonitor: React.FC<{ creditScore: CreditScore; onClick: () => vo
                     <p className={`text-xl font-bold ${config.color}`}>{rating}</p>
                     <p className="text-sm text-gray-400 mt-1">{config.description}</p>
                     <p className={change >= 0 ? 'text-green-400 text-sm mt-2' : 'text-red-400 text-sm mt-2'}>
-                        {change >= 0 ? '▲' : '▼'} {Math.abs(change)} points (30 Days)
+                        {change >= 0 ? 'â–²' : 'â–¼'} {Math.abs(change)} points (30 Days)
                     </p>
                 </div>
             </div>
@@ -897,7 +950,7 @@ const TheVisionWidget: React.FC = () => (
             <div className="pb-2">
                  <h4 className="font-bold text-xl text-yellow-400 mb-2 tracking-wider">III. The Path Forward: Integration and Expansion</h4>
                 <p className="leading-relaxed">
-                    The Dashboard you interact with is merely the tip of the iceberg—the user-facing interface. Beneath this lies the distributed ledger, the AI risk assessment matrix, and the automated execution layer. Your engagement, your data, and your trust are the fuel for this expansion. Do not mistake convenience for compliance. You are not a customer; you are a node in a superior network.
+                    The Dashboard you interact with is merely the tip of the icebergâ€”the user-facing interface. Beneath this lies the distributed ledger, the AI risk assessment matrix, and the automated execution layer. Your engagement, your data, and your trust are the fuel for this expansion. Do not mistake convenience for compliance. You are not a customer; you are a node in a superior network.
                 </p>
             </div>
         </div>
@@ -1028,6 +1081,9 @@ const Dashboard: React.FC<DashboardProps> = () => {
                         {/* --- AI & COMMAND ROW --- */}
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                             <div className="lg:col-span-12">
+                                <LearningModuleWidget setActiveView={setActiveView} />
+                            </div>
+                            <div className="lg:col-span-12">
                                 <AIPredictiveBundle />
                             </div>
                         </div>
@@ -1137,7 +1193,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
                             <div>
                                 <p className="text-4xl font-extrabold text-white">${modal?.data?.price.toFixed(2)}</p>
                                 <p className={`text-lg font-semibold ${modal?.data?.change > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                    {modal?.data?.change > 0 ? 'Ã¢â€“Â²' : 'Ã¢â€“Â¼'} {Math.abs(modal?.data?.change).toFixed(2)} ({((modal?.data?.change / modal?.data?.price) * 100).toFixed(2)}%)
+                                    {modal?.data?.change > 0 ? 'ÃƒÂ¢Ã¢â‚¬â€œÃ‚Â²' : 'ÃƒÂ¢Ã¢â‚¬â€œÃ‚Â¼'} {Math.abs(modal?.data?.change).toFixed(2)} ({((modal?.data?.change / modal?.data?.price) * 100).toFixed(2)}%)
                                 </p>
                             </div>
                             <p className="text-sm text-gray-400">Last 60 Trading Periods</p>
