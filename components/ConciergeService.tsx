@@ -189,7 +189,7 @@ const ASSETS: Record<Category, Asset[]> = {
       id: 'j2',
       title: 'Bombardier Global 8000 "Apex"',
       description: 'The fastest and longest-range business jet, breaking the sound barrier in tests. A true time machine.',
-      specs: ['Range: 8,000 nm', 'Top Speed: Mach 1.015', 'Capacity: 17 Pax', 'Smooth FlÄ•x Wing'],
+      specs: ['Range: 8,000 nm', 'Top Speed: Mach 1.015', 'Capacity: 17 Pax', 'Smooth Flex Wing'],
       availability: 'In Hangar (London)',
       image: 'linear-gradient(135deg, #2C3E50 0%, #4CA1AF 100%)',
       demandIndex: 1.25,
@@ -219,7 +219,7 @@ const ASSETS: Record<Category, Asset[]> = {
   YACHTS: [
     {
       id: 'y1',
-      title: 'LÃ¼rssen "Leviathan" 150m',
+      title: 'Lürssen "Leviathan" 150m',
       description: 'A floating private nation with two helipads, a submarine dock, and a full concert hall.',
       specs: ['Length: 150m', 'Crew: 50', 'Guest Cabins: 14', 'Missile Defense System'],
       availability: 'Docked (Monaco)',
@@ -250,7 +250,7 @@ const ASSETS: Record<Category, Asset[]> = {
     {
       id: 'y4',
       title: 'Wally "Why200" Space Yacht',
-      description: 'Radical design maximizing volume and stability. A true villa on the water with a 37 mÂ² master suite.',
+      description: 'Radical design maximizing volume and stability. A true villa on the water with a 37 m² master suite.',
       specs: ['Length: 27m', 'Beam: 7.6m', 'Guests: 8', 'Fold-out Terraces'],
       availability: 'Available',
       image: 'linear-gradient(135deg, #373B44 0%, #4286f4 100%)',
@@ -346,7 +346,7 @@ const ASSETS: Record<Category, Asset[]> = {
     {
       id: 'd1',
       title: 'Noma, Copenhagen - Full Buyout',
-      description: 'Exclusive access to the world\'s most influential restaurant for a private evening curated by RenÃ© Redzepi.',
+      description: 'Exclusive access to the world\'s most influential restaurant for a private evening curated by René Redzepi.',
       specs: ['20 Guests Max', 'Custom Menu', 'Wine Pairing', 'Kitchen Tour'],
       availability: 'By Arrangement',
       image: 'linear-gradient(135deg, #56ab2f 0%, #a8e063 100%)',
@@ -365,9 +365,9 @@ const ASSETS: Record<Category, Asset[]> = {
     },
     {
       id: 'd3',
-      title: 'Dom PÃ©rignon Vertical Tasting',
-      description: 'A private tasting of every vintage of Dom PÃ©rignon ever produced, hosted by the Chef de Cave in Ã‰pernay.',
-      specs: ['Rare Vintages', 'Cellar Access', 'Gourmet Dinner', 'Overnight at ChÃ¢teau'],
+      title: 'Dom Pérignon Vertical Tasting',
+      description: 'A private tasting of every vintage of Dom Pérignon ever produced, hosted by the Chef de Cave in Épernay.',
+      specs: ['Rare Vintages', 'Cellar Access', 'Gourmet Dinner', 'Overnight at Château'],
       availability: 'Twice Yearly',
       image: 'linear-gradient(135deg, #eacda3 0%, #d6ae7b 100%)',
       demandIndex: 2.10,
@@ -432,7 +432,7 @@ const ASSETS: Record<Category, Asset[]> = {
   WELLNESS: [createPlaceholderAsset('well1', 'Longevity Retreat', 'A personalized, data-driven wellness program at a private Swiss clinic.', 'linear-gradient(135deg, #e0eafc, #cfdef3)', 2.5)],
   PHILANTHROPY: [createPlaceholderAsset('phil1', 'Foundation Management', 'Establish and manage a high-impact philanthropic foundation.', 'linear-gradient(135deg, #00467f, #a5cc82)', 1.9)],
   TECHNOLOGY: [createPlaceholderAsset('tech1', 'Personal Tech Lab', 'Build a state-of-the-art research and development lab in your residence.', 'linear-gradient(135deg, #0575e6, #00f260)', 3.5)],
-  FASHION: [createPlaceholderAsset('fash1', 'Atelier PrivÃ© Access', 'Private access to the haute couture ateliers of Paris during fashion week.', 'linear-gradient(135deg, #ff00cc, #333399)', 2.1)],
+  FASHION: [createPlaceholderAsset('fash1', 'Atelier Privé Access', 'Private access to the haute couture ateliers of Paris during fashion week.', 'linear-gradient(135deg, #ff00cc, #333399)', 2.1)],
   COLLECTIBLES: [createPlaceholderAsset('coll1', 'Rare Horology Acquisition', 'Source the world\'s rarest and most sought-after timepieces.', 'linear-gradient(135deg, #eacda3, #d6ae7b)', 2.9)],
   STAFFING: [createPlaceholderAsset('staff1', 'Elite Household Staffing', 'Recruit and train world-class staff for your residences and assets.', 'linear-gradient(135deg, #536976, #292e49)', 1.5)],
   EDUCATION: [createPlaceholderAsset('edu1', 'Private Tutelage', 'Arrange for private education from Nobel laureates and industry titans.', 'linear-gradient(135deg, #141e30, #243b55)', 2.0)],
@@ -562,7 +562,7 @@ const ConciergeService: React.FC = () => {
       <header className="flex justify-between items-end mb-12 border-b border-gray-800 pb-6">
         <div>
           <h1 className="text-4xl font-extrabold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-yellow-400 to-yellow-600">
-            THE FAMILY CONCIERGE
+            THE SOVEREIGN CONCIERGE
           </h1>
           <p className="text-gray-400 mt-2 text-sm tracking-wide uppercase">
             Exclusive Access for Ultra-High-Net-Worth Individuals
@@ -697,7 +697,7 @@ const ConciergeService: React.FC = () => {
                 onClick={() => setBookingState({ ...bookingState, isBooking: false })}
                 className="text-gray-500 hover:text-white"
               >
-                âœ•
+                &times;
               </button>
             </div>
             
@@ -758,14 +758,14 @@ const ConciergeService: React.FC = () => {
                 <div className="space-y-6 animate-fade-in text-center py-8">
                   <div className="w-24 h-24 mx-auto border-4 border-gray-700 border-t-yellow-500 rounded-full animate-spin"></div>
                   <h4 className="text-lg font-bold text-white mt-6">Verifying Proof of Funds</h4>
-                  <p className="text-sm text-gray-500">Interfacing with Family Vault via ZK-Proof...</p>
+                  <p className="text-sm text-gray-500">Interfacing with Sovereign Wallet via ZK-Proof...</p>
                 </div>
               )}
 
               {bookingState.step === 'confirmed' && (
                 <div className="space-y-6 animate-fade-in text-center py-8">
                   <div className="w-20 h-20 mx-auto bg-green-500 rounded-full flex items-center justify-center text-black text-3xl font-bold shadow-[0_0_30px_rgba(34,197,94,0.6)]">
-                    âœ“
+                    ✓
                   </div>
                   <h4 className="text-2xl font-bold text-white">Allocation Confirmed</h4>
                   <p className="text-sm text-gray-400 max-w-sm mx-auto">
