@@ -91,7 +91,7 @@ export interface AccountsGroupDetailsList {
 
 
 // --- API Client for Accounts ---
-class AccountsAPI {
+export class AccountsAPI {
   private baseURL: string;
   private client_id: string;
 
