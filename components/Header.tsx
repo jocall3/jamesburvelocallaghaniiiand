@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { DataContext } from '../context/DataContext';
 import { View, Notification } from '../types';
-import { Infinity } from 'lucide-react'; // Conceptual icon
+import { Eye } from 'lucide-react'; // Conceptual icon
 
 const HeuristicAPIStatus: React.FC = () => {
     const messages = [
@@ -72,8 +72,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
                 {/* Title */}
                 <h1 className="text-lg sm:text-xl font-semibold text-white tracking-wider uppercase flex items-center gap-2">
-                    <Infinity className="w-5 h-5 text-cyan-400" />
-                    Citibank Demo Business Inc
+                    <Eye className="w-5 h-5 text-cyan-400" />
+                    Mind's Eye Orchestration
                 </h1>
             </div>
 
