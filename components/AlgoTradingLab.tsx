@@ -1,5 +1,3 @@
-
-
 import React, { useState, useCallback, useMemo } from 'react';
 import { 
   RefreshCw, Play, Save, History, Code, Settings, TrendingUp, DollarSign, X, User, LogOut,
@@ -812,7 +810,7 @@ const AppSidebar = ({ onNavigate, activeView }: any) => {
             <div className="p-5 flex items-center justify-between border-b border-gray-800 bg-gray-900 h-16">
                 {!isCollapsed && (
                   <div>
-                    <h1 className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 tracking-tighter">QUANTUM OS</h1>
+                    <h1 className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 tracking-tighter">FAMILY OS</h1>
                     <p className="text-[10px] text-gray-500 tracking-widest uppercase">High Frequency Trading</p>
                   </div>
                 )}
