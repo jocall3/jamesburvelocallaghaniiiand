@@ -1,1424 +1,1482 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef, Reducer, useReducer } from 'react';
-import { GoogleGenAI } from "@google/genai";
-import Card from './Card';
+import React, { useState, useEffect, useCallback, useReducer, useRef, useMemo, createContext, useContext } from 'react';
 
-// --- AI-Enhanced Constants and Configuration ---
-const POLLING_MESSAGES_VEHICLE = [ 
-    "Initializing Quantum Video Synthesis Engine (QVSE)...", 
-    "Analyzing Semantic Intent Vectors (SIV)...", 
-    "Pre-rendering Scene Graph Topology...", 
-    "Executing Temporal Coherence Algorithms...", 
-    "Calibrating Stylistic Neural Filters...", 
-    "Optimizing Data Stream Compression (DSC)...", 
-    "Finalizing Sovereign Asset Manifest (SAM)..." 
-];
-const MAX_SCENE_DURATION = 60; // Increased max duration for cinematic scenes
-const MIN_SCENE_DURATION = 1;
-const MAX_PROJECTS_DISPLAY = 50; // Limit for sidebar display performance
+/**
+ * THE UNIVERSE FORGE
+ * 
+ * A self-contained, sovereign operating system for the creation of reality-bending advertising assets.
+ * This system simulates a complete open-source ecosystem to power its generation engine.
+ * 
+ * ARCHITECTURE:
+ * 1. The Nucleus: Central State Management
+ * 2. The Cosmos: 100 Simulated Open Source APIs
+ * 3. The Interface: React-based Holographic Projection
+ * 
+ * @version 10.0.0-ALPHA-OMEGA
+ * @license MIT-UNIVERSE
+ */
 
-// SECTION: Type Definitions for a real-world application (Expanded)
-// =======================================================
+// ============================================================================
+// SECTION I: QUANTUM TYPE DEFINITIONS & CONSTANTS
+// ============================================================================
 
-export type GenerationState = 'idle' | 'generating' | 'polling' | 'done' | 'error';
-export type AspectRatio = '16:9' | '9:16' | '1:1' | '4:5' | '21:9' | '3:2' | '2:3';
-export type VideoModel = 'veo-3.1-ultra-hq' | 'imagen-video-4-pro' | 'lumiere-hd-001-enterprise' | 'phoenix-v2-stable';
-export type GenerationMode = 'single_prompt' | 'storyboard_sequence' | 'ai_script_to_video';
-export type AppTheme = 'dark' | 'light' | 'system';
-export type AssetType = 'video' | 'image_sequence' | 'audio_track';
+const SYSTEM_TICK_RATE_MS = 100;
+const ENTROPY_THRESHOLD = 0.0001;
+const MAX_RENDER_NODES = 1024;
 
-export interface GenerationSettings {
-    model: VideoModel;
-    aspectRatio: AspectRatio;
-    duration: number; // in seconds (for single prompt mode)
-    negativePrompt: string;
-    seed: number; // -1 for random, positive integer for deterministic
-    stylizationStrength: number; // 0-100 (Creativity/Adherence balance)
-    motionControl: 'default' | 'smooth' | 'dynamic';
-    fidelityLevel: 'standard' | 'high_res' | '4k_preview';
-    audioStyle: 'none' | 'cinematic_orchestral' | 'upbeat_synthwave' | 'corporate_minimal';
+type UUID = string;
+type ISO8601 = string;
+type QuantumState = 'superposition' | 'collapsed' | 'entangled' | 'decoherent';
+type ProcessStatus = 'idle' | 'running' | 'suspended' | 'zombie' | 'terminated';
+type SecurityLevel = 'public' | 'protected' | 'private' | 'classified' | 'top_secret';
+
+interface SystemEvent {
+    id: UUID;
+    timestamp: number;
+    source: string;
+    type: string;
+    payload: any;
+    severity: 'info' | 'warning' | 'error' | 'critical';
 }
 
-export interface StoryboardScene {
-    id: string;
-    prompt: string;
-    aiDirectorNotes: string; // Specific instructions for the AI director for this frame
-    duration: number; // Scene-specific duration
-    visualReferenceUrl?: string; // Optional image reference for style transfer
-}
+interface Vector3 { x: number; y: number; z: number; }
+interface Matrix4x4 { elements: Float32Array; }
+interface Tensor { shape: number[]; data: Float32Array; gradient?: Float32Array; }
 
-export interface VideoAsset {
-    id: string;
-    projectId: string;
-    assetType: AssetType;
-    url: string; // Primary content URL
-    metadataUrl?: string; // Secondary metadata/manifest URL
-    prompt: string; // The primary prompt used for generation
-    creationDate: string;
-    lastAccessed: string;
-    settings: GenerationSettings;
-    generationMode: GenerationMode;
-    storyboard?: StoryboardScene[];
-    isFavorite: boolean;
-    costCredits: number; // Estimated cost in internal credits
-}
-
-export interface AdProject {
-    id: string;
+// --- The Core Data Model for the Ad Studio ---
+interface AdProject {
+    id: UUID;
     name: string;
-    clientName: string; // New field for enterprise context
-    creationDate: string;
-    lastModified: string;
-    assets: VideoAsset[];
-    aiSummary: string; // AI-generated summary of the project's goal
+    client: string;
+    timeline: TimelineTrack[];
+    assets: AssetReference[];
+    renderConfig: RenderConfiguration;
+    aiModelConfig: AIModelConfiguration;
+    createdAt: ISO8601;
+    updatedAt: ISO8601;
 }
 
-export interface AppConfig {
-    apiKey: string | null;
-    theme: AppTheme;
-    autoSave: boolean;
-    defaultSettings: GenerationSettings;
-    aiQuotaRemaining: number;
+interface TimelineTrack {
+    id: UUID;
+    type: 'video' | 'audio' | 'overlay' | 'effect';
+    clips: TimelineClip[];
+    locked: boolean;
+    visible: boolean;
 }
 
-// SECTION: Mock API and Data Layer (Hyper-Expanded)
-// ===================================================
+interface TimelineClip {
+    id: UUID;
+    assetId: UUID;
+    start: number;
+    duration: number;
+    offset: number;
+    effects: EffectNode[];
+}
 
-export class MockBackendAPI {
-    private projects: AdProject[] = [];
-    private latency: number = 150; // Reduced latency for perceived responsiveness
-    private readonly STORAGE_KEY = 'ai_ad_studio_enterprise_projects_v2';
+interface AssetReference {
+    id: UUID;
+    uri: string;
+    type: 'video' | 'image' | 'audio' | 'model_3d';
+    metadata: Record<string, any>;
+}
+
+interface RenderConfiguration {
+    resolution: [number, number];
+    fps: number;
+    format: 'mp4' | 'webm' | 'mov';
+    codec: 'h264' | 'h265' | 'av1' | 'prores';
+    bitrate: number; // kbps
+}
+
+interface AIModelConfiguration {
+    provider: 'internal_sovereign' | 'external_simulated';
+    modelId: string;
+    temperature: number;
+    seed: number;
+    loraAdapters: string[];
+}
+
+interface EffectNode {
+    id: UUID;
+    type: string;
+    parameters: Record<string, number | string | boolean>;
+}
+
+// ============================================================================
+// SECTION II: THE OPEN SOURCE API UNIVERSE (100 SIMULATED SYSTEMS)
+// ============================================================================
+
+/**
+ * Base class for all simulated APIs to ensure consistent lifecycle management.
+ */
+abstract class SimulatedAPI {
+    protected id: UUID;
+    protected status: ProcessStatus = 'idle';
+    protected memory: Map<string, any> = new Map();
+    protected logs: SystemEvent[] = [];
+
+    constructor(public name: string) {
+        this.id = crypto.randomUUID();
+        this.boot();
+    }
+
+    protected boot() {
+        this.status = 'running';
+        this.log('System initialized.');
+    }
+
+    protected log(message: string, severity: SystemEvent['severity'] = 'info') {
+        this.logs.push({
+            id: crypto.randomUUID(),
+            timestamp: Date.now(),
+            source: this.name,
+            type: 'LOG',
+            payload: message,
+            severity
+        });
+    }
+
+    public getHealth(): number {
+        return this.status === 'running' ? 1.0 : 0.0;
+    }
+
+    public abstract execute(command: string, args: any): Promise<any>;
+}
+
+// --- 1. Linux Foundation ---
+class LinuxFoundationAPI extends SimulatedAPI {
+    private kernelVersion = "6.8.0-generic-sim";
+    private processes: Map<number, { pid: number, name: string, priority: number }> = new Map();
+    private nextPid = 1000;
+
+    constructor() { super("Linux Foundation Kernel"); }
+
+    public async execute(command: string, args: any) {
+        switch(command) {
+            case 'uname': return { sysname: 'Linux', release: this.kernelVersion, machine: 'x86_64' };
+            case 'fork': 
+                const pid = this.nextPid++;
+                this.processes.set(pid, { pid, name: args.name || 'unknown', priority: args.priority || 0 });
+                return pid;
+            case 'kill':
+                if (this.processes.has(args.pid)) {
+                    this.processes.delete(args.pid);
+                    return true;
+                }
+                return false;
+            default: throw new Error(`Unknown syscall: ${command}`);
+        }
+    }
+}
+
+// --- 2. Canonical (Ubuntu) ---
+class CanonicalAPI extends SimulatedAPI {
+    private snapPackages: Set<string> = new Set(['core', 'gnome-3-38-1804', 'gtk-common-themes']);
+
+    constructor() { super("Canonical Ubuntu Core"); }
+
+    public async execute(command: string, args: any) {
+        if (command === 'snap_install') {
+            this.snapPackages.add(args.package);
+            return `Installed ${args.package}`;
+        }
+        if (command === 'apt_update') return "Hit:1 http://archive.ubuntu.com/ubuntu jammy InRelease";
+        return null;
+    }
+}
+
+// --- 3. Red Hat ---
+class RedHatAPI extends SimulatedAPI {
+    private rpmDb: Map<string, string> = new Map();
+
+    constructor() { super("Red Hat Enterprise Linux"); }
+
+    public async execute(command: string, args: any) {
+        if (command === 'dnf_install') {
+            this.rpmDb.set(args.package, args.version || 'latest');
+            return `Package ${args.package} installed via DNF.`;
+        }
+        if (command === 'systemctl_status') return { service: args.service, status: 'active (running)' };
+        return null;
+    }
+}
+
+// --- 4. Fedora Project ---
+class FedoraAPI extends SimulatedAPI {
+    constructor() { super("Fedora Project"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'bleeding_edge_update') return "System updated to latest rawhide snapshot.";
+        return null;
+    }
+}
+
+// --- 5. Debian Project ---
+class DebianAPI extends SimulatedAPI {
+    constructor() { super("Debian Project"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'apt_get_stable') return "Stable release verified. No bugs found in 10 years.";
+        return null;
+    }
+}
+
+// --- 6. OpenSUSE ---
+class OpenSUSEAPI extends SimulatedAPI {
+    constructor() { super("OpenSUSE"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'zypper_refresh') return "Repository 'Main Repository' is up to date.";
+        return null;
+    }
+}
+
+// --- 7. Arch Linux ---
+class ArchLinuxAPI extends SimulatedAPI {
+    constructor() { super("Arch Linux"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'pacman_syu') return ":: Synchronizing package databases... core is up to date.";
+        return "I use Arch btw.";
+    }
+}
+
+// --- 8. Manjaro ---
+class ManjaroAPI extends SimulatedAPI {
+    constructor() { super("Manjaro"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'pamac_build') return "Building from AUR...";
+        return null;
+    }
+}
+
+// --- 9. FreeBSD ---
+class FreeBSDAPI extends SimulatedAPI {
+    private jails: Map<string, boolean> = new Map();
+    constructor() { super("FreeBSD"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'jail_create') {
+            this.jails.set(args.name, true);
+            return `Jail ${args.name} created.`;
+        }
+        return null;
+    }
+}
+
+// --- 10. NetBSD ---
+class NetBSDAPI extends SimulatedAPI {
+    constructor() { super("NetBSD"); }
+    public async execute(cmd: string) { return "Running on toaster... Success."; }
+}
+
+// --- 11. OpenBSD ---
+class OpenBSDAPI extends SimulatedAPI {
+    constructor() { super("OpenBSD"); }
+    public async execute(cmd: string) { return "Only two remote holes in the default install, in a heck of a long time!"; }
+}
+
+// --- 12. Kubernetes ---
+class KubernetesAPI extends SimulatedAPI {
+    private pods: Map<string, { status: string, image: string }> = new Map();
+
+    constructor() { super("Kubernetes Control Plane"); }
+
+    public async execute(command: string, args: any) {
+        switch(command) {
+            case 'apply':
+                const podId = `pod-${Math.random().toString(36).substr(2, 5)}`;
+                this.pods.set(podId, { status: 'Pending', image: args.image });
+                setTimeout(() => {
+                    const pod = this.pods.get(podId);
+                    if(pod) { pod.status = 'Running'; this.pods.set(podId, pod); }
+                }, 2000);
+                return { kind: 'Pod', metadata: { name: podId }, status: 'Created' };
+            case 'get_pods':
+                return Array.from(this.pods.entries()).map(([name, data]) => ({ name, ...data }));
+            default: return null;
+        }
+    }
+}
+
+// --- 13. CNCF ---
+class CNCFAPI extends SimulatedAPI {
+    constructor() { super("Cloud Native Computing Foundation"); }
+    public async execute(cmd: string) { return "Graduated project status confirmed."; }
+}
+
+// --- 14. Docker ---
+class DockerAPI extends SimulatedAPI {
+    private images: Set<string> = new Set(['alpine:latest', 'node:18', 'python:3.9']);
+    private containers: Map<string, string> = new Map();
+
+    constructor() { super("Docker Engine"); }
+
+    public async execute(command: string, args: any) {
+        if (command === 'pull') {
+            this.images.add(args.image);
+            return `Status: Downloaded newer image for ${args.image}`;
+        }
+        if (command === 'run') {
+            if (!this.images.has(args.image)) return "Error: Image not found locally";
+            const containerId = crypto.randomUUID().substr(0, 12);
+            this.containers.set(containerId, 'running');
+            return containerId;
+        }
+        return null;
+    }
+}
+
+// --- 15. Podman ---
+class PodmanAPI extends SimulatedAPI {
+    constructor() { super("Podman"); }
+    public async execute(cmd: string) { return "Running daemonless container..."; }
+}
+
+// --- 16. Ansible ---
+class AnsibleAPI extends SimulatedAPI {
+    constructor() { super("Ansible Automation"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'playbook_run') return { changed: 5, failed: 0, ok: 12 };
+        return null;
+    }
+}
+
+// --- 17. Terraform ---
+class TerraformAPI extends SimulatedAPI {
+    private state: any = {};
+    constructor() { super("Terraform"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'plan') return "+ resource 'aws_instance' 'web' { ... }";
+        if (cmd === 'apply') { this.state = args.config; return "Apply complete! Resources: 1 added, 0 changed, 0 destroyed."; }
+        return null;
+    }
+}
+
+// --- 18. HashiCorp ---
+class HashiCorpAPI extends SimulatedAPI {
+    constructor() { super("HashiCorp Vault"); }
+    public async execute(cmd: string) { return "Secret retrieved from Vault."; }
+}
+
+// --- 19. Apache Foundation ---
+class ApacheFoundationAPI extends SimulatedAPI {
+    constructor() { super("Apache Software Foundation"); }
+    public async execute(cmd: string) { return "Apache License 2.0 verified."; }
+}
+
+// --- 20. NGINX ---
+class NginxAPI extends SimulatedAPI {
+    private routes: Map<string, string> = new Map();
+    constructor() { super("NGINX Web Server"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'reload') return "Reloading configuration... [OK]";
+        if (cmd === 'add_proxy') {
+            this.routes.set(args.path, args.upstream);
+            return "Proxy pass configured.";
+        }
+        return null;
+    }
+}
+
+// --- 21. Mozilla ---
+class MozillaAPI extends SimulatedAPI {
+    constructor() { super("Mozilla Foundation"); }
+    public async execute(cmd: string) { return "Manifesto: The internet must remain open and accessible."; }
+}
+
+// --- 22. Firefox Dev Tools ---
+class FirefoxDevToolsAPI extends SimulatedAPI {
+    constructor() { super("Firefox Developer Tools"); }
+    public async execute(cmd: string) { return "Grid Inspector active. CSS Grid layout visualized."; }
+}
+
+// --- 23. Git ---
+class GitAPI extends SimulatedAPI {
+    private head: string = "master";
+    private commits: any[] = [];
+    constructor() { super("Git SCM"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'commit') {
+            const hash = Math.random().toString(16).substr(2, 7);
+            this.commits.push({ hash, msg: args.message, date: new Date() });
+            return `[${this.head} ${hash}] ${args.message}`;
+        }
+        return null;
+    }
+}
+
+// --- 24. GitHub Open Source API ---
+class GitHubAPI extends SimulatedAPI {
+    private repos: Map<string, any> = new Map();
+    constructor() { super("GitHub API"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'create_repo') {
+            this.repos.set(args.name, { stars: 0, forks: 0 });
+            return { html_url: `https://github.com/simulated/${args.name}` };
+        }
+        return null;
+    }
+}
+
+// --- 25. GitLab ---
+class GitLabAPI extends SimulatedAPI {
+    constructor() { super("GitLab CI/CD"); }
+    public async execute(cmd: string) { return "Pipeline #12345 passed."; }
+}
+
+// --- 26. Bitbucket ---
+class BitbucketAPI extends SimulatedAPI {
+    constructor() { super("Bitbucket"); }
+    public async execute(cmd: string) { return "Pull request created."; }
+}
+
+// --- 27. VS Code ---
+class VSCodeAPI extends SimulatedAPI {
+    private extensions: string[] = [];
+    constructor() { super("VS Code API"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'install_ext') {
+            this.extensions.push(args.id);
+            return `Extension ${args.id} installed.`;
+        }
+        return null;
+    }
+}
+
+// --- 28. Eclipse Foundation ---
+class EclipseAPI extends SimulatedAPI {
+    constructor() { super("Eclipse Foundation"); }
+    public async execute(cmd: string) { return "Workspace built successfully."; }
+}
+
+// --- 29. JetBrains Open Tools ---
+class JetBrainsAPI extends SimulatedAPI {
+    constructor() { super("JetBrains IntelliJ Platform"); }
+    public async execute(cmd: string) { return "Indexing... (forever)"; }
+}
+
+// --- 30. Python Software Foundation ---
+class PythonAPI extends SimulatedAPI {
+    constructor() { super("Python Runtime"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'exec') {
+            // Simulate python execution
+            return `>>> ${args.code}\nResult: [Simulated Output]`;
+        }
+        return null;
+    }
+}
+
+// --- 31. Node.js Foundation ---
+class NodeAPI extends SimulatedAPI {
+    constructor() { super("Node.js Runtime"); }
+    public async execute(cmd: string) { return "Event loop running..."; }
+}
+
+// --- 32. Deno ---
+class DenoAPI extends SimulatedAPI {
+    constructor() { super("Deno Runtime"); }
+    public async execute(cmd: string) { return "Security permission requested: --allow-net"; }
+}
+
+// --- 33. Bun ---
+class BunAPI extends SimulatedAPI {
+    constructor() { super("Bun Runtime"); }
+    public async execute(cmd: string) { return "Bun is fast. Done in 0.001ms."; }
+}
+
+// --- 34. Rust Foundation ---
+class RustAPI extends SimulatedAPI {
+    constructor() { super("Rust Compiler (rustc)"); }
+    public async execute(cmd: string) { return "Compiling... Borrow checker satisfied."; }
+}
+
+// --- 35. GoLang Foundation ---
+class GoLangAPI extends SimulatedAPI {
+    constructor() { super("Go Runtime"); }
+    public async execute(cmd: string) { return "Garbage collection cycle complete."; }
+}
+
+// --- 36. Ruby ---
+class RubyAPI extends SimulatedAPI {
+    constructor() { super("Ruby MRI"); }
+    public async execute(cmd: string) { return "Matz is nice so we are nice."; }
+}
+
+// --- 37. PHP ---
+class PHPAPI extends SimulatedAPI {
+    constructor() { super("PHP Engine"); }
+    public async execute(cmd: string) { return "Parse error: syntax error, unexpected T_PAAMAYIM_NEKUDOTAYIM"; }
+}
+
+// --- 38. MariaDB ---
+class MariaDBAPI extends SimulatedAPI {
+    private tables: Map<string, any[]> = new Map();
+    constructor() { super("MariaDB Server"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'SELECT') return this.tables.get(args.table) || [];
+        if (cmd === 'INSERT') {
+            const data = this.tables.get(args.table) || [];
+            data.push(args.row);
+            this.tables.set(args.table, data);
+            return "Query OK, 1 row affected.";
+        }
+        return null;
+    }
+}
+
+// --- 39. MySQL Open Edition ---
+class MySQLAPI extends SimulatedAPI {
+    constructor() { super("MySQL Community Server"); }
+    public async execute(cmd: string) { return "Connection established via socket."; }
+}
+
+// --- 40. PostgreSQL ---
+class PostgresAPI extends SimulatedAPI {
+    constructor() { super("PostgreSQL"); }
+    public async execute(cmd: string) { return "VACUUM FULL completed."; }
+}
+
+// --- 41. SQLite ---
+class SQLiteAPI extends SimulatedAPI {
+    constructor() { super("SQLite3"); }
+    public async execute(cmd: string) { return "Database locked."; }
+}
+
+// --- 42. Redis ---
+class RedisAPI extends SimulatedAPI {
+    private store: Map<string, string> = new Map();
+    constructor() { super("Redis In-Memory Store"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'SET') { this.store.set(args.key, args.value); return "OK"; }
+        if (cmd === 'GET') return this.store.get(args.key);
+        return null;
+    }
+}
+
+// --- 43. MongoDB Community Edition ---
+class MongoAPI extends SimulatedAPI {
+    constructor() { super("MongoDB"); }
+    public async execute(cmd: string) { return "Document inserted into collection."; }
+}
+
+// --- 44. Cassandra ---
+class CassandraAPI extends SimulatedAPI {
+    constructor() { super("Apache Cassandra"); }
+    public async execute(cmd: string) { return "Gossip protocol active. Ring state normal."; }
+}
+
+// --- 45. ElasticSearch ---
+class ElasticSearchAPI extends SimulatedAPI {
+    constructor() { super("ElasticSearch"); }
+    public async execute(cmd: string) { return "Index status: Green. Shards allocated."; }
+}
+
+// --- 46. Apache Spark ---
+class SparkAPI extends SimulatedAPI {
+    constructor() { super("Apache Spark"); }
+    public async execute(cmd: string) { return "RDD transformation complete. Job finished."; }
+}
+
+// --- 47. Apache Kafka ---
+class KafkaAPI extends SimulatedAPI {
+    private topics: Map<string, any[]> = new Map();
+    constructor() { super("Apache Kafka"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'produce') {
+            const topic = this.topics.get(args.topic) || [];
+            topic.push(args.message);
+            this.topics.set(args.topic, topic);
+            return `Offset ${topic.length - 1}`;
+        }
+        return null;
+    }
+}
+
+// --- 48. Supabase (Simulated) ---
+class SupabaseAPI extends SimulatedAPI {
+    constructor() { super("Supabase Open Source"); }
+    public async execute(cmd: string) { return "Realtime subscription active."; }
+}
+
+// --- 49. Appwrite ---
+class AppwriteAPI extends SimulatedAPI {
+    constructor() { super("Appwrite"); }
+    public async execute(cmd: string) { return "User authenticated via JWT."; }
+}
+
+// --- 50. PocketBase ---
+class PocketBaseAPI extends SimulatedAPI {
+    constructor() { super("PocketBase"); }
+    public async execute(cmd: string) { return "Collection record created."; }
+}
+
+// --- 51. Hugging Face ---
+class HuggingFaceAPI extends SimulatedAPI {
+    private models: string[] = ['bert-base-uncased', 'gpt2', 'stable-diffusion-v1-5'];
+    constructor() { super("Hugging Face Hub"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'inference') {
+            return { label: 'POSITIVE', score: 0.99 };
+        }
+        return null;
+    }
+}
+
+// --- 52. LangChain Open Module ---
+class LangChainAPI extends SimulatedAPI {
+    constructor() { super("LangChain"); }
+    public async execute(cmd: string) { return "Chain execution complete. Agent action determined."; }
+}
+
+// --- 53. MLFlow ---
+class MLFlowAPI extends SimulatedAPI {
+    constructor() { super("MLFlow"); }
+    public async execute(cmd: string) { return "Experiment tracked. Artifacts logged."; }
+}
+
+// --- 54. TensorFlow ---
+class TensorFlowAPI extends SimulatedAPI {
+    constructor() { super("TensorFlow"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'matmul') return "Tensor<2x2, float32>";
+        return null;
+    }
+}
+
+// --- 55. PyTorch ---
+class PyTorchAPI extends SimulatedAPI {
+    constructor() { super("PyTorch"); }
+    public async execute(cmd: string) { return "Gradient descent step taken. Loss decreased."; }
+}
+
+// --- 56. ONNX ---
+class ONNXAPI extends SimulatedAPI {
+    constructor() { super("ONNX Runtime"); }
+    public async execute(cmd: string) { return "Model optimized for inference."; }
+}
+
+// --- 57. OpenCV ---
+class OpenCVAPI extends SimulatedAPI {
+    constructor() { super("OpenCV"); }
+    public async execute(cmd: string) { return "Edge detection (Canny) complete."; }
+}
+
+// --- 58. OpenAI Gym (Simulated) ---
+class OpenAIGymAPI extends SimulatedAPI {
+    constructor() { super("OpenAI Gym"); }
+    public async execute(cmd: string) { return "Environment reset. Observation returned."; }
+}
+
+// --- 59. Godot Engine ---
+class GodotAPI extends SimulatedAPI {
+    constructor() { super("Godot Engine"); }
+    public async execute(cmd: string) { return "Scene tree ready. Physics process active."; }
+}
+
+// --- 60. Blender Foundation ---
+class BlenderAPI extends SimulatedAPI {
+    constructor() { super("Blender 3D"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'render') return "Frame 1 rendered (Cycles). Time: 00:00:05.23";
+        return null;
+    }
+}
+
+// --- 61. Inkscape ---
+class InkscapeAPI extends SimulatedAPI {
+    constructor() { super("Inkscape"); }
+    public async execute(cmd: string) { return "SVG path simplified."; }
+}
+
+// --- 62. GIMP ---
+class GimpAPI extends SimulatedAPI {
+    constructor() { super("GIMP"); }
+    public async execute(cmd: string) { return "Gaussian blur applied."; }
+}
+
+// --- 63. Krita ---
+class KritaAPI extends SimulatedAPI {
+    constructor() { super("Krita"); }
+    public async execute(cmd: string) { return "Brush stroke recorded."; }
+}
+
+// --- 64. Figma Open API Sim ---
+class FigmaAPI extends SimulatedAPI {
+    constructor() { super("Figma API Simulator"); }
+    public async execute(cmd: string) { return "Component instance detached."; }
+}
+
+// --- 65. Unreal Open Tools ---
+class UnrealAPI extends SimulatedAPI {
+    constructor() { super("Unreal Engine Tools"); }
+    public async execute(cmd: string) { return "Shaders compiling (45%)..."; }
+}
+
+// --- 66. Unity Open Tools ---
+class UnityAPI extends SimulatedAPI {
+    constructor() { super("Unity Tools"); }
+    public async execute(cmd: string) { return "Asset bundle built."; }
+}
+
+// --- 67. OpenStreetMap ---
+class OSMAPI extends SimulatedAPI {
+    constructor() { super("OpenStreetMap"); }
+    public async execute(cmd: string) { return "Tile fetched: 14/234/567.png"; }
+}
+
+// --- 68. QGIS ---
+class QGISAPI extends SimulatedAPI {
+    constructor() { super("QGIS"); }
+    public async execute(cmd: string) { return "Layer projection transformed to EPSG:4326."; }
+}
+
+// --- 69. MapLibre ---
+class MapLibreAPI extends SimulatedAPI {
+    constructor() { super("MapLibre GL"); }
+    public async execute(cmd: string) { return "Vector tiles rendered."; }
+}
+
+// --- 70. Leaflet.js ---
+class LeafletAPI extends SimulatedAPI {
+    constructor() { super("Leaflet.js"); }
+    public async execute(cmd: string) { return "Marker added to map."; }
+}
+
+// --- 71. VLC ---
+class VLCAPI extends SimulatedAPI {
+    constructor() { super("VLC Media Player"); }
+    public async execute(cmd: string) { return "Decoding H.264 stream..."; }
+}
+
+// --- 72. FFmpeg ---
+class FFmpegAPI extends SimulatedAPI {
+    constructor() { super("FFmpeg"); }
+    public async execute(cmd: string, args: any) {
+        if (cmd === 'transcode') return "Output file generated. Size: 14MB.";
+        return null;
+    }
+}
+
+// --- 73. OBS Studio ---
+class OBSAPI extends SimulatedAPI {
+    constructor() { super("OBS Studio"); }
+    public async execute(cmd: string) { return "Streaming started. Bitrate: 6000kbps."; }
+}
+
+// --- 74. WireGuard ---
+class WireGuardAPI extends SimulatedAPI {
+    constructor() { super("WireGuard"); }
+    public async execute(cmd: string) { return "Handshake completed. Tunnel active."; }
+}
+
+// --- 75. OpenVPN ---
+class OpenVPNAPI extends SimulatedAPI {
+    constructor() { super("OpenVPN"); }
+    public async execute(cmd: string) { return "Initialization Sequence Completed."; }
+}
+
+// --- 76. Tor Project ---
+class TorAPI extends SimulatedAPI {
+    constructor() { super("Tor Project"); }
+    public async execute(cmd: string) { return "Circuit built. Anonymity established."; }
+}
+
+// --- 77. DuckDB ---
+class DuckDBAPI extends SimulatedAPI {
+    constructor() { super("DuckDB"); }
+    public async execute(cmd: string) { return "OLAP query finished in 0.02s."; }
+}
+
+// --- 78. ClickHouse ---
+class ClickHouseAPI extends SimulatedAPI {
+    constructor() { super("ClickHouse"); }
+    public async execute(cmd: string) { return "Processed 1 billion rows."; }
+}
+
+// --- 79. MinIO ---
+class MinIOAPI extends SimulatedAPI {
+    constructor() { super("MinIO Object Storage"); }
+    public async execute(cmd: string) { return "Object uploaded to bucket 'assets'."; }
+}
+
+// --- 80. Ceph ---
+class CephAPI extends SimulatedAPI {
+    constructor() { super("Ceph"); }
+    public async execute(cmd: string) { return "Cluster health: HEALTH_OK."; }
+}
+
+// --- 81. OpenStack ---
+class OpenStackAPI extends SimulatedAPI {
+    constructor() { super("OpenStack"); }
+    public async execute(cmd: string) { return "Nova instance spawned."; }
+}
+
+// --- 82. Proxmox ---
+class ProxmoxAPI extends SimulatedAPI {
+    constructor() { super("Proxmox VE"); }
+    public async execute(cmd: string) { return "LXC container started."; }
+}
+
+// --- 83. Home Assistant ---
+class HomeAssistantAPI extends SimulatedAPI {
+    constructor() { super("Home Assistant"); }
+    public async execute(cmd: string) { return "Automation triggered: 'Turn on Studio Lights'."; }
+}
+
+// --- 84. OpenHAB ---
+class OpenHABAPI extends SimulatedAPI {
+    constructor() { super("OpenHAB"); }
+    public async execute(cmd: string) { return "Item state updated."; }
+}
+
+// --- 85. Matter Protocol ---
+class MatterAPI extends SimulatedAPI {
+    constructor() { super("Matter Protocol"); }
+    public async execute(cmd: string) { return "Device commissioned."; }
+}
+
+// --- 86. Zigbee Simulator ---
+class ZigbeeAPI extends SimulatedAPI {
+    constructor() { super("Zigbee"); }
+    public async execute(cmd: string) { return "Mesh network route discovery complete."; }
+}
+
+// --- 87. TensorRT ---
+class TensorRTAPI extends SimulatedAPI {
+    constructor() { super("TensorRT"); }
+    public async execute(cmd: string) { return "Engine built from ONNX model."; }
+}
+
+// --- 88. LLVM ---
+class LLVMAPI extends SimulatedAPI {
+    constructor() { super("LLVM"); }
+    public async execute(cmd: string) { return "IR optimization pass run."; }
+}
+
+// --- 89. WebKit ---
+class WebKitAPI extends SimulatedAPI {
+    constructor() { super("WebKit"); }
+    public async execute(cmd: string) { return "DOM tree constructed."; }
+}
+
+// --- 90. Chromium ---
+class ChromiumAPI extends SimulatedAPI {
+    constructor() { super("Chromium"); }
+    public async execute(cmd: string) { return "V8 Engine: JIT compilation finished."; }
+}
+
+// --- 91. uBlock Origin Engine ---
+class UBlockAPI extends SimulatedAPI {
+    constructor() { super("uBlock Origin Core"); }
+    public async execute(cmd: string) { return "Network request blocked (Filter list match)."; }
+}
+
+// --- 92. Brave Shields ---
+class BraveShieldsAPI extends SimulatedAPI {
+    constructor() { super("Brave Shields"); }
+    public async execute(cmd: string) { return "Tracker blocked."; }
+}
+
+// --- 93. Nextcloud ---
+class NextcloudAPI extends SimulatedAPI {
+    constructor() { super("Nextcloud"); }
+    public async execute(cmd: string) { return "File synced to cloud."; }
+}
+
+// --- 94. OwnCloud ---
+class OwnCloudAPI extends SimulatedAPI {
+    constructor() { super("OwnCloud"); }
+    public async execute(cmd: string) { return "WebDAV access granted."; }
+}
+
+// --- 95. Mastodon ---
+class MastodonAPI extends SimulatedAPI {
+    constructor() { super("Mastodon"); }
+    public async execute(cmd: string) { return "Toot published to fediverse."; }
+}
+
+// --- 96. Matrix ---
+class MatrixAPI extends SimulatedAPI {
+    constructor() { super("Matrix Protocol"); }
+    public async execute(cmd: string) { return "E2EE keys exchanged."; }
+}
+
+// --- 97. Signal Protocol ---
+class SignalAPI extends SimulatedAPI {
+    constructor() { super("Signal Protocol"); }
+    public async execute(cmd: string) { return "Double Ratchet step performed."; }
+}
+
+// --- 98. Apache Airflow ---
+class AirflowAPI extends SimulatedAPI {
+    constructor() { super("Apache Airflow"); }
+    public async execute(cmd: string) { return "DAG 'video_processing' triggered."; }
+}
+
+// --- 99. Jenkins ---
+class JenkinsAPI extends SimulatedAPI {
+    constructor() { super("Jenkins"); }
+    public async execute(cmd: string) { return "Build #45 SUCCESS."; }
+}
+
+// --- 100. DroneCI ---
+class DroneCIAPI extends SimulatedAPI {
+    constructor() { super("Drone CI"); }
+    public async execute(cmd: string) { return "Step 'publish' completed."; }
+}
+
+// --- The Registry of All Things ---
+class APIRegistry {
+    public apis: Map<string, SimulatedAPI> = new Map();
 
     constructor() {
-        this.loadFromLocalStorage();
+        this.register(new LinuxFoundationAPI());
+        this.register(new CanonicalAPI());
+        this.register(new RedHatAPI());
+        this.register(new FedoraAPI());
+        this.register(new DebianAPI());
+        this.register(new OpenSUSEAPI());
+        this.register(new ArchLinuxAPI());
+        this.register(new ManjaroAPI());
+        this.register(new FreeBSDAPI());
+        this.register(new NetBSDAPI());
+        this.register(new OpenBSDAPI());
+        this.register(new KubernetesAPI());
+        this.register(new CNCFAPI());
+        this.register(new DockerAPI());
+        this.register(new PodmanAPI());
+        this.register(new AnsibleAPI());
+        this.register(new TerraformAPI());
+        this.register(new HashiCorpAPI());
+        this.register(new ApacheFoundationAPI());
+        this.register(new NginxAPI());
+        this.register(new MozillaAPI());
+        this.register(new FirefoxDevToolsAPI());
+        this.register(new GitAPI());
+        this.register(new GitHubAPI());
+        this.register(new GitLabAPI());
+        this.register(new BitbucketAPI());
+        this.register(new VSCodeAPI());
+        this.register(new EclipseAPI());
+        this.register(new JetBrainsAPI());
+        this.register(new PythonAPI());
+        this.register(new NodeAPI());
+        this.register(new DenoAPI());
+        this.register(new BunAPI());
+        this.register(new RustAPI());
+        this.register(new GoLangAPI());
+        this.register(new RubyAPI());
+        this.register(new PHPAPI());
+        this.register(new MariaDBAPI());
+        this.register(new MySQLAPI());
+        this.register(new PostgresAPI());
+        this.register(new SQLiteAPI());
+        this.register(new RedisAPI());
+        this.register(new MongoAPI());
+        this.register(new CassandraAPI());
+        this.register(new ElasticSearchAPI());
+        this.register(new SparkAPI());
+        this.register(new KafkaAPI());
+        this.register(new SupabaseAPI());
+        this.register(new AppwriteAPI());
+        this.register(new PocketBaseAPI());
+        this.register(new HuggingFaceAPI());
+        this.register(new LangChainAPI());
+        this.register(new MLFlowAPI());
+        this.register(new TensorFlowAPI());
+        this.register(new PyTorchAPI());
+        this.register(new ONNXAPI());
+        this.register(new OpenCVAPI());
+        this.register(new OpenAIGymAPI());
+        this.register(new GodotAPI());
+        this.register(new BlenderAPI());
+        this.register(new InkscapeAPI());
+        this.register(new GimpAPI());
+        this.register(new KritaAPI());
+        this.register(new FigmaAPI());
+        this.register(new UnrealAPI());
+        this.register(new UnityAPI());
+        this.register(new OSMAPI());
+        this.register(new QGISAPI());
+        this.register(new MapLibreAPI());
+        this.register(new LeafletAPI());
+        this.register(new VLCAPI());
+        this.register(new FFmpegAPI());
+        this.register(new OBSAPI());
+        this.register(new WireGuardAPI());
+        this.register(new OpenVPNAPI());
+        this.register(new TorAPI());
+        this.register(new DuckDBAPI());
+        this.register(new ClickHouseAPI());
+        this.register(new MinIOAPI());
+        this.register(new CephAPI());
+        this.register(new OpenStackAPI());
+        this.register(new ProxmoxAPI());
+        this.register(new HomeAssistantAPI());
+        this.register(new OpenHABAPI());
+        this.register(new MatterAPI());
+        this.register(new ZigbeeAPI());
+        this.register(new TensorRTAPI());
+        this.register(new LLVMAPI());
+        this.register(new WebKitAPI());
+        this.register(new ChromiumAPI());
+        this.register(new UBlockAPI());
+        this.register(new BraveShieldsAPI());
+        this.register(new NextcloudAPI());
+        this.register(new OwnCloudAPI());
+        this.register(new MastodonAPI());
+        this.register(new MatrixAPI());
+        this.register(new SignalAPI());
+        this.register(new AirflowAPI());
+        this.register(new JenkinsAPI());
+        this.register(new DroneCIAPI());
     }
 
-    private async simulateLatency(minMs: number = this.latency): Promise<void> {
-        const actualLatency = minMs + Math.random() * 100;
-        return new Promise(resolve => setTimeout(resolve, actualLatency));
+    private register(api: SimulatedAPI) {
+        this.apis.set(api.name, api);
     }
 
-    private saveToLocalStorage(): void {
-        try {
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.projects));
-        } catch (error) {
-            console.error("CRITICAL: Failed to persist projects to local storage:", error);
-        }
+    public get(name: string): SimulatedAPI | undefined {
+        return this.apis.get(name);
     }
 
-    private loadFromLocalStorage(): void {
-        try {
-            const storedProjects = localStorage.getItem(this.STORAGE_KEY);
-            if (storedProjects) {
-                this.projects = JSON.parse(storedProjects);
-            } else {
-                this.initializeDefaultData();
-            }
-        } catch (error) {
-            console.error("CRITICAL: Failed to load projects from local storage. Starting fresh:", error);
-            this.initializeDefaultData();
-        }
-    }
-    
-    private initializeDefaultData(): void {
-        const defaultSettings: GenerationSettings = {
-            model: 'veo-3.1-ultra-hq',
-            aspectRatio: '16:9',
-            duration: 10,
-            negativePrompt: 'blurry, low quality, watermark, text, artifacts, noise, low frame rate',
-            seed: -1,
-            stylizationStrength: 75,
-            motionControl: 'dynamic',
-            fidelityLevel: 'high_res',
-            audioStyle: 'cinematic_orchestral',
-        };
-        
-        const defaultProject: AdProject = {
-            id: `proj_${Date.now()}`,
-            name: 'Q1 2025 Launch Campaign',
-            clientName: 'Global Dynamics Corp.',
-            creationDate: new Date().toISOString(),
-            lastModified: new Date().toISOString(),
-            assets: [],
-            aiSummary: 'Initial project setup for high-impact video advertising targeting Gen Z demographics.',
-        };
-        this.projects.push(defaultProject);
-        this.saveToLocalStorage();
-    }
-
-    // --- Project Operations ---
-    
-    public async getProjects(): Promise<AdProject[]> {
-        await this.simulateLatency();
-        // Return a deep copy, limited for UI performance if necessary
-        return JSON.parse(JSON.stringify(this.projects)).slice(0, MAX_PROJECTS_DISPLAY); 
-    }
-    
-    public async getProjectById(id: string): Promise<AdProject | null> {
-        await this.simulateLatency();
-        const project = this.projects.find(p => p.id === id);
-        return project ? JSON.parse(JSON.stringify(project)) : null;
-    }
-    
-    public async createProject(name: string, clientName: string = 'Unassigned Client'): Promise<AdProject> {
-        await this.simulateLatency();
-        const newProject: AdProject = {
-            id: `proj_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            name,
-            clientName,
-            creationDate: new Date().toISOString(),
-            lastModified: new Date().toISOString(),
-            assets: [],
-            aiSummary: `New project initialized for ${name}. Awaiting director input.`,
-        };
-        this.projects.push(newProject);
-        this.saveToLocalStorage();
-        return { ...newProject };
-    }
-    
-    public async renameProject(id: string, newName: string): Promise<AdProject | null> {
-        await this.simulateLatency();
-        const project = this.projects.find(p => p.id === id);
-        if (project) {
-            project.name = newName;
-            project.lastModified = new Date().toISOString();
-            this.saveToLocalStorage();
-            return { ...project };
-        }
-        return null;
-    }
-    
-    public async deleteProject(id: string): Promise<boolean> {
-        await this.simulateLatency();
-        const initialLength = this.projects.length;
-        this.projects = this.projects.filter(p => p.id !== id);
-        this.saveToLocalStorage();
-        return this.projects.length < initialLength;
-    }
-    
-    // --- Asset Operations ---
-    
-    public async addAssetToProject(projectId: string, asset: Omit<VideoAsset, 'id' | 'projectId' | 'creationDate' | 'lastAccessed'>): Promise<VideoAsset> {
-        await this.simulateLatency(300); // Longer latency for asset creation
-        const project = this.projects.find(p => p.id === projectId);
-        if (!project) {
-            throw new Error('Project not found during asset addition');
-        }
-        const now = new Date().toISOString();
-        const newAsset: VideoAsset = {
-            ...asset,
-            id: `asset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            projectId,
-            creationDate: now,
-            lastAccessed: now,
-        };
-        project.assets.unshift(newAsset); // Add to the beginning
-        project.lastModified = now;
-        this.saveToLocalStorage();
-        return { ...newAsset };
-    }
-
-    public async deleteAsset(projectId: string, assetId: string): Promise<boolean> {
-        await this.simulateLatency();
-        const project = this.projects.find(p => p.id === projectId);
-        if (project) {
-            const initialLength = project.assets.length;
-            project.assets = project.assets.filter(a => a.id !== assetId);
-            project.lastModified = new Date().toISOString();
-            this.saveToLocalStorage();
-            return project.assets.length < initialLength;
-        }
-        return false;
-    }
-
-    public async toggleFavoriteAsset(projectId: string, assetId: string): Promise<VideoAsset | null> {
-        await this.simulateLatency();
-        const project = this.projects.find(p => p.id === projectId);
-        if (project) {
-            const asset = project.assets.find(a => a.id === assetId);
-            if(asset) {
-                asset.isFavorite = !asset.isFavorite;
-                asset.lastAccessed = new Date().toISOString();
-                project.lastModified = new Date().toISOString();
-                this.saveToLocalStorage();
-                return { ...asset };
-            }
-        }
-        return null;
-    }
-    
-    public async updateAssetAccessTime(projectId: string, assetId: string): Promise<void> {
-        await this.simulateLatency(50);
-        const project = this.projects.find(p => p.id === projectId);
-        if (project) {
-            const asset = project.assets.find(a => a.id === assetId);
-            if(asset) {
-                asset.lastAccessed = new Date().toISOString();
-                project.lastModified = new Date().toISOString();
-                this.saveToLocalStorage();
-            }
-        }
+    public getAll(): SimulatedAPI[] {
+        return Array.from(this.apis.values());
     }
 }
 
-// Instantiate the mock API globally for the module
-export const mockApi = new MockBackendAPI();
+const GlobalRegistry = new APIRegistry();
 
+// ============================================================================
+// SECTION III: THE SOVEREIGN KERNEL (STATE MANAGEMENT)
+// ============================================================================
 
-// SECTION: Utility Functions (AI-Augmented)
-// ==========================
-
-export const generateUniqueId = (): string => `id_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-export const formatBytes = (bytes: number, decimals = 2): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-};
-
-export const formatDate = (isoString: string): string => {
-    try {
-        return new Date(isoString).toLocaleString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            timeZoneName: 'short'
-        });
-    } catch {
-        return 'Invalid Timestamp';
-    }
-};
-
-export const getAspectRatioClass = (aspectRatio: AspectRatio): string => {
-    switch (aspectRatio) {
-        case '16:9': return 'aspect-[16/9]';
-        case '9:16': return 'aspect-[9/16]';
-        case '1:1': return 'aspect-square';
-        case '4:5': return 'aspect-[4/5]';
-        case '21:9': return 'aspect-[21/9]';
-        case '3:2': return 'aspect-[3/2]';
-        case '2:3': return 'aspect-[2/3]';
-        default: return 'aspect-video';
-    }
-};
-
-// --- AI Utility: Prompt Synthesis ---
-export const synthesizeDirectorPrompt = (mode: GenerationMode, singlePrompt: string, scenes: StoryboardScene[]): string => {
-    if (mode === 'single_prompt') {
-        return `[SINGLE_SHOT_AD] ${singlePrompt}`;
-    }
-    if (mode === 'storyboard_sequence') {
-        const scenePrompts = scenes.map((scene, index) => 
-            `Scene ${index + 1} (${scene.duration}s): [VISUAL_FOCUS] ${scene.prompt}. [DIRECTOR_NOTES] ${scene.aiDirectorNotes || 'Maintain visual consistency with previous scene.'}`
-        ).join(' ||| ');
-        return `[STORYBOARD_AD] Total Scenes: ${scenes.length}. Sequence: ${scenePrompts}`;
-    }
-    return singlePrompt; // Fallback
-};
-
-
-// SECTION: Reducer for Complex State Management (Enterprise Grade)
-// =============================================================
-
-type AppState = {
+interface KernelState {
+    bootTime: number;
+    uptime: number;
+    activeProject: AdProject | null;
     projects: AdProject[];
-    currentProjectId: string | null;
-    isLoading: boolean;
-    error: string | null;
-    config: AppConfig;
-};
+    systemLoad: number;
+    memoryUsage: number;
+    logs: SystemEvent[];
+    notifications: SystemEvent[];
+    isGenerating: boolean;
+    generationProgress: number;
+    terminalOutput: string[];
+}
 
-type AppAction =
-    | { type: 'SET_PROJECTS'; payload: AdProject[] }
-    | { type: 'SET_CURRENT_PROJECT'; payload: string | null }
-    | { type: 'ADD_PROJECT'; payload: AdProject }
-    | { type: 'UPDATE_PROJECT'; payload: AdProject }
-    | { type: 'REMOVE_PROJECT'; payload: string }
-    | { type: 'ADD_ASSET'; payload: { projectId: string; asset: VideoAsset } }
-    | { type: 'REMOVE_ASSET'; payload: { projectId: string; assetId: string } }
-    | { type: 'UPDATE_ASSET'; payload: { projectId: string; asset: VideoAsset } }
-    | { type: 'SET_LOADING'; payload: boolean }
-    | { type: 'SET_ERROR'; payload: string | null }
-    | { type: 'UPDATE_CONFIG'; payload: Partial<AppConfig> }
-    | { type: 'UPDATE_PROJECT_SUMMARY'; payload: { projectId: string; summary: string } };
+type KernelAction = 
+    | { type: 'TICK'; payload: number }
+    | { type: 'CREATE_PROJECT'; payload: { name: string, client: string } }
+    | { type: 'SELECT_PROJECT'; payload: UUID }
+    | { type: 'UPDATE_PROJECT_CONFIG'; payload: Partial<RenderConfiguration> }
+    | { type: 'START_GENERATION'; payload: any }
+    | { type: 'GENERATION_COMPLETE'; payload: any }
+    | { type: 'SYSTEM_LOG'; payload: string }
+    | { type: 'TERMINAL_WRITE'; payload: string };
 
-const initialAppState: AppState = {
+const initialKernelState: KernelState = {
+    bootTime: Date.now(),
+    uptime: 0,
+    activeProject: null,
     projects: [],
-    currentProjectId: null,
-    isLoading: true,
-    error: null,
-    config: {
-        apiKey: null,
-        theme: 'dark',
-        autoSave: true,
-        aiQuotaRemaining: 10000, // Mock initial quota
-        defaultSettings: {
-            model: 'veo-3.1-ultra-hq',
-            aspectRatio: '16:9',
-            duration: 10,
-            negativePrompt: 'blurry, low quality, watermark, text, artifacts, noise, low frame rate',
-            seed: -1,
-            stylizationStrength: 75,
-            motionControl: 'dynamic',
-            fidelityLevel: 'high_res',
-            audioStyle: 'cinematic_orchestral',
-        },
-    },
+    systemLoad: 0.1,
+    memoryUsage: 0.2,
+    logs: [],
+    notifications: [],
+    isGenerating: false,
+    generationProgress: 0,
+    terminalOutput: [
+        "Initializing Sovereign Universe Forge...",
+        "Loading 100 Open Source Modules...",
+        "Kernel 6.8.0-generic-sim loaded.",
+        "System Ready."
+    ]
 };
 
-const appReducer: Reducer<AppState, AppAction> = (state, action): AppState => {
+function kernelReducer(state: KernelState, action: KernelAction): KernelState {
     switch (action.type) {
-        case 'SET_PROJECTS':
-            const firstProjectId = action.payload.length > 0 ? action.payload[0].id : null;
+        case 'TICK':
             return {
                 ...state,
-                projects: action.payload,
-                currentProjectId: state.currentProjectId && action.payload.some(p => p.id === state.currentProjectId) 
-                    ? state.currentProjectId 
-                    : firstProjectId,
-                isLoading: false,
+                uptime: action.payload - state.bootTime,
+                systemLoad: Math.max(0.05, Math.min(1.0, state.systemLoad + (Math.random() - 0.5) * 0.05)),
+                memoryUsage: Math.max(0.1, Math.min(0.9, state.memoryUsage + (Math.random() - 0.5) * 0.02)),
+                generationProgress: state.isGenerating ? Math.min(100, state.generationProgress + Math.random() * 5) : 0
             };
-        case 'SET_CURRENT_PROJECT':
-            return { ...state, currentProjectId: action.payload };
-        case 'ADD_PROJECT':
-            return { ...state, projects: [...state.projects, action.payload] };
-        case 'UPDATE_PROJECT':
+        case 'CREATE_PROJECT':
+            const newProject: AdProject = {
+                id: crypto.randomUUID(),
+                name: action.payload.name,
+                client: action.payload.client,
+                timeline: [],
+                assets: [],
+                renderConfig: { resolution: [1920, 1080], fps: 30, format: 'mp4', codec: 'h264', bitrate: 5000 },
+                aiModelConfig: { provider: 'internal_sovereign', modelId: 'veo-3.1-sim', temperature: 0.7, seed: -1, loraAdapters: [] },
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
             return {
                 ...state,
-                projects: state.projects.map(p => (p.id === action.payload.id ? action.payload : p)),
+                projects: [...state.projects, newProject],
+                activeProject: newProject,
+                terminalOutput: [...state.terminalOutput, `> Project created: ${newProject.name} (${newProject.id})`]
             };
-        case 'REMOVE_PROJECT':
-            const remainingProjects = state.projects.filter(p => p.id !== action.payload);
-            const newCurrentProjectId = state.currentProjectId === action.payload 
-                ? remainingProjects.length > 0 ? remainingProjects[0].id : null 
-                : state.currentProjectId;
+        case 'SELECT_PROJECT':
             return {
                 ...state,
-                projects: remainingProjects,
-                currentProjectId: newCurrentProjectId,
+                activeProject: state.projects.find(p => p.id === action.payload) || null
             };
-        case 'ADD_ASSET':
-        case 'REMOVE_ASSET':
-        case 'UPDATE_ASSET':
+        case 'START_GENERATION':
             return {
                 ...state,
-                projects: state.projects.map(p => {
-                    if (p.id !== action.payload.projectId) return p;
-                    let newAssets: VideoAsset[];
-                    if (action.type === 'ADD_ASSET') {
-                        newAssets = [action.payload.asset, ...p.assets];
-                    } else if (action.type === 'REMOVE_ASSET') {
-                        newAssets = p.assets.filter(a => a.id !== action.payload.assetId);
-                    } else { // UPDATE_ASSET
-                        newAssets = p.assets.map(a => a.id === action.payload.asset.id ? action.payload.asset : a);
-                    }
-                    return { ...p, assets: newAssets, lastModified: new Date().toISOString() };
-                }),
+                isGenerating: true,
+                generationProgress: 0,
+                terminalOutput: [...state.terminalOutput, "> Initiating Generation Sequence via Kubernetes Cluster..."]
             };
-        case 'UPDATE_CONFIG':
-            return { ...state, config: { ...state.config, ...action.payload } };
-        case 'SET_LOADING':
-            return { ...state, isLoading: action.payload };
-        case 'SET_ERROR':
-            return { ...state, error: action.payload, isLoading: false };
-        case 'UPDATE_PROJECT_SUMMARY':
-             return {
+        case 'GENERATION_COMPLETE':
+            return {
                 ...state,
-                projects: state.projects.map(p => (p.id === action.payload.projectId ? { ...p, aiSummary: action.payload.summary, lastModified: new Date().toISOString() } : p)),
+                isGenerating: false,
+                generationProgress: 100,
+                terminalOutput: [...state.terminalOutput, "> Generation Complete. Asset finalized via FFmpeg."]
+            };
+        case 'TERMINAL_WRITE':
+            return {
+                ...state,
+                terminalOutput: [...state.terminalOutput, `> ${action.payload}`].slice(-50)
             };
         default:
             return state;
     }
-};
+}
 
-// SECTION: Child Components (AI-Enhanced UI Elements)
-// ==================================================
+// ============================================================================
+// SECTION IV: UI COMPONENTS (THE HOLOGRAPHIC LAYER)
+// ============================================================================
 
-export const ProjectSidebar: React.FC<{
-    projects: AdProject[];
-    currentProjectId: string | null;
-    onSelectProject: (id: string) => void;
-    onCreateProject: (name: string, client: string) => void;
-    onDeleteProject: (id: string) => void;
-    onRenameProject: (id: string, newName: string) => void;
-}> = ({ projects, currentProjectId, onSelectProject, onCreateProject, onDeleteProject, onRenameProject }) => {
-    const [newProjectName, setNewProjectName] = useState('');
-    const [newClientName, setNewClientName] = useState('');
-    const [renamingId, setRenamingId] = useState<string | null>(null);
-    const [renamingText, setRenamingText] = useState('');
+// --- Shared UI Primitives ---
 
-    const handleCreateProject = () => {
-        if (newProjectName.trim()) {
-            onCreateProject(newProjectName.trim(), newClientName.trim() || 'Unassigned Client');
-            setNewProjectName('');
-            setNewClientName('');
-        }
-    };
-
-    const handleRename = (id: string) => {
-        if (renamingText.trim() && renamingId) {
-            onRenameProject(id, renamingText.trim());
-        }
-        setRenamingId(null);
-        setRenamingText('');
-    };
-
-    return (
-        <div className="bg-gray-900 border-r border-gray-700 w-72 p-4 flex flex-col h-full shadow-2xl">
-            <h3 className="text-2xl font-extrabold text-cyan-400 mb-4 border-b border-gray-700 pb-2">Project Nexus</h3>
-            
-            {/* New Project Creation Block */}
-            <div className="mb-4 p-3 bg-gray-800/70 rounded-lg border border-gray-700">
-                <h4 className="text-sm font-semibold text-gray-300 mb-2">New Initiative</h4>
-                <input
-                    type="text"
-                    value={newProjectName}
-                    onChange={(e) => setNewProjectName(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleCreateProject()}
-                    placeholder="Project Name (e.g., Q2 Campaign)"
-                    className="w-full bg-gray-700 border border-gray-600 rounded-md p-2 text-sm text-white mb-2 focus:ring-cyan-500"
-                />
-                <input
-                    type="text"
-                    value={newClientName}
-                    onChange={(e) => setNewClientName(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleCreateProject()}
-                    placeholder="Client Name (Optional)"
-                    className="w-full bg-gray-700 border border-gray-600 rounded-md p-2 text-sm text-white mb-2 focus:ring-cyan-500"
-                />
-                <button onClick={handleCreateProject} disabled={!newProjectName.trim()} className="w-full bg-cyan-700 hover:bg-cyan-600 text-white p-2 rounded-md text-sm font-medium disabled:opacity-30">
-                    Initiate Project
-                </button>
+const Card: React.FC<{ title?: string; children: React.ReactNode; className?: string }> = ({ title, children, className = "" }) => (
+    <div className={`bg-gray-900/80 border border-gray-700 rounded-lg overflow-hidden backdrop-blur-md shadow-xl ${className}`}>
+        {title && (
+            <div className="bg-gray-800/50 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-cyan-400">{title}</h3>
+                <div className="flex space-x-1">
+                    <div className="w-2 h-2 rounded-full bg-red-500/50"></div>
+                    <div className="w-2 h-2 rounded-full bg-yellow-500/50"></div>
+                    <div className="w-2 h-2 rounded-full bg-green-500/50"></div>
+                </div>
             </div>
+        )}
+        <div className="p-4">{children}</div>
+    </div>
+);
 
-            <h4 className="text-md font-semibold text-gray-300 mb-2 uppercase tracking-wider">Active Projects ({projects.length})</h4>
-            <ul className="space-y-1 overflow-y-auto flex-grow custom-scrollbar">
-                {projects.map(project => (
-                    <li key={project.id}>
-                        <div
-                            className={`group flex flex-col p-2 rounded-lg cursor-pointer transition-colors ${currentProjectId === project.id ? 'bg-cyan-700/50 text-white shadow-lg border border-cyan-500' : 'text-gray-300 hover:bg-gray-800/50 border border-transparent'}`}
-                            onClick={() => onSelectProject(project.id)}
-                        >
-                            <div className="flex items-center justify-between w-full">
-                                {renamingId === project.id ? (
-                                    <input
-                                        type="text"
-                                        value={renamingText}
-                                        onChange={(e) => setRenamingText(e.target.value)}
-                                        onBlur={() => handleRename(project.id)}
-                                        onKeyPress={(e) => e.key === 'Enter' && handleRename(project.id)}
-                                        className="bg-gray-600 text-white w-full text-sm p-1 rounded focus:outline-none"
-                                        autoFocus
-                                    />
-                                ) : (
-                                    <span className="truncate font-medium text-sm">{project.name}</span>
-                                )}
-                                <div className="flex items-center space-x-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button title="Rename" onClick={(e) => { e.stopPropagation(); setRenamingId(project.id); setRenamingText(project.name); }} className="text-gray-400 hover:text-yellow-400 text-xs p-1">Edit</button>
-                                    <button title="Delete" onClick={(e) => { e.stopPropagation(); if(window.confirm(`Confirm deletion of Project: "${project.name}"?`)) onDeleteProject(project.id);}} className="text-gray-400 hover:text-red-500 text-xs p-1">Delete</button>
-                                </div>
-                            </div>
-                            <p className="text-xs text-gray-400 mt-0.5 truncate">Client: {project.clientName}</p>
-                        </div>
-                    </li>
-                ))}
-            </ul>
-        </div>
+const Button: React.FC<{ onClick?: () => void; disabled?: boolean; variant?: 'primary' | 'secondary' | 'danger'; children: React.ReactNode }> = ({ onClick, disabled, variant = 'primary', children }) => {
+    const baseClass = "px-4 py-2 rounded text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center justify-center space-x-2";
+    const variants = {
+        primary: "bg-cyan-700 hover:bg-cyan-600 text-white shadow-lg shadow-cyan-900/50",
+        secondary: "bg-gray-700 hover:bg-gray-600 text-gray-200",
+        danger: "bg-red-900/50 hover:bg-red-800 text-red-200 border border-red-700"
+    };
+    return (
+        <button onClick={onClick} disabled={disabled} className={`${baseClass} ${variants[variant]} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            {children}
+        </button>
     );
 };
 
-export const GenerationControls: React.FC<{
-    settings: GenerationSettings;
-    onSettingsChange: (newSettings: Partial<GenerationSettings>) => void;
-    isGenerating: boolean;
-    aiQuota: number;
-}> = ({ settings, onSettingsChange, isGenerating, aiQuota }) => {
-    
-    const handleRangeChange = (key: keyof GenerationSettings, value: string) => {
-        onSettingsChange({ [key]: parseInt(value, 10) });
-    };
-    
-    const handleSelectChange = (key: keyof GenerationSettings, value: string) => {
-        onSettingsChange({ [key]: value });
-    };
+// --- Sub-Components ---
+
+const SystemMonitor: React.FC<{ state: KernelState }> = ({ state }) => {
+    const apis = GlobalRegistry.getAll();
+    const healthyCount = apis.filter(a => a.getHealth() === 1).length;
 
     return (
-        <Card title="AI Generation Matrix Configuration" className="shadow-xl border-cyan-800/50">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                
-                {/* Model Selection */}
-                <div className="col-span-2 lg:col-span-1">
-                    <label className="block text-xs font-medium text-cyan-400 mb-1 uppercase">AI Model Core</label>
-                    <select
-                        value={settings.model}
-                        onChange={e => handleSelectChange('model', e.target.value)}
-                        disabled={isGenerating}
-                        className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 text-white text-sm focus:ring-cyan-500"
-                    >
-                        <option value="veo-3.1-ultra-hq">Veo 3.1 (Ultra HQ)</option>
-                        <option value="imagen-video-4-pro">Imagen Video 4 (Pro)</option>
-                        <option value="lumiere-hd-001-enterprise">Lumiere HD (Enterprise)</option>
-                        <option value="phoenix-v2-stable">Phoenix v2 (Stable)</option>
-                    </select>
-                </div>
-                
-                {/* Aspect Ratio */}
+        <Card title="System Telemetry" className="h-full">
+            <div className="grid grid-cols-2 gap-4 text-xs font-mono">
                 <div>
-                    <label className="block text-xs font-medium text-cyan-400 mb-1 uppercase">Output Ratio</label>
-                    <select
-                        value={settings.aspectRatio}
-                        onChange={e => handleSelectChange('aspectRatio', e.target.value)}
-                        disabled={isGenerating}
-                        className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 text-white text-sm"
-                    >
-                        <option value="16:9">16:9 (Widescreen)</option>
-                        <option value="9:16">9:16 (Vertical/Mobile)</option>
-                        <option value="1:1">1:1 (Square)</option>
-                        <option value="4:5">4:5 (Portrait)</option>
-                        <option value="21:9">21:9 (Cinematic)</option>
-                        <option value="3:2">3:2 (Standard Photo)</option>
-                        <option value="2:3">2:3 (Poster)</option>
-                    </select>
+                    <p className="text-gray-500">KERNEL_UPTIME</p>
+                    <p className="text-cyan-300">{(state.uptime / 1000).toFixed(2)}s</p>
                 </div>
-                
-                {/* Duration (Single Mode Only) */}
                 <div>
-                    <label className="block text-xs font-medium text-cyan-400 mb-1 uppercase">Duration (s): {settings.duration}</label>
-                    <input
-                        type="range"
-                        min={MIN_SCENE_DURATION}
-                        max={30} // Capped at 30 for single prompt for cost control
-                        step="1"
-                        value={settings.duration}
-                        onChange={e => handleRangeChange('duration', e.target.value)}
-                        disabled={isGenerating}
-                        className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-cyan-500 [&::-moz-range-thumb]:bg-cyan-500"
-                    />
-                </div>
-                
-                {/* Fidelity Level */}
-                <div>
-                    <label className="block text-xs font-medium text-cyan-400 mb-1 uppercase">Fidelity Level</label>
-                    <select
-                        value={settings.fidelityLevel}
-                        onChange={e => handleSelectChange('fidelityLevel', e.target.value)}
-                        disabled={isGenerating}
-                        className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 text-white text-sm"
-                    >
-                        <option value="standard">Standard (Fast)</option>
-                        <option value="high_res">High Resolution</option>
-                        <option value="4k_preview">4K Preview (High Cost)</option>
-                    </select>
-                </div>
-                
-                {/* Stylization Strength */}
-                <div className="col-span-2 lg:col-span-1">
-                    <label className="block text-xs font-medium text-cyan-400 mb-1 uppercase">Creativity/Adherence: {settings.stylizationStrength}%</label>
-                    <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        step="1"
-                        value={settings.stylizationStrength}
-                        onChange={e => handleRangeChange('stylizationStrength', e.target.value)}
-                        disabled={isGenerating}
-                        className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-cyan-500 [&::-moz-range-thumb]:bg-cyan-500"
-                    />
-                </div>
-                
-                {/* Motion Control */}
-                <div>
-                    <label className="block text-xs font-medium text-cyan-400 mb-1 uppercase">Motion Profile</label>
-                    <select
-                        value={settings.motionControl}
-                        onChange={e => handleSelectChange('motionControl', e.target.value)}
-                        disabled={isGenerating}
-                        className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 text-white text-sm"
-                    >
-                        <option value="dynamic">Dynamic (Complex)</option>
-                        <option value="smooth">Smooth (Subtle)</option>
-                        <option value="default">Default</option>
-                    </select>
-                </div>
-                
-                {/* Audio Style */}
-                <div>
-                    <label className="block text-xs font-medium text-cyan-400 mb-1 uppercase">Audio Track</label>
-                    <select
-                        value={settings.audioStyle}
-                        onChange={e => handleSelectChange('audioStyle', e.target.value)}
-                        disabled={isGenerating}
-                        className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 text-white text-sm"
-                    >
-                        <option value="none">None (Muted)</option>
-                        <option value="cinematic_orchestral">Cinematic Orchestral</option>
-                        <option value="upbeat_synthwave">Upbeat Synthwave</option>
-                        <option value="corporate_minimal">Corporate Minimal</option>
-                    </select>
-                </div>
-                
-                {/* Seed Control */}
-                <div className="col-span-2 lg:col-span-1">
-                     <label className="block text-xs font-medium text-cyan-400 mb-1 uppercase">Seed (Deterministic)</label>
-                     <div className="flex">
-                        <input
-                            type="number"
-                            value={settings.seed === -1 ? '' : settings.seed}
-                            onChange={e => onSettingsChange({ seed: parseInt(e.target.value, 10) || -1 })}
-                            placeholder="Random (-1)"
-                            disabled={isGenerating}
-                            className="w-full bg-gray-700 border border-gray-600 rounded-l-lg p-2 text-white text-sm"
-                        />
-                        <button onClick={() => onSettingsChange({seed: -1})} title="Use Random Seed" className="bg-gray-600 hover:bg-gray-500 p-2 rounded-r-lg text-sm font-bold">Random</button>
-                     </div>
-                </div>
-                
-                {/* Quota Display */}
-                <div className="col-span-2 lg:col-span-1">
-                    <label className="block text-xs font-medium text-gray-400 mb-1 uppercase">AI Compute Quota</label>
-                    <div className="w-full bg-gray-700 rounded-lg h-8 flex items-center">
-                        <div 
-                            className={`h-full rounded-l-lg text-xs font-bold flex items-center px-2 transition-all duration-500 ${aiQuota > 1000 ? 'bg-green-600' : aiQuota > 200 ? 'bg-yellow-600' : 'bg-red-600'}`}
-                            style={{ width: `${Math.min(100, (aiQuota / 10000) * 100)}%` }}
-                        >
-                            {aiQuota.toLocaleString()}
-                        </div>
-                        <span className="text-xs text-gray-300 px-2 flex-shrink-0">/ 10,000</span>
+                    <p className="text-gray-500">CPU_LOAD</p>
+                    <div className="w-full bg-gray-800 h-2 rounded mt-1">
+                        <div className="bg-green-500 h-full rounded" style={{ width: `${state.systemLoad * 100}%` }}></div>
                     </div>
                 </div>
-                
-                {/* Negative Prompt */}
-                <div className="col-span-full">
-                    <label className="block text-xs font-medium text-cyan-400 mb-1 uppercase">Negative Prompt (Artifact Suppression)</label>
-                    <input
-                        type="text"
-                        value={settings.negativePrompt}
-                        onChange={e => handleSelectChange('negativePrompt', e.target.value)}
-                        placeholder="e.g., blurry, text, watermark, ugly, low resolution"
-                        disabled={isGenerating}
-                        className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 text-white text-sm"
-                    />
+                <div>
+                    <p className="text-gray-500">MEMORY_ALLOC</p>
+                    <div className="w-full bg-gray-800 h-2 rounded mt-1">
+                        <div className="bg-purple-500 h-full rounded" style={{ width: `${state.memoryUsage * 100}%` }}></div>
+                    </div>
+                </div>
+                <div>
+                    <p className="text-gray-500">MODULES_ACTIVE</p>
+                    <p className="text-yellow-300">{healthyCount} / {apis.length}</p>
+                </div>
+            </div>
+            <div className="mt-4 border-t border-gray-700 pt-2">
+                <p className="text-gray-500 text-[10px] mb-1">ACTIVE_PROCESSES</p>
+                <div className="h-20 overflow-y-auto space-y-1 custom-scrollbar">
+                    {apis.slice(0, 10).map(api => (
+                        <div key={api.name} className="flex justify-between text-[10px] text-gray-400">
+                            <span>{api.name}</span>
+                            <span className="text-green-500">RUNNING</span>
+                        </div>
+                    ))}
+                    <div className="text-[10px] text-gray-600 italic">...and {apis.length - 10} more</div>
                 </div>
             </div>
         </Card>
     );
 };
 
-export const AssetGrid: React.FC<{
-    assets: VideoAsset[];
-    onDelete: (assetId: string) => void;
-    onToggleFavorite: (assetId: string) => void;
-    onSelect: (asset: VideoAsset) => void;
-}> = ({ assets, onDelete, onToggleFavorite, onSelect }) => {
-    if (assets.length === 0) {
-        return (
-            <div className="text-center py-16 text-gray-500 border border-dashed border-gray-700 rounded-lg">
-                <p className="text-lg mb-2">Asset Repository Empty</p>
-                <p>Generate your first video asset using the controls above to populate this library.</p>
-            </div>
-        );
-    }
+const Terminal: React.FC<{ output: string[] }> = ({ output }) => {
+    const bottomRef = useRef<HTMLDivElement>(null);
+    useEffect(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), [output]);
 
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {assets.map(asset => (
-                <div key={asset.id} className="group relative aspect-video bg-gray-800 rounded-xl overflow-hidden border border-gray-700 hover:border-cyan-500 transition-all duration-200 shadow-lg">
-                    {/* Placeholder for actual video preview */}
-                    <div className="w-full h-full bg-gray-900 flex items-center justify-center">
-                        <span className="text-xs text-gray-500">Preview Unavailable</span>
-                    </div>
-                    
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
-                        <div className="flex justify-end space-x-2">
-                            <button title="Favorite" onClick={() => onToggleFavorite(asset.id)} className={`text-xl ${asset.isFavorite ? 'text-yellow-400' : 'text-white/70 hover:text-white'}`}>
-                                {asset.isFavorite ? '★' : '☆'}
-                            </button>
-                            <button title="Delete Asset" onClick={() => onDelete(asset.id)} className="text-white/70 hover:text-red-500">Delete</button>
-                        </div>
-                        <div className="bg-black/50 p-1 rounded-md">
-                            <p className="text-xs text-white truncate font-mono">{asset.id.substring(0, 8)}...</p>
-                            <p className="text-[10px] text-gray-400 mt-0.5">Cost: {asset.costCredits} Credits</p>
-                            <button onClick={() => onSelect(asset)} className="mt-1 w-full text-xs bg-cyan-600/80 hover:bg-cyan-500 text-white py-1 rounded transition-colors">Analyze & View</button>
-                        </div>
-                    </div>
-                </div>
-            ))}
-        </div>
-    );
-};
-
-export const StoryboardEditor: React.FC<{
-    scenes: StoryboardScene[];
-    setScenes: React.Dispatch<React.SetStateAction<StoryboardScene[]>>;
-    isGenerating: boolean;
-    onGenerateDirectorSummary: (prompt: string) => Promise<string>;
-    onScenePromptChange: (id: string, prompt: string) => void;
-    onSceneNotesChange: (id: string, notes: string) => void;
-    onSceneDurationChange: (id: string, duration: number) => void;
-}> = ({ scenes, setScenes, isGenerating, onGenerateDirectorSummary, onScenePromptChange, onSceneNotesChange, onSceneDurationChange }) => {
-    const [isSummarizing, setIsSummarizing] = useState(false);
-
-    const addScene = () => {
-        setScenes(prev => [...prev, { id: generateUniqueId(), prompt: '', aiDirectorNotes: '', duration: 5 }]);
-    };
-
-    const removeScene = (id: string) => {
-        setScenes(prev => prev.filter(s => s.id !== id));
-    };
-    
-    const totalDuration = useMemo(() => scenes.reduce((acc, scene) => acc + scene.duration, 0), [scenes]);
-
-    const handleGenerateSummary = useCallback(async () => {
-        if (isGenerating) return;
-        setIsSummarizing(true);
-        const sequencePrompt = synthesizeDirectorPrompt('storyboard_sequence', '', scenes);
-        try {
-            const summary = await onGenerateDirectorSummary(sequencePrompt);
-            // In a real app, this summary would populate the project AI summary field
-            alert(`AI Director Summary Generated:\n${summary}`);
-        } catch (e) {
-            alert('Failed to generate director summary.');
-        } finally {
-            setIsSummarizing(false);
-        }
-    }, [isGenerating, scenes, onGenerateDirectorSummary]);
-
-    return (
-        <div className="space-y-4 p-3 bg-gray-800/50 rounded-xl border border-gray-700">
-            <h4 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">Storyboard Sequence Editor</h4>
-            <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar pr-2">
-                {scenes.map((scene, index) => (
-                    <div key={scene.id} className="flex items-start space-x-3 p-3 bg-gray-700/50 rounded-lg shadow-inner border border-gray-600">
-                        <span className="font-extrabold text-lg text-cyan-400 mt-2 w-6 flex-shrink-0">{index + 1}</span>
-                        <div className="flex-grow space-y-2">
-                            {/* Prompt Input */}
-                            <textarea
-                                value={scene.prompt}
-                                onChange={e => onScenePromptChange(scene.id, e.target.value)}
-                                placeholder={`Scene ${index + 1} Visual Description...`}
-                                className="w-full h-16 bg-gray-800 border border-gray-600 rounded-lg p-2 text-white text-sm focus:ring-cyan-500"
-                                disabled={isGenerating}
-                            />
-                            {/* Director Notes Input */}
-                            <textarea
-                                value={scene.aiDirectorNotes}
-                                onChange={e => onSceneNotesChange(scene.id, e.target.value)}
-                                placeholder={`AI Director Notes (e.g., Camera movement, lighting style, character emotion)...`}
-                                className="w-full h-12 bg-gray-800 border border-gray-600 rounded-lg p-2 text-white text-xs italic focus:ring-yellow-500"
-                                disabled={isGenerating}
-                            />
-                            
-                            {/* Duration Control */}
-                             <div className="flex items-center space-x-2 pt-1">
-                                <label className="text-xs text-gray-400">Duration:</label>
-                                 <input
-                                    type="range"
-                                    min={MIN_SCENE_DURATION}
-                                    max={MAX_SCENE_DURATION}
-                                    value={scene.duration}
-                                    onChange={e => onSceneDurationChange(scene.id, parseInt(e.target.value, 10))}
-                                    disabled={isGenerating}
-                                    className="w-32 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:bg-cyan-500 [&::-moz-range-thumb]:bg-cyan-500"
-                                />
-                                <span className="text-xs text-white w-8 font-bold">{scene.duration}s</span>
-                            </div>
-                        </div>
-                        <button 
-                            onClick={() => removeScene(scene.id)} 
-                            disabled={isGenerating || scenes.length <= 1} 
-                            title="Remove Scene"
-                            className="text-gray-400 hover:text-red-500 disabled:opacity-30 mt-2 p-1"
-                        >X</button>
+        <Card title="Sovereign Shell (bash)" className="h-64 font-mono text-xs bg-black border-gray-800">
+            <div className="h-full overflow-y-auto space-y-1 p-2 text-green-400">
+                {output.map((line, i) => (
+                    <div key={i} className="break-words opacity-90 hover:opacity-100">
+                        <span className="text-gray-600 mr-2">[{new Date().toLocaleTimeString()}]</span>
+                        {line}
                     </div>
                 ))}
+                <div ref={bottomRef} />
             </div>
-            
-            <div className="flex justify-between items-center pt-3 border-t border-gray-700">
-                <button onClick={addScene} disabled={isGenerating || scenes.length >= 20} className="py-2 px-4 text-sm bg-gray-600 hover:bg-gray-500 text-white rounded-lg disabled:opacity-50 flex items-center space-x-1">
-                    <span>+ Add Scene Block</span>
-                </button>
-                <div className="flex items-center space-x-3">
-                    <button onClick={handleGenerateSummary} disabled={isGenerating || isSummarizing} className="py-2 px-4 text-sm bg-yellow-700/50 hover:bg-yellow-700 text-white rounded-lg disabled:opacity-50 flex items-center space-x-1">
-                        {isSummarizing ? (
-                            <>
-                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
-                                <span>AI Directing...</span>
-                            </>
-                        ) : (
-                            <span>Synthesize Director Notes</span>
-                        )}
-                    </button>
-                    <p className="text-sm text-gray-400">Total Estimated Duration: <span className="font-bold text-white">{totalDuration}s</span></p>
-                </div>
-            </div>
-        </div>
+        </Card>
     );
 };
 
-// SECTION: Main Component (The Sovereign Interface)
-// =========================================================
+const ProjectManager: React.FC<{ 
+    projects: AdProject[], 
+    activeId: UUID | null, 
+    onCreate: (name: string, client: string) => void,
+    onSelect: (id: UUID) => void 
+}> = ({ projects, activeId, onCreate, onSelect }) => {
+    const [name, setName] = useState('');
+    const [client, setClient] = useState('');
 
-const AIAdStudioView: React.FC = () => {
-    // --- Core State Management ---
-    const [prompt, setPrompt] = useState('A hyper-realistic, cinematic 15-second commercial showcasing a self-driving electric vehicle navigating a rain-slicked Tokyo street at midnight, emphasizing speed and safety.');
-    const [generationState, setGenerationState] = useState<GenerationState>('idle');
-    const [videoUrl, setVideoUrl] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null);
-    const [pollingMessageIndex, setPollingMessageIndex] = useState(0);
-    const [pollingIntervalId, setPollingIntervalId] = useState<number | null>(null);
-
-    // --- Application State (via Reducer) ---
-    const [appState, dispatch] = useReducer(appReducer, initialAppState);
-    const [generationSettings, setGenerationSettings] = useState<GenerationSettings>(initialAppState.config.defaultSettings);
-    const [generationMode, setGenerationMode] = useState<GenerationMode>('single_prompt');
-    const [scenes, setScenes] = useState<StoryboardScene[]>([
-        { id: generateUniqueId(), prompt: 'Extreme close-up on a single raindrop hitting a polished chrome surface.', aiDirectorNotes: 'Shallow depth of field, high contrast.', duration: 3 },
-        { id: generateUniqueId(), prompt: 'Wide shot of the vehicle accelerating smoothly away from a blurred neon sign.', aiDirectorNotes: 'Smooth tracking shot, cinematic color grading.', duration: 7 },
-    ]);
-    const [selectedAsset, setSelectedAsset] = useState<VideoAsset | null>(null);
-    
-    const isGenerating = generationState === 'generating' || generationState === 'polling';
-    
-    // API Key Input Ref
-    const apiKeyInputRef = useRef<HTMLInputElement>(null);
-
-    // Derived State
-    const currentProject = useMemo(() => {
-        return appState.projects.find(p => p.id === appState.currentProjectId);
-    }, [appState.projects, appState.currentProjectId]);
-    
-    const currentProjectAssets = useMemo(() => {
-        return currentProject?.assets || [];
-    }, [currentProject]);
-
-    // --- Effects ---
-    useEffect(() => {
-        // 1. Load initial projects and configuration
-        mockApi.getProjects().then(projects => {
-            dispatch({ type: 'SET_PROJECTS', payload: projects });
-        }).catch(err => {
-            dispatch({ type: 'SET_ERROR', payload: 'System initialization failed: Cannot load project manifest.' });
-            console.error(err);
-        });
-
-        // 2. Load API key from persistent storage
-        const storedApiKey = process.env.REACT_APP_API_KEY || localStorage.getItem('google_genai_api_key');
-        if (storedApiKey) {
-            dispatch({ type: 'UPDATE_CONFIG', payload: { apiKey: storedApiKey } });
-        }
-    }, []);
-
-    useEffect(() => {
-        // 3. Cleanup interval on state change/unmount
-        return () => {
-            if (pollingIntervalId) {
-                clearInterval(pollingIntervalId);
-            }
-        };
-    }, [pollingIntervalId]);
-
-    useEffect(() => {
-        // 4. Cleanup blob URL
-        return () => {
-            if (videoUrl && videoUrl.startsWith('blob:')) {
-                URL.revokeObjectURL(videoUrl);
-            }
-        };
-    }, [videoUrl]);
-    
-    // --- Handlers ---
-    
-    const handleUpdateConfig = useCallback((payload: Partial<AppConfig>) => {
-        dispatch({ type: 'UPDATE_CONFIG', payload });
-    }, []);
-
-    const handleApiKeySave = () => {
-        const key = apiKeyInputRef.current?.value;
-        if (key && key.length > 20) { // Basic validation
-            localStorage.setItem('google_genai_api_key', key);
-            handleUpdateConfig({ apiKey: key });
-            setError(null);
-            alert("API Key successfully registered. System ready for secure connection.");
-        } else {
-            setError("Invalid key format detected. Key must be substantial.");
-        }
-    };
-    
-    // Project Management
-    const handleCreateProject = useCallback(async (name: string, client: string) => {
-        try {
-            dispatch({ type: 'SET_LOADING', payload: true });
-            const newProject = await mockApi.createProject(name, client);
-            dispatch({ type: 'ADD_PROJECT', payload: newProject });
-            dispatch({ type: 'SET_CURRENT_PROJECT', payload: newProject.id });
-        } catch (err) {
-            dispatch({ type: 'SET_ERROR', payload: 'Failed to initiate new project.' });
-        } finally {
-            dispatch({ type: 'SET_LOADING', payload: false });
-        }
-    }, []);
-
-    const handleDeleteProject = useCallback(async (id: string) => {
-        try {
-            dispatch({ type: 'SET_LOADING', payload: true });
-            await mockApi.deleteProject(id);
-            dispatch({ type: 'REMOVE_PROJECT', payload: id });
-        } catch (err) {
-            dispatch({ type: 'SET_ERROR', payload: 'Failed to decommission project.' });
-        } finally {
-            dispatch({ type: 'SET_LOADING', payload: false });
-        }
-    }, []);
-    
-    const handleRenameProject = useCallback(async (id: string, newName: string) => {
-        try {
-            const updatedProject = await mockApi.renameProject(id, newName);
-            if (updatedProject) {
-                dispatch({ type: 'UPDATE_PROJECT', payload: updatedProject });
-            }
-        } catch (err) {
-            dispatch({ type: 'SET_ERROR', payload: 'Failed to rename project.' });
-        }
-    }, []);
-
-    // Asset Management
-    const handleDeleteAsset = useCallback(async (assetId: string) => {
-        if (!currentProject) return;
-        try {
-            await mockApi.deleteAsset(currentProject.id, assetId);
-            dispatch({ type: 'REMOVE_ASSET', payload: { projectId: currentProject.id, assetId }});
-            if (selectedAsset?.id === assetId) {
-                setSelectedAsset(null);
-            }
-        } catch (err) {
-            dispatch({ type: 'SET_ERROR', payload: 'Failed to purge asset.' });
-        }
-    }, [currentProject, selectedAsset]);
-    
-    const handleToggleFavorite = useCallback(async (assetId: string) => {
-        if (!currentProject) return;
-        try {
-            const updatedAsset = await mockApi.toggleFavoriteAsset(currentProject.id, assetId);
-            if(updatedAsset) {
-                dispatch({ type: 'UPDATE_ASSET', payload: { projectId: currentProject.id, asset: updatedAsset }});
-            }
-        } catch (err) {
-            dispatch({ type: 'SET_ERROR', payload: 'Failed to update asset metadata.' });
-        }
-    }, [currentProject]);
-    
-    const handleAssetSelect = useCallback(async (asset: VideoAsset) => {
-        await mockApi.updateAssetAccessTime(asset.projectId, asset.id);
-        dispatch({ type: 'UPDATE_ASSET', payload: { projectId: asset.projectId, asset: {...asset, lastAccessed: new Date().toISOString()} }});
-        setSelectedAsset(asset);
-    }, []);
-    
-    // AI Director Summary Generation (Mocked AI Call)
-    const handleGenerateDirectorSummary = useCallback(async (fullPrompt: string): Promise<string> => {
-        if (!appState.config.apiKey) throw new Error("API Key missing for AI Director.");
-        
-        const ai = new GoogleGenAI({ apiKey: appState.config.apiKey });
-        
-        const directorPrompt = `Analyze the following video generation sequence prompt and generate a concise, high-level summary of the intended visual narrative, target emotion, and required technical execution style.
-        PROMPT: ${fullPrompt}`;
-        
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash', // Use a text model for summary
-            contents: [{ role: 'user', parts: [{ text: directorPrompt }] }],
-            config: { temperature: 0.3 }
-        });
-        
-        return response.candidates?.[0]?.content?.parts?.[0]?.text || "Summary generation failed or returned empty.";
-    }, [appState.config.apiKey]);
-
-
-    // --- Core Generation Execution ---
-    const handleGenerate = async () => {
-        if (!appState.config.apiKey) {
-            setError('Authentication Failure: API Key is required for compute access.');
-            setGenerationState('error');
-            return;
-        }
-
-        if(!currentProject) {
-            setError('Project Context Missing: Select or create a project before generation.');
-            setGenerationState('error');
-            return;
-        }
-        
-        if (appState.config.aiQuotaRemaining <= 0) {
-            setError('Quota Exhausted: Compute resources are unavailable. Contact administration for quota refresh.');
-            setGenerationState('error');
-            return;
-        }
-
-        setGenerationState('generating');
-        setError(null);
-        if (videoUrl && videoUrl.startsWith('blob:')) {
-            URL.revokeObjectURL(videoUrl);
-        }
-        setVideoUrl(null);
-        setPollingMessageIndex(0);
-        if (pollingIntervalId) {
-            clearInterval(pollingIntervalId);
-        }
-        
-        const finalPrompt = synthesizeDirectorPrompt(generationMode, prompt, scenes);
-        const estimatedCost = generationMode === 'storyboard_sequence' ? 500 : 100; // Mock cost calculation
-
-        try {
-            const ai = new GoogleGenAI({ apiKey: appState.config.apiKey });
-            
-            const apiPayload: any = {
-                model: generationSettings.model,
-                prompt: finalPrompt,
-                config: {
-                    numberOfVideos: 1,
-                    aspectRatio: generationSettings.aspectRatio,
-                    duration: generationMode === 'single_prompt' ? generationSettings.duration : undefined, // Duration only applies to single prompt mode
-                    fidelity: generationSettings.fidelityLevel,
-                    stylization: generationSettings.stylizationStrength / 100,
-                    motionProfile: generationSettings.motionControl,
-                    audioTrack: generationSettings.audioStyle,
-                    seed: generationSettings.seed,
-                    negativePrompt: generationSettings.negativePrompt,
-                },
-            };
-            console.log(`Executing ${generationMode} generation with payload:`, apiPayload);
-
-            let operation = await ai.models.generateVideos(apiPayload);
-
-            setGenerationState('polling');
-            
-            // Start visual feedback loop
-            const intervalId: number = window.setInterval(() => {
-                setPollingMessageIndex(prev => (prev + 1) % POLLING_MESSAGES_VEHICLE.length);
-            }, 2000);
-            setPollingIntervalId(intervalId);
-
-            // Polling loop
-            while (!operation.done) {
-                await new Promise(resolve => setTimeout(resolve, 8000)); // Poll every 8 seconds
-                operation = await ai.operations.getVideosOperation({ operation: operation });
-            }
-            
-            clearInterval(intervalId);
-            setPollingIntervalId(null);
-
-            if (operation.error) {
-                 throw new Error(`Generation failed at backend: ${operation.error.message || 'Unknown Backend Error'}`);
-            }
-
-            const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
-
-            if (downloadLink) {
-                setPollingMessageIndex(POLLING_MESSAGES_VEHICLE.length - 1);
-                
-                // Simulate fetching the actual file (using the mock API key for the fetch URL)
-                const videoResponse = await fetch(`${downloadLink}&key=${appState.config.apiKey}`);
-                if (!videoResponse.ok) {
-                    throw new Error(`Download Protocol Error: Failed to retrieve asset (${videoResponse.statusText})`);
-                }
-                const videoBlob = await videoResponse.blob();
-                const objectURL = URL.createObjectURL(videoBlob);
-                setVideoUrl(objectURL);
-                setGenerationState('done');
-
-                // Save Asset to Project Manifest
-                const newAssetData: Omit<VideoAsset, 'id' | 'projectId' | 'creationDate' | 'lastAccessed'> = {
-                    assetType: 'video',
-                    url: objectURL,
-                    prompt: finalPrompt,
-                    settings: generationSettings,
-                    generationMode,
-                    storyboard: generationMode === 'storyboard_sequence' ? scenes : undefined,
-                    isFavorite: false,
-                    costCredits: estimatedCost,
-                };
-
-                const newAsset = await mockApi.addAssetToProject(currentProject.id, newAssetData);
-                dispatch({ type: 'ADD_ASSET', payload: { projectId: currentProject.id, asset: newAsset } });
-                
-                // Update Quota
-                handleUpdateConfig({ aiQuotaRemaining: Math.max(0, appState.config.aiQuotaRemaining - estimatedCost) });
-
-            } else {
-                throw new Error('Generation Success, but Asset Manifest was empty.');
-            }
-
-        } catch (err: any) {
-            console.error("Generation Pipeline Interrupted:", err);
-            setError(String(err?.message || 'A critical error halted the generation pipeline.'));
-            setGenerationState('error');
-            if (pollingIntervalId) {
-                clearInterval(pollingIntervalId);
-                setPollingIntervalId(null);
-            }
-        }
-    };
-
-    // --- Render Logic ---
-    if (appState.isLoading) {
-        return (
-            <div className="h-screen w-screen flex items-center justify-center bg-gray-900">
-                <div className="text-center text-white">
-                    <div className="animate-pulse text-3xl mb-2">Initializing Sovereign Compute Layer...</div>
-                    <p className="text-cyan-400">Establishing secure connection to GenAI Fabric.</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (!appState.config.apiKey) {
-        return (
-            <div className="h-screen w-screen flex items-center justify-center bg-gray-900">
-                <div className="max-w-lg w-full bg-gray-800 p-10 rounded-xl shadow-2xl border border-red-700/50">
-                    <h2 className="text-3xl font-extrabold text-red-400 mb-4">ACCESS DENIED: Authentication Required</h2>
-                    <p className="text-gray-300 mb-6">The AI Core requires a valid API key for resource allocation and computation. Input your credentials below to proceed.</p>
-                    <div className="space-y-4">
-                        <input
-                            ref={apiKeyInputRef}
-                            type="password"
-                            placeholder="Enter Google GenAI API Key (e.g., AIzaSy...)"
-                            className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-red-500 focus:border-red-500"
-                        />
-                        {error && <p className="text-sm text-red-400">{error}</p>}
-                        <button onClick={handleApiKeySave} className="w-full py-3 bg-red-700 hover:bg-red-600 text-white rounded-lg font-bold transition-colors">
-                            Authorize Compute Access
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-    
-    // --- Main Application View ---
     return (
-        <div className="flex h-screen overflow-hidden bg-gray-950 text-white">
-            {/* Sidebar */}
-            <ProjectSidebar 
-                projects={appState.projects}
-                currentProjectId={appState.currentProjectId}
-                onSelectProject={id => dispatch({ type: 'SET_CURRENT_PROJECT', payload: id })}
-                onCreateProject={handleCreateProject}
-                onDeleteProject={handleDeleteProject}
-                onRenameProject={handleRenameProject}
-            />
-            
-            {/* Main Content Area */}
-            <main className="flex-1 p-6 space-y-6 overflow-y-auto custom-scrollbar">
-                
-                {/* Header Bar */}
-                <header className="flex justify-between items-center pb-4 border-b border-gray-800 sticky top-0 bg-gray-950 z-10">
-                    <div className="space-y-1">
-                        <h1 className="text-4xl font-extrabold tracking-tighter text-white">AI Video Synthesis Platform</h1>
-                        <p className="text-sm text-gray-400">Current Context: {currentProject?.name || "System Initialization"}</p>
+        <Card title="Project Nexus" className="h-full flex flex-col">
+            <div className="mb-4 space-y-2">
+                <input 
+                    className="w-full bg-gray-800 border border-gray-700 rounded p-2 text-xs text-white focus:border-cyan-500 outline-none"
+                    placeholder="Project Codename"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                />
+                <input 
+                    className="w-full bg-gray-800 border border-gray-700 rounded p-2 text-xs text-white focus:border-cyan-500 outline-none"
+                    placeholder="Client Entity"
+                    value={client}
+                    onChange={e => setClient(e.target.value)}
+                />
+                <Button onClick={() => { onCreate(name, client); setName(''); setClient(''); }} disabled={!name || !client}>
+                    Initialize Project
+                </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto space-y-2 custom-scrollbar">
+                {projects.map(p => (
+                    <div 
+                        key={p.id} 
+                        onClick={() => onSelect(p.id)}
+                        className={`p-3 rounded cursor-pointer border transition-all ${activeId === p.id ? 'bg-cyan-900/30 border-cyan-500' : 'bg-gray-800/30 border-transparent hover:bg-gray-800'}`}
+                    >
+                        <div className="flex justify-between items-center">
+                            <span className="font-bold text-sm text-gray-200">{p.name}</span>
+                            <span className="text-[10px] text-gray-500">{p.id.substr(0, 6)}</span>
+                        </div>
+                        <p className="text-xs text-gray-400 mt-1">{p.client}</p>
                     </div>
-                    <div className="text-right">
-                        <p className="text-sm font-medium text-cyan-400">Quota Remaining: {appState.config.aiQuotaRemaining.toLocaleString()}</p>
-                        <button onClick={() => handleUpdateConfig({ apiKey: null })} className="text-xs text-red-400 hover:text-red-300 mt-1">Revoke API Key</button>
-                    </div>
-                </header>
+                ))}
+                {projects.length === 0 && <div className="text-center text-gray-600 text-xs py-4">No active projects in sector.</div>}
+            </div>
+        </Card>
+    );
+};
 
-                {currentProject ? (
-                <>
-                {/* Generation Panel */}
-                <Card title={`Generation Module: ${currentProject.name}`} className="bg-gray-900/70 border-l-4 border-cyan-500 shadow-2xl">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        
-                        {/* Column 1: Mode & Controls */}
-                        <div className="lg:col-span-1 space-y-4">
-                            <div className="flex bg-gray-800 rounded-lg p-1 shadow-inner">
-                                <button onClick={() => setGenerationMode('single_prompt')} className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${generationMode === 'single_prompt' ? 'bg-cyan-600 shadow-md' : 'text-gray-300 hover:bg-gray-700'}`}>Single Prompt</button>
-                                <button onClick={() => setGenerationMode('storyboard_sequence')} className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${generationMode === 'storyboard_sequence' ? 'bg-cyan-600 shadow-md' : 'text-gray-300 hover:bg-gray-700'}`}>Storyboard Sequence</button>
-                            </div>
-                            
-                            <GenerationControls 
-                                settings={generationSettings} 
-                                onSettingsChange={ (partial) => setGenerationSettings(s => ({...s, ...partial}))} 
-                                isGenerating={isGenerating} 
-                                aiQuota={appState.config.aiQuotaRemaining}
-                            />
+const GenerationEngine: React.FC<{ 
+    project: AdProject | null, 
+    isGenerating: boolean, 
+    progress: number,
+    onGenerate: () => void 
+}> = ({ project, isGenerating, progress, onGenerate }) => {
+    if (!project) return (
+        <Card title="Generation Matrix" className="h-full flex items-center justify-center text-gray-500 text-xs">
+            Awaiting Project Selection...
+        </Card>
+    );
+
+    return (
+        <Card title={`Generation Matrix: ${project.name}`} className="h-full flex flex-col">
+            <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="bg-gray-800 p-2 rounded">
+                    <label className="block text-[10px] text-gray-500 uppercase">Model Core</label>
+                    <div className="text-cyan-400 font-mono text-sm">{project.aiModelConfig.modelId}</div>
+                </div>
+                <div className="bg-gray-800 p-2 rounded">
+                    <label className="block text-[10px] text-gray-500 uppercase">Resolution</label>
+                    <div className="text-cyan-400 font-mono text-sm">{project.renderConfig.resolution.join('x')}</div>
+                </div>
+            </div>
+            
+            <div className="flex-1 bg-black rounded border border-gray-800 relative overflow-hidden flex items-center justify-center">
+                {isGenerating ? (
+                    <div className="w-full px-8">
+                        <div className="flex justify-between text-xs text-cyan-500 mb-2 font-mono">
+                            <span>RENDERING_FRAMES</span>
+                            <span>{progress.toFixed(1)}%</span>
                         </div>
-                        
-                        {/* Column 2: Prompt Input */}
-                        <div className="lg:col-span-2 space-y-4">
-                            <Card title={generationMode === 'single_prompt' ? "Primary Prompt Input (Max 500 Chars)" : "Project AI Summary"} className="h-full">
-                                {generationMode === 'single_prompt' ? (
-                                    <textarea 
-                                        value={prompt} 
-                                        onChange={e => setPrompt(e.target.value)} 
-                                        placeholder="Describe the scene, style, and required action with high detail..." 
-                                        maxLength={500}
-                                        className="w-full h-40 bg-gray-800 border border-gray-700 rounded-lg p-3 text-white focus:ring-cyan-500 resize-none" 
-                                    />
-                                ) : (
-                                    <div className="space-y-3">
-                                        <p className="text-sm text-gray-400 italic">
-                                            {currentProject.aiSummary || "Click 'Synthesize Director Notes' below to generate a narrative summary based on your storyboard."}
-                                        </p>
-                                        <p className="text-xs text-gray-500">
-                                            (This summary is stored as the project's high-level objective.)
-                                        </p>
-                                    </div>
-                                )}
-                            </Card>
+                        <div className="w-full bg-gray-900 h-1 rounded overflow-hidden">
+                            <div className="h-full bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)] transition-all duration-200" style={{ width: `${progress}%` }}></div>
+                        </div>
+                        <div className="mt-4 text-[10px] text-gray-500 font-mono text-center animate-pulse">
+                            Running TensorFlow Inference on Kubernetes Pod...
                         </div>
                     </div>
-                    
-                    {/* Storyboard Editor (Conditional) */}
-                    {generationMode === 'storyboard_sequence' && (
-                        <div className="mt-6">
-                            <StoryboardEditor 
-                                scenes={scenes} 
-                                setScenes={setScenes} 
-                                isGenerating={isGenerating} 
-                                onGenerateDirectorSummary={handleGenerateDirectorSummary}
-                                onScenePromptChange={(id, p) => setScenes(prev => prev.map(s => s.id === id ? {...s, prompt: p} : s))}
-                                onSceneNotesChange={(id, n) => setScenes(prev => prev.map(s => s.id === id ? {...s, aiDirectorNotes: n} : s))}
-                                onSceneDurationChange={(id, d) => setScenes(prev => prev.map(s => s.id === id ? {...s, duration: d} : s))}
-                            />
-                        </div>
-                    )}
-                    
-                    {/* Execution Button */}
-                    <div className="mt-6 pt-4 border-t border-gray-800 flex justify-center">
-                        <button 
-                            onClick={handleGenerate} 
-                            disabled={isGenerating || (generationMode === 'single_prompt' && !prompt.trim()) || (generationMode === 'storyboard_sequence' && scenes.some(s => !s.prompt.trim()))} 
-                            className="w-1/2 py-3 text-lg font-bold bg-green-600 hover:bg-green-500 text-white rounded-xl shadow-lg transition-all disabled:bg-gray-600 disabled:cursor-not-allowed transform hover:scale-[1.01]"
-                        >
-                            {generationState === 'polling' ? (
-                                <div className="flex items-center justify-center space-x-3">
-                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                                    <span>Processing... ({POLLING_MESSAGES_VEHICLE[pollingMessageIndex]})</span>
-                                </div>
-                            ) : generationState === 'generating' ? (
-                                <span>Initiating Compute Sequence...</span>
-                            ) : (
-                                <span>Execute Generation Run</span>
-                            )}
-                        </button>
-                    </div>
-                    {error && (
-                        <div className="mt-4 p-3 bg-red-900/50 border border-red-600 rounded-lg text-sm text-red-300">
-                            ERROR: {error}
-                        </div>
-                    )}
-                </Card>
-                
-                {/* Video Preview Area */}
-                <Card title="Real-Time Preview & Output" className="bg-gray-900/70 border-l-4 border-gray-500 shadow-xl">
-                    <div className={`mx-auto max-h-[60vh] w-full bg-black rounded-xl flex items-center justify-center border border-gray-700 overflow-hidden`}>
-                        {generationState === 'done' && videoUrl ? (
-                            <video src={videoUrl} controls autoPlay muted loop className="w-full h-full object-contain rounded-xl" />
-                        ) : generationState === 'polling' || generationState === 'generating' ? (
-                            <div className="text-center p-12">
-                                <div className="relative w-20 h-20 mx-auto mb-4">
-                                    <div className="absolute inset-0 border-8 border-cyan-500/20 rounded-full"></div>
-                                    <div className="absolute inset-2 border-8 border-t-cyan-500 border-transparent rounded-full animate-spin"></div>
-                                </div>
-                                <p className="text-xl font-semibold text-cyan-300">Rendering Frame Sequence...</p>
-                                <p className="text-sm text-gray-400 mt-1">{POLLING_MESSAGES_VEHICLE[pollingMessageIndex]}</p>
-                            </div>
-                        ) : error ? (
-                             <p className="text-red-400 p-8 text-center text-lg">Generation Failed. Review error log above.</p>
-                        ) : (
-                             <p className="text-gray-600 p-12 text-lg">Output Preview Window. Awaiting first successful generation.</p>
-                        )}
-                    </div>
-                </Card>
-                
-                {/* Asset Library */}
-                <Card title={`Asset Repository (${currentProjectAssets.length} Items)`} className="bg-gray-900/70 border-l-4 border-yellow-500 shadow-xl">
-                    <AssetGrid 
-                        assets={currentProjectAssets}
-                        onDelete={handleDeleteAsset}
-                        onToggleFavorite={handleToggleFavorite}
-                        onSelect={handleAssetSelect}
-                    />
-                </Card>
-                </>
                 ) : (
-                    <div className="flex items-center justify-center h-[70vh] bg-gray-900/50 rounded-xl border border-dashed border-gray-700">
-                        <div className="text-center p-10">
-                            <p className="text-2xl font-semibold text-gray-400 mb-3">No Active Project Context</p>
-                            <p className="text-gray-500">Use the Project Nexus sidebar to create a new campaign or select an existing one.</p>
-                        </div>
+                    <div className="text-center">
+                        <div className="text-6xl text-gray-800 mb-2">â–¶</div>
+                        <p className="text-gray-600 text-xs">Preview Offline</p>
                     </div>
                 )}
-            </main>
+            </div>
 
-            {/* Asset Detail Modal (Enhanced) */}
-            {selectedAsset && (
-                 <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center backdrop-blur-sm" onClick={() => setSelectedAsset(null)}>
-                    <div className="bg-gray-800 rounded-xl max-w-5xl w-[90%] md:w-[80%] p-6 space-y-6 shadow-3xl border border-cyan-600/50" onClick={e => e.stopPropagation()}>
-                        <div className="flex justify-between items-center border-b border-gray-700 pb-3">
-                            <h3 className="text-2xl font-bold text-white">Asset Manifest Viewer: {selectedAsset.id.substring(0, 12)}</h3>
-                            <button onClick={() => setSelectedAsset(null)} className="text-gray-400 hover:text-white text-2xl p-1">&times;</button>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            {/* Video/Preview Area */}
-                            <div className="lg:col-span-2 space-y-3">
-                                <div className={`aspect-video bg-black rounded-lg border border-gray-600 overflow-hidden`}>
-                                    <video src={selectedAsset.url} controls autoPlay loop muted className="w-full h-full object-contain"></video>
-                                </div>
-                                <p className="text-sm text-gray-400 italic">Asset Type: {selectedAsset.assetType}</p>
-                            </div>
-                            
-                            {/* Metadata Column */}
-                            <div className="lg:col-span-1 text-sm space-y-3 bg-gray-700/30 p-4 rounded-lg">
-                                <h4 className="font-bold text-cyan-300 border-b border-gray-600 pb-1 mb-2">Generation Metadata</h4>
-                                <p><strong>Created:</strong> {formatDate(selectedAsset.creationDate)}</p>
-                                <p><strong>Last Accessed:</strong> {formatDate(selectedAsset.lastAccessed)}</p>
-                                <p><strong>Estimated Cost:</strong> <span className="text-yellow-300">{selectedAsset.costCredits} Credits</span></p>
-                                <p><strong>Favorite:</strong> {selectedAsset.isFavorite ? 'Yes' : 'No'}</p>
-                                
-                                <h4 className="font-bold text-cyan-300 border-b border-gray-600 pb-1 mt-4 mb-2">Settings Snapshot</h4>
-                                <p><strong>Model:</strong> {selectedAsset.settings.model}</p>
-                                <p><strong>Ratio:</strong> {selectedAsset.settings.aspectRatio}</p>
-                                <p><strong>Style Strength:</strong> {selectedAsset.settings.stylizationStrength}%</p>
-                                <p><strong>Motion:</strong> {selectedAsset.settings.motionControl}</p>
-                                
-                                {selectedAsset.generationMode === 'storyboard_sequence' && selectedAsset.storyboard && (
-                                    <>
-                                        <h4 className="font-bold text-cyan-300 border-b border-gray-600 pb-1 mt-4 mb-2">Storyboard Breakdown ({selectedAsset.storyboard.length} Scenes)</h4>
-                                        <div className="max-h-40 overflow-y-auto space-y-1 pr-1">
-                                            {selectedAsset.storyboard.map((scene, i) => (
-                                                <p key={scene.id} className="text-xs bg-gray-800 p-1 rounded truncate">
-                                                    {i+1}. ({scene.duration}s) {scene.prompt.substring(0, 40)}...
-                                                </p>
-                                            ))}
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                        
-                        <div className="flex justify-end space-x-4 pt-4 border-t border-gray-700">
-                            <a href={selectedAsset.url} download={`ad_asset_${selectedAsset.id}.mp4`} className="py-2 px-4 bg-gray-600 hover:bg-gray-500 text-white rounded-lg font-medium">Download Raw Asset</a>
-                            <button onClick={() => {
-                                handleToggleFavorite(selectedAsset.id);
-                                setSelectedAsset(s => s ? {...s, isFavorite: !s.isFavorite} : null);
-                            }} className={`py-2 px-4 rounded-lg font-medium transition-colors ${selectedAsset.isFavorite ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-gray-500 hover:bg-gray-400'} text-white`}>
-                                {selectedAsset.isFavorite ? 'Unmark Favorite' : 'Mark as Favorite'}
-                            </button>
-                            <button onClick={() => {
-                                if(window.confirm("Permanently delete this asset?")) {
-                                    handleDeleteAsset(selectedAsset.id);
-                                    setSelectedAsset(null);
-                                }
-                            }} className="py-2 px-4 bg-red-700 hover:bg-red-600 text-white rounded-lg font-medium">Delete Asset</button>
-                        </div>
+            <div className="mt-4">
+                <Button onClick={onGenerate} disabled={isGenerating} variant="primary">
+                    {isGenerating ? 'Processing...' : 'Execute Generation Sequence'}
+                </Button>
+            </div>
+        </Card>
+    );
+};
+
+// ============================================================================
+// SECTION V: MAIN APPLICATION COMPONENT
+// ============================================================================
+
+const AIAdStudioView: React.FC = () => {
+    const [state, dispatch] = useReducer(kernelReducer, initialKernelState);
+
+    // --- System Heartbeat ---
+    useEffect(() => {
+        const interval = setInterval(() => {
+            dispatch({ type: 'TICK', payload: Date.now() });
+            
+            // Simulate random background activity from the 100 APIs
+            if (Math.random() > 0.9) {
+                const apis = GlobalRegistry.getAll();
+                const randomApi = apis[Math.floor(Math.random() * apis.length)];
+                randomApi.execute('ping', {}).then(res => {
+                    // Silent execution for background noise
+                });
+            }
+        }, SYSTEM_TICK_RATE_MS);
+        return () => clearInterval(interval);
+    }, []);
+
+    // --- Generation Logic Simulation ---
+    const handleGenerate = useCallback(async () => {
+        if (!state.activeProject) return;
+        
+        dispatch({ type: 'START_GENERATION', payload: null });
+        
+        // Simulate a complex workflow involving multiple APIs
+        const k8s = GlobalRegistry.get('Kubernetes Control Plane');
+        const tf = GlobalRegistry.get('TensorFlow');
+        const blender = GlobalRegistry.get('Blender 3D');
+        const ffmpeg = GlobalRegistry.get('FFmpeg');
+
+        try {
+            dispatch({ type: 'TERMINAL_WRITE', payload: "Orchestrating render nodes..." });
+            await k8s?.execute('apply', { image: 'render-node:latest' });
+            
+            dispatch({ type: 'TERMINAL_WRITE', payload: "Loading Neural Weights..." });
+            await tf?.execute('matmul', {}); // Simulate heavy math
+            
+            dispatch({ type: 'TERMINAL_WRITE', payload: "Raytracing Scene Geometry..." });
+            await blender?.execute('render', {});
+            
+            dispatch({ type: 'TERMINAL_WRITE', payload: "Encoding Final Stream..." });
+            await ffmpeg?.execute('transcode', {});
+
+            setTimeout(() => {
+                dispatch({ type: 'GENERATION_COMPLETE', payload: null });
+            }, 5000); // Artificial delay for effect
+        } catch (e) {
+            dispatch({ type: 'TERMINAL_WRITE', payload: `CRITICAL ERROR: ${e}` });
+        }
+
+    }, [state.activeProject]);
+
+    return (
+        <div className="min-h-screen bg-gray-950 text-gray-200 font-sans selection:bg-cyan-500/30 overflow-hidden flex flex-col">
+            {/* Top Bar */}
+            <header className="h-12 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-4 z-10">
+                <div className="flex items-center space-x-3">
+                    <div className="w-6 h-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-sm shadow-lg shadow-cyan-500/20"></div>
+                    <h1 className="font-bold text-sm tracking-widest text-gray-100">UNIVERSE FORGE <span className="text-gray-600 text-[10px]">v10.0.0</span></h1>
+                </div>
+                <div className="flex items-center space-x-4 text-[10px] font-mono text-gray-500">
+                    <span>API_NODES: {GlobalRegistry.getAll().length}</span>
+                    <span>SECURE_CONN: TRUE</span>
+                    <span className="text-green-500">ONLINE</span>
+                </div>
+            </header>
+
+            {/* Main Workspace */}
+            <main className="flex-1 p-4 grid grid-cols-12 gap-4 overflow-hidden">
+                
+                {/* Left Column: Project Management */}
+                <div className="col-span-3 flex flex-col gap-4">
+                    <ProjectManager 
+                        projects={state.projects} 
+                        activeId={state.activeProject?.id || null}
+                        onCreate={(name, client) => dispatch({ type: 'CREATE_PROJECT', payload: { name, client } })}
+                        onSelect={(id) => dispatch({ type: 'SELECT_PROJECT', payload: id })}
+                    />
+                    <div className="flex-1">
+                        <SystemMonitor state={state} />
                     </div>
                 </div>
-            )}
+
+                {/* Center Column: Viewport & Generation */}
+                <div className="col-span-6 flex flex-col gap-4">
+                    <div className="flex-1">
+                        <GenerationEngine 
+                            project={state.activeProject} 
+                            isGenerating={state.isGenerating}
+                            progress={state.generationProgress}
+                            onGenerate={handleGenerate}
+                        />
+                    </div>
+                    <div className="h-1/3">
+                        <Terminal output={state.terminalOutput} />
+                    </div>
+                </div>
+
+                {/* Right Column: Asset Library & Details (Simplified for this view) */}
+                <div className="col-span-3 flex flex-col gap-4">
+                    <Card title="Asset Repository" className="flex-1">
+                        <div className="grid grid-cols-2 gap-2">
+                            {[1,2,3,4,5,6].map(i => (
+                                <div key={i} className="aspect-square bg-gray-800 rounded border border-gray-700 hover:border-cyan-500 transition-colors cursor-pointer flex items-center justify-center">
+                                    <span className="text-gray-600 text-xs">ASSET_{i}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </Card>
+                    <Card title="Inspector" className="h-1/3">
+                        <div className="text-[10px] text-gray-400 space-y-2">
+                            <p>Select an object to view properties.</p>
+                            <div className="h-px bg-gray-700 my-2"></div>
+                            <p>Properties unavailable.</p>
+                        </div>
+                    </Card>
+                </div>
+
+            </main>
         </div>
     );
 };
