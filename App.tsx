@@ -263,6 +263,21 @@ const EnhancedLandingPage = () => {
     );
 };
 
+const UnderConstructionView = () => {
+    return (
+        <div className="flex flex-col items-center justify-center h-full text-gray-500 bg-gray-800/20 rounded-lg border-2 border-dashed border-gray-700 p-8">
+            <Cpu className="w-16 h-16 mb-4 animate-pulse text-cyan-500" />
+            <h1 className="text-2xl font-bold text-gray-300 mb-2">Module Under Construction</h1>
+            <p className="text-center max-w-md">
+                Our top engineers are currently building this feature.
+            </p>
+            <p className="text-center max-w-md mt-1">
+                Please check back later for updates.
+            </p>
+        </div>
+    );
+};
+
 // --- Layout ---
 const SAppLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -344,10 +359,7 @@ const SAppLayout = () => {
                     <Component {...finalProps} />
                 )
             ) : (
-                <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                    <AlertTriangle className="w-12 h-12 mb-4" />
-                    <p>Component not found for view: {activeView}</p>
-                </div>
+                <UnderConstructionView />
             )}
         </main>
       </div>
