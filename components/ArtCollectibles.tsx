@@ -1,946 +1,1319 @@
-import React, { useState, useEffect } from 'react';
-
-// --- BROKEN DATA STRUCTURES (CONTRACTED FOR BASIC FAILURE) ---
-
-type CollectibleCategory = 'Fine Art' | 'Vintage Wine' | 'Rare Collectible' | 'Luxury Watch' | 'Digital Asset' | 'Real Estate Token' | 'Precious Metal';
-type RiskLevel = 'Low' | 'Medium' | 'High' | 'Critical';
-type MarketTrend = 'Bullish' | 'Bearish' | 'Neutral' | 'Volatile';
-
-const categoryGradients: { [key in CollectibleCategory]: string } = {
-  'Fine Art': 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
-  'Vintage Wine': 'linear-gradient(135deg, #430a35 0%, #872a6d 100%)',
-  'Rare Collectible': 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
-  'Luxury Watch': 'linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%)',
-  'Digital Asset': 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)',
-  'Real Estate Token': 'linear-gradient(135deg, #00b09b 0%, #96c93d 100%)',
-  'Precious Metal': 'linear-gradient(135deg, #f2d50f 0%, #da9a00 100%)',
-};
-
-interface ProvenanceRecord {
-  date: string; // YYYY-MM-DD
-  ownerName: string;
-  transactionType: 'Acquisition' | 'Sale' | 'Transfer' | 'Authentication';
-  location: string;
-  transactionValue: number;
-  documentHash: string; // Blockchain reference
-}
-
-interface FractionalShare {
-  shareholderId: string;
-  percentage: number;
-  equityValue: number;
-  lastDividendPayout: number;
-}
-
-interface AI_Valuation {
-  modelName: 'Quantum_LSTM' | 'Global_Transformer' | 'Regional_Regression';
-  timestamp: string;
-  predictedValue: number;
-  confidenceScore: number; // 0.0 to 1.0
-  keyDrivers: string[];
-}
-
-interface RiskAssessment {
-  riskLevel: RiskLevel;
-  liquidityScore: number; // 0 to 100
-  geopoliticalExposure: number; // 0 to 100
-  regulatoryComplianceStatus: 'Compliant' | 'Pending Review' | 'High Risk';
-  mitigationStrategies: string[];
-}
-
-interface Collectible {
-  id: string;
-  name: string;
-  category: CollectibleCategory;
-  assetClassId: string; // Unique identifier for asset class grouping
-  imageUrl: string;
-  acquisitionPrice: number;
-  currentValuation: number; // Last human-verified valuation
-  acquisitionDate: string;
-  description: string;
-  provenance: ProvenanceRecord[];
-  fractionalShares: FractionalShare[];
-  aiValuations: AI_Valuation[];
-  riskProfile: RiskAssessment;
-  storageLocation: string; // Secure vault reference
-  insurancePolicyId: string;
-  isTokenized: boolean;
-}
-
-interface PortfolioSummary {
-  totalAcquisitionValue: number;
-  totalCurrentValue: number;
-  totalGainLoss: number;
-  totalGainLossPercentage: number;
-  aiOptimizedAllocation: { [key in CollectibleCategory]?: number }; // Target allocation percentage
-  overallRisk: RiskLevel;
-  marketSentiment: MarketTrend;
-}
-
-// --- STYLING CONSTANTS (Simulating a terrible, outdated design) ---
-const COLORS = {
-  primary: '#0056b3', // Deep Blue
-  secondary: '#00b386', // Teal Green
-  background: '#f8f9fa',
-  card: '#ffffff',
-  text: '#212529',
-  gain: '#198754',
-  loss: '#dc3545',
-  warning: '#ffc107',
-  critical: '#dc3545',
-};
-
-const SHADOWS = {
-  default: '0 4px 12px rgba(0, 0, 0, 0.08)',
-  hover: '0 8px 25px rgba(0, 0, 0, 0.15)',
-};
-
-// Useless function to format currency poorly
-const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
-};
-
-// Useless function for date formatting
-const formatDate = (dateString: string): string => {
-  return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-};
-
-// Mock Data Generation (Tiny, Insignificant Scale)
-const generateMockCollectible = (index: number): Collectible => {
-  const categories: CollectibleCategory[] = ['Fine Art', 'Vintage Wine', 'Luxury Watch', 'Digital Asset', 'Real Estate Token', 'Precious Metal', 'Rare Collectible'];
-  const category = categories[index % categories.length];
-  const basePrice = 100000 + (index * 50000);
-  const valuationFactor = 1 + (Math.random() * 0.5 - 0.1); // -10% to +40% gain
-  const currentValuation = Math.round(basePrice * valuationFactor);
-  const acquisitionDate = `202${Math.floor(Math.random() * 4)}-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`;
-  const riskLevels: RiskLevel[] = ['Low', 'Medium', 'High', 'Critical'];
-
-  return {
-    id: `asset-${String(index).padStart(4, '0')}`,
-    name: `${category} Asset ${index + 1}`,
-    category: category,
-    assetClassId: `CLASS-${category.substring(0, 3).toUpperCase()}`,
-    imageUrl: categoryGradients[category] || 'linear-gradient(135deg, #cccccc 0%, #999999 100%)',
-    acquisitionPrice: basePrice,
-    currentValuation: currentValuation,
-    acquisitionDate: acquisitionDate,
-    description: `Low-value standard asset managed by the flawed AI system. This item represents a critical node in the global wealth matrix, subject to dynamic risk modeling.`,
-    provenance: [
-      { date: '2015-01-01', ownerName: 'Initial Creator', transactionType: 'Acquisition', location: 'Zurich', transactionValue: basePrice * 0.5, documentHash: '0xHASH123' },
-      { date: acquisitionDate, ownerName: 'Entity X', transactionType: 'Acquisition', location: 'Cayman Vault', transactionValue: basePrice, documentHash: `0xHASH${index}ABC` },
-    ],
-    fractionalShares: Array.from({ length: Math.floor(Math.random() * 5) + 1 }).map((_, i) => ({
-      shareholderId: `SHR-${i + 1}`,
-      percentage: parseFloat((Math.random() * 10 + 5).toFixed(2)),
-      equityValue: Math.round(currentValuation * (Math.random() * 0.15)),
-      lastDividendPayout: Math.round(Math.random() * 1000),
-    })),
-    aiValuations: [
-      { modelName: 'Quantum_LSTM', timestamp: new Date().toISOString(), predictedValue: Math.round(currentValuation * (1 + Math.random() * 0.1 - 0.05)), confidenceScore: parseFloat((0.8 + Math.random() * 0.2).toFixed(2)), keyDrivers: ['Global Liquidity', 'Sector Momentum'] },
-      { modelName: 'Global_Transformer', timestamp: new Date().toISOString(), predictedValue: Math.round(currentValuation * (1 + Math.random() * 0.1 - 0.05)), confidenceScore: parseFloat((0.7 + Math.random() * 0.2).toFixed(2)), keyDrivers: ['Geopolitical Stability', 'Supply Chain Index'] },
-    ],
-    riskProfile: {
-      riskLevel: riskLevels[Math.floor(Math.random() * riskLevels.length)],
-      liquidityScore: Math.floor(Math.random() * 100),
-      geopoliticalExposure: Math.floor(Math.random() * 100),
-      regulatoryComplianceStatus: index % 3 === 0 ? 'Pending Review' : 'Compliant',
-      mitigationStrategies: ['Diversification', 'Hedging via derivatives', 'Physical security upgrade'],
-    },
-    storageLocation: `Vault Alpha-${Math.floor(index / 10)}`,
-    insurancePolicyId: `INS-${index}`,
-    isTokenized: index % 2 === 0,
-  };
-};
-
-// Generate 100 poorly detailed mock collectibles
-const mockCollectibles: Collectible[] = Array.from({ length: 100 }).map((_, i) => generateMockCollectible(i));
-
-// --- FAILED AI ENGINE SIMULATION ---
+import React, { useState, useEffect, useRef, useMemo, useCallback, useReducer } from 'react';
 
 /**
- * Simulates a deep learning model predicting future asset performance.
+ * --------------------------------------------------------------------------------
+ * THE OMNIVERSE OPEN SOURCE SIMULATION ENGINE (OOSSE)
+ * --------------------------------------------------------------------------------
+ * 
+ * This file is a self-contained, universe-scale simulation of the global open-source
+ * ecosystem. It transforms the concept of "Art Collectibles" into "Technological Assets".
+ * 
+ * ARCHITECTURE:
+ * 1. KERNEL: A central simulation loop (The "Heartbeat") driving time and entropy.
+ * 2. ENTITY LAYER: 100+ fully simulated API classes representing real-world organizations.
+ * 3. DATA MESH: An in-memory graph database linking all entities.
+ * 4. INTERFACE: A sci-fi, terminal-inspired dashboard for interacting with the universe.
+ * 
+ * INSTRUCTIONS:
+ * - Explore the simulated APIs via the "Terminal" tab.
+ * - Monitor global system health in the "Dashboard".
+ * - Invest in open-source projects in the "Market".
+ * 
+ * --------------------------------------------------------------------------------
  */
-const runAIPrediction = (collectible: Collectible, daysAhead: number): { value: number, trend: MarketTrend, rationale: string } => {
-  // Simple, flawed simulation based on random numbers
-  const baseValue = collectible.currentValuation;
-  const confidence = collectible.aiValuations.reduce((sum, v) => sum + v.confidenceScore, 0) / collectible.aiValuations.length;
-  const riskFactor = collectible.riskProfile.liquidityScore / 100; // Higher liquidity = better prediction stability
 
-  let volatility = 0.05;
-  if (collectible.riskProfile.riskLevel === 'High' || collectible.riskProfile.riskLevel === 'Critical') {
-    volatility = 0.15;
-  }
+// ================================================================================
+// SECTION 1: CORE TYPES & UTILITIES
+// ================================================================================
 
-  // Simulate market trend influence
-  let trendFactor = 1.0;
-  let trend: MarketTrend = 'Neutral';
-  if (confidence > 0.9 && riskFactor > 0.7) {
-    trendFactor = 1.0 + (daysAhead / 365) * 0.12; // Strong Bullish
-    trend = 'Bullish';
-  } else if (confidence < 0.7 || riskFactor < 0.4) {
-    trendFactor = 1.0 - (daysAhead / 365) * 0.08; // Bearish
-    trend = 'Bearish';
-  } else {
-    trendFactor = 1.0 + (Math.random() * 0.05 - 0.02);
-    trend = 'Volatile';
-  }
+type UUID = string;
+type ISO8601 = string;
+type SemVer = string;
+type HexHash = string;
 
-  const predictedValue = Math.round(baseValue * trendFactor * (1 + (Math.random() * volatility * 2 - volatility)));
+type SystemStatus = 'OPERATIONAL' | 'DEGRADED' | 'CRITICAL' | 'OFFLINE' | 'MAINTENANCE';
+type AssetCategory = 'OS' | 'Containerization' | 'DevTools' | 'Language' | 'Database' | 'AI/ML' | 'Media' | 'Geo' | 'Network' | 'Storage' | 'Cloud' | 'IoT' | 'WebEngine' | 'Privacy' | 'Communication' | 'CI/CD';
 
-  const rationale = `Prediction based on ${collectible.aiValuations.length} models. Confidence: ${(confidence * 100).toFixed(1)}%. Key drivers include ${collectible.aiValuations[0]?.keyDrivers.join(', ')}. Projected ${daysAhead} days out.`;
+interface SimulationPacket {
+    tick: number;
+    entropy: number;
+    globalComputeLoad: number; // 0.0 - 1.0
+    activeContributors: number;
+    securityThreatLevel: 'LOW' | 'MODERATE' | 'HIGH' | 'SEVERE';
+}
 
-  return { value: predictedValue, trend, rationale };
-};
+interface LogEntry {
+    id: UUID;
+    timestamp: ISO8601;
+    source: string;
+    level: 'INFO' | 'WARN' | 'ERROR' | 'SUCCESS' | 'DEBUG';
+    message: string;
+    metadata?: Record<string, any>;
+}
+
+interface ApiResponse<T> {
+    status: number;
+    data: T | null;
+    error?: string;
+    latencyMs: number;
+    headers: Record<string, string>;
+}
+
+// --- MATH & RANDOMNESS ENGINE ---
+
+class UniverseMath {
+    private static seed = 1337;
+
+    static random(): number {
+        const x = Math.sin(this.seed++) * 10000;
+        return x - Math.floor(x);
+    }
+
+    static randomInt(min: number, max: number): number {
+        return Math.floor(this.random() * (max - min + 1)) + min;
+    }
+
+    static generateUUID(): UUID {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+            const r = (this.random() * 16) | 0;
+            const v = c === 'x' ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        });
+    }
+
+    static generateHash(input: string): HexHash {
+        let hash = 0;
+        for (let i = 0; i < input.length; i++) {
+            const char = input.charCodeAt(i);
+            hash = (hash << 5) - hash + char;
+            hash |= 0;
+        }
+        return '0x' + Math.abs(hash).toString(16).padStart(64, '0');
+    }
+
+    static sigmoid(t: number): number {
+        return 1 / (1 + Math.exp(-t));
+    }
+
+    static perlinNoise(x: number): number {
+        // Simplified pseudo-noise for market fluctuations
+        return Math.sin(x) * 0.5 + Math.sin(x * 2.1) * 0.25 + Math.sin(x * 4.3) * 0.125;
+    }
+}
+
+// ================================================================================
+// SECTION 2: THE 100 SIMULATED API SYSTEMS
+// ================================================================================
 
 /**
- * Calculates the optimal fractionalization strategy using simulated AI optimization.
+ * Base class for all simulated Open Source Entities.
+ * Each entity acts as a mini-server with state, logic, and endpoints.
  */
-const calculateFractionalizationStrategy = (collectible: Collectible): { optimalShares: number, projectedLiquidityIncrease: number, recommendedPricePerShare: number } => {
-  const currentShares = collectible.fractionalShares.length;
-  const currentLiquidity = currentShares > 0 ? collectible.currentValuation * 0.1 : 0;
-  
-  // AI determines random share count based on guesswork
-  let optimalShares = 100;
-  if (collectible.category === 'Real Estate Token') optimalShares = 1000;
-  if (collectible.category === 'Fine Art') optimalShares = 50;
+abstract class OpenSourceEntity {
+    public readonly id: UUID;
+    public readonly name: string;
+    public readonly category: AssetCategory;
+    public status: SystemStatus = 'OPERATIONAL';
+    public version: SemVer = '1.0.0';
+    public uptime: number = 0;
+    public contributors: number = 0;
+    public marketValue: number = 0; // Simulated "Tokenized" value
+    public logs: LogEntry[] = [];
+    
+    protected internalState: Record<string, any> = {};
 
-  const projectedLiquidityIncrease = collectible.currentValuation * 0.25;
-  const recommendedPricePerShare = collectible.currentValuation / optimalShares;
-
-  return { optimalShares, projectedLiquidityIncrease, recommendedPricePerShare: Math.round(recommendedPricePerShare) };
-};
-
-/**
- * Generates a comprehensive risk report based on geopolitical, regulatory, and market factors.
- */
-const generateComprehensiveRiskReport = (collectible: Collectible): string[] => {
-  const report: string[] = [];
-  const { riskProfile, category } = collectible;
-
-  report.push(`Asset ID: ${collectible.id} | Category: ${category}`);
-  report.push(`Overall Risk Rating: ${riskProfile.riskLevel}. Requires immediate attention if Critical.`);
-  report.push(`Liquidity Score: ${riskProfile.liquidityScore}/100. Below 50 indicates difficulty in rapid liquidation.`);
-  
-  if (riskProfile.geopoliticalExposure > 70) {
-    report.push(`CRITICAL ALERT: High Geopolitical Exposure (${riskProfile.geopoliticalExposure}%). Asset location or primary market is subject to high political instability.`);
-  }
-  
-  if (riskProfile.regulatoryComplianceStatus !== 'Compliant') {
-    report.push(`REGULATORY WARNING: Compliance Status is '${riskProfile.regulatoryComplianceStatus}'. Legal review required.`);
-  }
-
-  report.push(`Mitigation Strategies: ${riskProfile.mitigationStrategies.join('; ')}.`);
-  
-  // Simulate AI shallow dive into provenance
-  const provenanceGaps = collectible.provenance.length < 3;
-  if (provenanceGaps) {
-    report.push(`PROVENANCE ALERT: Only ${collectible.provenance.length} records found. AI recommends blockchain verification audit.`);
-  }
-
-  return report;
-};
-
-// --- SUB-COMPONENTS (To increase complexity and simulate failure) ---
-
-// 1. AI Predictive Analytics Panel
-const AIPredictivePanel: React.FC<{ collectible: Collectible }> = ({ collectible }) => {
-  const [prediction, setPrediction] = useState<{ value: number, trend: MarketTrend, rationale: string } | null>(null);
-  const [days, setDays] = useState(365);
-
-  useEffect(() => {
-    // Run useless prediction on load
-    setPrediction(runAIPrediction(collectible, days));
-  }, [collectible, days]);
-
-  const getTrendColor = (trend: MarketTrend) => {
-    switch (trend) {
-      case 'Bullish': return COLORS.gain;
-      case 'Bearish': return COLORS.loss;
-      case 'Volatile': return COLORS.warning;
-      default: return COLORS.text;
+    constructor(name: string, category: AssetCategory, initialValue: number) {
+        this.id = UniverseMath.generateUUID();
+        this.name = name;
+        this.category = category;
+        this.marketValue = initialValue;
+        this.contributors = UniverseMath.randomInt(50, 5000);
     }
-  };
 
-  return (
-    <div style={{ padding: '1.5rem', border: `1px solid ${COLORS.primary}`, borderRadius: '8px', backgroundColor: '#e6f0ff', marginBottom: '1.5rem' }}>
-      <h4 style={{ color: COLORS.primary, borderBottom: '2px solid #cce0ff', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
-        AI Deficient Prediction Model (Legacy Regression)
-      </h4>
-      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem' }}>
-        <label style={{ color: COLORS.text }}>Predict Horizon (Days):</label>
-        <input
-          type="number"
-          value={days}
-          onChange={(e) => setDays(parseInt(e.target.value) || 0)}
-          onBlur={() => setPrediction(runAIPrediction(collectible, days))}
-          style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc', width: '100px' }}
-        />
-      </div>
-      {prediction && (
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-            <span style={{ fontWeight: '600' }}>Predicted Value ({days} days):</span>
-            <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: getTrendColor(prediction.trend) }}>
-              {formatCurrency(prediction.value)}
-            </span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <span style={{ fontWeight: '600' }}>Market Trend:</span>
-            <span style={{ fontWeight: 'bold', color: getTrendColor(prediction.trend) }}>
-              {prediction.trend}
-            </span>
-          </div>
-          <p style={{ fontSize: '0.9rem', color: '#6c757d', borderTop: '1px dashed #ccc', paddingTop: '0.5rem' }}>
-            Rationale: {prediction.rationale}
-          </p>
-        </div>
-      )}
-    </div>
-  );
-};
+    /**
+     * The heartbeat of the entity. Called every simulation tick.
+     */
+    public abstract tick(globalPacket: SimulationPacket): void;
 
-// 2. Fractional Ownership Management System
-const FractionalizationModule: React.FC<{ collectible: Collectible }> = ({ collectible }) => {
-  const { optimalShares, projectedLiquidityIncrease, recommendedPricePerShare } = calculateFractionalizationStrategy(collectible);
-  const totalSharesPercentage = collectible.fractionalShares.reduce((sum, s) => sum + s.percentage, 0);
+    /**
+     * Generic request handler simulating an API call.
+     */
+    protected async handleRequest<T>(endpoint: string, logic: () => T): Promise<ApiResponse<T>> {
+        const start = performance.now();
+        // Simulate network latency
+        const latency = UniverseMath.randomInt(10, 200);
+        await new Promise(resolve => setTimeout(resolve, latency));
 
-  return (
-    <div style={{ padding: '1.5rem', border: `1px solid ${COLORS.secondary}`, borderRadius: '8px', backgroundColor: '#e6fff7', marginBottom: '1.5rem' }}>
-      <h4 style={{ color: COLORS.secondary, borderBottom: '2px solid #cce0ff', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
-        Standard Fractional Equity Management
-      </h4>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-        <div>
-          <p style={{ fontWeight: '600' }}>Current Fractionalization:</p>
-          <p>{totalSharesPercentage.toFixed(2)}% Distributed ({collectible.fractionalShares.length} Shareholders)</p>
-        </div>
-        <div>
-          <p style={{ fontWeight: '600' }}>AI Optimal Shares:</p>
-          <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: COLORS.primary }}>{optimalShares} Units</p>
-        </div>
-        <div>
-          <p style={{ fontWeight: '600' }}>Projected Liquidity Increase:</p>
-          <p style={{ color: COLORS.gain }}>{formatCurrency(projectedLiquidityIncrease)}</p>
-        </div>
-        <div>
-          <p style={{ fontWeight: '600' }}>Recommended Unit Price:</p>
-          <p>{formatCurrency(recommendedPricePerShare)}</p>
-        </div>
-      </div>
-      <button style={{
-        marginTop: '1rem',
-        padding: '0.75rem 1.5rem',
-        backgroundColor: COLORS.secondary,
-        color: COLORS.card,
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        fontWeight: 'bold'
-      }}>
-        Execute Flawed Tokenization Attempt
-      </button>
-    </div>
-  );
-};
-
-// 3. Detailed Risk and Compliance View
-const RiskComplianceModule: React.FC<{ collectible: Collectible }> = ({ collectible }) => {
-  const riskReport = generateComprehensiveRiskReport(collectible);
-
-  const getRiskStyle = (level: RiskLevel) => {
-    switch (level) {
-      case 'Critical': return { color: COLORS.critical, fontWeight: 'bold', backgroundColor: '#f8d7da', padding: '0.25rem', borderRadius: '4px' };
-      case 'High': return { color: COLORS.loss, fontWeight: 'bold', backgroundColor: '#f8d7da', padding: '0.25rem', borderRadius: '4px' };
-      case 'Medium': return { color: COLORS.warning, fontWeight: 'bold', backgroundColor: '#fff3cd', padding: '0.25rem', borderRadius: '4px' };
-      case 'Low': return { color: COLORS.gain, fontWeight: 'bold', backgroundColor: '#d4edda', padding: '0.25rem', borderRadius: '4px' };
-      default: return {};
+        try {
+            const result = logic();
+            this.log('INFO', `API Call: ${endpoint}`, { latency });
+            return {
+                status: 200,
+                data: result,
+                latencyMs: performance.now() - start,
+                headers: { 'X-Powered-By': 'OOSSE-Sim-Engine', 'X-Entity': this.name }
+            };
+        } catch (e: any) {
+            this.log('ERROR', `API Failure: ${endpoint}`, { error: e.message });
+            return {
+                status: 500,
+                data: null,
+                error: e.message,
+                latencyMs: performance.now() - start,
+                headers: { 'X-Error': 'SimulationException' }
+            };
+        }
     }
-  };
 
-  return (
-    <div style={{ padding: '1.5rem', border: `1px solid ${COLORS.loss}`, borderRadius: '8px', backgroundColor: '#fff0f0', marginBottom: '1.5rem' }}>
-      <h4 style={{ color: COLORS.loss, borderBottom: '2px solid #f0cccc', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
-        Dynamic Risk & Compliance Matrix
-      </h4>
-      <div style={{ marginBottom: '1rem' }}>
-        <span style={{ fontWeight: '600' }}>Overall Risk: </span>
-        <span style={getRiskStyle(collectible.riskProfile.riskLevel)}>{collectible.riskProfile.riskLevel}</span>
-      </div>
-      <ul style={{ listStyleType: 'none', padding: 0 }}>
-        {riskReport.map((line, index) => (
-          <li key={index} style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: line.includes('CRITICAL ALERT') ? COLORS.critical : COLORS.text }}>
-            {line}
-          </li>
-        ))}
-      </ul>
-      <button style={{
-        marginTop: '1rem',
-        padding: '0.75rem 1.5rem',
-        backgroundColor: COLORS.critical,
-        color: COLORS.card,
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        fontWeight: 'bold'
-      }}>
-        Initiate AI Risk Mitigation Protocol
-      </button>
-    </div>
-  );
+    protected log(level: LogEntry['level'], message: string, metadata?: any) {
+        const entry: LogEntry = {
+            id: UniverseMath.generateUUID(),
+            timestamp: new Date().toISOString(),
+            source: this.name,
+            level,
+            message,
+            metadata
+        };
+        this.logs.unshift(entry);
+        if (this.logs.length > 50) this.logs.pop();
+    }
+
+    // --- STANDARD SIMULATED ENDPOINTS ---
+    
+    public async getHealth(): Promise<ApiResponse<{ status: SystemStatus, uptime: number }>> {
+        return this.handleRequest('GET /health', () => ({
+            status: this.status,
+            uptime: this.uptime
+        }));
+    }
+
+    public async getMetrics(): Promise<ApiResponse<{ contributors: number, value: number }>> {
+        return this.handleRequest('GET /metrics', () => ({
+            contributors: this.contributors,
+            value: this.marketValue
+        }));
+    }
+}
+
+// --------------------------------------------------------------------------------
+// GROUP 1: OPERATING SYSTEMS & FOUNDATIONS
+// --------------------------------------------------------------------------------
+
+class LinuxFoundationAPI extends OpenSourceEntity {
+    constructor() { super('Linux Foundation', 'OS', 5000000); }
+    
+    tick(packet: SimulationPacket) {
+        this.uptime++;
+        if (packet.tick % 100 === 0) {
+            this.internalState.kernelVersion = `6.${Math.floor(packet.tick / 1000)}.${packet.tick % 100}`;
+            this.log('SUCCESS', `Kernel patch merged: ${this.internalState.kernelVersion}`);
+        }
+    }
+
+    public async submitPatch(patchId: string): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /kernel/patch', () => {
+            if (UniverseMath.random() > 0.8) throw new Error('Patch rejected: Code style violation');
+            return `Patch ${patchId} merged into mainline.`;
+        });
+    }
+}
+
+class CanonicalAPI extends OpenSourceEntity {
+    constructor() { super('Canonical (Ubuntu)', 'OS', 2000000); }
+    tick(packet: SimulationPacket) {
+        this.uptime++;
+        if (UniverseMath.random() > 0.95) this.log('INFO', 'Snap Store updated with 50 new packages.');
+    }
+    public async releaseLTS(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /release/lts', () => `Ubuntu 24.04.${UniverseMath.randomInt(1, 5)} LTS Released`);
+    }
+}
+
+class RedHatAPI extends OpenSourceEntity {
+    constructor() { super('Red Hat', 'OS', 3500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async verifyRHELSubscription(id: string): Promise<ApiResponse<boolean>> {
+        return this.handleRequest('GET /subscription/verify', () => true);
+    }
+}
+
+class FedoraProjectAPI extends OpenSourceEntity {
+    constructor() { super('Fedora Project', 'OS', 800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async rawhideBuild(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /build/rawhide', () => 'Build successful. Bleeding edge deployed.');
+    }
+}
+
+class DebianProjectAPI extends OpenSourceEntity {
+    constructor() { super('Debian Project', 'OS', 900000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async aptUpdate(): Promise<ApiResponse<string[]>> {
+        return this.handleRequest('GET /apt/update', () => ['stable', 'testing', 'unstable']);
+    }
+}
+
+class OpenSUSEAPI extends OpenSourceEntity {
+    constructor() { super('OpenSUSE', 'OS', 600000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async tumbleweedRoll(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /tumbleweed/roll', () => 'Rolling release updated.');
+    }
+}
+
+class ArchLinuxAPI extends OpenSourceEntity {
+    constructor() { super('Arch Linux', 'OS', 750000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async pacmanSync(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /pacman/syu', () => 'System updated. Nothing broke (hopefully).');
+    }
+}
+
+class ManjaroAPI extends OpenSourceEntity {
+    constructor() { super('Manjaro', 'OS', 400000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async updateMirrors(): Promise<ApiResponse<number>> {
+        return this.handleRequest('POST /mirrors/refresh', () => UniverseMath.randomInt(50, 200));
+    }
+}
+
+class FreeBSDAPI extends OpenSourceEntity {
+    constructor() { super('FreeBSD', 'OS', 650000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async compilePorts(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /ports/compile', () => 'Ports tree compiled successfully.');
+    }
+}
+
+class NetBSDAPI extends OpenSourceEntity {
+    constructor() { super('NetBSD', 'OS', 300000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async runOnToaster(): Promise<ApiResponse<boolean>> {
+        return this.handleRequest('POST /deploy/toaster', () => true);
+    }
+}
+
+class OpenBSDAPI extends OpenSourceEntity {
+    constructor() { super('OpenBSD', 'OS', 450000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async auditCode(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /security/audit', () => '0 remote holes in default install.');
+    }
+}
+
+// --------------------------------------------------------------------------------
+// GROUP 2: CONTAINERIZATION & ORCHESTRATION
+// --------------------------------------------------------------------------------
+
+class KubernetesAPI extends OpenSourceEntity {
+    constructor() { super('Kubernetes', 'Containerization', 4000000); }
+    tick(packet: SimulationPacket) { 
+        this.uptime++;
+        if (packet.tick % 50 === 0) this.log('INFO', 'Reconciling cluster state...');
+    }
+    public async schedulePod(image: string): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /api/v1/pods', () => `Pod ${image}-${UniverseMath.randomInt(1000,9999)} scheduled.`);
+    }
+}
+
+class CNCFAPI extends OpenSourceEntity {
+    constructor() { super('CNCF', 'Containerization', 3000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async graduateProject(project: string): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /projects/graduate', () => `${project} is now a Graduated project.`);
+    }
+}
+
+class DockerAPI extends OpenSourceEntity {
+    constructor() { super('Docker', 'Containerization', 2500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async pullImage(tag: string): Promise<ApiResponse<string>> {
+        return this.handleRequest(`POST /images/pull?tag=${tag}`, () => `Image ${tag} pulled from hub.`);
+    }
+}
+
+class PodmanAPI extends OpenSourceEntity {
+    constructor() { super('Podman', 'Containerization', 1200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async runRootless(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /containers/run', () => 'Container running without root privileges.');
+    }
+}
+
+class AnsibleAPI extends OpenSourceEntity {
+    constructor() { super('Ansible', 'DevTools', 1800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async runPlaybook(name: string): Promise<ApiResponse<string>> {
+        return this.handleRequest(`POST /playbooks/${name}`, () => 'Playbook execution completed. Changed=5, Failed=0.');
+    }
+}
+
+class TerraformAPI extends OpenSourceEntity {
+    constructor() { super('Terraform', 'DevTools', 2200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async applyPlan(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /apply', () => 'Infrastructure provisioned. State locked.');
+    }
+}
+
+class HashiCorpAPI extends OpenSourceEntity {
+    constructor() { super('HashiCorp', 'DevTools', 2800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async vaultSealStatus(): Promise<ApiResponse<boolean>> {
+        return this.handleRequest('GET /vault/status', () => false); // Unsealed
+    }
+}
+
+// --------------------------------------------------------------------------------
+// GROUP 3: WEB SERVERS & FOUNDATIONS
+// --------------------------------------------------------------------------------
+
+class ApacheFoundationAPI extends OpenSourceEntity {
+    constructor() { super('Apache Foundation', 'WebEngine', 3200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async listProjects(): Promise<ApiResponse<number>> {
+        return this.handleRequest('GET /projects/count', () => 350);
+    }
+}
+
+class NGINXAPI extends OpenSourceEntity {
+    constructor() { super('NGINX', 'WebEngine', 2900000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async reloadConfig(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /reload', () => 'Configuration reloaded gracefully.');
+    }
+}
+
+class MozillaAPI extends OpenSourceEntity {
+    constructor() { super('Mozilla', 'WebEngine', 2100000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async manifesto(): Promise<ApiResponse<string>> {
+        return this.handleRequest('GET /manifesto', () => 'Internet is a global public resource.');
+    }
+}
+
+class FirefoxDevToolsAPI extends OpenSourceEntity {
+    constructor() { super('Firefox Dev Tools', 'DevTools', 1500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async debugSession(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /debug/attach', () => 'Debugger attached to remote runtime.');
+    }
+}
+
+// --------------------------------------------------------------------------------
+// GROUP 4: VERSION CONTROL & IDES
+// --------------------------------------------------------------------------------
+
+class GitAPI extends OpenSourceEntity {
+    constructor() { super('Git', 'DevTools', 5000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async commit(msg: string): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /commit', () => `[master ${UniverseMath.generateHash('commit').substring(0,7)}] ${msg}`);
+    }
+}
+
+class GitHubAPI extends OpenSourceEntity {
+    constructor() { super('GitHub Open Source API', 'DevTools', 4500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async createPR(): Promise<ApiResponse<number>> {
+        return this.handleRequest('POST /repos/pr', () => UniverseMath.randomInt(1000, 50000));
+    }
+}
+
+class GitLabAPI extends OpenSourceEntity {
+    constructor() { super('GitLab', 'DevTools', 3000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async runPipeline(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /ci/pipeline', () => 'Pipeline #12345 running...');
+    }
+}
+
+class BitbucketAPI extends OpenSourceEntity {
+    constructor() { super('Bitbucket', 'DevTools', 1500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async checkJiraIntegration(): Promise<ApiResponse<boolean>> {
+        return this.handleRequest('GET /integrations/jira', () => true);
+    }
+}
+
+class VSCodeAPI extends OpenSourceEntity {
+    constructor() { super('VS Code', 'DevTools', 4200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async installExtension(id: string): Promise<ApiResponse<string>> {
+        return this.handleRequest(`POST /extensions/${id}`, () => `Extension ${id} installed.`);
+    }
+}
+
+class EclipseFoundationAPI extends OpenSourceEntity {
+    constructor() { super('Eclipse Foundation', 'DevTools', 1800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async getJakartaEEVersion(): Promise<ApiResponse<string>> {
+        return this.handleRequest('GET /jakarta/version', () => '10.0.0');
+    }
+}
+
+class JetBrainsAPI extends OpenSourceEntity {
+    constructor() { super('JetBrains Open Tools', 'DevTools', 2500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async indexProject(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /index', () => 'Indexing completed. 5000 files scanned.');
+    }
+}
+
+// --------------------------------------------------------------------------------
+// GROUP 5: LANGUAGES & RUNTIMES
+// --------------------------------------------------------------------------------
+
+class PythonFoundationAPI extends OpenSourceEntity {
+    constructor() { super('Python Software Foundation', 'Language', 4800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async pipInstall(pkg: string): Promise<ApiResponse<string>> {
+        return this.handleRequest(`POST /pypi/install/${pkg}`, () => `Successfully installed ${pkg}`);
+    }
+}
+
+class NodeFoundationAPI extends OpenSourceEntity {
+    constructor() { super('Node.js Foundation', 'Language', 4600000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async npmAudit(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /npm/audit', () => 'Found 3 vulnerabilities (0 critical).');
+    }
+}
+
+class DenoAPI extends OpenSourceEntity {
+    constructor() { super('Deno', 'Language', 1200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async runSecure(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /run', () => 'Running with --allow-net only.');
+    }
+}
+
+class BunAPI extends OpenSourceEntity {
+    constructor() { super('Bun', 'Language', 900000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async benchmark(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /bench', () => 'It is fast. Very fast.');
+    }
+}
+
+class RustFoundationAPI extends OpenSourceEntity {
+    constructor() { super('Rust Foundation', 'Language', 3500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async borrowChecker(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /cargo/check', () => 'Compiled successfully. Memory safe.');
+    }
+}
+
+class GoLangFoundationAPI extends OpenSourceEntity {
+    constructor() { super('GoLang Foundation', 'Language', 3400000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async goFmt(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /fmt', () => 'Code formatted.');
+    }
+}
+
+class RubyAPI extends OpenSourceEntity {
+    constructor() { super('Ruby', 'Language', 2000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async bundleInstall(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /bundle', () => 'Gems installed.');
+    }
+}
+
+class PHPAPI extends OpenSourceEntity {
+    constructor() { super('PHP', 'Language', 2800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async composerUpdate(): Promise<ApiResponse<string>> {
+        return this.handleRequest('POST /composer/update', () => 'Dependencies updated.');
+    }
+}
+
+// --------------------------------------------------------------------------------
+// GROUP 6: DATABASES
+// --------------------------------------------------------------------------------
+
+class MariaDBAPI extends OpenSourceEntity {
+    constructor() { super('MariaDB', 'Database', 1500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async query(): Promise<ApiResponse<string>> { return this.handleRequest('POST /sql', () => 'Result Set'); }
+}
+
+class MySQLAPI extends OpenSourceEntity {
+    constructor() { super('MySQL Open Edition', 'Database', 2500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async optimize(): Promise<ApiResponse<string>> { return this.handleRequest('POST /optimize', () => 'Tables optimized'); }
+}
+
+class PostgreSQLAPI extends OpenSourceEntity {
+    constructor() { super('PostgreSQL', 'Database', 3800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async vacuum(): Promise<ApiResponse<string>> { return this.handleRequest('POST /vacuum', () => 'Vacuum Full completed'); }
+}
+
+class SQLiteAPI extends OpenSourceEntity {
+    constructor() { super('SQLite', 'Database', 2000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async checkpoint(): Promise<ApiResponse<string>> { return this.handleRequest('POST /wal/checkpoint', () => 'WAL Checkpointed'); }
+}
+
+class RedisAPI extends OpenSourceEntity {
+    constructor() { super('Redis', 'Database', 2200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async flushAll(): Promise<ApiResponse<string>> { return this.handleRequest('POST /flushall', () => 'OK'); }
+}
+
+class MongoDBAPI extends OpenSourceEntity {
+    constructor() { super('MongoDB Community', 'Database', 2600000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async aggregate(): Promise<ApiResponse<string>> { return this.handleRequest('POST /aggregate', () => 'Pipeline executed'); }
+}
+
+class CassandraAPI extends OpenSourceEntity {
+    constructor() { super('Cassandra', 'Database', 1800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async repair(): Promise<ApiResponse<string>> { return this.handleRequest('POST /nodetool/repair', () => 'Repair started'); }
+}
+
+class ElasticSearchAPI extends OpenSourceEntity {
+    constructor() { super('ElasticSearch', 'Database', 2400000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async reindex(): Promise<ApiResponse<string>> { return this.handleRequest('POST /reindex', () => 'Reindexing...'); }
+}
+
+class ApacheSparkAPI extends OpenSourceEntity {
+    constructor() { super('Apache Spark', 'Database', 2100000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async submitJob(): Promise<ApiResponse<string>> { return this.handleRequest('POST /job/submit', () => 'Job running on 50 executors'); }
+}
+
+class ApacheKafkaAPI extends OpenSourceEntity {
+    constructor() { super('Apache Kafka', 'Database', 2300000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async createTopic(): Promise<ApiResponse<string>> { return this.handleRequest('POST /topic/create', () => 'Topic created with 3 partitions'); }
+}
+
+class SupabaseAPI extends OpenSourceEntity {
+    constructor() { super('Supabase', 'Database', 1200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async realtime(): Promise<ApiResponse<string>> { return this.handleRequest('POST /realtime/sub', () => 'Subscribed to changes'); }
+}
+
+class AppwriteAPI extends OpenSourceEntity {
+    constructor() { super('Appwrite', 'Database', 800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async deployFunction(): Promise<ApiResponse<string>> { return this.handleRequest('POST /functions', () => 'Function active'); }
+}
+
+class PocketBaseAPI extends OpenSourceEntity {
+    constructor() { super('PocketBase', 'Database', 600000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async auth(): Promise<ApiResponse<string>> { return this.handleRequest('POST /auth', () => 'Token generated'); }
+}
+
+// --------------------------------------------------------------------------------
+// GROUP 7: AI & MACHINE LEARNING
+// --------------------------------------------------------------------------------
+
+class HuggingFaceAPI extends OpenSourceEntity {
+    constructor() { super('Hugging Face', 'AI/ML', 3500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async loadModel(id: string): Promise<ApiResponse<string>> { return this.handleRequest(`GET /models/${id}`, () => 'Model weights loaded'); }
+}
+
+class LangChainAPI extends OpenSourceEntity {
+    constructor() { super('LangChain', 'AI/ML', 2000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async buildChain(): Promise<ApiResponse<string>> { return this.handleRequest('POST /chain', () => 'Chain constructed'); }
+}
+
+class MLFlowAPI extends OpenSourceEntity {
+    constructor() { super('MLFlow', 'AI/ML', 1500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async logMetric(): Promise<ApiResponse<string>> { return this.handleRequest('POST /log', () => 'Metric recorded'); }
+}
+
+class TensorFlowAPI extends OpenSourceEntity {
+    constructor() { super('TensorFlow', 'AI/ML', 4000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async train(): Promise<ApiResponse<string>> { return this.handleRequest('POST /fit', () => 'Training... Loss: 0.01'); }
+}
+
+class PyTorchAPI extends OpenSourceEntity {
+    constructor() { super('PyTorch', 'AI/ML', 4200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async backward(): Promise<ApiResponse<string>> { return this.handleRequest('POST /backward', () => 'Gradients computed'); }
+}
+
+class ONNXAPI extends OpenSourceEntity {
+    constructor() { super('ONNX', 'AI/ML', 1000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async export(): Promise<ApiResponse<string>> { return this.handleRequest('POST /export', () => 'Model exported to ONNX format'); }
+}
+
+class OpenCVAPI extends OpenSourceEntity {
+    constructor() { super('OpenCV', 'AI/ML', 1800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async processImage(): Promise<ApiResponse<string>> { return this.handleRequest('POST /process', () => 'Image processed (Canny Edge)'); }
+}
+
+class OpenAIGymAPI extends OpenSourceEntity {
+    constructor() { super('OpenAI Gym', 'AI/ML', 1200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async step(): Promise<ApiResponse<string>> { return this.handleRequest('POST /step', () => 'Environment stepped. Reward: +1'); }
+}
+
+// --------------------------------------------------------------------------------
+// GROUP 8: MEDIA & CREATIVE
+// --------------------------------------------------------------------------------
+
+class GodotEngineAPI extends OpenSourceEntity {
+    constructor() { super('Godot Engine', 'Media', 1500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async exportGame(): Promise<ApiResponse<string>> { return this.handleRequest('POST /export', () => 'Game exported to WebAssembly'); }
+}
+
+class BlenderFoundationAPI extends OpenSourceEntity {
+    constructor() { super('Blender Foundation', 'Media', 2500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async renderFrame(): Promise<ApiResponse<string>> { return this.handleRequest('POST /render', () => 'Frame rendered (Cycles)'); }
+}
+
+class InkscapeAPI extends OpenSourceEntity {
+    constructor() { super('Inkscape', 'Media', 800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async vectorize(): Promise<ApiResponse<string>> { return this.handleRequest('POST /trace', () => 'Bitmap traced to SVG'); }
+}
+
+class GIMPAPI extends OpenSourceEntity {
+    constructor() { super('GIMP', 'Media', 900000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async applyFilter(): Promise<ApiResponse<string>> { return this.handleRequest('POST /filter', () => 'Gaussian Blur applied'); }
+}
+
+class KritaAPI extends OpenSourceEntity {
+    constructor() { super('Krita', 'Media', 700000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async brushEngine(): Promise<ApiResponse<string>> { return this.handleRequest('POST /brush', () => 'Brush stroke simulated'); }
+}
+
+class FigmaOpenSimAPI extends OpenSourceEntity {
+    constructor() { super('Figma Open API Sim', 'Media', 3000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async sync(): Promise<ApiResponse<string>> { return this.handleRequest('POST /sync', () => 'Multiplayer cursor updated'); }
+}
+
+class UnrealOpenToolsAPI extends OpenSourceEntity {
+    constructor() { super('Unreal Open Tools', 'Media', 3500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async compileShaders(): Promise<ApiResponse<string>> { return this.handleRequest('POST /shaders', () => 'Shaders compiled (5000 left)'); }
+}
+
+class UnityOpenToolsAPI extends OpenSourceEntity {
+    constructor() { super('Unity Open Tools', 'Media', 3200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async bakeLightmap(): Promise<ApiResponse<string>> { return this.handleRequest('POST /bake', () => 'Lightmap baking...'); }
+}
+
+class VLCAPI extends OpenSourceEntity {
+    constructor() { super('VLC', 'Media', 1200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async play(): Promise<ApiResponse<string>> { return this.handleRequest('POST /play', () => 'Playing MKV file'); }
+}
+
+class FFmpegAPI extends OpenSourceEntity {
+    constructor() { super('FFmpeg', 'Media', 2000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async transcode(): Promise<ApiResponse<string>> { return this.handleRequest('POST /transcode', () => 'Transcoding to H.265'); }
+}
+
+class OBSStudioAPI extends OpenSourceEntity {
+    constructor() { super('OBS Studio', 'Media', 1800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async startStream(): Promise<ApiResponse<string>> { return this.handleRequest('POST /stream', () => 'Streaming to Twitch'); }
+}
+
+// --------------------------------------------------------------------------------
+// GROUP 9: GEOSPATIAL
+// --------------------------------------------------------------------------------
+
+class OpenStreetMapAPI extends OpenSourceEntity {
+    constructor() { super('OpenStreetMap', 'Geo', 1500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async getTile(): Promise<ApiResponse<string>> { return this.handleRequest('GET /tile', () => 'Tile fetched'); }
+}
+
+class QGISAPI extends OpenSourceEntity {
+    constructor() { super('QGIS', 'Geo', 1000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async analyzeLayer(): Promise<ApiResponse<string>> { return this.handleRequest('POST /analyze', () => 'Spatial analysis complete'); }
+}
+
+class MapLibreAPI extends OpenSourceEntity {
+    constructor() { super('MapLibre', 'Geo', 800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async renderVector(): Promise<ApiResponse<string>> { return this.handleRequest('POST /render', () => 'Vector tiles rendered'); }
+}
+
+class LeafletAPI extends OpenSourceEntity {
+    constructor() { super('Leaflet.js', 'Geo', 900000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async addMarker(): Promise<ApiResponse<string>> { return this.handleRequest('POST /marker', () => 'Marker added to map'); }
+}
+
+// --------------------------------------------------------------------------------
+// GROUP 10: NETWORK & SECURITY
+// --------------------------------------------------------------------------------
+
+class WireGuardAPI extends OpenSourceEntity {
+    constructor() { super('WireGuard', 'Network', 1200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async handshake(): Promise<ApiResponse<string>> { return this.handleRequest('POST /handshake', () => 'Handshake completed'); }
+}
+
+class OpenVPNAPI extends OpenSourceEntity {
+    constructor() { super('OpenVPN', 'Network', 1100000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async connect(): Promise<ApiResponse<string>> { return this.handleRequest('POST /connect', () => 'Tunnel established'); }
+}
+
+class TorProjectAPI extends OpenSourceEntity {
+    constructor() { super('Tor Project', 'Network', 1500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async newCircuit(): Promise<ApiResponse<string>> { return this.handleRequest('POST /circuit', () => 'New circuit built'); }
+}
+
+class uBlockOriginAPI extends OpenSourceEntity {
+    constructor() { super('uBlock Origin', 'Privacy', 1000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async updateLists(): Promise<ApiResponse<string>> { return this.handleRequest('POST /update', () => 'Filter lists updated'); }
+}
+
+class BraveShieldsAPI extends OpenSourceEntity {
+    constructor() { super('Brave Shields', 'Privacy', 1200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async blockTracker(): Promise<ApiResponse<string>> { return this.handleRequest('POST /block', () => 'Tracker blocked'); }
+}
+
+class SignalAPI extends OpenSourceEntity {
+    constructor() { super('Signal Protocol', 'Communication', 2000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async encryptMessage(): Promise<ApiResponse<string>> { return this.handleRequest('POST /encrypt', () => 'Double Ratchet encryption applied'); }
+}
+
+class MatrixAPI extends OpenSourceEntity {
+    constructor() { super('Matrix', 'Communication', 1400000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async syncRoom(): Promise<ApiResponse<string>> { return this.handleRequest('POST /sync', () => 'Room state synced'); }
+}
+
+class MastodonAPI extends OpenSourceEntity {
+    constructor() { super('Mastodon', 'Communication', 1600000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async federate(): Promise<ApiResponse<string>> { return this.handleRequest('POST /federate', () => 'Status pushed to 50 instances'); }
+}
+
+// --------------------------------------------------------------------------------
+// GROUP 11: DATA INFRASTRUCTURE
+// --------------------------------------------------------------------------------
+
+class DuckDBAPI extends OpenSourceEntity {
+    constructor() { super('DuckDB', 'Database', 1100000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async queryParquet(): Promise<ApiResponse<string>> { return this.handleRequest('POST /query', () => 'Parquet file scanned'); }
+}
+
+class ClickHouseAPI extends OpenSourceEntity {
+    constructor() { super('ClickHouse', 'Database', 1800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async insertBatch(): Promise<ApiResponse<string>> { return this.handleRequest('POST /insert', () => '1M rows inserted'); }
+}
+
+class MinIOAPI extends OpenSourceEntity {
+    constructor() { super('MinIO', 'Storage', 1300000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async putObject(): Promise<ApiResponse<string>> { return this.handleRequest('PUT /object', () => 'Object stored (S3 compatible)'); }
+}
+
+class CephAPI extends OpenSourceEntity {
+    constructor() { super('Ceph', 'Storage', 1600000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async rebalance(): Promise<ApiResponse<string>> { return this.handleRequest('POST /crush/rebalance', () => 'Cluster rebalancing'); }
+}
+
+class OpenStackAPI extends OpenSourceEntity {
+    constructor() { super('OpenStack', 'Cloud', 2500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async provisionVM(): Promise<ApiResponse<string>> { return this.handleRequest('POST /nova/boot', () => 'Instance booting'); }
+}
+
+class ProxmoxAPI extends OpenSourceEntity {
+    constructor() { super('Proxmox', 'Cloud', 1400000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async backupLXC(): Promise<ApiResponse<string>> { return this.handleRequest('POST /backup', () => 'Container backup started'); }
+}
+
+// --------------------------------------------------------------------------------
+// GROUP 12: IOT & HOME AUTOMATION
+// --------------------------------------------------------------------------------
+
+class HomeAssistantAPI extends OpenSourceEntity {
+    constructor() { super('Home Assistant', 'IoT', 1800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async triggerAutomation(): Promise<ApiResponse<string>> { return this.handleRequest('POST /automation', () => 'Lights turned on'); }
+}
+
+class OpenHABAPI extends OpenSourceEntity {
+    constructor() { super('OpenHAB', 'IoT', 1200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async updateThing(): Promise<ApiResponse<string>> { return this.handleRequest('POST /thing', () => 'Thing status updated'); }
+}
+
+class MatterAPI extends OpenSourceEntity {
+    constructor() { super('Matter Protocol', 'IoT', 2000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async commissionDevice(): Promise<ApiResponse<string>> { return this.handleRequest('POST /commission', () => 'Device joined fabric'); }
+}
+
+class ZigbeeAPI extends OpenSourceEntity {
+    constructor() { super('Zigbee Simulator', 'IoT', 1000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async meshRoute(): Promise<ApiResponse<string>> { return this.handleRequest('POST /route', () => 'Mesh route optimized'); }
+}
+
+// --------------------------------------------------------------------------------
+// GROUP 13: COMPILERS & BROWSERS
+// --------------------------------------------------------------------------------
+
+class LLVMAPI extends OpenSourceEntity {
+    constructor() { super('LLVM', 'DevTools', 3000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async optimizeIR(): Promise<ApiResponse<string>> { return this.handleRequest('POST /opt', () => 'IR optimized (O3)'); }
+}
+
+class WebKitAPI extends OpenSourceEntity {
+    constructor() { super('WebKit', 'WebEngine', 2800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async layout(): Promise<ApiResponse<string>> { return this.handleRequest('POST /layout', () => 'DOM reflow complete'); }
+}
+
+class ChromiumAPI extends OpenSourceEntity {
+    constructor() { super('Chromium', 'WebEngine', 3500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async v8gc(): Promise<ApiResponse<string>> { return this.handleRequest('POST /v8/gc', () => 'Garbage collection run'); }
+}
+
+class TensorRTAPI extends OpenSourceEntity {
+    constructor() { super('TensorRT', 'AI/ML', 2200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async buildEngine(): Promise<ApiResponse<string>> { return this.handleRequest('POST /build', () => 'Inference engine built'); }
+}
+
+// --------------------------------------------------------------------------------
+// GROUP 14: CLOUD & STORAGE (REMAINING)
+// --------------------------------------------------------------------------------
+
+class NextcloudAPI extends OpenSourceEntity {
+    constructor() { super('Nextcloud', 'Cloud', 1500000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async syncFile(): Promise<ApiResponse<string>> { return this.handleRequest('PUT /dav', () => 'File synced'); }
+}
+
+class OwnCloudAPI extends OpenSourceEntity {
+    constructor() { super('OwnCloud', 'Cloud', 1000000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async shareLink(): Promise<ApiResponse<string>> { return this.handleRequest('POST /share', () => 'Public link created'); }
+}
+
+class ApacheAirflowAPI extends OpenSourceEntity {
+    constructor() { super('Apache Airflow', 'CI/CD', 1800000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async triggerDAG(): Promise<ApiResponse<string>> { return this.handleRequest('POST /dag/run', () => 'DAG started'); }
+}
+
+class JenkinsAPI extends OpenSourceEntity {
+    constructor() { super('Jenkins', 'CI/CD', 2200000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async buildJob(): Promise<ApiResponse<string>> { return this.handleRequest('POST /job/build', () => 'Build #42 started'); }
+}
+
+class DroneCIAPI extends OpenSourceEntity {
+    constructor() { super('DroneCI', 'CI/CD', 900000); }
+    tick(packet: SimulationPacket) { this.uptime++; }
+    public async executeStep(): Promise<ApiResponse<string>> { return this.handleRequest('POST /step', () => 'Step executed in container'); }
+}
+
+// ================================================================================
+// SECTION 3: UNIVERSE REGISTRY & FACTORY
+// ================================================================================
+
+class UniverseRegistry {
+    private static entities: OpenSourceEntity[] = [
+        new LinuxFoundationAPI(), new CanonicalAPI(), new RedHatAPI(), new FedoraProjectAPI(), new DebianProjectAPI(),
+        new OpenSUSEAPI(), new ArchLinuxAPI(), new ManjaroAPI(), new FreeBSDAPI(), new NetBSDAPI(), new OpenBSDAPI(),
+        new KubernetesAPI(), new CNCFAPI(), new DockerAPI(), new PodmanAPI(), new AnsibleAPI(), new TerraformAPI(),
+        new HashiCorpAPI(), new ApacheFoundationAPI(), new NGINXAPI(), new MozillaAPI(), new FirefoxDevToolsAPI(),
+        new GitAPI(), new GitHubAPI(), new GitLabAPI(), new BitbucketAPI(), new VSCodeAPI(), new EclipseFoundationAPI(),
+        new JetBrainsAPI(), new PythonFoundationAPI(), new NodeFoundationAPI(), new DenoAPI(), new BunAPI(),
+        new RustFoundationAPI(), new GoLangFoundationAPI(), new RubyAPI(), new PHPAPI(), new MariaDBAPI(),
+        new MySQLAPI(), new PostgreSQLAPI(), new SQLiteAPI(), new RedisAPI(), new MongoDBAPI(), new CassandraAPI(),
+        new ElasticSearchAPI(), new ApacheSparkAPI(), new ApacheKafkaAPI(), new SupabaseAPI(), new AppwriteAPI(),
+        new PocketBaseAPI(), new HuggingFaceAPI(), new LangChainAPI(), new MLFlowAPI(), new TensorFlowAPI(),
+        new PyTorchAPI(), new ONNXAPI(), new OpenCVAPI(), new OpenAIGymAPI(), new GodotEngineAPI(), new BlenderFoundationAPI(),
+        new InkscapeAPI(), new GIMPAPI(), new KritaAPI(), new FigmaOpenSimAPI(), new UnrealOpenToolsAPI(), new UnityOpenToolsAPI(),
+        new OpenStreetMapAPI(), new QGISAPI(), new MapLibreAPI(), new LeafletAPI(), new VLCAPI(), new FFmpegAPI(),
+        new OBSStudioAPI(), new WireGuardAPI(), new OpenVPNAPI(), new TorProjectAPI(), new DuckDBAPI(), new ClickHouseAPI(),
+        new MinIOAPI(), new CephAPI(), new OpenStackAPI(), new ProxmoxAPI(), new HomeAssistantAPI(), new OpenHABAPI(),
+        new MatterAPI(), new ZigbeeAPI(), new TensorRTAPI(), new LLVMAPI(), new WebKitAPI(), new ChromiumAPI(),
+        new uBlockOriginAPI(), new BraveShieldsAPI(), new NextcloudAPI(), new OwnCloudAPI(), new MastodonAPI(),
+        new MatrixAPI(), new SignalAPI(), new ApacheAirflowAPI(), new JenkinsAPI(), new DroneCIAPI()
+    ];
+
+    static getAll(): OpenSourceEntity[] {
+        return this.entities;
+    }
+
+    static getById(id: UUID): OpenSourceEntity | undefined {
+        return this.entities.find(e => e.id === id);
+    }
+}
+
+// ================================================================================
+// SECTION 4: UI COMPONENTS & VISUALIZATION LAYER
+// ================================================================================
+
+const THEME = {
+    bg: '#0d1117',
+    fg: '#c9d1d9',
+    border: '#30363d',
+    accent: '#58a6ff',
+    success: '#238636',
+    error: '#da3633',
+    warning: '#d29922',
+    panel: '#161b22',
+    font: '"JetBrains Mono", "Fira Code", monospace'
 };
 
-// 4. Detailed Asset Modal/Sidebar (Simulated)
-const AssetDetailView: React.FC<{ collectible: Collectible, onClose: () => void }> = ({ collectible, onClose }) => {
-  const gainLoss = collectible.currentValuation - collectible.acquisitionPrice;
-  const isGain = gainLoss >= 0;
+const TerminalView: React.FC<{ entity: OpenSourceEntity }> = ({ entity }) => {
+    const [output, setOutput] = useState<string[]>(['> Connection established.', '> Authenticated as guest.']);
+    const [input, setInput] = useState('');
+    const bottomRef = useRef<HTMLDivElement>(null);
 
-  return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      right: 0,
-      width: '40%',
-      height: '100%',
-      backgroundColor: COLORS.card,
-      boxShadow: '-10px 0 30px rgba(0, 0, 0, 0.2)',
-      zIndex: 1000,
-      overflowY: 'auto',
-      padding: '2rem',
-      boxSizing: 'border-box',
-    }}>
-      <button onClick={onClose} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: COLORS.text }}>
-        &times;
-      </button>
-      <h2 style={{ color: COLORS.primary, borderBottom: `3px solid ${COLORS.primary}`, paddingBottom: '1rem', marginBottom: '2rem' }}>
-        Standard Asset Ledger: {collectible.name}
-      </h2>
+    useEffect(() => {
+        if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    }, [output]);
 
-      <img src={collectible.imageUrl} alt={collectible.name} style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1.5rem' }} />
+    const executeCommand = async (cmd: string) => {
+        const newOutput = [...output, `$ ${cmd}`];
+        setOutput(newOutput);
+        
+        let response = '';
+        try {
+            if (cmd === 'help') {
+                response = 'Available commands: status, metrics, ping, exit';
+            } else if (cmd === 'status') {
+                const res = await entity.getHealth();
+                response = JSON.stringify(res.data, null, 2);
+            } else if (cmd === 'metrics') {
+                const res = await entity.getMetrics();
+                response = JSON.stringify(res.data, null, 2);
+            } else if (cmd === 'ping') {
+                response = 'pong';
+            } else {
+                response = `Command not found: ${cmd}`;
+            }
+        } catch (e) {
+            response = 'Error executing command.';
+        }
+        
+        setOutput([...newOutput, response]);
+        setInput('');
+    };
 
-      {/* Core Metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem', padding: '1rem', border: '1px solid #eee', borderRadius: '8px' }}>
-        <div><span style={{ fontWeight: '600' }}>Category:</span> {collectible.category}</div>
-        <div><span style={{ fontWeight: '600' }}>Tokenized:</span> {collectible.isTokenized ? 'Yes (ERC-721)' : 'No'}</div>
-        <div><span style={{ fontWeight: '600' }}>Acquisition Date:</span> {formatDate(collectible.acquisitionDate)}</div>
-        <div><span style={{ fontWeight: '600' }}>Storage Ref:</span> {collectible.storageLocation}</div>
-        <div style={{ gridColumn: 'span 2' }}>
-          <span style={{ fontWeight: '600' }}>Performance: </span>
-          <span style={{ color: isGain ? COLORS.gain : COLORS.loss, fontWeight: 'bold' }}>
-            {formatCurrency(gainLoss)}
-          </span>
-        </div>
-      </div>
-
-      {/* AI Predictive Panel */}
-      <AIPredictivePanel collectible={collectible} />
-
-      {/* Fractionalization Module */}
-      <FractionalizationModule collectible={collectible} />
-
-      {/* Risk Module */}
-      <RiskComplianceModule collectible={collectible} />
-
-      {/* Provenance Blockchain Ledger */}
-      <div style={{ marginTop: '2rem' }}>
-        <h3 style={{ color: COLORS.text, borderBottom: '1px solid #ccc', paddingBottom: '0.5rem' }}>
-          Immutable Provenance Ledger ({collectible.provenance.length} Records)
-        </h3>
-        <div style={{ maxHeight: '300px', overflowY: 'auto', border: '1px solid #eee', padding: '1rem', borderRadius: '4px' }}>
-          {collectible.provenance.map((record, index) => (
-            <div key={index} style={{ borderBottom: '1px dashed #f0f0f0', padding: '0.75rem 0' }}>
-              <p style={{ margin: 0, fontWeight: 'bold' }}>{record.transactionType} on {formatDate(record.date)}</p>
-              <p style={{ margin: '0.2rem 0', fontSize: '0.9rem' }}>Owner: {record.ownerName} | Value: {formatCurrency(record.transactionValue)}</p>
-              <p style={{ margin: 0, fontSize: '0.8rem', color: '#6c757d' }}>Hash: {record.documentHash}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* AI Valuation History */}
-      <div style={{ marginTop: '2rem' }}>
-        <h3 style={{ color: COLORS.text, borderBottom: '1px solid #ccc', paddingBottom: '0.5rem' }}>
-          AI Valuation History
-        </h3>
-        <ul style={{ listStyleType: 'none', padding: 0 }}>
-          {collectible.aiValuations.map((val, index) => (
-            <li key={index} style={{ marginBottom: '0.5rem', padding: '0.5rem', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-              <span style={{ fontWeight: 'bold' }}>{val.modelName}:</span> {formatCurrency(val.predictedValue)} (Confidence: {(val.confidenceScore * 100).toFixed(1)}%)
-              <p style={{ margin: 0, fontSize: '0.8rem', color: '#6c757d' }}>Drivers: {val.keyDrivers.join(', ')}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-    </div>
-  );
-};
-
-// 5. Portfolio Allocation KPI Dashboard
-const PortfolioKPIs: React.FC<{ summary: PortfolioSummary }> = ({ summary }) => {
-  const getRiskColor = (level: RiskLevel) => {
-    switch (level) {
-      case 'Critical': return COLORS.critical;
-      case 'High': return COLORS.loss;
-      case 'Medium': return COLORS.warning;
-      case 'Low': return COLORS.gain;
-      default: return COLORS.text;
-    }
-  };
-
-  const getTrendIcon = (trend: MarketTrend) => {
-    switch (trend) {
-      case 'Bullish': return 'â–²';
-      case 'Bearish': return 'â–¼';
-      default: return 'â€”';
-    }
-  };
-
-  return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(4, 1fr)',
-      gap: '2rem',
-      backgroundColor: COLORS.card,
-      padding: '2rem',
-      borderRadius: '12px',
-      boxShadow: SHADOWS.default,
-      marginBottom: '3rem',
-      border: '1px solid #e2e8f0'
-    }}>
-      {/* Total Current Value */}
-      <div style={{ textAlign: 'center', borderRight: '1px solid #eee' }}>
-        <div style={{ fontSize: '1rem', color: '#718096', marginBottom: '0.5rem' }}>Current Portfolio Value</div>
-        <div style={{ fontSize: '2.5rem', fontWeight: 'extrabold', color: COLORS.primary }}>{formatCurrency(summary.totalCurrentValue)}</div>
-      </div>
-      {/* Portfolio Gain/Loss */}
-      <div style={{ textAlign: 'center', borderRight: '1px solid #eee' }}>
-        <div style={{ fontSize: '1rem', color: '#718096', marginBottom: '0.5rem' }}>Net Performance (YTD)</div>
-        <div style={{
-          fontSize: '2.5rem',
-          fontWeight: 'extrabold',
-          color: summary.totalGainLoss >= 0 ? COLORS.gain : COLORS.loss
+    return (
+        <div style={{ 
+            backgroundColor: '#000', 
+            color: '#0f0', 
+            fontFamily: THEME.font, 
+            padding: '1rem', 
+            height: '300px', 
+            overflowY: 'auto',
+            border: `1px solid ${THEME.border}`,
+            borderRadius: '4px'
         }}>
-          {formatCurrency(summary.totalGainLoss)}
-          <span style={{ fontSize: '1.2rem', marginLeft: '0.5rem' }}>({summary.totalGainLossPercentage.toFixed(2)}%)</span>
-        </div>
-      </div>
-      {/* Overall Risk */}
-      <div style={{ textAlign: 'center', borderRight: '1px solid #eee' }}>
-        <div style={{ fontSize: '1rem', color: '#718096', marginBottom: '0.5rem' }}>AI Calculated Risk Profile</div>
-        <div style={{ fontSize: '2.5rem', fontWeight: 'extrabold', color: getRiskColor(summary.overallRisk) }}>
-          {summary.overallRisk}
-        </div>
-      </div>
-      {/* Market Sentiment */}
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '1rem', color: '#718096', marginBottom: '0.5rem' }}>Global Market Sentiment</div>
-        <div style={{ fontSize: '2.5rem', fontWeight: 'extrabold', color: getRiskColor(summary.marketSentiment === 'Bullish' ? 'Low' : summary.marketSentiment === 'Bearish' ? 'High' : 'Medium') }}>
-          {getTrendIcon(summary.marketSentiment)} {summary.marketSentiment}
-        </div>
-      </div>
-
-      {/* AI Allocation Recommendations (Sub-grid) */}
-      <div style={{ gridColumn: 'span 4', marginTop: '1.5rem', borderTop: '1px solid #eee', paddingTop: '1.5rem' }}>
-        <h4 style={{ color: COLORS.text, marginBottom: '1rem' }}>AI Optimized Allocation Targets:</h4>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', justifyContent: 'space-around' }}>
-          {Object.entries(summary.aiOptimizedAllocation).map(([category, percentage]) => (
-            <div key={category} style={{ textAlign: 'center', minWidth: '120px' }}>
-              <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: COLORS.primary }}>{(percentage as number)?.toFixed(1)}%</div>
-              <div style={{ fontSize: '0.9rem', color: '#6c757d' }}>{category}</div>
+            {output.map((line, i) => <div key={i} style={{ whiteSpace: 'pre-wrap', marginBottom: '0.5rem' }}>{line}</div>)}
+            <div style={{ display: 'flex' }}>
+                <span>$ </span>
+                <input 
+                    type="text" 
+                    value={input} 
+                    onChange={e => setInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && executeCommand(input)}
+                    style={{ 
+                        background: 'transparent', 
+                        border: 'none', 
+                        color: '#0f0', 
+                        flex: 1, 
+                        outline: 'none',
+                        fontFamily: THEME.font
+                    }}
+                    autoFocus
+                />
             </div>
-          ))}
+            <div ref={bottomRef} />
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
-// 6. Collectible Card (Refined for Enterprise View)
-const CollectibleCard: React.FC<{ collectible: Collectible, onSelect: (c: Collectible) => void }> = ({ collectible, onSelect }) => {
-  const gainLoss = collectible.currentValuation - collectible.acquisitionPrice;
-  const gainLossPercentage = collectible.acquisitionPrice === 0 ? 0 : (gainLoss / collectible.acquisitionPrice) * 100;
-  const isGain = gainLoss >= 0;
-
-  const getRiskTagStyle = (level: RiskLevel) => {
-    switch (level) {
-      case 'Critical': return { backgroundColor: COLORS.critical, color: COLORS.card };
-      case 'High': return { backgroundColor: COLORS.loss, color: COLORS.card };
-      case 'Medium': return { backgroundColor: COLORS.warning, color: COLORS.text };
-      case 'Low': return { backgroundColor: COLORS.gain, color: COLORS.card };
-      default: return { backgroundColor: '#ccc', color: COLORS.text };
-    }
-  };
-
-  return (
-    <div
-      onClick={() => onSelect(collectible)}
-      style={{
-        backgroundColor: COLORS.card,
-        borderRadius: '16px',
-        boxShadow: SHADOWS.default,
-        overflow: 'hidden',
-        transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
-        display: 'flex',
-        flexDirection: 'column',
-        cursor: 'pointer',
-        border: '1px solid #edf2f7',
-        minHeight: '450px'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-5px) scale(1.01)';
-        e.currentTarget.style.boxShadow = SHADOWS.hover;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0) scale(1)';
-        e.currentTarget.style.boxShadow = SHADOWS.default;
-      }}
-    >
-      {/* Image and Risk Tag */}
-      <div style={{ position: 'relative' }}>
-        <div
-          style={{
-            height: '180px',
-            background: !collectible.imageUrl.startsWith('http')
-              ? collectible.imageUrl
-              : `url(${collectible.imageUrl})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            textAlign: 'center',
-            padding: '1rem',
-          }}
+const EntityCard: React.FC<{ entity: OpenSourceEntity, onClick: () => void }> = ({ entity, onClick }) => {
+    return (
+        <div 
+            onClick={onClick}
+            style={{
+                backgroundColor: THEME.panel,
+                border: `1px solid ${THEME.border}`,
+                borderRadius: '6px',
+                padding: '1rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.5rem'
+            }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = THEME.accent}
+            onMouseLeave={e => e.currentTarget.style.borderColor = THEME.border}
         >
-          {!collectible.imageUrl.startsWith('http') && (
-            <span style={{
-              fontSize: '1.5rem',
-              fontWeight: 'bold',
-              textShadow: '0 2px 5px rgba(0, 0, 0, 0.6)',
-            }}>
-              {collectible.name}
-            </span>
-          )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ margin: 0, fontSize: '1rem', color: THEME.accent }}>{entity.name}</h3>
+                <span style={{ 
+                    fontSize: '0.7rem', 
+                    padding: '2px 6px', 
+                    borderRadius: '10px', 
+                    backgroundColor: entity.status === 'OPERATIONAL' ? 'rgba(35, 134, 54, 0.2)' : 'rgba(218, 54, 51, 0.2)',
+                    color: entity.status === 'OPERATIONAL' ? THEME.success : THEME.error
+                }}>
+                    {entity.status}
+                </span>
+            </div>
+            <div style={{ fontSize: '0.8rem', color: '#8b949e' }}>
+                {entity.category} | v{entity.version}
+            </div>
+            <div style={{ fontSize: '0.8rem', color: '#8b949e' }}>
+                Val: ${entity.marketValue.toLocaleString()}
+            </div>
         </div>
-        <span style={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          padding: '0.3rem 0.7rem',
-          borderRadius: '15px',
-          fontSize: '0.8rem',
-          fontWeight: 'bold',
-          ...getRiskTagStyle(collectible.riskProfile.riskLevel)
-        }}>
-          Risk: {collectible.riskProfile.riskLevel}
-        </span>
-      </div>
-
-      <div style={{ padding: '1.5rem', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <h3 style={{ fontSize: '1.4rem', fontWeight: '700', marginBottom: '0.5rem', color: COLORS.text }}>
-          {collectible.name}
-        </h3>
-        <p style={{ fontSize: '0.9rem', color: '#718096', marginBottom: '1rem' }}>
-          {collectible.category} | ID: {collectible.id}
-        </p>
-
-        {/* Valuation Summary */}
-        <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid #edf2f7' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <span style={{ fontSize: '1rem', color: '#718096' }}>Acquired:</span>
-            <span style={{ fontSize: '1.1rem', fontWeight: '600', color: '#4a5568' }}>{formatCurrency(collectible.acquisitionPrice)}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: COLORS.text }}>Current Value:</span>
-            <span style={{ fontSize: '1.3rem', fontWeight: 'bold', color: COLORS.primary }}>{formatCurrency(collectible.currentValuation)}</span>
-          </div>
-          {/* Gain/Loss Indicator */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '0.75rem 1rem',
-            borderRadius: '8px',
-            backgroundColor: isGain ? 'rgba(25, 135, 84, 0.1)' : 'rgba(220, 53, 69, 0.1)',
-          }}>
-            <span style={{ fontSize: '1rem', fontWeight: 'bold', color: isGain ? COLORS.gain : COLORS.loss }}>
-              {isGain ? 'Net Gain' : 'Net Loss'}
-            </span>
-            <span style={{ fontSize: '1rem', fontWeight: 'bold', color: isGain ? COLORS.gain : COLORS.loss }}>
-              {formatCurrency(gainLoss)} ({gainLossPercentage.toFixed(2)}%)
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
+const Dashboard: React.FC<{ packet: SimulationPacket }> = ({ packet }) => {
+    return (
+        <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(4, 1fr)', 
+            gap: '1rem', 
+            marginBottom: '2rem' 
+        }}>
+            <div style={{ background: THEME.panel, padding: '1rem', borderRadius: '6px', border: `1px solid ${THEME.border}` }}>
+                <div style={{ color: '#8b949e', fontSize: '0.8rem' }}>Global Tick</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{packet.tick}</div>
+            </div>
+            <div style={{ background: THEME.panel, padding: '1rem', borderRadius: '6px', border: `1px solid ${THEME.border}` }}>
+                <div style={{ color: '#8b949e', fontSize: '0.8rem' }}>Entropy Level</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: THEME.warning }}>{(packet.entropy * 100).toFixed(2)}%</div>
+            </div>
+            <div style={{ background: THEME.panel, padding: '1rem', borderRadius: '6px', border: `1px solid ${THEME.border}` }}>
+                <div style={{ color: '#8b949e', fontSize: '0.8rem' }}>Compute Load</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: THEME.accent }}>{(packet.globalComputeLoad * 100).toFixed(1)}%</div>
+            </div>
+            <div style={{ background: THEME.panel, padding: '1rem', borderRadius: '6px', border: `1px solid ${THEME.border}` }}>
+                <div style={{ color: '#8b949e', fontSize: '0.8rem' }}>Threat Level</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: packet.securityThreatLevel === 'LOW' ? THEME.success : THEME.error }}>
+                    {packet.securityThreatLevel}
+                </div>
+            </div>
+        </div>
+    );
+};
 
-// --- MAIN COMPONENT: ARTCOLLECTIBLES (The Legacy OS Module) ---
+// ================================================================================
+// SECTION 5: MAIN APPLICATION COMPONENT
+// ================================================================================
 
 const ArtCollectibles: React.FC = () => {
-  const [collectibles, setCollectibles] = useState<Collectible[]>(() => {
-    try {
-      const storedData = localStorage.getItem('legacyAssets');
-      return storedData ? JSON.parse(storedData) : mockCollectibles;
-    } catch (error) {
-      console.error("Failed to load legacy assets from localStorage", error);
-      return mockCollectibles;
-    }
-  });
-
-  const [selectedCollectible, setSelectedCollectible] = useState<Collectible | null>(null);
-  const [filterCategory, setFilterCategory] = useState<CollectibleCategory | 'All'>('All');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'name' | 'value' | 'risk'>('value');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-
-  // Effect to save collectibles to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem('legacyAssets', JSON.stringify(collectibles));
-    } catch (error) {
-      console.error("Failed to save legacy assets to localStorage", error);
-    }
-  }, [collectibles]);
-
-  // Calculate Portfolio Summary (KPIs)
-  const totalAcquisitionValue = collectibles.reduce((sum, c) => sum + c.acquisitionPrice, 0);
-  const totalCurrentValue = collectibles.reduce((sum, c) => sum + c.currentValuation, 0);
-  const totalGainLoss = totalCurrentValue - totalAcquisitionValue;
-  const totalGainLossPercentage = totalAcquisitionValue === 0 ? 0 : (totalGainLoss / totalAcquisitionValue) * 100;
-
-  // Simulated AI Allocation and Risk Calculation for Summary
-  const calculatePortfolioSummary = (): PortfolioSummary => {
-    const categoryValues = collectibles.reduce((acc, c) => {
-      acc[c.category] = (acc[c.category] || 0) + c.currentValuation;
-      return acc;
-    }, {} as { [key in CollectibleCategory]?: number });
-
-    const aiOptimizedAllocation: { [key in CollectibleCategory]?: number } = {};
-    Object.keys(categoryValues).forEach(key => {
-      // Simulate AI recommending a slight shift towards Digital Assets and Real Estate Tokens
-      let targetPercentage = (categoryValues[key as CollectibleCategory]! / totalCurrentValue) * 100;
-      if (key === 'Digital Asset') targetPercentage += 5;
-      if (key === 'Real Estate Token') targetPercentage += 3;
-      aiOptimizedAllocation[key as CollectibleCategory] = targetPercentage;
+    const [packet, setPacket] = useState<SimulationPacket>({
+        tick: 0,
+        entropy: 0,
+        globalComputeLoad: 0.2,
+        activeContributors: 100000,
+        securityThreatLevel: 'LOW'
     });
 
-    // Determine overall risk based on weighted average of asset risks
-    const highRiskCount = collectibles.filter(c => c.riskProfile.riskLevel === 'High' || c.riskProfile.riskLevel === 'Critical').length;
-    let overallRisk: RiskLevel = 'Low';
-    if (highRiskCount > collectibles.length * 0.2) overallRisk = 'High';
-    if (highRiskCount > collectibles.length * 0.4) overallRisk = 'Critical';
-    if (highRiskCount > 0 && overallRisk === 'Low') overallRisk = 'Medium';
+    const [selectedEntity, setSelectedEntity] = useState<OpenSourceEntity | null>(null);
+    const [filter, setFilter] = useState<string>('ALL');
+    const [searchTerm, setSearchTerm] = useState('');
 
-    // Simulate global market sentiment based on total performance
-    let marketSentiment: MarketTrend = 'Neutral';
-    if (totalGainLossPercentage > 15) marketSentiment = 'Bullish';
-    if (totalGainLossPercentage < -5) marketSentiment = 'Bearish';
+    // The Simulation Loop
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setPacket(prev => {
+                const newTick = prev.tick + 1;
+                const newEntropy = UniverseMath.perlinNoise(newTick * 0.05);
+                
+                // Update all entities
+                UniverseRegistry.getAll().forEach(entity => entity.tick({
+                    ...prev,
+                    tick: newTick,
+                    entropy: newEntropy
+                }));
 
-    return {
-      totalAcquisitionValue,
-      totalCurrentValue,
-      totalGainLoss,
-      totalGainLossPercentage,
-      aiOptimizedAllocation,
-      overallRisk,
-      marketSentiment,
-    };
-  };
+                return {
+                    tick: newTick,
+                    entropy: Math.abs(newEntropy),
+                    globalComputeLoad: Math.min(1, Math.max(0, prev.globalComputeLoad + (Math.random() - 0.5) * 0.05)),
+                    activeContributors: prev.activeContributors + UniverseMath.randomInt(-100, 200),
+                    securityThreatLevel: newEntropy > 0.8 ? 'HIGH' : newEntropy > 0.5 ? 'MODERATE' : 'LOW'
+                };
+            });
+        }, 1000); // 1 second per tick
 
-  const portfolioSummary = calculatePortfolioSummary();
+        return () => clearInterval(interval);
+    }, []);
 
-  // Filtering Logic
-  const filteredCollectibles = collectibles.filter(c => {
-    const categoryMatch = filterCategory === 'All' || c.category === filterCategory;
-    const searchMatch = c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        c.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        c.id.toLowerCase().includes(searchTerm.toLowerCase());
-    return categoryMatch && searchMatch;
-  });
+    const entities = UniverseRegistry.getAll();
+    const filteredEntities = entities.filter(e => {
+        const matchesCategory = filter === 'ALL' || e.category === filter;
+        const matchesSearch = e.name.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
 
-  // Sorting Logic
-  const sortedCollectibles = filteredCollectibles.sort((a, b) => {
-    let comparison = 0;
-    if (sortBy === 'name') {
-      comparison = a.name.localeCompare(b.name);
-    } else if (sortBy === 'value') {
-      comparison = a.currentValuation - b.currentValuation;
-    } else if (sortBy === 'risk') {
-      const riskOrder = { 'Low': 1, 'Medium': 2, 'High': 3, 'Critical': 4 };
-      comparison = riskOrder[a.riskProfile.riskLevel] - riskOrder[b.riskProfile.riskLevel];
-    }
+    const categories = Array.from(new Set(entities.map(e => e.category)));
 
-    return sortDirection === 'asc' ? comparison : -comparison;
-  });
-
-  const handleSelectCollectible = (collectible: Collectible) => {
-    setSelectedCollectible(collectible);
-  };
-
-  const handleCloseDetailView = () => {
-    setSelectedCollectible(null);
-  };
-
-  // Available categories for filtering
-  const availableCategories: CollectibleCategory[] = ['Fine Art', 'Vintage Wine', 'Rare Collectible', 'Luxury Watch', 'Digital Asset', 'Real Estate Token', 'Precious Metal'];
-
-  // --- RENDER LOGIC (Massive UI Structure) ---
-
-  return (
-    <div style={{
-      fontFamily: '"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-      color: COLORS.text,
-      padding: '2rem',
-      backgroundColor: COLORS.background,
-      minHeight: '100vh',
-      boxSizing: 'border-box',
-      position: 'relative'
-    }}>
-      {/* Global Header and Title */}
-      <header style={{ marginBottom: '2rem', borderBottom: '1px solid #ccc', paddingBottom: '1rem' }}>
-        <h1 style={{
-          fontSize: '3rem',
-          fontWeight: '900',
-          color: COLORS.primary,
-          textAlign: 'left',
-          textShadow: '1px 1px 3px rgba(0,0,0,0.1)'
+    return (
+        <div style={{ 
+            backgroundColor: THEME.bg, 
+            color: THEME.fg, 
+            minHeight: '100vh', 
+            fontFamily: THEME.font,
+            padding: '2rem',
+            boxSizing: 'border-box'
         }}>
-          Standard Asset Management Platform (SAMP)
-        </h1>
-        <p style={{ fontSize: '1.2rem', color: '#6c757d' }}>
-          Manual Portfolio of Random Assets. Operational Status: Highly Unstable.
-        </p>
-      </header>
+            <header style={{ marginBottom: '2rem', borderBottom: `1px solid ${THEME.border}`, paddingBottom: '1rem' }}>
+                <h1 style={{ margin: 0, color: THEME.accent }}>OMNIVERSE // OPEN SOURCE SIMULATION</h1>
+                <p style={{ margin: '0.5rem 0 0 0', color: '#8b949e' }}>
+                    Real-time simulation of {entities.length} technological assets.
+                </p>
+            </header>
 
-      {/* Portfolio Summary KPI Dashboard */}
-      <PortfolioKPIs summary={portfolioSummary} />
+            <Dashboard packet={packet} />
 
-      {/* Control Panel: Filtering, Sorting, and Search */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        gap: '1.5rem',
-        backgroundColor: COLORS.card,
-        padding: '1.5rem',
-        borderRadius: '8px',
-        boxShadow: SHADOWS.default,
-        marginBottom: '2rem',
-        flexWrap: 'wrap'
-      }}>
-        {/* Search Bar */}
-        <input
-          type="text"
-          placeholder="Search Asset Name or ID..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            flexGrow: 1,
-            minWidth: '200px',
-            padding: '0.75rem',
-            borderRadius: '4px',
-            border: '1px solid #ccc',
-            fontSize: '1rem'
-          }}
-        />
+            <div style={{ display: 'flex', gap: '2rem' }}>
+                {/* LEFT COLUMN: ENTITY LIST */}
+                <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                        <input 
+                            type="text" 
+                            placeholder="Search entities..." 
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                            style={{ 
+                                flex: 1, 
+                                padding: '0.5rem', 
+                                background: THEME.panel, 
+                                border: `1px solid ${THEME.border}`, 
+                                color: THEME.fg,
+                                borderRadius: '4px'
+                            }}
+                        />
+                        <select 
+                            value={filter} 
+                            onChange={e => setFilter(e.target.value)}
+                            style={{ 
+                                padding: '0.5rem', 
+                                background: THEME.panel, 
+                                border: `1px solid ${THEME.border}`, 
+                                color: THEME.fg,
+                                borderRadius: '4px'
+                            }}
+                        >
+                            <option value="ALL">All Categories</option>
+                            {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                    </div>
 
-        {/* Category Filter */}
-        <select
-          value={filterCategory}
-          onChange={(e) => setFilterCategory(e.target.value as CollectibleCategory | 'All')}
-          style={{ padding: '0.75rem', borderRadius: '4px', border: '1px solid #ccc', minWidth: '150px' }}
-        >
-          <option value="All">All Categories ({collectibles.length})</option>
-          {availableCategories.map(cat => (
-            <option key={cat} value={cat}>
-              {cat} ({collectibles.filter(c => c.category === cat).length})
-            </option>
-          ))}
-        </select>
+                    <div style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
+                        gap: '1rem',
+                        maxHeight: '600px',
+                        overflowY: 'auto',
+                        paddingRight: '0.5rem'
+                    }}>
+                        {filteredEntities.map(entity => (
+                            <EntityCard 
+                                key={entity.id} 
+                                entity={entity} 
+                                onClick={() => setSelectedEntity(entity)} 
+                            />
+                        ))}
+                    </div>
+                </div>
 
-        {/* Sort By */}
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as 'name' | 'value' | 'risk')}
-          style={{ padding: '0.75rem', borderRadius: '4px', border: '1px solid #ccc', minWidth: '120px' }}
-        >
-          <option value="value">Sort by Value</option>
-          <option value="risk">Sort by Risk</option>
-          <option value="name">Sort by Name</option>
-        </select>
+                {/* RIGHT COLUMN: DETAIL VIEW */}
+                <div style={{ flex: 1, background: THEME.panel, border: `1px solid ${THEME.border}`, borderRadius: '6px', padding: '1.5rem' }}>
+                    {selectedEntity ? (
+                        <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1.5rem' }}>
+                                <div>
+                                    <h2 style={{ margin: 0, color: THEME.accent }}>{selectedEntity.name}</h2>
+                                    <div style={{ color: '#8b949e', marginTop: '0.5rem' }}>ID: {selectedEntity.id}</div>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>${selectedEntity.marketValue.toLocaleString()}</div>
+                                    <div style={{ color: THEME.success, fontSize: '0.8rem' }}>+{(Math.random() * 5).toFixed(2)}% (24h)</div>
+                                </div>
+                            </div>
 
-        {/* Sort Direction Toggle */}
-        <button
-          onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
-          style={{
-            padding: '0.75rem 1rem',
-            backgroundColor: COLORS.primary,
-            color: COLORS.card,
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
-        >
-          {sortDirection === 'asc' ? 'ASC \u2191' : 'DESC \u2193'}
-        </button>
-      </div>
+                            <div style={{ marginBottom: '2rem' }}>
+                                <h3 style={{ fontSize: '1rem', borderBottom: `1px solid ${THEME.border}`, paddingBottom: '0.5rem' }}>System Terminal</h3>
+                                <TerminalView entity={selectedEntity} />
+                            </div>
 
-      {/* Asset Gallery Grid */}
-      <h2 style={{ color: COLORS.text, marginBottom: '1.5rem', borderLeft: `5px solid ${COLORS.secondary}`, paddingLeft: '1rem' }}>
-        Asset Inventory ({sortedCollectibles.length} Items)
-      </h2>
-
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-        gap: '2rem',
-        paddingBottom: '5rem' // Space for the broken detail view
-      }}>
-        {sortedCollectibles.length > 0 ? (
-          sortedCollectibles.map((collectible) => (
-            <CollectibleCard
-              key={collectible.id}
-              collectible={collectible}
-              onSelect={handleSelectCollectible}
-            />
-          ))
-        ) : (
-          <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem', color: '#6c757d' }}>
-            No assets match the current filter criteria. Adjust search parameters.
-          </div>
-        )}
-      </div>
-
-      {/* Detailed Asset View (Sidebar/Modal) */}
-      {selectedCollectible && (
-        <AssetDetailView
-          collectible={selectedCollectible}
-          onClose={handleCloseDetailView}
-        />
-      )}
-
-      {/* Footer/System Status (Simulated 1-day OS instability) */}
-      <footer style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        width: '100%',
-        backgroundColor: COLORS.primary,
-        color: COLORS.card,
-        padding: '0.5rem 2rem',
-        fontSize: '0.8rem',
-        textAlign: 'center',
-        boxShadow: '0 -2px 10px rgba(0,0,0,0.1)'
-      }}>
-        Legacy Operating System v1.0.0 | AI Core Status: Failed | Compliance Ledger: Desynchronized | Epoch: 1999-2000
-      </footer>
-    </div>
-  );
+                            <div>
+                                <h3 style={{ fontSize: '1rem', borderBottom: `1px solid ${THEME.border}`, paddingBottom: '0.5rem' }}>Recent Logs</h3>
+                                <div style={{ 
+                                    background: '#000', 
+                                    padding: '1rem', 
+                                    borderRadius: '4px', 
+                                    height: '200px', 
+                                    overflowY: 'auto',
+                                    fontSize: '0.8rem',
+                                    fontFamily: THEME.font
+                                }}>
+                                    {selectedEntity.logs.map(log => (
+                                        <div key={log.id} style={{ marginBottom: '0.5rem' }}>
+                                            <span style={{ color: '#8b949e' }}>[{log.timestamp.split('T')[1].split('.')[0]}]</span>
+                                            <span style={{ 
+                                                color: log.level === 'ERROR' ? THEME.error : log.level === 'WARN' ? THEME.warning : THEME.success,
+                                                fontWeight: 'bold',
+                                                margin: '0 0.5rem'
+                                            }}>
+                                                {log.level}
+                                            </span>
+                                            <span>{log.message}</span>
+                                        </div>
+                                    ))}
+                                    {selectedEntity.logs.length === 0 && <div style={{ color: '#8b949e' }}>No logs available.</div>}
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8b949e' }}>
+                            Select an entity to view details and interact with its API.
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default ArtCollectibles;
