@@ -1,5 +1,6 @@
 import React, { useState, useEffect, createContext, useContext, useCallback } from 'react';
-import { AccountsAPI, MoneyMovementAPI } from '../api/CitibankSDK'; // Assuming SDK files are in '../api/CitibankSDK'
+import { AccountsAPI } from './CitibankAccountsView';
+import { MoneyMovementAPI } from './CitibankMoneyMovementSDK';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 
