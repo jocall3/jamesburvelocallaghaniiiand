@@ -25,7 +25,7 @@ const UUID = () => {
 const Random = {
   float: (min: number, max: number) => Math.random() * (max - min) + min,
   int: (min: number, max: number) => Math.floor(Math.random() * (max - min + 1) + min),
-  choice: <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)],
+  choice: <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)],
   bool: (chance: number = 0.5) => Math.random() < chance,
   date: (start: Date, end: Date) => new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())),
   series: (length: number, generator: (i: number) => any) => Array.from({ length }, (_, i) => generator(i)),
@@ -765,11 +765,11 @@ const AccountDetailsView: React.FC<{ provider: OpenSourceProvider }> = ({ provid
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         color: tx.type === 'donation' ? Color.theme.secondary : Color.theme.primary
                       }}>
-                        {tx.type === 'donation' ? '+' : 'â†’'}
+                        {tx.type === 'donation' ? '+' : '→'}
                       </div>
                       <div>
                         <Text weight={600} size={14} style={{ display: 'block' }}>{tx.type.charAt(0).toUpperCase() + tx.type.slice(1)}</Text>
-                        <Text size={12} color={Color.theme.textMuted}>{Time.ago(tx.timestamp)} â€¢ {tx.hash}</Text>
+                        <Text size={12} color={Color.theme.textMuted}>{Time.ago(tx.timestamp)} • {tx.hash}</Text>
                       </div>
                     </Flex>
                     <Text weight={600} color={tx.type === 'donation' ? Color.theme.secondary : Color.theme.dark}>
