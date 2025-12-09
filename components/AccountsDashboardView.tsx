@@ -100,7 +100,7 @@ const Utils = {
   
   randomFloat: (min: number, max: number): number => Math.random() * (max - min) + min,
   
-  pick: <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)],
+  pick: <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)],
   
   sleep: (ms: number) => new Promise(resolve => setTimeout(resolve, ms)),
   
