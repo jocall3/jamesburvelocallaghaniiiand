@@ -624,7 +624,7 @@ namespace ApiUniverse {
             this.data.cloudImages = ['ami-12345', 'gce-ubuntu-2404'];
         }
         getLTSRelease(apiKey: string) { return this.handle(apiKey, () => this.data.releases.find((r: any) => r.lts)); }
-        listCloudImages(apiKey: string, cloud: 'aws' | 'gcp') { return this.handle(apiKey, (c: string) => this.data.cloudImages.filter((i: string) => i.startsWith(c.slice(0, 3)))), cloud); }
+        listCloudImages(apiKey: string, cloud: 'aws' | 'gcp') { return this.handle(apiKey, (c: string) => this.data.cloudImages.filter((i: string) => i.startsWith(c.slice(0, 3))), cloud); }
         getProStatus(apiKey: string, machineId: string) { return this.handle(apiKey, (id: string) => ({ machineId: id, pro: true, expires: '2025-01-01' }), machineId); }
         launchInstance(apiKey: string, region: string) { return this.handle(apiKey, (r: string) => ({ instanceId: `i-${Math.random().toString(16).slice(2)}`, region: r, status: 'pending' }), region); }
         getSecurityNotices(apiKey: string) { return this.handle(apiKey, () => [{ USN: 'USN-5811-1', package: 'openssl', severity: 'high' }]); }
@@ -655,9 +655,9 @@ namespace ApiUniverse {
         }
         getCurrentRelease(apiKey: string) { return this.handle(apiKey, () => this.data.releases[0]); }
         getPackageInfo(apiKey: string, packageName: string) { return this.handle(apiKey, (pkg: string) => ({ name: pkg, version: '1.2.3', repo: 'updates' }), packageName); }
-        getMirrorList(apiKey: string, arch: string) { return this.handle(apiKey, (a: string) => [`https://mirrors.fedoraproject.org/metalink?repo=fedora-40&arch=${a}`]), arch); }
+        getMirrorList(apiKey: string, arch: string) { return this.handle(apiKey, (a: string) => [`https://mirrors.fedoraproject.org/metalink?repo=fedora-40&arch=${a}`], arch); }
         getBodhiUpdateStatus(apiKey: string, updateId: string) { return this.handle(apiKey, (id: string) => ({ id, status: 'stable', karma: 5 }), updateId); }
-        searchCopr(apiKey: string, query: string) { return this.handle(apiKey, (q: string) => [{ owner: '@copr', name: `${q}-repo` }]), query); }
+        searchCopr(apiKey: string, query: string) { return this.handle(apiKey, (q: string) => [{ owner: '@copr', name: `${q}-repo` }], query); }
     }
     export const fedoraProjectAPI = new FedoraProjectAPI();
 
@@ -671,7 +671,7 @@ namespace ApiUniverse {
         getStableRelease(apiKey: string) { return this.handle(apiKey, () => this.data.releases.find((r: any) => r.status === 'stable')); }
         getPackageVersion(apiKey: string, pkg: string) { return this.handle(apiKey, (p: string) => ({ package: p, version: this.data.packages[p] || 'not found' }), pkg); }
         getSecurityAdvisory(apiKey: string, dsaId: string) { return this.handle(apiKey, (id: string) => ({ id, package: 'linux', severity: 'high' }), dsaId); }
-        listPopcon(apiKey: string, limit: number) { return this.handle(apiKey, (l: number) => [{ package: 'bash', rank: 1 }, { package: 'coreutils', rank: 2 }].slice(0, l)), limit); }
+        listPopcon(apiKey: string, limit: number) { return this.handle(apiKey, (l: number) => [{ package: 'bash', rank: 1 }, { package: 'coreutils', rank: 2 }].slice(0, l), limit); }
         searchBug(apiKey: string, bugNumber: number) { return this.handle(apiKey, (n: number) => ({ id: n, package: 'apt', status: 'fixed' }), bugNumber); }
     }
     export const debianAPI = new DebianAPI();
@@ -705,7 +705,7 @@ namespace ApiUniverse {
         listNodes(apiKey: string) { return this.handle(apiKey, () => this.data.nodes); }
         listPods(apiKey: string, namespace: string) { return this.handle(apiKey, (ns: string) => this.data.pods.filter((p: any) => p.namespace === ns), namespace); }
         createDeployment(apiKey: string, manifest: object) { return this.handle(apiKey, (m: any) => ({ name: m.metadata.name, status: 'created' }), manifest); }
-        getLogs(apiKey: string, podName: string) { return this.handle(apiKey, (p: string) => `Logs for pod ${p}...`), podName); }
+        getLogs(apiKey: string, podName: string) { return this.handle(apiKey, (p: string) => `Logs for pod ${p}...`, podName); }
         scaleDeployment(apiKey: string, name: string, replicas: number) { return this.handle(apiKey, (n: string, r: number) => ({ name: n, replicas: r, status: 'scaling' }), name, replicas); }
     }
     export const kubernetesAPI = new KubernetesAPI();
@@ -748,7 +748,7 @@ namespace ApiUniverse {
         inference(apiKey: string, modelId: string, inputs: any) { return this.handle(apiKey, (id: string, i: any) => ({ model: id, output: `Generated text for: ${i.inputs}` }), modelId, inputs); }
         downloadModel(apiKey: string, modelId: string) { return this.handle(apiKey, (id: string) => ({ status: 'downloading', model: id }), modelId); }
         listSpaces(apiKey: string) { return this.handle(apiKey, () => [{ id: 'user/my-space', status: 'running' }]); }
-        getCommunityDiscussions(apiKey: string, modelId: string) { return this.handle(apiKey, (id: string) => [{ title: `How to fine-tune ${id}?`, author: 'user1' }]), modelId); }
+        getCommunityDiscussions(apiKey: string, modelId: string) { return this.handle(apiKey, (id: string) => [{ title: `How to fine-tune ${id}?`, author: 'user1' }], modelId); }
     }
     export const huggingFaceAPI = new HuggingFaceAPI();
 
@@ -760,8 +760,8 @@ namespace ApiUniverse {
         }
         getRepoBuilds(apiKey: string, repo: string) { return this.handle(apiKey, (r: string) => this.data.repos[r]?.builds || [], repo); }
         triggerBuild(apiKey: string, repo: string) { return this.handle(apiKey, (r: string) => { const newBuild = { id: 2, status: 'pending' }; this.data.repos[r].builds.push(newBuild); return newBuild; }, repo); }
-        getBuildLogs(apiKey: string, repo: string, buildId: number) { return this.handle(apiKey, (r: string, id: number) => `Logs for build ${id}...`), repo, buildId); }
-        listSecrets(apiKey: string, repo: string) { return this.handle(apiKey, (r: string) => [{ name: 'DOCKER_USERNAME' }]), repo); }
+        getBuildLogs(apiKey: string, repo: string, buildId: number) { return this.handle(apiKey, (r: string, id: number) => `Logs for build ${id}...`, repo, buildId); }
+        listSecrets(apiKey: string, repo: string) { return this.handle(apiKey, (r: string) => [{ name: 'DOCKER_USERNAME' }], repo); }
         createSecret(apiKey: string, repo: string, name: string, value: string) { return this.handle(apiKey, (r: string, n: string, v: string) => ({ status: 'created', secret: n }), repo, name, value); }
     }
     export const droneCIAPI = new DroneCIAPI();
