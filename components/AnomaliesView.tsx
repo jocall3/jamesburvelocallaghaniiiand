@@ -22,7 +22,7 @@ const U = {
     }),
     rand: (min: number, max: number) => Math.random() * (max - min) + min,
     randInt: (min: number, max: number) => Math.floor(Math.random() * (max - min + 1) + min),
-    pick: <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)],
+    pick: <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)],
     clamp: (val: number, min: number, max: number) => Math.min(Math.max(val, min), max),
     now: () => new Date().toISOString(),
     hash: (str: string) => {
