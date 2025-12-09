@@ -1,3 +1,91 @@
+import React, { useEffect, useState } from 'react';
+
+// --- Mocks and Definitions to ensure compilation and runtime safety ---
+
+interface BaseUniverseDataStore<T> {
+    query(predicate: (item: T) => boolean): T[];
+    create(item: T): T;
+}
+
+const universeLogger = {
+    warn: (msg: string) => console.warn(`[WARN] ${msg}`),
+    info: (msg: string) => console.log(`[INFO] ${msg}`),
+    critical: (msg: string) => console.error(`[CRITICAL] ${msg}`),
+    setLogLevel: (level: string) => {},
+    getRecentLogs: (count: number) => ['Log 1', 'Log 2'] as string[],
+};
+
+const universeTime = {
+    formatDuration: (ms: number) => `${ms}ms`,
+    getCurrentTimestamp: () => Date.now(),
+    getISODate: () => new Date().toISOString(),
+};
+
+const universeUUID = {
+    generate: () => 'uuid-' + Math.random().toString(36).substr(2, 9),
+};
+
+const universeEventBus = {
+    publish: (event: string, data: any) => console.log('Event:', event, data),
+};
+
+const universalLedgerSystem = {
+    verifyLedgerIntegrity: () => true,
+};
+
+const economicSimulationEngine = {
+    startSimulation: () => {},
+    getSimulationSpeed: () => 1,
+};
+
+const paymentProcessor = {};
+const regulatoryComplianceEngine = {};
+
+const aiAgentSystem = {
+    startAgentProcessing: () => {},
+};
+
+const aiAgentDataStore = {
+    query: (predicate: any) => [] as any[],
+};
+
+const cloudResourceDataStore = {
+    create: (item: any) => item,
+};
+
+const universeAuth = {
+    hasRole: (auth: any, role: string) => true,
+};
+
+const universePersonalizationManager = {
+    getSetting: (userId: string, key: string, defaultVal: any) => defaultVal,
+    setSetting: (userId: string, key: string, val: any) => {},
+};
+
+const API_ERROR_RESPONSES = {
+    FORBIDDEN: { error: 'Forbidden' },
+    UNAUTHORIZED: { error: 'Unauthorized' },
+    BAD_REQUEST: { error: 'Bad Request' },
+};
+
+class UniverseAPIManager {
+    private apis: Map<string, any> = new Map();
+    registerAPI(api: any) { this.apis.set(api.name, api); }
+    getAllAPIs() { return this.apis; }
+}
+const universeAPIManager = new UniverseAPIManager();
+
+class UniverseNavigator {
+    registerRoute(route: any) {}
+}
+
+const UniverseUI = {
+    universeNavigator: new UniverseNavigator(),
+    DashboardScene: () => null,
+    APIDocsScene: () => null,
+    SettingsScene: () => null,
+};
+
 // --- Start of THE EVOLUTIONARY UNIVERSE-FORGE ---
 
 // This file represents a self-contained, 10,000+ line, universe-scale system
@@ -64,10 +152,10 @@ class UniverseForge {
         universeLogger.info('Core utilities (Logger, UUID, Crypto, Time, EventBus, Auth, RateLimiter) initialized.');
 
         // Initialize internal logic core systems
-        universalLedgerSystem; // Access to trigger constructor
+        // universalLedgerSystem; // Access to trigger constructor
         economicSimulationEngine.startSimulation();
-        paymentProcessor; // Access to trigger constructor
-        regulatoryComplianceEngine; // Access to trigger constructor
+        // paymentProcessor; // Access to trigger constructor
+        // regulatoryComplianceEngine; // Access to trigger constructor
         aiAgentSystem.startAgentProcessing();
         universeLogger.info('Internal Logic Core systems initialized and started.');
 
@@ -102,12 +190,12 @@ class UniverseForge {
                     method: 'GET',
                     description: 'Retrieves the overall status of the financial core system.',
                     authRequired: false,
-                    logic: async (auth, params, body) => {
+                    logic: async (auth: any, params: any, body: any) => {
                         return {
                             status: 'operational',
                             uptime: universeTime.formatDuration(universeTime.getCurrentTimestamp() - UniverseForge.START_TIME),
                             ledgerIntegrity: universalLedgerSystem.verifyLedgerIntegrity(),
-                            activeAgents: aiAgentDataStore.query(a => a.status === 'active').length,
+                            activeAgents: aiAgentDataStore.query((a: any) => a.status === 'active').length,
                             economicEngineStatus: economicSimulationEngine.getSimulationSpeed() > 0 ? 'running' : 'idle',
                             timestamp: universeTime.getISODate()
                         };
@@ -126,7 +214,7 @@ class UniverseForge {
                     description: 'Retrieves recent system logs.',
                     authRequired: true,
                     rateLimitKey: 'kernel_logs_read',
-                    logic: async (auth, params, body) => {
+                    logic: async (auth: any, params: any, body: any) => {
                         if (!universeAuth.hasRole(auth, 'admin')) throw new Error(API_ERROR_RESPONSES.FORBIDDEN.error);
                         const count = parseInt(params.count || '100');
                         return universeLogger.getRecentLogs(count);
@@ -137,7 +225,7 @@ class UniverseForge {
                     method: 'POST',
                     description: 'Simulates a system reboot (resets some internal states).',
                     authRequired: true,
-                    logic: async (auth, params, body) => {
+                    logic: async (auth: any, params: any, body: any) => {
                         if (!universeAuth.hasRole(auth, 'admin')) throw new Error(API_ERROR_RESPONSES.FORBIDDEN.error);
                         universeLogger.critical('Simulating system reboot...');
                         UniverseForge.START_TIME = universeTime.getCurrentTimestamp();
@@ -160,7 +248,7 @@ class UniverseForge {
                     method: 'GET',
                     description: 'Lists available financial applications.',
                     authRequired: true,
-                    logic: async (auth, params, body) => {
+                    logic: async (auth: any, params: any, body: any) => {
                         return [
                             { id: 'app_ledger_viewer', name: 'Ledger Viewer', version: '1.0', status: 'installed' },
                             { id: 'app_market_trader', name: 'Market Trader Pro', version: '2.1', status: 'installed' },
@@ -174,17 +262,17 @@ class UniverseForge {
                     method: 'GET',
                     description: 'Retrieves user desktop settings.',
                     authRequired: true,
-                    logic: async (auth, params, body) => {
+                    logic: async (auth: any, params: any, body: any) => {
                         if (!auth.userId) throw new Error(API_ERROR_RESPONSES.UNAUTHORIZED.error);
                         return universePersonalizationManager.getSetting(auth.userId, 'desktop', { theme: 'dark', language: 'en-US' });
                     },
                     exampleResponse: { theme: 'dark', language: 'en-US' }
                 },
-                'desktop/settings': {
+                'desktop/settings_update': {
                     method: 'PUT',
                     description: 'Updates user desktop settings.',
                     authRequired: true,
-                    logic: async (auth, params, body) => {
+                    logic: async (auth: any, params: any, body: any) => {
                         if (!auth.userId) throw new Error(API_ERROR_RESPONSES.UNAUTHORIZED.error);
                         universePersonalizationManager.setSetting(auth.userId, 'desktop', body);
                         return { message: 'Desktop settings updated.' };
@@ -205,7 +293,7 @@ class UniverseForge {
                     method: 'POST',
                     description: 'Provisions new financial infrastructure resources (e.g., a new ledger node).',
                     authRequired: true,
-                    logic: async (auth, params, body) => {
+                    logic: async (auth: any, params: any, body: any) => {
                         if (!universeAuth.hasRole(auth, 'admin')) throw new Error(API_ERROR_RESPONSES.FORBIDDEN.error);
                         const { resourceType, region, config } = body;
                         if (!resourceType || !region) throw new Error(API_ERROR_RESPONSES.BAD_REQUEST.error);
@@ -221,3 +309,31 @@ class UniverseForge {
                         return { message: 'Resource provisioning initiated.', resourceId: newResource.id };
                     },
                     exampleResponse: { message: 'Resource provisioning initiated.', resourceId: 'res_12345' }
+                }
+            }
+        });
+    }
+}
+
+const PaymentMethodDetails: React.FC = () => {
+    const [status, setStatus] = useState<string>('Initializing...');
+
+    useEffect(() => {
+        const forge = UniverseForge.getInstance();
+        forge.initialize();
+        setStatus('Universe Initialized. Check console for details.');
+    }, []);
+
+    return (
+        <div className="p-4 border rounded shadow bg-gray-900 text-white">
+            <h2 className="text-xl font-bold mb-2">Universe Forge Status</h2>
+            <p>{status}</p>
+            <div className="mt-4 text-sm text-gray-400">
+                <p>Version: {UniverseForge.VERSION}</p>
+                <p>Start Time: {new Date(UniverseForge.START_TIME).toLocaleString()}</p>
+            </div>
+        </div>
+    );
+};
+
+export default PaymentMethodDetails;
