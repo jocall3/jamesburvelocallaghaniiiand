@@ -26,10 +26,9 @@ import SSOView from './components/SSOView';
 import CitiAuthGate from './components/CitiAuthGate';
 import ResourceGraphView from './components/ResourceGraphView';
 import ComplianceOracleView from './components/ComplianceOracleView';
-import ComponentLibraryView from './components/ComponentLibraryView';
 
 // --- Component Registry & Dynamic Loading ---
-const modules = import.meta.glob(['./components/**/*.tsx', './src/components/**/*.tsx', './src/views/**/*.tsx'], { eager: true });
+const modules = import.meta.glob('./components/*.tsx', { eager: true });
 
 const getComponentForView = (view: string) => {
     // 1. Manual Overrides
@@ -121,21 +120,24 @@ const getComponentForView = (view: string) => {
 
     // 2. Auto-Resolution
     let Component = null;
-    const possibleEndings = [
-        `/${componentName}.tsx`,
-        `/${componentName}View.tsx`,
-        `/${componentName}Dashboard.tsx`,
-        `/${componentName}DashboardView.tsx`,
-    ];
+    const lowerComponentName = componentName.toLowerCase();
 
     for (const path in modules) {
-        for (const ending of possibleEndings) {
-            if (path.endsWith(ending)) {
-                Component = (modules[path] as any).default;
-                break;
-            }
+        const pathParts = path.split('/');
+        const fileNameWithExt = pathParts[pathParts.length - 1];
+        const lowerFileName = fileNameWithExt.toLowerCase().replace('.tsx', '');
+
+        const possibleFileNames = [
+            lowerComponentName,
+            `${lowerComponentName}view`,
+            `${lowerComponentName}dashboard`,
+            `${lowerComponentName}dashboardview`
+        ];
+
+        if (possibleFileNames.includes(lowerFileName)) {
+            Component = (modules[path] as any).default;
+            break;
         }
-        if (Component) break;
     }
 
     // 3. Props Injection
@@ -413,7 +415,6 @@ function SApp() {
                       
                       <Route path="/resource-graph" element={<ResourceGraphView />} />
                       <Route path="/compliance-oracle" element={<ComplianceOracleView />} />
-                      <Route path="/component-library" element={<ComponentLibraryView />} />
 
                       <Route path="*" element={<Dashboard />} />
                     </Route>
