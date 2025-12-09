@@ -290,4 +290,332 @@ interface UniversalCode {
   code: string;
   description: string;
   category: CodeCategory;
-  version: string
+  version: string;
+  isActive: boolean;
+}
+
+/**
+ * @class UniversalCodeRegistry
+ * @description Manages the lifecycle and retrieval of UniversalCodes.
+ */
+class UniversalCodeRegistry {
+  private static instance: UniversalCodeRegistry;
+  private codes: Map<string, UniversalCode> = new Map();
+
+  private constructor() {
+    this.seedRegistry();
+  }
+
+  public static getInstance(): UniversalCodeRegistry {
+    if (!UniversalCodeRegistry.instance) {
+      UniversalCodeRegistry.instance = new UniversalCodeRegistry();
+    }
+    return UniversalCodeRegistry.instance;
+  }
+
+  private seedRegistry() {
+    const defaults: UniversalCode[] = [
+      { code: 'URGP', description: 'Urgent Priority Payment', category: CodeCategory.SERVICE_LEVEL, version: '1.0', isActive: true },
+      { code: 'NURG', description: 'Non-Urgent Batch', category: CodeCategory.SERVICE_LEVEL, version: '1.0', isActive: true },
+      { code: 'SALA', description: 'Payroll/Salary', category: CodeCategory.PURPOSE, version: '1.0', isActive: true },
+      { code: 'SUPP', description: 'Supplier Payment', category: CodeCategory.PURPOSE, version: '1.0', isActive: true },
+      { code: 'TAX', description: 'Government Tax', category: CodeCategory.PURPOSE, version: '1.0', isActive: true },
+      { code: 'GALX', description: 'Galactic Credits', category: CodeCategory.CURRENCY, version: '1.0', isActive: true },
+      { code: 'QBIT', description: 'Quantum Bits', category: CodeCategory.CURRENCY, version: '1.0', isActive: true },
+    ];
+    defaults.forEach(c => this.codes.set(c.code, c));
+  }
+
+  public getCodesByCategory(category: CodeCategory): UniversalCode[] {
+    return Array.from(this.codes.values()).filter(c => c.category === category && c.isActive);
+  }
+}
+
+const UCR = UniversalCodeRegistry.getInstance();
+
+// --- UI COMPONENTS ---
+
+// Internal styled components simulation using inline styles
+const styles = {
+  container: {
+    backgroundColor: SystemConfig.UI_THEME.background,
+    color: SystemConfig.UI_THEME.text,
+    padding: '2rem',
+    fontFamily: '"Courier New", Courier, monospace',
+    minHeight: '100vh',
+  },
+  card: {
+    backgroundColor: SystemConfig.UI_THEME.surface,
+    border: `1px solid ${SystemConfig.UI_THEME.border}`,
+    borderRadius: '8px',
+    padding: '1.5rem',
+    marginBottom: '1.5rem',
+    boxShadow: `0 4px 6px ${SystemConfig.UI_THEME.shadow}`,
+  },
+  header: {
+    color: SystemConfig.UI_THEME.primary,
+    borderBottom: `2px solid ${SystemConfig.UI_THEME.secondary}`,
+    paddingBottom: '0.5rem',
+    marginBottom: '1rem',
+    fontSize: '1.5rem',
+    fontWeight: 'bold',
+  },
+  inputGroup: {
+    marginBottom: '1rem',
+  },
+  label: {
+    display: 'block',
+    marginBottom: '0.5rem',
+    color: SystemConfig.UI_THEME.secondary,
+    fontSize: '0.9rem',
+  },
+  input: {
+    width: '100%',
+    padding: '0.8rem',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    border: `1px solid ${SystemConfig.UI_THEME.border}`,
+    color: SystemConfig.UI_THEME.text,
+    borderRadius: '4px',
+    fontSize: '1rem',
+    outline: 'none',
+  },
+  select: {
+    width: '100%',
+    padding: '0.8rem',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    border: `1px solid ${SystemConfig.UI_THEME.border}`,
+    color: SystemConfig.UI_THEME.text,
+    borderRadius: '4px',
+    fontSize: '1rem',
+    outline: 'none',
+  },
+  button: {
+    backgroundColor: SystemConfig.UI_THEME.primary,
+    color: '#fff',
+    padding: '1rem 2rem',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '1rem',
+    fontWeight: 'bold',
+    textTransform: 'uppercase' as const,
+    transition: 'background 0.3s',
+  },
+  logConsole: {
+    backgroundColor: '#000',
+    color: '#0f0',
+    padding: '1rem',
+    borderRadius: '4px',
+    height: '200px',
+    overflowY: 'auto' as const,
+    fontFamily: 'monospace',
+    fontSize: '0.8rem',
+    border: `1px solid ${SystemConfig.UI_THEME.border}`,
+  }
+};
+
+const PaymentInitiationForm: React.FC = () => {
+  const [formData, setFormData] = useState({
+    instructionId: UUID.generate(),
+    amount: '',
+    currency: SystemConfig.DEFAULT_CURRENCY,
+    debtorAccount: '',
+    creditorAccount: '',
+    purpose: '',
+    serviceLevel: '',
+  });
+
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+
+  // Sync logs from SystemLogger
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLogs(SystemLog.getLogs().reverse());
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsProcessing(true);
+    SystemLog.info('PaymentForm', 'Initiating payment sequence...', formData);
+
+    try {
+      // Simulate processing delay
+      await new Promise(resolve => setTimeout(resolve, SystemConfig.SIMULATION_SPEED_FACTOR));
+
+      // Validation
+      if (!formData.amount || parseFloat(formData.amount) <= 0) {
+        throw new Error('Invalid amount detected. Quantum flux unstable.');
+      }
+      if (!formData.debtorAccount || !formData.creditorAccount) {
+        throw new Error('Account coordinates missing. Cannot establish wormhole.');
+      }
+
+      // Crypto Signing
+      const signature = Crypto.sign(JSON.stringify(formData), 'PRIVATE_KEY_SIMULATION');
+      SystemLog.debug('PaymentForm', 'Transaction signed', { signature });
+
+      SystemLog.info('PaymentForm', 'Payment processed successfully. Funds teleported.');
+      
+      // Reset form with new ID
+      setFormData(prev => ({
+        ...prev,
+        instructionId: UUID.generate(),
+        amount: '',
+      }));
+
+    } catch (error: any) {
+      SystemLog.error('PaymentForm', 'Payment failed', { error: error.message });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <h1 style={styles.header}>IFTP Nexus // Payment Initiation</h1>
+        <p style={{ marginBottom: '1rem', color: SystemConfig.UI_THEME.text }}>
+          Secure Quantum-Ledger Transaction Interface
+        </p>
+
+        <form onSubmit={handleSubmit}>
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Instruction ID (Auto-Generated)</label>
+            <input 
+              style={{ ...styles.input, opacity: 0.7, cursor: 'not-allowed' }}
+              name="instructionId"
+              value={formData.instructionId}
+              readOnly
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <div style={{ ...styles.inputGroup, flex: 1 }}>
+              <label style={styles.label}>Amount</label>
+              <input 
+                style={styles.input}
+                type="number"
+                name="amount"
+                value={formData.amount}
+                onChange={handleInputChange}
+                placeholder="0.00"
+              />
+            </div>
+            <div style={{ ...styles.inputGroup, width: '150px' }}>
+              <label style={styles.label}>Currency</label>
+              <select 
+                style={styles.select}
+                name="currency"
+                value={formData.currency}
+                onChange={handleInputChange}
+              >
+                {UCR.getCodesByCategory(CodeCategory.CURRENCY).map(c => (
+                  <option key={c.code} value={c.code}>{c.code}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Debtor Account (Source)</label>
+            <input 
+              style={styles.input}
+              name="debtorAccount"
+              value={formData.debtorAccount}
+              onChange={handleInputChange}
+              placeholder="XXXX-XXXX-XXXX-XXXX"
+            />
+          </div>
+
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Creditor Account (Destination)</label>
+            <input 
+              style={styles.input}
+              name="creditorAccount"
+              value={formData.creditorAccount}
+              onChange={handleInputChange}
+              placeholder="YYYY-YYYY-YYYY-YYYY"
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <div style={{ ...styles.inputGroup, flex: 1 }}>
+              <label style={styles.label}>Service Level</label>
+              <select 
+                style={styles.select}
+                name="serviceLevel"
+                value={formData.serviceLevel}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Service Level...</option>
+                {UCR.getCodesByCategory(CodeCategory.SERVICE_LEVEL).map(c => (
+                  <option key={c.code} value={c.code}>{c.description}</option>
+                ))}
+              </select>
+            </div>
+            <div style={{ ...styles.inputGroup, flex: 1 }}>
+              <label style={styles.label}>Purpose</label>
+              <select 
+                style={styles.select}
+                name="purpose"
+                value={formData.purpose}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Purpose...</option>
+                {UCR.getCodesByCategory(CodeCategory.PURPOSE).map(c => (
+                  <option key={c.code} value={c.code}>{c.description}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <button 
+            type="submit" 
+            style={{ 
+              ...styles.button, 
+              opacity: isProcessing ? 0.7 : 1,
+              cursor: isProcessing ? 'wait' : 'pointer'
+            }}
+            disabled={isProcessing}
+          >
+            {isProcessing ? 'Transmitting...' : 'Initiate Transfer'}
+          </button>
+        </form>
+      </div>
+
+      <div style={styles.card}>
+        <h2 style={{ ...styles.header, fontSize: '1.2rem' }}>System Log Console</h2>
+        <div style={styles.logConsole}>
+          {logs.length === 0 && <div style={{ opacity: 0.5 }}>System ready. Waiting for input...</div>}
+          {logs.map((log, idx) => (
+            <div key={idx} style={{ marginBottom: '0.25rem' }}>
+              <span style={{ color: '#888' }}>[{log.timestamp.split('T')[1].split('.')[0]}]</span>
+              {' '}
+              <span style={{ 
+                color: log.level === LogLevel.ERROR ? '#f00' : 
+                       log.level === LogLevel.WARN ? '#fa0' : 
+                       '#0f0' 
+              }}>
+                [{log.level}]
+              </span>
+              {' '}
+              <span style={{ color: '#fff' }}>[{log.module}]</span>
+              {' '}
+              {log.message}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PaymentInitiationForm;
