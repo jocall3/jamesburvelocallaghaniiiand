@@ -7,7 +7,7 @@
  * complete with a custom rendering engine, a market simulation core,
  * AI agents, and a universe of 100 fully implemented, non-networked APIs.
  *
- * The "soul" of the original file—a nexus for financial events—has been
+ * The "soul" of the original fileâ€”a nexus for financial eventsâ€”has been
  * preserved and amplified into the central organizing principle of this world.
  *
  * @version 1.0.0
@@ -146,7 +146,7 @@ const NexusUtils = {
     },
     getRandomNumber: (min: number, max: number): number => Math.random() * (max - min) + min,
     getRandomInt: (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min,
-    deepClone: <T>(obj: T): T => JSON.parse(JSON.stringify(obj)),
+    deepClone: <T,>(obj: T): T => JSON.parse(JSON.stringify(obj)),
     logger: {
         logs: [] as { timestamp: Timestamp; level: 'INFO' | 'WARN' | 'ERROR'; message: string; context?: any }[],
         log(level: 'INFO' | 'WARN' | 'ERROR', message: string, context?: any) {
@@ -232,7 +232,7 @@ const NexusRenderer = (() => {
     };
 
     // A simplified useState hook simulation
-    const useState = <T>(initialValue: T): [T, (newValue: T) => void] => {
+    const useState = <T,>(initialValue: T): [T, (newValue: T) => void] => {
         const currentIndex = stateIndex;
         const stateKey = `component_${currentIndex}`;
         stateIndex++;
@@ -656,7 +656,7 @@ const CorporateActionsNexusView: () => VNode = () => {
                                 h('div', { className: 'w-12 h-12 rounded-lg flex items-center justify-center font-bold text-xl bg-gray-700 text-white' }, action.securityTicker.substring(0, 2)),
                                 h('div', {},
                                     h('h4', { className: 'font-bold text-white' }, action.securityName),
-                                    h('p', { className: 'text-sm text-gray-400' }, `${action.type.replace('_', ' ')} • ${action.securityTicker}`)
+                                    h('p', { className: 'text-sm text-gray-400' }, `${action.type.replace('_', ' ')} â€¢ ${action.securityTicker}`)
                                 )
                             ),
                             h('div', { className: 'flex items-center gap-6' },
