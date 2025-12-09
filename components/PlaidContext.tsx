@@ -1,3 +1,5 @@
+import React from 'react';
+
 // This file has been transformed into the Evolutionary Universe-Forge,
 // a self-contained, 10,000+ line mega-system simulating a Global Financial Operating System (GFOS).
 // It expands upon the core concept of financial data access and identity verification,
@@ -5,10 +7,6 @@
 // The original PlaidContext's "soul" is preserved as the central FinancialDataNexus,
 // around which an entire simulated world of financial services, open-source ecosystems,
 // and interactive components is built.
-
-// CRITICAL RULE: This entire response is ONLY the raw source code for the file.
-// No markdown code fences, no explanatory text, no preamble.
-// This response will be saved directly to a file, so it must be 100% valid code.
 
 // --- Core Universe Foundation: Re-implementing React-like Context for Self-Containment ---
 
@@ -26,7 +24,7 @@ const _ReactLike = (() => {
      * @description Represents a simulated React Context object.
      */
     interface _Context<T> {
-        Provider: _ProviderComponent<T>;
+        Provider: (props: _ProviderProps<T>) => any;
         _currentValue: T;
         _listeners: Set<Function>;
     }
@@ -93,258 +91,308 @@ const _ReactLike = (() => {
 const { _createContext, _useContext, _render } = _ReactLike;
 
 // --- Universe Core: Data Models and Schemas ---
+// Flattened from previous namespace _DataModels
 
 /**
- * @namespace _DataModels
- * @description Defines the fundamental data structures for the Global Financial Operating System (GFOS).
- *              These models are the "DNA" expanded from the original Plaid concepts.
+ * @enum _AccountType
+ * @description Enumerates various types of financial accounts.
  */
-namespace _DataModels {
+export enum _AccountType {
+    CHECKING = "checking",
+    SAVINGS = "savings",
+    CREDIT_CARD = "credit_card",
+    LOAN = "loan",
+    MORTGAGE = "mortgage",
+    INVESTMENT = "investment",
+    BROKERAGE = "brokerage",
+    RETIREMENT = "retirement",
+    CRYPTO = "crypto",
+    PREPAID = "prepaid",
+    OTHER = "other"
+}
 
-    /**
-     * @enum _AccountType
-     * @description Enumerates various types of financial accounts.
-     */
-    export enum _AccountType {
-        CHECKING = "checking",
-        SAVINGS = "savings",
-        CREDIT_CARD = "credit_card",
-        LOAN = "loan",
-        MORTGAGE = "mortgage",
-        INVESTMENT = "investment",
-        BROKERAGE = "brokerage",
-        RETIREMENT = "retirement",
-        CRYPTO = "crypto",
-        PREPAID = "prepaid",
-        OTHER = "other"
-    }
+/**
+ * @enum _TransactionCategory
+ * @description Enumerates common transaction categories.
+ */
+export enum _TransactionCategory {
+    FOOD_DINING = "Food & Dining",
+    TRANSPORTATION = "Transportation",
+    HOUSING = "Housing",
+    UTILITIES = "Utilities",
+    ENTERTAINMENT = "Entertainment",
+    SHOPPING = "Shopping",
+    HEALTH_FITNESS = "Health & Fitness",
+    EDUCATION = "Education",
+    FINANCIAL = "Financial",
+    INCOME = "Income",
+    TRANSFER = "Transfer",
+    OTHER = "Other"
+}
 
-    /**
-     * @enum _TransactionCategory
-     * @description Enumerates common transaction categories.
-     */
-    export enum _TransactionCategory {
-        FOOD_DINING = "Food & Dining",
-        TRANSPORTATION = "Transportation",
-        HOUSING = "Housing",
-        UTILITIES = "Utilities",
-        ENTERTAINMENT = "Entertainment",
-        SHOPPING = "Shopping",
-        HEALTH_FITNESS = "Health & Fitness",
-        EDUCATION = "Education",
-        FINANCIAL = "Financial",
-        INCOME = "Income",
-        TRANSFER = "Transfer",
-        OTHER = "Other"
-    }
+/**
+ * @interface _Address
+ * @description Represents a physical address.
+ */
+export interface _Address {
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+}
 
-    /**
-     * @interface _Address
-     * @description Represents a physical address.
-     */
-    export interface _Address {
-        street: string;
-        city: string;
-        state: string;
-        zip: string;
-        country: string;
-    }
+/**
+ * @interface _Identity
+ * @description Represents a user's verified identity information.
+ *              Expanded from Plaid's identity concept.
+ */
+export interface _Identity {
+    id: string;
+    userId: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    address: _Address;
+    dateOfBirth: string; // YYYY-MM-DD
+    ssnLast4?: string;
+    isVerified: boolean;
+    verificationDate?: string;
+    riskScore: number; // 0-100
+}
 
-    /**
-     * @interface _Identity
-     * @description Represents a user's verified identity information.
-     *              Expanded from Plaid's identity concept.
-     */
-    export interface _Identity {
-        id: string;
-        userId: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-        phone: string;
-        address: _Address;
-        dateOfBirth: string; // YYYY-MM-DD
-        ssnLast4?: string;
-        isVerified: boolean;
-        verificationDate?: string;
-        riskScore: number; // 0-100
-    }
+/**
+ * @interface _Account
+ * @description Represents a financial account.
+ */
+export interface _Account {
+    id: string;
+    userId: string;
+    institutionId: string;
+    name: string;
+    mask: string; // Last 4 digits
+    type: _AccountType;
+    subtype: string;
+    currentBalance: number;
+    availableBalance: number;
+    currency: string;
+    isConnected: boolean;
+    connectionDate: string;
+    lastUpdated: string;
+    accountNumber?: string; // Sensitive, often masked
+    routingNumber?: string; // Sensitive, often masked
+}
 
-    /**
-     * @interface _Account
-     * @description Represents a financial account.
-     */
-    export interface _Account {
-        id: string;
-        userId: string;
-        institutionId: string;
-        name: string;
-        mask: string; // Last 4 digits
-        type: _AccountType;
-        subtype: string;
-        currentBalance: number;
-        availableBalance: number;
-        currency: string;
-        isConnected: boolean;
-        connectionDate: string;
-        lastUpdated: string;
-        accountNumber?: string; // Sensitive, often masked
-        routingNumber?: string; // Sensitive, often masked
-    }
+/**
+ * @interface _Transaction
+ * @description Represents a financial transaction.
+ */
+export interface _Transaction {
+    id: string;
+    accountId: string;
+    userId: string;
+    name: string;
+    amount: number;
+    currency: string;
+    date: string; // YYYY-MM-DD
+    authorizedDate?: string; // YYYY-MM-DD
+    category: _TransactionCategory[];
+    merchantName?: string;
+    pending: boolean;
+    transactionType: 'digital' | 'place' | 'special';
+    paymentChannel: 'online' | 'in store' | 'other';
+    location?: {
+        address?: string;
+        city?: string;
+        state?: string;
+        zip?: string;
+        lat?: number;
+        lon?: number;
+    };
+}
 
-    /**
-     * @interface _Transaction
-     * @description Represents a financial transaction.
-     */
-    export interface _Transaction {
-        id: string;
-        accountId: string;
-        userId: string;
-        name: string;
-        amount: number;
-        currency: string;
-        date: string; // YYYY-MM-DD
-        authorizedDate?: string; // YYYY-MM-DD
-        category: _TransactionCategory[];
-        merchantName?: string;
-        pending: boolean;
-        transactionType: 'digital' | 'place' | 'special';
-        paymentChannel: 'online' | 'in store' | 'other';
-        location?: {
-            address?: string;
-            city?: string;
-            state?: string;
-            zip?: string;
-            lat?: number;
-            lon?: number;
-        };
-    }
+/**
+ * @interface _Institution
+ * @description Represents a financial institution.
+ */
+export interface _Institution {
+    id: string;
+    name: string;
+    logoUrl?: string;
+    website: string;
+    primaryColor?: string;
+    products: string[]; // e.g., ['auth', 'transactions', 'identity']
+    status: 'active' | 'maintenance' | 'inactive';
+}
 
-    /**
-     * @interface _Institution
-     * @description Represents a financial institution.
-     */
-    export interface _Institution {
-        id: string;
-        name: string;
-        logoUrl?: string;
-        website: string;
-        primaryColor?: string;
-        products: string[]; // e.g., ['auth', 'transactions', 'identity']
-        status: 'active' | 'maintenance' | 'inactive';
-    }
+/**
+ * @interface _InvestmentHolding
+ * @description Represents a holding in an investment account.
+ */
+export interface _InvestmentHolding {
+    id: string;
+    accountId: string;
+    securityId: string;
+    quantity: number;
+    costBasis: number;
+    currentValue: number;
+    lastPrice: number;
+    lastPriceDate: string;
+}
 
-    /**
-     * @interface _InvestmentHolding
-     * @description Represents a holding in an investment account.
-     */
-    export interface _InvestmentHolding {
-        id: string;
-        accountId: string;
-        securityId: string;
-        quantity: number;
-        costBasis: number;
-        currentValue: number;
-        lastPrice: number;
-        lastPriceDate: string;
-    }
+/**
+ * @interface _Security
+ * @description Represents a financial security (stock, bond, crypto, etc.).
+ */
+export interface _Security {
+    id: string;
+    isin?: string;
+    cusip?: string;
+    sedol?: string;
+    tickerSymbol: string;
+    name: string;
+    type: 'equity' | 'bond' | 'crypto' | 'mutual fund' | 'etf' | 'other';
+    currency: string;
+    closePrice: number;
+    closePriceDate: string;
+}
 
-    /**
-     * @interface _Security
-     * @description Represents a financial security (stock, bond, crypto, etc.).
-     */
-    export interface _Security {
-        id: string;
-        isin?: string;
-        cusip?: string;
-        sedol?: string;
-        tickerSymbol: string;
-        name: string;
-        type: 'equity' | 'bond' | 'crypto' | 'mutual fund' | 'etf' | 'other';
-        currency: string;
-        closePrice: number;
-        closePriceDate: string;
-    }
+/**
+ * @interface _Loan
+ * @description Represents a loan account.
+ */
+export interface _Loan {
+    id: string;
+    accountId: string;
+    loanType: 'student' | 'mortgage' | 'personal' | 'auto';
+    originalBalance: number;
+    currentBalance: number;
+    interestRate: number;
+    nextPaymentDueDate: string;
+    nextPaymentAmount: number;
+    minimumPaymentAmount: number;
+    lastPaymentDate: string;
+    lastPaymentAmount: number;
+}
 
-    /**
-     * @interface _Loan
-     * @description Represents a loan account.
-     */
-    export interface _Loan {
-        id: string;
-        accountId: string;
-        loanType: 'student' | 'mortgage' | 'personal' | 'auto';
-        originalBalance: number;
-        currentBalance: number;
-        interestRate: number;
-        nextPaymentDueDate: string;
-        nextPaymentAmount: number;
-        minimumPaymentAmount: number;
-        lastPaymentDate: string;
-        lastPaymentAmount: number;
-    }
+/**
+ * @interface _CreditCard
+ * @description Represents a credit card account.
+ */
+export interface _CreditCard {
+    id: string;
+    accountId: string;
+    last4Digits: string;
+    creditLimit: number;
+    currentBalance: number;
+    availableCredit: number;
+    minimumPaymentAmount: number;
+    nextPaymentDueDate: string;
+    interestRate: number;
+    rewardsBalance?: number;
+    rewardsType?: string;
+}
 
-    /**
-     * @interface _CreditCard
-     * @description Represents a credit card account.
-     */
-    export interface _CreditCard {
-        id: string;
-        accountId: string;
-        last4Digits: string;
-        creditLimit: number;
-        currentBalance: number;
-        availableCredit: number;
-        minimumPaymentAmount: number;
-        nextPaymentDueDate: string;
-        interestRate: number;
-        rewardsBalance?: number;
-        rewardsType?: string;
-    }
+/**
+ * @interface _User
+ * @description Represents a user of the GFOS.
+ */
+export interface _User {
+    id: string;
+    username: string;
+    email: string;
+    createdAt: string;
+    lastLogin: string;
+    preferences: {
+        theme: string;
+        notifications: boolean;
+        dataSharingConsent: boolean;
+    };
+    roles: string[]; // e.g., 'admin', 'user', 'developer'
+}
 
-    /**
-     * @interface _User
-     * @description Represents a user of the GFOS.
-     */
-    export interface _User {
-        id: string;
-        username: string;
-        email: string;
-        createdAt: string;
-        lastLogin: string;
-        preferences: {
-            theme: string;
-            notifications: boolean;
-            dataSharingConsent: boolean;
-        };
-        roles: string[]; // e.g., 'admin', 'user', 'developer'
-    }
+/**
+ * @interface _APIKey
+ * @description Represents an API key for internal system access.
+ */
+export interface _APIKey {
+    key: string;
+    ownerId: string;
+    name: string;
+    permissions: string[]; // e.g., 'read:accounts', 'write:transactions'
+    createdAt: string;
+    expiresAt?: string;
+    isActive: boolean;
+}
 
-    /**
-     * @interface _APIKey
-     * @description Represents an API key for internal system access.
-     */
-    export interface _APIKey {
-        key: string;
-        ownerId: string;
-        name: string;
-        permissions: string[]; // e.g., 'read:accounts', 'write:transactions'
-        createdAt: string;
-        expiresAt?: string;
-        isActive: boolean;
-    }
+/**
+ * @interface _AuditLogEntry
+ * @description Represents an entry in the system's audit log.
+ */
+export interface _AuditLogEntry {
+    id: string;
+    timestamp: string;
+    userId?: string;
+    apiKeyId?: string;
+    action: string;
+    resource: string;
+    resourceId?: string;
+    details: Record<string, any>;
+    ipAddress?: string;
+}
 
-    /**
-     * @interface _AuditLogEntry
-     * @description Represents an entry in the system's audit log.
-     */
-    export interface _AuditLogEntry {
-        id: string;
-        timestamp: string;
-        userId?: string;
-        apiKeyId?: string;
-        action: string;
-        resource: string;
-        resourceId?: string;
-        details: Record<string, any>;
-        ipAddress?: string
+// --- Financial Data Nexus ---
+
+/**
+ * @interface FinancialDataNexusState
+ * @description The state shape for the central financial context.
+ */
+export interface FinancialDataNexusState {
+    currentUser: _User | null;
+    accounts: _Account[];
+    transactions: _Transaction[];
+    institutions: _Institution[];
+    isLoading: boolean;
+    error: string | null;
+    linkToken: string | null;
+    openLink: () => void;
+}
+
+const defaultNexusState: FinancialDataNexusState = {
+    currentUser: null,
+    accounts: [],
+    transactions: [],
+    institutions: [],
+    isLoading: false,
+    error: null,
+    linkToken: null,
+    openLink: () => console.warn("FinancialDataNexus: openLink not initialized")
+};
+
+// Create the context using the simulated React-like system
+export const PlaidContext = _createContext<FinancialDataNexusState>(defaultNexusState);
+
+/**
+ * @component PlaidProvider
+ * @description The provider component for the Financial Data Nexus.
+ */
+export const PlaidProvider = ({ children }: { children: any }) => {
+    // In a real implementation, this would hold state and effects.
+    // For this simulation, we pass the default state.
+    return (
+        <PlaidContext.Provider value={defaultNexusState}>
+            {children}
+        </PlaidContext.Provider>
+    );
+};
+
+/**
+ * @hook usePlaidContext
+ * @description Hook to access the Financial Data Nexus.
+ */
+export function usePlaidContext() {
+    return _useContext(PlaidContext);
+}
+
+export default PlaidProvider;
