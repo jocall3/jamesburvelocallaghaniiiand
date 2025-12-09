@@ -765,11 +765,11 @@ const AccountDetailsView: React.FC<{ provider: OpenSourceProvider }> = ({ provid
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         color: tx.type === 'donation' ? Color.theme.secondary : Color.theme.primary
                       }}>
-                        {tx.type === 'donation' ? '+' : '→'}
+                        {tx.type === 'donation' ? '+' : 'â†’'}
                       </div>
                       <div>
                         <Text weight={600} size={14} style={{ display: 'block' }}>{tx.type.charAt(0).toUpperCase() + tx.type.slice(1)}</Text>
-                        <Text size={12} color={Color.theme.textMuted}>{Time.ago(tx.timestamp)} • {tx.hash}</Text>
+                        <Text size={12} color={Color.theme.textMuted}>{Time.ago(tx.timestamp)} â€¢ {tx.hash}</Text>
                       </div>
                     </Flex>
                     <Text weight={600} color={tx.type === 'donation' ? Color.theme.secondary : Color.theme.dark}>
@@ -814,9 +814,9 @@ const AccountDetailsView: React.FC<{ provider: OpenSourceProvider }> = ({ provid
                 </Text>
               </Flex>
               <div style={{ padding: '12px', backgroundColor: '#111827', borderRadius: '6px', color: '#10b981', fontFamily: 'monospace', fontSize: '12px' }}>
-                > sys_status: OK<br/>
-                > load_avg: 0.45<br/>
-                > mem_usage: 42%
+                &gt; sys_status: OK<br/>
+                &gt; load_avg: 0.45<br/>
+                &gt; mem_usage: 42%
               </div>
             </Flex>
           </Card>
