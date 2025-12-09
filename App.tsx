@@ -29,7 +29,7 @@ import ComplianceOracleView from './components/ComplianceOracleView';
 import ComponentLibraryView from './components/ComponentLibraryView';
 
 // --- Component Registry & Dynamic Loading ---
-const modules = import.meta.glob('./components/*.tsx', { eager: true });
+const modules = import.meta.glob(['./components/**/*.tsx', './src/components/**/*.tsx', './src/views/**/*.tsx'], { eager: true });
 
 const getComponentForView = (view: string) => {
     // 1. Manual Overrides
@@ -120,19 +120,22 @@ const getComponentForView = (view: string) => {
     const componentName = overrides[view] || view;
 
     // 2. Auto-Resolution
-    const candidates = [
-        `./components/${componentName}.tsx`,
-        `./components/${componentName}View.tsx`,
-        `./components/${componentName}Dashboard.tsx`,
-        `./components/${componentName}DashboardView.tsx`,
+    let Component = null;
+    const possibleEndings = [
+        `/${componentName}.tsx`,
+        `/${componentName}View.tsx`,
+        `/${componentName}Dashboard.tsx`,
+        `/${componentName}DashboardView.tsx`,
     ];
 
-    let Component = null;
-    for (const path of candidates) {
-        if (modules[path]) {
-            Component = (modules[path] as any).default;
-            break;
+    for (const path in modules) {
+        for (const ending of possibleEndings) {
+            if (path.endsWith(ending)) {
+                Component = (modules[path] as any).default;
+                break;
+            }
         }
+        if (Component) break;
     }
 
     // 3. Props Injection
