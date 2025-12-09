@@ -429,7 +429,7 @@ class DebianProject extends BaseAPI {
 }
 
 class OpenSUSE extends BaseAPI {
-    constructor() { super('OpenSUSE', 'The makers' choice for sysadmins.'); }
+    constructor() { super('OpenSUSE', "The makers' choice for sysadmins."); }
     executeCommand(cmd: string) { return 'YaST configuration updated.'; }
 }
 
@@ -1105,7 +1105,7 @@ const UniverseOrchestrator: React.FC = () => {
                             OPEN SOURCE UNIVERSE
                         </h1>
                         <p className="text-gray-400 mt-1">
-                            Simulating {apis.length} active systems • Tick: {tickCount} • Global Entropy: {(Math.random()).toFixed(4)}
+                            Simulating {apis.length} active systems â€¢ Tick: {tickCount} â€¢ Global Entropy: {(Math.random()).toFixed(4)}
                         </p>
                     </div>
                     
