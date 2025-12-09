@@ -52,7 +52,7 @@ const KernelUtils = {
     return hash.toString(16);
   },
 
-  deepClone: <T>(obj: T): T => JSON.parse(JSON.stringify(obj)),
+  deepClone: <T,>(obj: T): T => JSON.parse(JSON.stringify(obj)),
 };
 
 // -----------------------------------------------------------------------------
