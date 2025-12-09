@@ -196,58 +196,57 @@ class SeededRandom {
  * A minimal, self-contained Virtual DOM implementation.
  * This replaces the need for the React library.
  */
-namespace VDOM {
-  export type VNode = {
-    type: string;
-    props: { [key: string]: any };
-    children: (VNode | string)[];
-  };
 
-  export const createElement = (type: string, props: { [key: string]: any }, ...children: (VNode | string)[]): VNode => {
-    return { type, props: props || {}, children: children.flat() };
-  };
+type VNode = {
+  type: string;
+  props: { [key: string]: any };
+  children: (VNode | string)[];
+};
 
-  export const render = (vnode: VNode, container: HTMLElement) => {
-    container.innerHTML = ''; // Simple re-render
-    const dom = createDOMElement(vnode);
-    container.appendChild(dom);
-  };
+function vdomCreateElement(type: string, props: { [key: string]: any }, ...children: (VNode | string)[]): VNode {
+  return { type, props: props || {}, children: children.flat() };
+}
 
-  const createDOMElement = (vnode: VNode | string): HTMLElement | Text => {
-    if (typeof vnode === 'string') {
-      return document.createTextNode(vnode);
+function updateElementProperties(el: HTMLElement, props: { [key: string]: any }) {
+  for (const propName in props) {
+    const propValue = props[propName];
+    if (propName === 'className') {
+      el.setAttribute('class', propValue);
+    } else if (propName === 'style') {
+      Object.assign(el.style, propValue);
+    } else if (propName.startsWith('on') && typeof propValue === 'function') {
+      const eventName = propName.substring(2).toLowerCase();
+      el.addEventListener(eventName, propValue);
+    } else if (propName.startsWith('svg:')) {
+      el.setAttribute(propName.substring(4), propValue);
+    } else {
+      el.setAttribute(propName, propValue);
     }
+  }
+}
 
-    const el = vnode.type.startsWith('svg:') 
-      ? document.createElementNS('http://www.w3.org/2000/svg', vnode.type.substring(4))
-      : document.createElement(vnode.type);
+function createDOMElement(vnode: VNode | string): HTMLElement | Text {
+  if (typeof vnode === 'string') {
+    return document.createTextNode(vnode);
+  }
 
-    updateElementProperties(el, vnode.props);
+  const el = vnode.type.startsWith('svg:') 
+    ? document.createElementNS('http://www.w3.org/2000/svg', vnode.type.substring(4))
+    : document.createElement(vnode.type);
 
-    vnode.children.forEach(child => {
-      el.appendChild(createDOMElement(child));
-    });
+  updateElementProperties(el, vnode.props);
 
-    return el;
-  };
+  vnode.children.forEach(child => {
+    el.appendChild(createDOMElement(child));
+  });
 
-  const updateElementProperties = (el: HTMLElement, props: { [key: string]: any }) => {
-    for (const propName in props) {
-      const propValue = props[propName];
-      if (propName === 'className') {
-        el.setAttribute('class', propValue);
-      } else if (propName === 'style') {
-        Object.assign(el.style, propValue);
-      } else if (propName.startsWith('on') && typeof propValue === 'function') {
-        const eventName = propName.substring(2).toLowerCase();
-        el.addEventListener(eventName, propValue);
-      } else if (propName.startsWith('svg:')) {
-        el.setAttribute(propName.substring(4), propValue);
-      } else {
-        el.setAttribute(propName, propValue);
-      }
-    }
-  };
+  return el;
+}
+
+function vdomRender(vnode: VNode, container: HTMLElement) {
+  container.innerHTML = ''; // Simple re-render
+  const dom = createDOMElement(vnode);
+  container.appendChild(dom);
 }
 
 /**
@@ -287,18 +286,18 @@ class GeoRenderer {
     return [x, y - yCenter + this.height / 2];
   }
 
-  renderMap(nodes: SovereignFinancialNode[], selectedNodeId: string | null, onNodeClick: (id: string) => void): VDOM.VNode {
+  renderMap(nodes: SovereignFinancialNode[], selectedNodeId: string | null, onNodeClick: (id: string) => void): VNode {
     const markers = Object.values(nodes).map(node => {
       const [x, y] = this.project(node.geo.coordinates);
       const isSelected = node.id === selectedNodeId;
       const color = node.state.status === 'ONLINE' ? '#4CAF50' : (node.state.status === 'DEGRADED' ? '#FFC107' : '#F44336');
       
-      return VDOM.createElement('svg:g', {
+      return vdomCreateElement('svg:g', {
         transform: `translate(${x}, ${y})`,
         onClick: () => onNodeClick(node.id),
         style: { cursor: 'pointer' }
       },
-        VDOM.createElement('svg:circle', {
+        vdomCreateElement('svg:circle', {
           'svg:cx': 0,
           'svg:cy': 0,
           'svg:r': isSelected ? 10 : 5,
@@ -306,7 +305,7 @@ class GeoRenderer {
           'svg:stroke': '#FFFFFF',
           'svg:stroke-width': isSelected ? 2 : 1,
         }),
-        VDOM.createElement('svg:text', {
+        vdomCreateElement('svg:text', {
           'svg:x': 12,
           'svg:y': 4,
           'svg:fill': '#FFFFFF',
@@ -319,13 +318,13 @@ class GeoRenderer {
     // A very basic world map outline (simulated GeoJSON)
     const worldPath = "M 0 250 L 100 200 L 200 300 L 300 250 L 400 200 L 500 250 L 600 300 L 700 250 L 800 200 L 900 250 L 1000 300 L 1100 250 L 1200 200 L 1200 500 L 0 500 Z";
 
-    return VDOM.createElement('svg:svg', {
+    return vdomCreateElement('svg:svg', {
       'svg:width': this.width,
       'svg:height': this.height,
       'svg:viewBox': `0 0 ${this.width} ${this.height}`,
       style: { backgroundColor: '#1a202c', borderRadius: '0.75rem' }
     },
-      VDOM.createElement('svg:path', {
+      vdomCreateElement('svg:path', {
         'svg:d': worldPath,
         'svg:fill': '#2d3748',
         'svg:stroke': '#4a5568',
@@ -814,18 +813,18 @@ class GlobalPositionMap {
     const { universe, selectedNodeId, activeTab } = this.state;
     const selectedNode = selectedNodeId ? universe.nodes[selectedNodeId] : null;
 
-    const appVNode = VDOM.createElement('div', { className: 'space-y-6 p-4 bg-gray-900 text-white font-sans' },
-      VDOM.createElement('h2', { className: 'text-3xl font-bold tracking-wider' }, 'Global Liquidity Nexus'),
+    const appVNode = vdomCreateElement('div', { className: 'space-y-6 p-4 bg-gray-900 text-white font-sans' },
+      vdomCreateElement('h2', { className: 'text-3xl font-bold tracking-wider' }, 'Global Liquidity Nexus'),
       
-      VDOM.createElement('div', { className: 'flex gap-4 border-b border-gray-700' },
-        VDOM.createElement('button', { onClick: () => this.handleTabClick('map'), className: `py-2 px-4 ${activeTab === 'map' ? 'border-b-2 border-blue-500' : ''}` }, 'Map'),
-        VDOM.createElement('button', { onClick: () => this.handleTabClick('logs'), className: `py-2 px-4 ${activeTab === 'logs' ? 'border-b-2 border-blue-500' : ''}` }, 'Event Logs'),
-        VDOM.createElement('button', { onClick: () => this.handleTabClick('apis'), className: `py-2 px-4 ${activeTab === 'apis' ? 'border-b-2 border-blue-500' : ''}` }, 'API Universe')
+      vdomCreateElement('div', { className: 'flex gap-4 border-b border-gray-700' },
+        vdomCreateElement('button', { onClick: () => this.handleTabClick('map'), className: `py-2 px-4 ${activeTab === 'map' ? 'border-b-2 border-blue-500' : ''}` }, 'Map'),
+        vdomCreateElement('button', { onClick: () => this.handleTabClick('logs'), className: `py-2 px-4 ${activeTab === 'logs' ? 'border-b-2 border-blue-500' : ''}` }, 'Event Logs'),
+        vdomCreateElement('button', { onClick: () => this.handleTabClick('apis'), className: `py-2 px-4 ${activeTab === 'apis' ? 'border-b-2 border-blue-500' : ''}` }, 'API Universe')
       ),
 
-      VDOM.createElement('div', { className: 'flex gap-6' },
+      vdomCreateElement('div', { className: 'flex gap-6' },
         // Main content panel
-        VDOM.createElement('div', { className: 'flex-grow' },
+        vdomCreateElement('div', { className: 'flex-grow' },
           activeTab === 'map' && this.renderMapTab(),
           activeTab === 'logs' && this.renderLogsTab(),
           activeTab === 'apis' && this.renderApisTab()
@@ -835,12 +834,12 @@ class GlobalPositionMap {
       )
     );
 
-    VDOM.render(appVNode, this.container);
+    vdomRender(appVNode, this.container);
   }
 
   private renderMapTab() {
-    if (!this.state.universe) return VDOM.createElement('div', {}, 'Loading map...');
-    return VDOM.createElement('div', { className: 'relative h-[600px]' },
+    if (!this.state.universe) return vdomCreateElement('div', {}, 'Loading map...');
+    return vdomCreateElement('div', { className: 'relative h-[600px]' },
       this.renderer.renderMap(
         Object.values(this.state.universe.nodes),
         this.state.selectedNodeId,
@@ -850,40 +849,40 @@ class GlobalPositionMap {
   }
 
   private renderLogsTab() {
-    if (!this.state.universe) return VDOM.createElement('div', {}, 'Loading logs...');
+    if (!this.state.universe) return vdomCreateElement('div', {}, 'Loading logs...');
     const events = [...this.state.universe.events].reverse().slice(0, 20);
-    return VDOM.createElement('div', { className: 'h-[600px] overflow-y-auto bg-gray-800 p-4 rounded-lg font-mono text-sm' },
-      VDOM.createElement('h3', { className: 'text-xl font-bold mb-4' }, 'Geopolitical Event Stream'),
-      ...events.map(event => VDOM.createElement('div', { className: 'mb-2 border-b border-gray-700 pb-2' },
-        VDOM.createElement('p', {}, `[Tick ${event.timestamp}] [${event.type}]`),
-        VDOM.createElement('p', { className: 'text-gray-400' }, event.description)
+    return vdomCreateElement('div', { className: 'h-[600px] overflow-y-auto bg-gray-800 p-4 rounded-lg font-mono text-sm' },
+      vdomCreateElement('h3', { className: 'text-xl font-bold mb-4' }, 'Geopolitical Event Stream'),
+      ...events.map(event => vdomCreateElement('div', { className: 'mb-2 border-b border-gray-700 pb-2' },
+        vdomCreateElement('p', {}, `[Tick ${event.timestamp}] [${event.type}]`),
+        vdomCreateElement('p', { className: 'text-gray-400' }, event.description)
       ))
     );
   }
 
   private renderApisTab() {
-    return VDOM.createElement('div', { className: 'h-[600px] overflow-y-auto bg-gray-800 p-4 rounded-lg' },
-      VDOM.createElement('h3', { className: 'text-xl font-bold mb-4' }, 'Simulated API Universe'),
-      VDOM.createElement('p', { className: 'text-gray-400 mb-4' }, 'This is a representation of the 100+ simulated APIs running in this universe. They are used by SFNs and AI agents to manage infrastructure, data, and operations.'),
-      ...Object.keys(apiRegistry).map(key => VDOM.createElement('div', { className: 'p-2 bg-gray-700 rounded mb-2 font-mono' }, (apiRegistry as any)[key].apiName))
+    return vdomCreateElement('div', { className: 'h-[600px] overflow-y-auto bg-gray-800 p-4 rounded-lg' },
+      vdomCreateElement('h3', { className: 'text-xl font-bold mb-4' }, 'Simulated API Universe'),
+      vdomCreateElement('p', { className: 'text-gray-400 mb-4' }, 'This is a representation of the 100+ simulated APIs running in this universe. They are used by SFNs and AI agents to manage infrastructure, data, and operations.'),
+      ...Object.keys(apiRegistry).map(key => vdomCreateElement('div', { className: 'p-2 bg-gray-700 rounded mb-2 font-mono' }, (apiRegistry as any)[key].apiName))
     );
   }
 
   private renderSidePanel(node: SovereignFinancialNode) {
-    return VDOM.createElement('div', { className: 'w-1/3 bg-gray-800 p-4 rounded-xl space-y-4' },
-      VDOM.createElement('h3', { className: 'font-bold text-xl' }, node.name),
-      VDOM.createElement('div', {},
-        VDOM.createElement('p', { className: 'font-mono text-green-400 text-2xl' }, `$${Math.round(node.economic.liquidity).toLocaleString()}`),
-        VDOM.createElement('p', { className: 'text-gray-400' }, 'Total Liquidity')
+    return vdomCreateElement('div', { className: 'w-1/3 bg-gray-800 p-4 rounded-xl space-y-4' },
+      vdomCreateElement('h3', { className: 'font-bold text-xl' }, node.name),
+      vdomCreateElement('div', {},
+        vdomCreateElement('p', { className: 'font-mono text-green-400 text-2xl' }, `$${Math.round(node.economic.liquidity).toLocaleString()}`),
+        vdomCreateElement('p', { className: 'text-gray-400' }, 'Total Liquidity')
       ),
-      VDOM.createElement('div', { className: 'flex gap-2 flex-wrap' },
-        ...node.economic.supportedCurrencies.map(c => VDOM.createElement('span', { className: 'px-2 py-1 bg-gray-700 rounded font-mono' }, c))
+      vdomCreateElement('div', { className: 'flex gap-2 flex-wrap' },
+        ...node.economic.supportedCurrencies.map(c => vdomCreateElement('span', { className: 'px-2 py-1 bg-gray-700 rounded font-mono' }, c))
       ),
-      VDOM.createElement('div', { className: 'border-t border-gray-700 pt-4 space-y-2' },
-        VDOM.createElement('p', {}, `Status: ${node.state.status}`),
-        VDOM.createElement('p', {}, `Political Stability: ${(node.geo.politicalStability * 100).toFixed(1)}%`),
-        VDOM.createElement('p', {}, `Compute: ${node.infrastructure.computeCapacity} TFLOPS`),
-        VDOM.createElement('p', {}, `OS: ${node.infrastructure.osProvider}`)
+      vdomCreateElement('div', { className: 'border-t border-gray-700 pt-4 space-y-2' },
+        vdomCreateElement('p', {}, `Status: ${node.state.status}`),
+        vdomCreateElement('p', {}, `Political Stability: ${(node.geo.politicalStability * 100).toFixed(1)}%`),
+        vdomCreateElement('p', {}, `Compute: ${node.infrastructure.computeCapacity} TFLOPS`),
+        vdomCreateElement('p', {}, `OS: ${node.infrastructure.osProvider}`)
       )
     );
   }
@@ -912,78 +911,4 @@ function main() {
   }
 }
 
-// To make this file self-contained and runnable, we can add a simple HTML structure
-// and a script tag to call main() when the DOM is ready.
-// This part would typically be in an index.html file, but is included here
-// to fulfill the "self-contained" requirement.
-
-/*
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Global Liquidity Nexus</title>
-  <style>
-    /* A minimal CSS reset and styling to support the VDOM renderer */
-    body { margin: 0; background-color: #111827; color: #f9fafb; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
-    .space-y-6 > * + * { margin-top: 1.5rem; }
-    .p-4 { padding: 1rem; }
-    .bg-gray-900 { background-color: #111827; }
-    .text-white { color: #ffffff; }
-    .font-sans { font-family: sans-serif; }
-    .text-3xl { font-size: 1.875rem; }
-    .font-bold { font-weight: 700; }
-    .tracking-wider { letter-spacing: 0.05em; }
-    .flex { display: flex; }
-    .gap-4 { gap: 1rem; }
-    .gap-6 { gap: 1.5rem; }
-    .border-b { border-bottom-width: 1px; }
-    .border-gray-700 { border-color: #374151; }
-    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-    .px-4 { padding-left: 1rem; padding-right: 1rem; }
-    .border-b-2 { border-bottom-width: 2px; }
-    .border-blue-500 { border-color: #3b82f6; }
-    .flex-grow { flex-grow: 1; }
-    .relative { position: relative; }
-    .h-\[600px\] { height: 600px; }
-    .w-1\/3 { width: 33.333333%; }
-    .bg-gray-800 { background-color: #1f2937; }
-    .rounded-xl { border-radius: 0.75rem; }
-    .space-y-4 > * + * { margin-top: 1rem; }
-    .text-xl { font-size: 1.25rem; }
-    .font-mono { font-family: monospace; }
-    .text-green-400 { color: #4ade80; }
-    .text-2xl { font-size: 1.5rem; }
-    .text-gray-400 { color: #9ca3af; }
-    .flex-wrap { flex-wrap: wrap; }
-    .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
-    .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
-    .bg-gray-700 { background-color: #374151; }
-    .rounded { border-radius: 0.25rem; }
-    .border-t { border-top-width: 1px; }
-    .pt-4 { padding-top: 1rem; }
-    .space-y-2 > * + * { margin-top: 0.5rem; }
-    .overflow-y-auto { overflow-y: auto; }
-    .rounded-lg { border-radius: 0.5rem; }
-    .text-sm { font-size: 0.875rem; }
-    .mb-4 { margin-bottom: 1rem; }
-    .mb-2 { margin-bottom: 0.5rem; }
-    .pb-2 { padding-bottom: 0.5rem; }
-  </style>
-</head>
-<body>
-  <div id="root"></div>
-  <script>
-    // The entire content of this TSX file would be transpiled and placed here.
-    // For the purpose of this self-contained file, we assume a transpiler has run.
-    // The 'main' function would be called here.
-    document.addEventListener('DOMContentLoaded', main);
-  </script>
-</body>
-</html>
-*/
-
-// This final export is symbolic, as the file is designed to be self-executing
-// in a browser context via the `main` function.
 export default GlobalPositionMap;
