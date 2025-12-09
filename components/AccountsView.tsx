@@ -111,7 +111,7 @@ const Utils = {
     },
     sleep: (ms: number) => new Promise(resolve => setTimeout(resolve, ms)),
     randomInt: (min: number, max: number) => Math.floor(Math.random() * (max - min + 1) + min),
-    randomItem: <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)],
+    randomItem: <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)],
 };
 
 // -----------------------------------------------------------------------------
@@ -1527,7 +1527,7 @@ const AccountsView: React.FC = () => {
                         <Badge text={api.getMetadata().version} />
                     </div>
                     <div style={{ fontSize: '12px', color: NebulaTheme.colors.textDim }}>
-                        Status: <span style={{ color: NebulaTheme.colors.success }}>● Online</span>
+                        Status: <span style={{ color: NebulaTheme.colors.success }}>â—  Online</span>
                     </div>
                 </div>
             ))}
@@ -1546,7 +1546,7 @@ const AccountsView: React.FC = () => {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', height: '100%' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <Button onClick={() => setView('GRID')}>← Back</Button>
+                        <Button onClick={() => setView('GRID')}>â†  Back</Button>
                         <h2 style={{ margin: 0, color: NebulaTheme.colors.text }}>{selectedApi.getMetadata().name} Control Plane</h2>
                     </div>
                     
