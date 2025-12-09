@@ -585,13 +585,13 @@ const GodotAPI = createTechStack('Godot Engine', 'MEDIA', '4.2', {
 
 // 60. Blender Foundation
 const BlenderAPI = createTechStack('Blender Foundation', 'MEDIA', '4.0', {
-  '/extensions/add-ons': () => ({ status: 200, data: ['Node Wrangler', 'Cycles'] }, headers: {}, latency: 0 }),
+  '/extensions/add-ons': () => ({ status: 200, data: ['Node Wrangler', 'Cycles'], headers: {}, latency: 0 }),
   '/fund/status': () => ({ status: 200, data: { members: 5000 }, headers: {}, latency: 0 })
 });
 
 // 61. Inkscape
 const InkscapeAPI = createTechStack('Inkscape', 'MEDIA', '1.3', {
-  '/extensions/gallery': () => ({ status: 200, data: ['TexText', 'MightyScape'] }, headers: {}, latency: 0 }),
+  '/extensions/gallery': () => ({ status: 200, data: ['TexText', 'MightyScape'], headers: {}, latency: 0 }),
   '/cli/export': () => ({ status: 200, data: { supported: ['png', 'pdf', 'svg'] }, headers: {}, latency: 0 })
 });
 
