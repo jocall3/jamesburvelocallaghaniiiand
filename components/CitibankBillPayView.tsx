@@ -34,7 +34,7 @@ const generateUUID = (): UUID => {
 };
 
 const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
-const randomChoice = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+const randomChoice = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
 // --- System Logger ---
 
