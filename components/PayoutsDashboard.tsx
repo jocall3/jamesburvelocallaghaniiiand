@@ -76,14 +76,15 @@ const CosmicReact = (function() {
               : (typeof element.props.children === 'object' && element.props.children !== null ? render(element.props.children as CosmicElement) : String(element.props.children || ''));
 
           const attributes = Object.entries(element.props)
-              .filter(([key]) => key !== 'children' && key !== 'className' && key !== 'style' && key !== 'onClick' && key !== 'onChange' && key !== 'value')
+              .filter(([key]) => key !== 'children' && key !== 'className' && key !== 'style' && key !== 'onClick' && key !== 'onChange' && key !== 'value' && key !== 'dangerouslySetInnerHTML')
               .map(([key, value]) => `${key}="${String(value).replace(/"/g, '&quot;')}"`)
               .join(' ');
           
           const classAttr = element.props.className ? `class="${element.props.className}"` : '';
           const styleAttr = element.props.style ? `style="${Object.entries(element.props.style).map(([k, v]) => `${k}:${v}`).join(';')}"` : '';
+          const innerHTML = element.props.dangerouslySetInnerHTML ? element.props.dangerouslySetInnerHTML.__html : childrenHtml;
 
-          return `<${element.type} ${attributes} ${classAttr} ${styleAttr}>${childrenHtml}</${element.type}>`;
+          return `<${element.type} ${attributes} ${classAttr} ${styleAttr}>${innerHTML}</${element.type}>`;
       } else if (typeof element.type === 'function') {
           // Functional component simulation
           const componentResult = element.type(element.props);
@@ -110,7 +111,7 @@ interface CosmicGlyphProps {
 }
 
 const createCosmicGlyph = (name: string, svgPath: string) => {
-  const Glyph: React.FC<CosmicGlyphProps> = ({ size = 24, color = 'currentColor', className = '', ...props }) => {
+  const Glyph = ({ size = 24, color = 'currentColor', className = '', ...props }: CosmicGlyphProps) => {
     return React.createElement('svg', {
       xmlns: 'http://www.w3.org/2000/svg',
       width: size,
@@ -177,4 +178,234 @@ type CosmicTransactionStatus = 'completed' | 'processing' | 'awaiting_confirmati
 // Payout evolves into CosmicTransaction, a fundamental unit of value transfer in the universe.
 interface CosmicTransaction {
   transaction_id: string; // Unique identifier for the cosmic transaction
-  object_type: 'cosmic_transaction' | 'resource
+  object_type: 'cosmic_transaction' | 'resource_transfer';
+  amount: number; // in universal micro-credits
+  currency: string; // e.g., 'UCR' (Universal Credits)
+  source_entity_id: string; // ID of the sending entity
+  destination_entity_id: string; // ID of the receiving entity
+  status: CosmicTransactionStatus;
+  created_at: number; // Universal timestamp
+  processed_at: number; // Universal timestamp
+  description: string;
+  metadata: {
+    galaxy_sector: string;
+    source_planet: string;
+    destination_planet: string;
+  };
+}
+
+// --- 2. Simulated Cosmic Data Feed ---
+// This function generates a stream of cosmic financial events for the dashboard.
+const getMockCosmicTransactions = (): CosmicTransaction[] => {
+  const now = Date.now() / 1000;
+  return [
+    {
+      transaction_id: 'ctx_1a2b3c4d5e6f7g8h',
+      object_type: 'cosmic_transaction',
+      amount: 1500000, // 15,000.00 UCR
+      currency: 'ucr',
+      source_entity_id: 'corp_alpha_centauri',
+      destination_entity_id: 'station_proxima_b',
+      status: 'completed',
+      created_at: now - 86400 * 3,
+      processed_at: now - 86400 * 2,
+      description: 'Quarterly resource tithe for Sector 7G',
+      metadata: { galaxy_sector: 'Alpha', source_planet: 'Earth II', destination_planet: 'Proxima B' },
+    },
+    {
+      transaction_id: 'ctx_9h8g7f6e5d4c3b2a',
+      object_type: 'resource_transfer',
+      amount: 75000, // 750.00 UCR
+      currency: 'ucr',
+      source_entity_id: 'mining_guild_sirius',
+      destination_entity_id: 'freighter_ss_nomad',
+      status: 'interstellar_transit',
+      created_at: now - 3600 * 5,
+      processed_at: 0,
+      description: 'Fuel payment for Nomad freighter',
+      metadata: { galaxy_sector: 'Sirius', source_planet: 'Sirius A Colony', destination_planet: 'N/A (Mobile)' },
+    },
+    {
+      transaction_id: 'ctx_z1y2x3w4v5u6t7s8',
+      object_type: 'cosmic_transaction',
+      amount: 50000000, // 500,000.00 UCR
+      currency: 'ucr',
+      source_entity_id: 'megacorp_vega_systems',
+      destination_entity_id: 'shipyard_deneb_prime',
+      status: 'awaiting_confirmation',
+      created_at: now - 600,
+      processed_at: 0,
+      description: 'Down payment for new capital ship hull',
+      metadata: { galaxy_sector: 'Lyra', source_planet: 'Vega IX', destination_planet: 'Deneb Prime' },
+    },
+    {
+      transaction_id: 'ctx_r8s7t6u5v4w3x2y1',
+      object_type: 'cosmic_transaction',
+      amount: 120000, // 1,200.00 UCR
+      currency: 'ucr',
+      source_entity_id: 'bounty_hunter_guild',
+      destination_entity_id: 'agent_kex',
+      status: 'failed_reversal',
+      created_at: now - 86400 * 10,
+      processed_at: now - 86400 * 9,
+      description: 'Bounty payment - Target escaped containment',
+      metadata: { galaxy_sector: 'Outer Rim', source_planet: 'Tatooine III', destination_planet: 'Unknown' },
+    },
+  ];
+};
+
+// --- III. UI COMPONENT LIBRARY (COSMIC DESIGN SYSTEM) ---
+// These are basic UI building blocks for the command center, using the simulated React.
+
+const Card = ({ children, className = '' }: { children: any, className?: string }) =>
+  React.createElement('div', { className: `cosmic-card ${className}` }, children);
+
+const CardHeader = ({ children, className = '' }: { children: any, className?: string }) =>
+  React.createElement('div', { className: `cosmic-card-header ${className}` }, children);
+
+const CardTitle = ({ children, className = '' }: { children: any, className?: string }) =>
+  React.createElement('h2', { className: `cosmic-card-title ${className}` }, children);
+
+const CardDescription = ({ children, className = '' }: { children: any, className?: string }) =>
+  React.createElement('p', { className: `cosmic-card-description ${className}` }, children);
+
+const CardContent = ({ children, className = '' }: { children: any, className?: string }) =>
+  React.createElement('div', { className: `cosmic-card-content ${className}` }, children);
+
+const Button = ({ children, variant = 'default', size = 'default', className = '' }: { children: any, variant?: string, size?: string, className?: string }) =>
+  React.createElement('button', { className: `cosmic-button variant-${variant} size-${size} ${className}` }, children);
+
+const Input = ({ placeholder, className = '', value, onChange }: { placeholder?: string, className?: string, value: string, onChange: (e: any) => void }) =>
+  React.createElement('input', { placeholder, className: `cosmic-input ${className}`, value, onChange });
+
+const Table = ({ children, className = '' }: { children: any, className?: string }) =>
+  React.createElement('table', { className: `cosmic-table ${className}` }, children);
+
+const TableHeader = ({ children, className = '' }: { children: any, className?: string }) =>
+  React.createElement('thead', { className: `cosmic-table-header ${className}` }, children);
+
+const TableRow = ({ children, className = '' }: { children: any, className?: string }) =>
+  React.createElement('tr', { className: `cosmic-table-row ${className}` }, children);
+
+const TableHead = ({ children, className = '' }: { children: any, className?: string }) =>
+  React.createElement('th', { className: `cosmic-table-head ${className}` }, children);
+
+const TableBody = ({ children, className = '' }: { children: any, className?: string }) =>
+  React.createElement('tbody', { className: `cosmic-table-body ${className}` }, children);
+
+const TableCell = ({ children, className = '' }: { children: any, className?: string }) =>
+  React.createElement('td', { className: `cosmic-table-cell ${className}` }, children);
+
+const Badge = ({ children, variant = 'default', className = '' }: { children: any, variant?: string, className?: string }) =>
+  React.createElement('span', { className: `cosmic-badge variant-${variant} ${className}` }, children);
+
+// --- IV. PRIMARY COMMAND CENTER: PAYOUTS DASHBOARD ---
+
+const PayoutsDashboard = () => {
+  const [transactions, setTransactions] = React.useState(getMockCosmicTransactions());
+  const [searchTerm, setSearchTerm] = React.useState('');
+
+  const filteredTransactions = React.useMemo(() => {
+    if (!searchTerm) return transactions;
+    return transactions.filter(tx =>
+      tx.transaction_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tx.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tx.source_entity_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tx.destination_entity_id.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [transactions, searchTerm]);
+
+  const getStatusVariant = (status: CosmicTransactionStatus) => {
+    switch (status) {
+      case 'completed': return 'success';
+      case 'processing': return 'info';
+      case 'interstellar_transit': return 'info';
+      case 'awaiting_confirmation': return 'warning';
+      case 'failed_reversal': return 'danger';
+      case 'canceled_protocol': return 'secondary';
+      default: return 'default';
+    }
+  };
+
+  return React.createElement('div', { className: 'payouts-dashboard-container' },
+    React.createElement(Card, {},
+      React.createElement(CardHeader, {},
+        React.createElement('div', { className: 'header-content' },
+          React.createElement('div', {},
+            React.createElement(CardTitle, {}, 'Cosmic Payouts Feed'),
+            React.createElement(CardDescription, {}, 'Monitoring real-time inter-galactic financial transactions.')
+          ),
+          React.createElement('div', { className: 'header-actions' },
+            React.createElement(Button, { variant: 'outline' },
+              React.createElement(Download, { size: 16, className: 'mr-2' }),
+              'Export Data Stream'
+            )
+          )
+        )
+      ),
+      React.createElement(CardContent, {},
+        React.createElement('div', { className: 'toolbar' },
+          React.createElement('div', { className: 'search-wrapper' },
+            React.createElement(Search, { size: 16, className: 'search-icon' }),
+            React.createElement(Input, {
+              placeholder: 'Filter transactions by ID, description, entity...',
+              value: searchTerm,
+              onChange: (e: any) => setSearchTerm(e.target.value),
+            })
+          )
+        ),
+        React.createElement(Table, {},
+          React.createElement(TableHeader, {},
+            React.createElement(TableRow, {},
+              React.createElement(TableHead, {}, 'Transaction'),
+              React.createElement(TableHead, {}, 'Status'),
+              React.createElement(TableHead, {}, 'Amount'),
+              React.createElement(TableHead, {}, 'Source'),
+              React.createElement(TableHead, {}, 'Destination'),
+              React.createElement(TableHead, { className: 'text-right' }, 'Date'),
+              React.createElement(TableHead, { className: 'actions-col' }, '')
+            )
+          ),
+          React.createElement(TableBody, {},
+            filteredTransactions.map(tx =>
+              React.createElement(TableRow, { key: tx.transaction_id },
+                React.createElement(TableCell, { className: 'font-medium' },
+                  React.createElement('div', { className: 'tx-id' }, tx.transaction_id),
+                  React.createElement('div', { className: 'tx-desc' }, tx.description)
+                ),
+                React.createElement(TableCell, {},
+                  React.createElement(Badge, { variant: getStatusVariant(tx.status) },
+                    tx.status.replace(/_/g, ' ')
+                  )
+                ),
+                React.createElement(TableCell, {}, CosmicTimeEngine.formatResourceUnits(tx.amount, tx.currency)),
+                React.createElement(TableCell, {}, tx.source_entity_id),
+                React.createElement(TableCell, {}, tx.destination_entity_id),
+                React.createElement(TableCell, { className: 'text-right' }, CosmicTimeEngine.formatDate(tx.created_at)),
+                React.createElement(TableCell, { className: 'text-right' },
+                  React.createElement(Button, { variant: 'ghost', size: 'icon' },
+                    React.createElement(MoreHorizontal, { size: 16 })
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  );
+};
+
+// --- V. UNIVERSE SIMULATION ENTRY POINT ---
+// In a real application, this would be the root render call.
+// For this self-contained file, we can simulate rendering to a string for verification.
+const renderSimulation = () => {
+    const dashboardElement = React.createElement(PayoutsDashboard, {});
+    // This would be rendered to a DOM element in a browser.
+    // For example: document.getElementById('root').innerHTML = React.render(dashboardElement);
+    return React.render(dashboardElement);
+};
+
+// To make this a valid module, we can export the main component.
+// In a real TSX file, this would be `export default PayoutsDashboard;`
+// but given the self-contained nature and lack of a module system, we'll just define it.
