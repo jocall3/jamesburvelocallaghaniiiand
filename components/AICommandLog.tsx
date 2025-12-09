@@ -32,7 +32,9 @@ const Timestamp = () => new Date().toISOString();
 
 const RandomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-const RandomPick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+function RandomPick<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 
 const GenerateHash = (str: string) => {
   let hash = 0;
@@ -410,7 +412,7 @@ const LogRow = ({ log, onClick }: { log: SystemLog; onClick: () => void }) => {
           <span className="text-xs font-bold text-gray-300 font-mono">{log.source}</span>
           {log.target && (
             <>
-              <span className="text-gray-600 text-[10px]">→</span>
+              <span className="text-gray-600 text-[10px]">â†’</span>
               <span className="text-xs text-gray-400 font-mono">{log.target}</span>
             </>
           )}
