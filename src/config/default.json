@@ -1,0 +1,94 @@
+{
+  "api": {
+    "port": 3000,
+    "host": "0.0.0.0",
+    "environment": "development",
+    "name": "MultiCloudAPI",
+    "version": "1.0.0",
+    "baseUrl": "/api/v1"
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "consoleEnabled": true,
+    "fileEnabled": false,
+    "filePath": "/var/log/multicloud-api.log",
+    "maxSize": "10m",
+    "maxFiles": "5d"
+  },
+  "cloudProviders": {
+    "aws": {
+      "defaultRegion": "us-east-1",
+      "apiVersion": "2016-11-15",
+      "enabled": true,
+      "credentialsSource": "environment"
+    },
+    "gcp": {
+      "defaultProject": "your-gcp-project-id",
+      "defaultRegion": "us-central1",
+      "enabled": true,
+      "credentialsSource": "environment"
+    },
+    "azure": {
+      "defaultSubscriptionId": "your-azure-subscription-id",
+      "defaultRegion": "eastus",
+      "enabled": true,
+      "credentialsSource": "environment"
+    }
+  },
+  "security": {
+    "rateLimiting": {
+      "enabled": true,
+      "windowMs": 60000,
+      "maxRequests": 100,
+      "message": "Too many requests from this IP, please try again after 1 minute"
+    },
+    "cors": {
+      "enabled": true,
+      "origin": "*",
+      "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+      "headers": "Content-Type,Authorization,X-API-Key"
+    },
+    "apiKey": {
+      "headerName": "X-API-Key",
+      "enabled": false
+    }
+  },
+  "database": {
+    "type": "mongodb",
+    "host": "localhost",
+    "port": 27017,
+    "name": "multicloud_db",
+    "uri": "mongodb://localhost:27017/multicloud_db",
+    "connectionOptions": {
+      "useNewUrlParser": true,
+      "useUnifiedTopology": true
+    }
+  },
+  "cache": {
+    "enabled": true,
+    "type": "redis",
+    "host": "localhost",
+    "port": 6379,
+    "ttlSeconds": 300
+  },
+  "featureFlags": {
+    "billingNormalization": {
+      "enabled": true,
+      "schemaVersion": "v1"
+    },
+    "logAggregation": {
+      "enabled": true,
+      "retentionDays": 30
+    },
+    "iamAnalyzer": {
+      "enabled": true,
+      "riskThreshold": "medium"
+    }
+  },
+  "telemetry": {
+    "enabled": false,
+    "provider": "opentelemetry",
+    "endpoint": "http://localhost:4318/v1/traces"
+  }
+}
