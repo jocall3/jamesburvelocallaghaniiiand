@@ -1,0 +1,39 @@
+{
+  "id": "capital-projects",
+  "name": "Capital Projects",
+  "description": "Manage and track capital improvement projects and assets.",
+  "version": "1.0.0",
+  "icon": "building",
+  "main": "index.html",
+  "routes": [
+    {
+      "path": "/projects",
+      "component": "views/ProjectList.js",
+      "title": "Projects"
+    },
+    {
+      "path": "/projects/:id",
+      "component": "views/ProjectDetail.js",
+      "title": "Project Detail"
+    },
+    {
+      "path": "/assets",
+      "component": "views/AssetManagement.js",
+      "title": "Assets"
+    },
+    {
+      "path": "/budget",
+      "component": "views/BudgetPlanning.js",
+      "title": "Budget"
+    }
+  ],
+  "permissions": [
+    "read:projects",
+    "write:projects",
+    "manage:assets"
+  ],
+  "settings": {
+    "default_view": "/projects",
+    "enable_reporting": true
+  }
+}
