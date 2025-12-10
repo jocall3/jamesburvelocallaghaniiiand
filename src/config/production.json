@@ -1,0 +1,63 @@
+{
+  "environment": "production",
+  "port": 8080,
+  "database": {
+    "type": "postgresql",
+    "host": "prod-db.example.com",
+    "port": 5432,
+    "username": "billing_user",
+    "password": "${DB_PASSWORD}",
+    "database": "billing_normalizer_prod",
+    "synchronize": false,
+    "logging": false,
+    "ssl": {
+      "rejectUnauthorized": true
+    }
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "destination": "stdout"
+  },
+  "apiKeys": {
+    "aws": {
+      "accessKeyId": "${AWS_ACCESS_KEY_ID}",
+      "secretAccessKey": "${AWS_SECRET_ACCESS_KEY}",
+      "region": "us-east-1"
+    },
+    "gcp": {
+      "projectId": "${GCP_PROJECT_ID}",
+      "keyFile": "${GCP_KEY_FILE_PATH}"
+    },
+    "azure": {
+      "tenantId": "${AZURE_TENANT_ID}",
+      "clientId": "${AZURE_CLIENT_ID}",
+      "clientSecret": "${AZURE_CLIENT_SECRET}",
+      "subscriptionId": "${AZURE_SUBSCRIPTION_ID}"
+    }
+  },
+  "billingServiceEndpoints": {
+    "aws": "https://billing.us-east-1.amazonaws.com",
+    "gcp": "https://cloudbilling.googleapis.com",
+    "azure": "https://management.azure.com"
+  },
+  "cache": {
+    "enabled": true,
+    "type": "redis",
+    "host": "prod-redis.example.com",
+    "port": 6379,
+    "password": "${REDIS_PASSWORD}",
+    "ttlSeconds": 3600
+  },
+  "security": {
+    "jwtSecret": "${JWT_SECRET}",
+    "rateLimit": {
+      "windowMs": 60000,
+      "max": 100
+    }
+  },
+  "metrics": {
+    "enabled": true,
+    "path": "/metrics"
+  }
+}
