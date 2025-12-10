@@ -1,0 +1,395 @@
+openapi: 3.0.0
+info:
+  title: Multi-Cloud Billing Normalizer API
+  description: An API that merges AWS, GCP, and Azure billing data into a single, normalized schema for unified cost analysis and reporting.
+  version: 1.0.0
+servers:
+  - url: https://api.multicloudbilling.com/v1
+    description: Production server
+  - url: http://localhost:8080/v1
+    description: Local development server
+security:
+  - ApiKeyAuth: []
+paths:
+  /billing/summary:
+    get:
+      summary: Get a high-level billing summary across all clouds
+      operationId: getBillingSummary
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+          description: The start date for the billing summary (YYYY-MM-DD). Defaults to 30 days ago.
+          example: '2023-01-01'
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+          description: The end date for the billing summary (YYYY-MM-DD). Defaults to today.
+          example: '2023-01-31'
+      responses:
+        '200':
+          description: Unified billing summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /billing/details:
+    get:
+      summary: Retrieve detailed billing records across multiple clouds
+      operationId: getBillingDetails
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+          description: The start date for detailed records (YYYY-MM-DD).
+          required: true
+          example: '2023-01-01'
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+          description: The end date for detailed records (YYYY-MM-DD).
+          required: true
+          example: '2023-01-31'
+        - in: query
+          name: cloudProvider
+          schema:
+            type: string
+            enum: [AWS, GCP, Azure]
+          description: Filter by specific cloud provider.
+        - in: query
+          name: service
+          schema:
+            type: string
+          description: Filter by specific service (e.g., EC2, Compute Engine, Virtual Machines).
+        - in: query
+          name: resourceId
+          schema:
+            type: string
+          description: Filter by a specific resource ID.
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Number of records to return.
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            default: 0
+          description: Offset for pagination.
+      responses:
+        '200':
+          description: A list of detailed billing records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BillingDetail'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /billing/sync:
+    post:
+      summary: Trigger a manual synchronization of billing data from configured cloud accounts
+      operationId: triggerBillingSync
+      requestBody:
+        description: Optional parameters to specify which accounts to sync.
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cloudProviders:
+                  type: array
+                  items:
+                    type: string
+                    enum: [AWS, GCP, Azure]
+                  description: List of cloud providers to sync. If empty, all configured providers will be synced.
+                accountIds:
+                  type: array
+                  items:
+                    type: string
+                  description: List of specific internal account IDs to sync.
+      responses:
+        '202':
+          description: Billing data synchronization initiated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Billing data synchronization initiated."
+                  syncId:
+                    type: string
+                    format: uuid
+                    example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /billing/accounts:
+    get:
+      summary: List configured cloud billing accounts
+      operationId: listBillingAccounts
+      responses:
+        '200':
+          description: A list of configured cloud accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CloudAccount'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key # Or Authorization: Bearer <token> if using JWT
+  schemas:
+    BillingSummary:
+      type: object
+      description: High-level summary of billing costs across all clouds.
+      properties:
+        totalCost:
+          type: number
+          format: float
+          description: Total cost across all providers for the period.
+          example: 12345.67
+        currency:
+          type: string
+          description: The currency of the costs.
+          example: USD
+        period:
+          type: object
+          properties:
+            startDate:
+              type: string
+              format: date
+              example: '2023-01-01'
+            endDate:
+              type: string
+              format: date
+              example: '2023-01-31'
+        costByProvider:
+          type: object
+          additionalProperties:
+            type: number
+            format: float
+          description: Cost broken down by cloud provider.
+          example:
+            AWS: 5000.00
+            GCP: 4000.00
+            Azure: 3345.67
+        costByServiceCategory:
+          type: object
+          additionalProperties:
+            type: number
+            format: float
+          description: Cost broken down by service category (e.g., Compute, Storage, Network).
+          example:
+            Compute: 8000.00
+            Storage: 2000.00
+            Network: 1000.00
+            Database: 1345.67
+
+    BillingDetail:
+      type: object
+      description: A single detailed billing record item.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the billing record.
+          example: "rec-12345-abcde"
+        cloudProvider:
+          type: string
+          enum: [AWS, GCP, Azure]
+          description: The cloud provider for this record.
+          example: AWS
+        accountId:
+          type: string
+          description: The internal ID of the cloud account.
+          example: "acc-aws-prod-1"
+        externalAccountId:
+          type: string
+          description: The actual account ID from the cloud provider (e.g., AWS Account ID, GCP Project ID, Azure Subscription ID).
+          example: "123456789012"
+        service:
+          type: string
+          description: The specific cloud service (e.g., EC2, Compute Engine, Virtual Machines).
+          example: EC2
+        serviceCategory:
+          type: string
+          description: A normalized category for the service (e.g., Compute, Storage, Network, Database).
+          example: Compute
+        resourceId:
+          type: string
+          description: The ID of the resource associated with the cost.
+          example: "i-0abcdef1234567890"
+        resourceName:
+          type: string
+          description: The name of the resource, if available.
+          example: "my-web-server"
+        region:
+          type: string
+          description: The cloud region where the resource is located.
+          example: "us-east-1"
+        cost:
+          type: number
+          format: float
+          description: The cost for this item.
+          example: 0.012
+        currency:
+          type: string
+          description: The currency of the cost.
+          example: USD
+        usageAmount:
+          type: number
+          format: float
+          description: The amount of usage (e.g., 1.0 for 1 hour, 1024 for 1GB).
+          example: 1.0
+        usageUnit:
+          type: string
+          description: The unit of usage (e.g., Hour, GB, Request).
+          example: Hour
+        startTime:
+          type: string
+          format: date-time
+          description: The start time of the usage period.
+          example: '2023-01-01T00:00:00Z'
+        endTime:
+          type: string
+          format: date-time
+          description: The end time of the usage period.
+          example: '2023-01-01T01:00:00Z'
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Key-value tags/labels associated with the resource.
+          example:
+            Project: "Alpha"
+            Environment: "Prod"
+
+    CloudAccount:
+      type: object
+      description: Represents a configured cloud billing account.
+      properties:
+        id:
+          type: string
+          description: Internal ID of the configured account.
+          example: "acc-aws-prod-1"
+        provider:
+          type: string
+          enum: [AWS, GCP, Azure]
+          description: The cloud provider.
+          example: AWS
+        externalAccountId:
+          type: string
+          description: The actual account ID from the cloud provider (e.g., AWS Account ID, GCP Project ID, Azure Subscription ID).
+          example: "123456789012"
+        name:
+          type: string
+          description: A user-friendly name for the account.
+          example: "AWS Production"
+        status:
+          type: string
+          enum: [Active, Inactive, Error]
+          description: Current status of the account integration.
+          example: Active
+        lastSyncTime:
+          type: string
+          format: date-time
+          description: Timestamp of the last successful billing data synchronization.
+          example: '2023-10-26T10:30:00Z'
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: A unique error code.
+          example: "INVALID_PARAMETER"
+        message:
+          type: string
+          description: A human-readable error message.
+          example: "The provided startDate is invalid."
+        details:
+          type: string
+          description: More specific details about the error.
+          example: "startDate must be in YYYY-MM-DD format."
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            invalidDate:
+              value:
+                code: "INVALID_PARAMETER"
+                message: "Invalid date format."
+                details: "startDate and endDate must be in YYYY-MM-DD format."
+    Unauthorized:
+      description: Authentication required or failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            missingApiKey:
+              value:
+                code: "AUTHENTICATION_REQUIRED"
+                message: "API Key is missing or invalid."
+    InternalServerError:
+      description: An unexpected error occurred on the server.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            serverError:
+              value:
+                code: "INTERNAL_SERVER_ERROR"
+                message: "An unexpected error occurred."
+                details: "Please try again later or contact support."
