@@ -1,0 +1,48 @@
+{
+  "port": 8080,
+  "logLevel": "debug",
+  "database": {
+    "type": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "username": "devuser",
+    "password": "devpassword",
+    "database": "billing_normalizer_dev",
+    "synchronize": true,
+    "logging": true
+  },
+  "cloudProviders": {
+    "aws": {
+      "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+      "secretAccessKey": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+      "region": "us-east-1",
+      "billingApiEndpoint": "http://localhost:4001/mock-aws-billing"
+    },
+    "gcp": {
+      "projectId": "dev-gcp-project-12345",
+      "keyFilePath": "./gcp-dev-service-account.json",
+      "billingApiEndpoint": "http://localhost:4002/mock-gcp-billing"
+    },
+    "azure": {
+      "tenantId": "dev-tenant-id-abcdef",
+      "clientId": "dev-client-id-12345",
+      "clientSecret": "dev-client-secret-xyz",
+      "subscriptionId": "dev-subscription-id-67890",
+      "billingApiEndpoint": "http://localhost:4003/mock-azure-billing"
+    }
+  },
+  "api": {
+    "baseUrl": "http://localhost:8080/api/v1",
+    "mockDataEnabled": true,
+    "cacheTTLSeconds": 5
+  },
+  "debug": {
+    "enableVerboseLogging": true,
+    "simulateErrors": false,
+    "slowApiResponsesMs": 100
+  },
+  "featureFlags": {
+    "newReportingDashboard": true,
+    "costPredictionModule": false
+  }
+}
