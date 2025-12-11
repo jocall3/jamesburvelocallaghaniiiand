@@ -1,0 +1,127 @@
+// This is the Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Core Entities ---
+
+model Issuer {
+  id               String           @id @default(uuid())
+  name             String           @db.VarChar(255)
+  full_name        String?          @db.VarChar(500)
+  sector           String?          @db.VarChar(100)
+  profile          String?          @db.Text
+  country_of_risk  String?          @db.VarChar(50)
+  // Identifiers
+  isin             String?          @unique @db.VarChar(12)
+  cusip            String?          @db.VarChar(9)
+  figi             String?          @db.VarChar(12) // Global Financial Instrument Identifier
+  ticker           String?          @db.VarChar(50)
+  // Relationships
+  instruments      BondInstrument[]
+  ratings          IssuerRating[]
+}
+
+model IssuerRating {
+  id               String    @id @default(uuid())
+  issuer_id        String
+  agency           String    @db.VarChar(100)
+  rating_scale     String?   @db.VarChar(100)
+  rating           String    @db.VarChar(50)
+  forecast         String?   @db.VarChar(50)
+  date             DateTime? @db.Date
+  // Relationships
+  issuer           Issuer    @relation(fields: [issuer_id], references: [id])
+}
+
+model BondInstrument {
+  id                   String           @id @default(uuid())
+  issuer_id            String
+  isin                 String           @unique @db.VarChar(12)
+  name                 String           @db.VarChar(255)
+  // Key Features
+  security_type        String?          @db.VarChar(50) // e.g., "Zero-coupon bonds"
+  sub_type             String?          @db.VarChar(50) // e.g., "Senior Unsecured"
+  maturity_date        DateTime?        @db.Date
+  nominal_value        Decimal?         @db.Decimal(18, 4)
+  nominal_currency     String?          @db.VarChar(3)
+  coupon_rate          Decimal?         @db.Decimal(8, 4) // Percentage (e.g., 3.875)
+  // Status and Amount
+  status               String?          @db.VarChar(50) // e.g., "Matured"
+  placement_amount     Decimal?         @db.Decimal(20, 2)
+  outstanding_amount   Decimal?         @db.Decimal(20, 2)
+  // Placement details
+  placement_method     String?          @db.VarChar(100) // e.g., "Open subscription"
+  placement_type       String?          @db.VarChar(100) // e.g., "Public"
+  initial_issue_price  Decimal?         @db.Decimal(10, 4) // Initial price (or yield)
+  // Cash Flow parameters
+  day_count_fraction   String?          @db.VarChar(50)
+  business_day_convention String?       @db.VarChar(100)
+  payment_currency     String?          @db.VarChar(3)
+  // Identifiers
+  cfi                  String?          @db.VarChar(6) // Classification of Financial Instruments
+  ticker               String?          @db.VarChar(50) // e.g., B 0 12/21/21
+  // Trading Data (Snapshot)
+  latest_data_date     DateTime?        @db.Date
+  // Relationships
+  issuer               Issuer           @relation(fields: [issuer_id], references: [id])
+  cash_flows           CashFlow[]
+  holdings             BondHolding[]
+}
+
+model CashFlow {
+  id                       String         @id @default(uuid())
+  bond_id                  String
+  cash_flow_number         Int
+  end_of_coupon_period     DateTime       @db.Date
+  coupon_rate_percent      Decimal?       @db.Decimal(8, 4)
+  coupon_payment_amount    Decimal?       @db.Decimal(18, 2)
+  redemption_amount        Decimal?       @db.Decimal(18, 2)
+  actual_payment           Decimal?       @db.Decimal(18, 2)
+  // Relationships
+  bond                     BondInstrument @relation(fields: [bond_id], references: [id])
+
+  @@unique([bond_id, cash_flow_number])
+}
+
+
+// --- Related Market Data ---
+
+model BondAuction {
+  id                   String    @id @default(uuid())
+  bond_id              String?   // If linked to a specific bond ISIN
+  date                 DateTime  @db.Date
+  deal_type            String?   @db.VarChar(50)
+  status               String?   @db.VarChar(50)
+  offer_m              Decimal?  @db.Decimal(15, 2) // Million units
+  bids_m               Decimal?  @db.Decimal(15, 2) // Million units
+  placement_buy_back_m Decimal?  @db.Decimal(15, 2) // Million units
+  settlement_duration  String?   @db.VarChar(50)
+  cut_off_price_yield  String?   @db.VarChar(50)
+  weighted_avg_price_yield String? @db.VarChar(50)
+
+  // Relationships (Optional, depends on strict ISIN mapping)
+  // bond                 BondInstrument? @relation(fields: [bond_id], references: [id])
+}
+
+// Example model for tracking investor holdings/breakdown (if detailed breakdown is required)
+model BondHolding {
+  id               String         @id @default(uuid())
+  bond_id          String
+  investor_type    String         @db.VarChar(100) // e.g., "Retail", "Institutional", "Foreign"
+  share_percent    Decimal?       @db.Decimal(5, 2)
+  date_recorded    DateTime?      @db.Date
+
+  bond             BondInstrument @relation(fields: [bond_id], references: [id])
+
+  @@unique([bond_id, investor_type])
+}
+// Note: This schema focuses on parsing and structuring the static bond detail page information.
+// Real-time trading data (price, yield, duration) would typically live in separate time-series tables (e.g., BondQuote).
