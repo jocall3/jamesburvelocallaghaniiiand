@@ -1,0 +1,214 @@
+:root {
+    --glass-bg-primary: rgba(16, 18, 27, 0.6);
+    --glass-bg-secondary: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-highlight: rgba(255, 255, 255, 0.15);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    --glass-blur: 16px;
+    
+    --quantum-accent: #00f0ff;
+    --quantum-glow: 0 0 15px rgba(0, 240, 255, 0.3);
+    --quantum-error: #ff2a6d;
+    --quantum-text-main: #e0e6ed;
+    --quantum-text-muted: #94a3b8;
+    --quantum-font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+}
+
+/* Main Container for Glassmorphism Effects */
+.glass-panel {
+    background: var(--glass-bg-primary);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 12px;
+    color: var(--quantum-text-main);
+    padding: 1.5rem;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Subtle shine effect on top border */
+.glass-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--glass-highlight), transparent);
+    opacity: 0.5;
+}
+
+.glass-panel:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* Header Section within the Panel */
+.glass-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.glass-title {
+    font-family: var(--quantum-font-mono);
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--quantum-accent);
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    text-transform: uppercase;
+}
+
+/* Data Display Areas (Stack, Memory, Gas) */
+.glass-data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.glass-metric {
+    background: var(--glass-bg-secondary);
+    border-radius: 8px;
+    padding: 0.75rem;
+    border: 1px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.glass-metric:hover {
+    border-color: var(--glass-highlight);
+}
+
+.glass-metric-label {
+    font-size: 0.75rem;
+    color: var(--quantum-text-muted);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.glass-metric-value {
+    font-family: var(--quantum-font-mono);
+    font-size: 0.95rem;
+    color: var(--quantum-text-main);
+    word-break: break-all;
+}
+
+/* Trace Logs and Code Lines */
+.glass-code-block {
+    font-family: var(--quantum-font-mono);
+    font-size: 0.85rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    padding: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--glass-border);
+}
+
+.trace-line {
+    display: flex;
+    padding: 0.25rem 0.5rem;
+    border-left: 2px solid transparent;
+}
+
+.trace-line:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.trace-line.active {
+    background: rgba(0, 240, 255, 0.1);
+    border-left-color: var(--quantum-accent);
+}
+
+.trace-line.revert {
+    background: rgba(255, 42, 109, 0.1);
+    border-left-color: var(--quantum-error);
+}
+
+/* Opcode Badges */
+.opcode-badge {
+    display: inline-block;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    min-width: 40px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--quantum-text-main);
+}
+
+.opcode-badge.push { color: #a5b3ce; border: 1px solid #a5b3ce; background: transparent; }
+.opcode-badge.swap { color: #f0c674; border: 1px solid #f0c674; background: transparent; }
+.opcode-badge.dup { color: #81a2be; border: 1px solid #81a2be; background: transparent; }
+.opcode-badge.control { color: var(--quantum-accent); border: 1px solid var(--quantum-accent); box-shadow: var(--quantum-glow); }
+
+/* Interactive Elements */
+.glass-btn {
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+    border: 1px solid var(--glass-border);
+    color: var(--quantum-text-main);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--quantum-font-mono);
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.glass-btn:hover {
+    border-color: var(--quantum-accent);
+    color: var(--quantum-accent);
+    background: rgba(0, 240, 255, 0.05);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+}
+
+.glass-btn:active {
+    transform: scale(0.98);
+}
+
+/* Scrollbars */
+.glass-panel ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.glass-panel ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.glass-panel ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+}
+
+.glass-panel ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Utility: Loading State */
+.glass-skeleton {
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.05) 25%, 
+        rgba(255, 255, 255, 0.1) 50%, 
+        rgba(255, 255, 255, 0.05) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    height: 1rem;
+    margin: 0.5rem 0;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
