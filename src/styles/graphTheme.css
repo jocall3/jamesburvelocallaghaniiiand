@@ -1,0 +1,93 @@
+/*
+ * src/styles/graphTheme.css
+ *
+ * CSS definitions for the graph visualization.
+ * Provides a dark, "quantum"-themed style for nodes and edges,
+ * with specific animations for active connections.
+ */
+
+/* General Styles for Graph Elements */
+.node circle {
+    stroke: #9f7aea; /* Quantum Purple */
+    stroke-width: 1.5px;
+    fill: #1a202c; /* Dark background */
+    cursor: pointer;
+    transition: fill 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.node circle:hover {
+    fill: #4a5568;
+    transform: scale(1.1);
+}
+
+.node text {
+    fill: #e2e8f0;
+    font-family: 'Consolas', 'Menlo', monospace;
+    font-size: 12px;
+    text-anchor: middle;
+    dominant-baseline: central;
+    pointer-events: none; /* Prevents text from blocking node interaction */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.link {
+    stroke: #4a5568;
+    stroke-opacity: 0.6;
+    stroke-width: 1.5px;
+    fill: none;
+    transition: stroke 0.2s ease, stroke-width 0.2s ease, stroke-opacity 0.2s ease;
+}
+
+/* Quantum Animations for Active Edges */
+
+/*
+ * Base style for an active edge. It glows with a bright, energetic color.
+ * The 'quantum-glow' animation creates a pulsing effect.
+ */
+.link.active {
+    stroke: #38b2ac; /* Quantum Teal */
+    stroke-opacity: 1;
+    stroke-width: 2.5px;
+    animation: quantum-glow 2s infinite ease-in-out;
+}
+
+/*
+ * Add the 'flow' class to an active edge to simulate particle movement.
+ * This is achieved by animating the stroke-dasharray property.
+ */
+.link.active.flow {
+    stroke-dasharray: 5 10;
+    animation-name: quantum-glow, quantum-flow;
+    animation-duration: 2s, 1.5s;
+    animation-timing-function: ease-in-out, linear;
+    animation-iteration-count: infinite, infinite;
+}
+
+/**
+ * Keyframes for the glowing/pulsing effect.
+ * Uses filter: drop-shadow for a soft, performance-friendly glow on SVG elements.
+ */
+@keyframes quantum-glow {
+    0%, 100% {
+        filter: drop-shadow(0 0 2px #38b2ac);
+        stroke-width: 2.5px;
+    }
+    50% {
+        filter: drop-shadow(0 0 8px #38b2ac);
+        stroke-width: 3.5px;
+    }
+}
+
+/**
+ * Keyframes for the particle flow animation.
+ * Animates the stroke-dashoffset to create the illusion of movement along the path.
+ * The 'to' value is the negative sum of the dasharray (5 + 10 = 15).
+ */
+@keyframes quantum-flow {
+    to {
+        stroke-dashoffset: -15;
+    }
+}
