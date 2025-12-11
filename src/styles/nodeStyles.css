@@ -1,0 +1,98 @@
+.graph-node {
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 14px;
+    text-align: center;
+    width: 180px;
+    border: 2px solid;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.graph-node:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.graph-node .node-header {
+    font-weight: 600;
+    font-size: 1em;
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid;
+    word-wrap: break-word;
+}
+
+.graph-node .node-type {
+    font-size: 0.8em;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+/* Enterprise Application Node Style */
+.enterprise-app-node {
+    border-color: #28a745; /* Green */
+    background-color: #f0fff4;
+}
+
+.enterprise-app-node .node-header {
+    color: #1e7e34;
+    border-bottom-color: #a3d3a3;
+}
+
+.enterprise-app-node .node-type {
+    color: #218838;
+}
+
+/* Microsoft Application Node Style */
+.microsoft-app-node {
+    border-color: #007bff; /* Blue */
+    background-color: #e7f3fe;
+}
+
+.microsoft-app-node .node-header {
+    color: #0056b3;
+    border-bottom-color: #a9cce3;
+}
+
+.microsoft-app-node .node-type {
+    color: #0069d9;
+}
+
+/* Managed Identity Node Style */
+.managed-identity-node {
+    border-color: #ffc107; /* Yellow/Orange */
+    background-color: #fffbec;
+}
+
+.managed-identity-node .node-header {
+    color: #d39e00;
+    border-bottom-color: #ffeeba;
+}
+
+.managed-identity-node .node-type {
+    color: #e0a800;
+}
+
+/* Unknown Type Node Style (for null or empty applicationType) */
+.unknown-type-node {
+    border-color: #6c757d; /* Gray */
+    background-color: #f8f9fa;
+}
+
+.unknown-type-node .node-header {
+    color: #495057;
+    border-bottom-color: #ced4da;
+}
+
+.unknown-type-node .node-type {
+    color: #5a6268;
+}
+
+/* Style for selected nodes to override default React Flow selection */
+.react-flow__node.selected .graph-node {
+    box-shadow: 0 0 0 2px #343a40, 0 8px 16px rgba(0,0,0,0.15);
+    border-color: #343a40;
+}
