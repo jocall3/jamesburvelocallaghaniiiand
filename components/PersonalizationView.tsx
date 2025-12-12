@@ -12,7 +12,7 @@ const PersonalizationView: React.FC = () => {
             <Card title="The Interface of Will">
                 <div className="space-y-6">
                     <p className="text-gray-300 italic border-l-4 border-cyan-500 pl-4 py-2 bg-gray-800/50 rounded-r">
-                        "You click on 'Personalization' and think you're choosing a theme. Cute. You're not decorating a dashboard. You are stepping into the mind of James Burvel O'Callaghan III." — idgafai
+                        "You click on 'Personalization' and think you're choosing a theme. Cute. You're not decorating a dashboard. You are stepping into the mind of James Burvel O'Callaghan III." â€” idgafai
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
