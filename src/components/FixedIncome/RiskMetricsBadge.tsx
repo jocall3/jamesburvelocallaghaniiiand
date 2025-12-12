@@ -1,4 +1,3 @@
-```tsx
 import React from 'react';
 import { Badge } from 'antd';
 
@@ -92,4 +91,3 @@ const RiskMetricsBadge: React.FC<RiskMetricsBadgeProps> = ({ duration, creditRat
 };
 
 export default RiskMetricsBadge;
-```
