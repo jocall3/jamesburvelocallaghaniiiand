@@ -1,4 +1,3 @@
-```tsx
 import React, { useState, useEffect } from 'react';
 import { Prism as SyntaxHighlighter } from 'prism-react-renderer';
 import { vsDark } from 'prism-react-renderer/themes/vsDark';
@@ -29,4 +28,3 @@ const GeneratedCodeViewer: React.FC<GeneratedCodeViewerProps> = ({ code, languag
 };
 
 export default GeneratedCodeViewer;
-```
