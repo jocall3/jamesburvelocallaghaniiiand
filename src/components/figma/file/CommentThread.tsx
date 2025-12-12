@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 import { Comment } from '../../../types/figma';
 
@@ -25,4 +24,3 @@ const CommentThread: React.FC<CommentThreadProps> = ({ comment }) => {
 };
 
 export default CommentThread;
-```
