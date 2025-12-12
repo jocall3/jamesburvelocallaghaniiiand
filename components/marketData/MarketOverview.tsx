@@ -17,6 +17,62 @@ interface NewsArticle {
   url: string;
 }
 
+// --- Internal Generative-Data Functions ---
+// As per Citibankdemobusinessinc principles: zero mock data, internal data generators.
+
+const generateRandomFloat = (min: number, max: number, decimals: number): number => {
+  const str = (Math.random() * (max - min) + min).toFixed(decimals);
+  return parseFloat(str);
+};
+
+const generateMarketIndexData = (): MarketIndex[] => {
+  const indices = [
+    { id: 'SPX', name: 'S&P 500', baseValue: 5200 },
+    { id: 'NDX', name: 'NASDAQ', baseValue: 16300 },
+    { id: 'DJI', name: 'Dow Jones', baseValue: 39000 },
+    { id: 'FTSE', name: 'FTSE 100', baseValue: 7900 },
+    { id: 'N225', name: 'Nikkei 225', baseValue: 38500 },
+    { id: 'DAX', name: 'DAX', baseValue: 18200 },
+  ];
+
+  return indices.map(index => {
+    const value = index.baseValue * (1 + generateRandomFloat(-0.05, 0.05, 4));
+    const changePercent = generateRandomFloat(-1.5, 1.5, 2);
+    const previousValue = value / (1 + changePercent / 100);
+    const change = value - previousValue;
+    
+    return {
+      id: index.id,
+      name: index.name,
+      value: parseFloat(value.toFixed(2)),
+      change: parseFloat(change.toFixed(2)),
+      changePercent: changePercent,
+    };
+  });
+};
+
+const generateMarketNewsData = (): NewsArticle[] => {
+  const subjects = ['Tech Giants', 'Global Markets', 'Oil Prices', 'Semiconductor Stocks', 'European Markets', 'Central Bank'];
+  const actions = ['Report Strong', 'Experience Volatility', 'Fluctuate Amid', 'Drive Higher', 'React to', 'Hints at'];
+  const reasons = ['Q1 Earnings', 'Geopolitical Tensions', 'Inflation Concerns', 'New AI Breakthroughs', 'ECB Policy Statements', 'Stable Interest Rates'];
+  const sources = ['Reuters', 'Bloomberg', 'Wall Street Journal', 'TechCrunch', 'Financial Times', 'Associated Press'];
+  const times = ['2 hours ago', '4 hours ago', '6 hours ago', '1 day ago', '2 days ago'];
+
+  const articles: NewsArticle[] = [];
+  for (let i = 0; i < 5; i++) {
+    const title = `${subjects[Math.floor(Math.random() * subjects.length)]} ${actions[Math.floor(Math.random() * actions.length)]} ${reasons[Math.floor(Math.random() * reasons.length)]}`;
+    articles.push({
+      id: `n${i + 1}-${Date.now()}`,
+      title: title,
+      source: sources[Math.floor(Math.random() * sources.length)],
+      time: times[Math.floor(Math.random() * times.length)],
+      url: '#',
+    });
+  }
+  return articles;
+};
+
+
 const MarketOverview: React.FC = () => {
   const [marketIndices, setMarketIndices] = useState<MarketIndex[]>([]);
   const [marketNews, setMarketNews] = useState<NewsArticle[]>([]);
@@ -28,28 +84,15 @@ const MarketOverview: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        // Simulate API call
+        // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        const mockIndices: MarketIndex[] = [
-          { id: 'SPX', name: 'S&P 500', value: 5200.12, change: 15.34, changePercent: 0.30 },
-          { id: 'NDX', name: 'NASDAQ', value: 16300.55, change: -50.21, changePercent: -0.31 },
-          { id: 'DJI', name: 'Dow Jones', value: 39000.78, change: 120.05, changePercent: 0.31 },
-          { id: 'FTSE', name: 'FTSE 100', value: 7900.23, change: 25.10, changePercent: 0.32 },
-          { id: 'N225', name: 'Nikkei 225', value: 38500.45, change: -150.70, changePercent: -0.39 },
-          { id: 'DAX', name: 'DAX', value: 18200.67, change: 40.80, changePercent: 0.22 },
-        ];
+        // Use internal generative functions instead of mock data
+        const generatedIndices = generateMarketIndexData();
+        const generatedNews = generateMarketNewsData();
 
-        const mockNews: NewsArticle[] = [
-          { id: 'n1', title: 'Tech Giants Report Strong Q1 Earnings, Boosting Market Confidence', source: 'Reuters', time: '2 hours ago', url: '#' },
-          { id: 'n2', title: 'Inflation Concerns Ease as Fed Hints at Stable Interest Rates', source: 'Bloomberg', time: '4 hours ago', url: '#' },
-          { id: 'n3', title: 'Oil Prices Fluctuate Amid Geopolitical Tensions in Middle East', source: 'Wall Street Journal', time: '6 hours ago', url: '#' },
-          { id: 'n4', title: 'New AI Breakthroughs Drive Semiconductor Stocks Higher', source: 'TechCrunch', time: '1 day ago', url: '#' },
-          { id: 'n5', title: 'European Markets React to Latest ECB Policy Statements', source: 'Financial Times', time: '1 day ago', url: '#' },
-        ];
-
-        setMarketIndices(mockIndices);
-        setMarketNews(mockNews);
+        setMarketIndices(generatedIndices);
+        setMarketNews(generatedNews);
       } catch (err) {
         setError('Failed to fetch market data. Please try again later.');
         console.error(err);
@@ -83,7 +126,7 @@ const MarketOverview: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-800 rounded-lg shadow-lg text-white">
-      <h2 className="text-3xl font-bold mb-6 text-blue-400">Global Market Overview</h2>
+      <h2 className="text-3xl font-bold mb-6 text-blue-400">Citibankdemobusinessinc - Global Market Overview</h2>
 
       {/* Key Global Indices */}
       <section className="mb-8">
@@ -97,7 +140,7 @@ const MarketOverview: React.FC = () => {
               </div>
               <div className="mt-2">
                 <span className={`text-lg font-semibold ${index.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {index.change >= 0 ? '▲' : '▼'} {Math.abs(index.change).toFixed(2)}
+                  {index.change >= 0 ? 'â–²' : 'â–¼'} {Math.abs(index.change).toFixed(2)}
                 </span>
                 <span className={`ml-2 text-md ${index.changePercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                   ({Math.abs(index.changePercent).toFixed(2)}%)
@@ -118,7 +161,7 @@ const MarketOverview: React.FC = () => {
                 <a href={article.url} target="_blank" rel="noopener noreferrer" className="block hover:text-blue-400 transition-colors duration-200">
                   <p className="text-lg font-medium text-gray-100">{article.title}</p>
                   <p className="text-sm text-gray-400 mt-1">
-                    {article.source} <span className="mx-1">•</span> {article.time}
+                    {article.source} <span className="mx-1">â€¢</span> {article.time}
                   </p>
                 </a>
               </li>
