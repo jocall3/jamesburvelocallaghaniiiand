@@ -46,8 +46,8 @@ const cardStyle: React.CSSProperties = {
   width: CARD_WIDTH,
   height: CARD_HEIGHT,
   borderRadius: '15px',
-  background: 'linear-gradient(135deg, #1f1f3a, #4a4e69)',
-  boxShadow: '0 10px 20px rgba(0, 0, 0, 0.5)',
+  background: 'linear-gradient(135deg, #00529B, #003B70)',
+  boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)',
   color: 'white',
   padding: '20px',
   position: 'relative',
@@ -107,10 +107,10 @@ const cardTextRowStyle: React.CSSProperties = {
   alignItems: 'flex-end',
 };
 
-// Mock Stripe Logo (Text representation)
-const StripeLogo: React.FC = () => (
-  <span style={{ fontSize: '12px', fontWeight: 'bold', letterSpacing: '1px', opacity: 0.7 }}>
-    STRIPE ISSUING
+// Mock Citibankdemobusinessinc Logo (Text representation)
+const CitibankdemobusinessincLogo: React.FC = () => (
+  <span style={{ fontSize: '10px', fontWeight: 'bold', letterSpacing: '0.5px', opacity: 0.8 }}>
+    Citibankdemobusinessinc
   </span>
 );
 
@@ -195,7 +195,7 @@ const CardDesignVisualizer: React.FC<CardDesignVisualizerProps> = ({ design, car
           </div>
         </div>
         
-        {/* Overlay the Stripe logo and Status */}
+        {/* Overlay the logo and Status */}
         <div style={{ 
             position: 'absolute', 
             bottom: '10px', 
@@ -210,7 +210,7 @@ const CardDesignVisualizer: React.FC<CardDesignVisualizerProps> = ({ design, car
         </div>
 
         <div style={{ position: 'absolute', bottom: '10px', right: '20px' }}>
-            <StripeLogo />
+            <CitibankdemobusinessincLogo />
         </div>
       </div>
 
@@ -227,10 +227,10 @@ const CardDesignVisualizer: React.FC<CardDesignVisualizerProps> = ({ design, car
       }}>
           <p style={{ margin: 0, fontWeight: 'bold', marginBottom: '10px' }}>Carrier Text Configuration:</p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              <div><strong>Header Title:</strong> {design.carrier_text.header_title || '—'}</div>
-              <div><strong>Footer Title:</strong> {design.carrier_text.footer_title || '—'}</div>
-              <div><strong>Header Body:</strong> {design.carrier_text.header_body || '—'}</div>
-              <div><strong>Footer Body:</strong> {design.carrier_text.footer_body || '—'}</div>
+              <div><strong>Header Title:</strong> {design.carrier_text.header_title || 'â€”'}</div>
+              <div><strong>Footer Title:</strong> {design.carrier_text.footer_title || 'â€”'}</div>
+              <div><strong>Header Body:</strong> {design.carrier_text.header_body || 'â€”'}</div>
+              <div><strong>Footer Body:</strong> {design.carrier_text.footer_body || 'â€”'}</div>
           </div>
           <p style={{ margin: '10px 0 0 0', fontWeight: 'bold' }}>Rejection Reasons:</p>
           <p style={{ margin: '5px 0 0 0', color: design.status === 'rejected' ? 'red' : 'green' }}>
