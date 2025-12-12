@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-// Define the interface for a JPMorgan Chase account
+// Define the interface for a Citibankdemobusinessinc account
 interface Account {
   id: string;
   name: string;
@@ -15,10 +15,10 @@ interface Account {
 }
 
 /**
- * Mock API call to simulate fetching accounts from JPMorgan Chase.
+ * Mock API call to simulate fetching accounts from Citibankdemobusinessinc.
  * In a real application, this would be an actual API call (e.g., using fetch or axios).
  */
-const fetchJPMChaseAccounts = (): Promise<Account[]> => {
+const fetchCitibankdemobusinessincAccounts = (): Promise<Account[]> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       // Simulate a successful fetch
@@ -79,7 +79,7 @@ const fetchJPMChaseAccounts = (): Promise<Account[]> => {
 };
 
 /**
- * `AccountList` component displays a list of JPMorgan Chase accounts.
+ * `AccountList` component displays a list of Citibankdemobusinessinc accounts.
  * It handles loading, error states, and renders account details.
  */
 const AccountList: React.FC = () => {
@@ -92,7 +92,7 @@ const AccountList: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const fetchedAccounts = await fetchJPMChaseAccounts();
+        const fetchedAccounts = await fetchCitibankdemobusinessincAccounts();
         setAccounts(fetchedAccounts);
       } catch (err) {
         if (err instanceof Error) {
@@ -111,7 +111,7 @@ const AccountList: React.FC = () => {
   if (loading) {
     return (
       <div className="p-4 bg-white shadow rounded-lg">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">JPMorgan Chase Accounts</h2>
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">Citibankdemobusinessinc Accounts</h2>
         <div className="flex items-center justify-center h-32">
           <svg className="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -126,7 +126,7 @@ const AccountList: React.FC = () => {
   if (error) {
     return (
       <div className="p-4 bg-white shadow rounded-lg">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">JPMorgan Chase Accounts</h2>
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">Citibankdemobusinessinc Accounts</h2>
         <div className="text-red-600 bg-red-50 p-3 rounded-md border border-red-200">
           <p className="font-medium">Error:</p>
           <p>{error}</p>
@@ -139,8 +139,8 @@ const AccountList: React.FC = () => {
   if (accounts.length === 0) {
     return (
       <div className="p-4 bg-white shadow rounded-lg">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">JPMorgan Chase Accounts</h2>
-        <p className="text-gray-600">No JPMorgan Chase accounts found.</p>
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">Citibankdemobusinessinc Accounts</h2>
+        <p className="text-gray-600">No Citibankdemobusinessinc accounts found.</p>
         <p className="text-sm text-gray-500 mt-2">
           It looks like there are no accounts linked or available.
         </p>
@@ -157,7 +157,7 @@ const AccountList: React.FC = () => {
 
   return (
     <div className="p-4 bg-white shadow rounded-lg">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">JPMorgan Chase Accounts</h2>
+      <h2 className="text-xl font-semibold mb-4 text-gray-800">Citibankdemobusinessinc Accounts</h2>
       <div className="space-y-4">
         {accounts.map((account) => (
           <div
