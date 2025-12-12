@@ -1,5 +1,4 @@
-```tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Shield, 
@@ -36,9 +35,365 @@ const RESOURCES = [
   'API Keys',
   'Content',
   'Marketing',
+  'Risk Management',
+  'Compliance',
+  'Customer Data',
 ];
 
 const PERMISSION_LEVELS: PermissionLevel[] = ['none', 'read', 'write', 'full'];
+
+// --- Utility Functions ---
+
+const generateId = (): string => `role-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+const generateRandomInt = (min: number, max: number): number => {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+const generateRandomDescription = (): string => {
+    const descriptions = [
+        "Manages user accounts and permissions.",
+        "Oversees financial transactions and reporting.",
+        "Monitors system logs for security breaches.",
+        "Configures system settings and parameters.",
+        "Generates and manages API keys.",
+        "Creates and publishes marketing content.",
+        "Analyzes market trends and customer behavior.",
+        "Identifies and mitigates potential risks.",
+        "Ensures compliance with regulatory requirements.",
+        "Maintains customer data privacy and security.",
+        "Handles legal matters and contracts.",
+        "Develops and maintains software applications.",
+        "Provides technical support to users.",
+        "Manages projects and timelines.",
+        "Conducts research and development activities."
+    ];
+    return descriptions[Math.floor(Math.random() * descriptions.length)];
+};
+
+// --- Citibankdemobusinessinc Namespace ---
+
+namespace Citibankdemobusinessinc {
+    export namespace OpenBanking {
+        export interface RoleManagementInterface {
+            roles: Role[];
+            selectedRole: Role | null;
+            addRole: (role: Role) => void;
+            updateRole: (role: Role) => void;
+            deleteRole: (roleId: string) => void;
+            selectRole: (roleId: string) => void;
+            searchRoles: (query: string) => Role[];
+        }
+
+        export class RoleManagement implements RoleManagementInterface {
+            public roles: Role[] = [];
+            public selectedRole: Role | null = null;
+
+            constructor(initialRoles: Role[] = []) {
+                this.roles = initialRoles;
+                if (initialRoles.length > 0) {
+                    this.selectedRole = initialRoles[0];
+                }
+            }
+
+            addRole(role: Role): void {
+                this.roles = [...this.roles, role];
+                this.selectedRole = role;
+            }
+
+            updateRole(role: Role): void {
+                this.roles = this.roles.map(r => (r.id === role.id ? role : r));
+                this.selectedRole = role;
+            }
+
+            deleteRole(roleId: string): void {
+                this.roles = this.roles.filter(r => r.id !== roleId);
+                this.selectedRole = this.roles.length > 0 ? this.roles[0] : null;
+            }
+
+            selectRole(roleId: string): void {
+                this.selectedRole = this.roles.find(r => r.id === roleId) || null;
+            }
+
+            searchRoles(query: string): Role[] {
+                const lowerQuery = query.toLowerCase();
+                return this.roles.filter(r => r.name.toLowerCase().includes(lowerQuery));
+            }
+        }
+    }
+
+    export namespace Viewit {
+        export namespace MoviePlayform {
+            export function generateMovieRole(): Role {
+                const roleName = `Movie Buff ${generateRandomInt(1, 100)}`;
+                return {
+                    id: generateId(),
+                    name: roleName,
+                    description: "Enjoys watching movies and providing reviews.",
+                    usersCount: generateRandomInt(10, 50),
+                    isSystem: false,
+                    permissions: {
+                        'Users': 'none',
+                        'Financials': 'none',
+                        'Audit Logs': 'none',
+                        'System Settings': 'none',
+                        'API Keys': 'none',
+                        'Content': 'read',
+                        'Marketing': 'none',
+                        'Risk Management': 'none',
+                        'Compliance': 'none',
+                        'Customer Data': 'none',
+                    },
+                };
+            }
+        }
+    }
+
+    export namespace Lendfast {
+        export namespace LoanApproval {
+            export function generateLoanOfficerRole(): Role {
+                const roleName = `Loan Officer ${generateRandomInt(1, 100)}`;
+                return {
+                    id: generateId(),
+                    name: roleName,
+                    description: "Approves or denies loan applications.",
+                    usersCount: generateRandomInt(5, 20),
+                    isSystem: false,
+                    permissions: {
+                        'Users': 'read',
+                        'Financials': 'read',
+                        'Audit Logs': 'read',
+                        'System Settings': 'none',
+                        'API Keys': 'none',
+                        'Content': 'none',
+                        'Marketing': 'none',
+                        'Risk Management': 'read',
+                        'Compliance': 'read',
+                        'Customer Data': 'read',
+                    },
+                };
+            }
+        }
+    }
+
+    export namespace Investwise {
+        export namespace PortfolioManagement {
+            export function generatePortfolioManagerRole(): Role {
+                const roleName = `Portfolio Manager ${generateRandomInt(1, 100)}`;
+                return {
+                    id: generateId(),
+                    name: roleName,
+                    description: "Manages investment portfolios for clients.",
+                    usersCount: generateRandomInt(3, 15),
+                    isSystem: false,
+                    permissions: {
+                        'Users': 'read',
+                        'Financials': 'write',
+                        'Audit Logs': 'read',
+                        'System Settings': 'none',
+                        'API Keys': 'none',
+                        'Content': 'none',
+                        'Marketing': 'none',
+                        'Risk Management': 'read',
+                        'Compliance': 'read',
+                        'Customer Data': 'read',
+                    },
+                };
+            }
+        }
+    }
+
+    export namespace Securepay {
+        export namespace PaymentProcessing {
+            export function generateSecurityAnalystRole(): Role {
+                const roleName = `Security Analyst ${generateRandomInt(1, 100)}`;
+                return {
+                    id: generateId(),
+                    name: roleName,
+                    description: "Monitors payment systems for fraud and security breaches.",
+                    usersCount: generateRandomInt(2, 10),
+                    isSystem: false,
+                    permissions: {
+                        'Users': 'read',
+                        'Financials': 'read',
+                        'Audit Logs': 'full',
+                        'System Settings': 'none',
+                        'API Keys': 'none',
+                        'Content': 'none',
+                        'Marketing': 'none',
+                        'Risk Management': 'read',
+                        'Compliance': 'read',
+                        'Customer Data': 'read',
+                    },
+                };
+            }
+        }
+    }
+
+    export namespace Smartbudget {
+        export namespace BudgetPlanning {
+            export function generateBudgetAnalystRole(): Role {
+                const roleName = `Budget Analyst ${generateRandomInt(1, 100)}`;
+                return {
+                    id: generateId(),
+                    name: roleName,
+                    description: "Creates and manages budgets for various departments.",
+                    usersCount: generateRandomInt(4, 12),
+                    isSystem: false,
+                    permissions: {
+                        'Users': 'read',
+                        'Financials': 'write',
+                        'Audit Logs': 'read',
+                        'System Settings': 'none',
+                        'API Keys': 'none',
+                        'Content': 'none',
+                        'Marketing': 'none',
+                        'Risk Management': 'read',
+                        'Compliance': 'read',
+                        'Customer Data': 'read',
+                    },
+                };
+            }
+        }
+    }
+
+    export namespace Globaltrade {
+        export namespace TradeFinance {
+            export function generateTradeFinanceSpecialistRole(): Role {
+                const roleName = `Trade Finance Specialist ${generateRandomInt(1, 100)}`;
+                return {
+                    id: generateId(),
+                    name: roleName,
+                    description: "Facilitates international trade transactions.",
+                    usersCount: generateRandomInt(3, 10),
+                    isSystem: false,
+                    permissions: {
+                        'Users': 'read',
+                        'Financials': 'write',
+                        'Audit Logs': 'read',
+                        'System Settings': 'none',
+                        'API Keys': 'none',
+                        'Content': 'none',
+                        'Marketing': 'none',
+                        'Risk Management': 'read',
+                        'Compliance': 'read',
+                        'Customer Data': 'read',
+                    },
+                };
+            }
+        }
+    }
+
+    export namespace Insuretech {
+        export namespace ClaimsProcessing {
+            export function generateClaimsAdjusterRole(): Role {
+                const roleName = `Claims Adjuster ${generateRandomInt(1, 100)}`;
+                return {
+                    id: generateId(),
+                    name: roleName,
+                    description: "Processes insurance claims and determines payouts.",
+                    usersCount: generateRandomInt(5, 15),
+                    isSystem: false,
+                    permissions: {
+                        'Users': 'read',
+                        'Financials': 'read',
+                        'Audit Logs': 'read',
+                        'System Settings': 'none',
+                        'API Keys': 'none',
+                        'Content': 'none',
+                        'Marketing': 'none',
+                        'Risk Management': 'read',
+                        'Compliance': 'read',
+                        'Customer Data': 'read',
+                    },
+                };
+            }
+        }
+    }
+
+    export namespace Healthfinance {
+        export namespace MedicalBilling {
+            export function generateBillingSpecialistRole(): Role {
+                const roleName = `Billing Specialist ${generateRandomInt(1, 100)}`;
+                return {
+                    id: generateId(),
+                    name: roleName,
+                    description: "Handles medical billing and coding.",
+                    usersCount: generateRandomInt(4, 12),
+                    isSystem: false,
+                    permissions: {
+                        'Users': 'read',
+                        'Financials': 'write',
+                        'Audit Logs': 'read',
+                        'System Settings': 'none',
+                        'API Keys': 'none',
+                        'Content': 'none',
+                        'Marketing': 'none',
+                        'Risk Management': 'read',
+                        'Compliance': 'read',
+                        'Customer Data': 'read',
+                    },
+                };
+            }
+        }
+    }
+
+    export namespace Edutechloan {
+        export namespace StudentLoan {
+            export function generateLoanCounselorRole(): Role {
+                const roleName = `Loan Counselor ${generateRandomInt(1, 100)}`;
+                return {
+                    id: generateId(),
+                    name: roleName,
+                    description: "Provides guidance to students on loan options.",
+                    usersCount: generateRandomInt(3, 10),
+                    isSystem: false,
+                    permissions: {
+                        'Users': 'read',
+                        'Financials': 'read',
+                        'Audit Logs': 'read',
+                        'System Settings': 'none',
+                        'API Keys': 'none',
+                        'Content': 'none',
+                        'Marketing': 'none',
+                        'Risk Management': 'read',
+                        'Compliance': 'read',
+                        'Customer Data': 'read',
+                    },
+                };
+            }
+        }
+    }
+
+    export namespace Greentechfund {
+        export namespace GreenInvestment {
+            export function generateInvestmentAnalystRole(): Role {
+                const roleName = `Investment Analyst ${generateRandomInt(1, 100)}`;
+                return {
+                    id: generateId(),
+                    name: roleName,
+                    description: "Analyzes green investment opportunities.",
+                    usersCount: generateRandomInt(2, 8),
+                    isSystem: false,
+                    permissions: {
+                        'Users': 'read',
+                        'Financials': 'write',
+                        'Audit Logs': 'read',
+                        'System Settings': 'none',
+                        'API Keys': 'none',
+                        'Content': 'none',
+                        'Marketing': 'none',
+                        'Risk Management': 'read',
+                        'Compliance': 'read',
+                        'Customer Data': 'read',
+                    },
+                };
+            }
+        }
+    }
+}
 
 // --- Mock Data ---
 
@@ -65,6 +420,9 @@ const INITIAL_ROLES: Role[] = [
       'API Keys': 'none',
       'Content': 'read',
       'Marketing': 'none',
+      'Risk Management': 'read',
+      'Compliance': 'full',
+      'Customer Data': 'read',
     },
   },
   {
@@ -81,6 +439,9 @@ const INITIAL_ROLES: Role[] = [
       'API Keys': 'none',
       'Content': 'full',
       'Marketing': 'full',
+      'Risk Management': 'none',
+      'Compliance': 'none',
+      'Customer Data': 'none',
     },
   },
 ];
@@ -88,8 +449,10 @@ const INITIAL_ROLES: Role[] = [
 // --- Components ---
 
 export default function RoleManagementView() {
-  const [roles, setRoles] = useState<Role[]>(INITIAL_ROLES);
-  const [selectedRole, setSelectedRole] = useState<Role>(INITIAL_ROLES[0]);
+  const [roleManagement, setRoleManagement] = useState<Citibankdemobusinessinc.OpenBanking.RoleManagement>(
+    new Citibankdemobusinessinc.OpenBanking.RoleManagement(INITIAL_ROLES)
+  );
+  const [selectedRole, setSelectedRole] = useState<Role | null>(roleManagement.selectedRole);
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -98,7 +461,12 @@ export default function RoleManagementView() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState<Role | null>(null);
 
+  useEffect(() => {
+    setSelectedRole(roleManagement.selectedRole);
+  }, [roleManagement]);
+
   const handleUpdatePermission = (resource: string, level: PermissionLevel) => {
+    if (!selectedRole) return;
     if (selectedRole.isSystem && selectedRole.name === 'Super Admin') return; // Protect super admin
 
     const updatedRole = {
@@ -108,8 +476,10 @@ export default function RoleManagementView() {
         [resource]: level,
       },
     };
-    setSelectedRole(updatedRole);
-    setRoles(roles.map((r) => (r.id === updatedRole.id ? updatedRole : r)));
+
+    const newRoleManagement = new Citibankdemobusinessinc.OpenBanking.RoleManagement(roleManagement.roles);
+    newRoleManagement.updateRole(updatedRole);
+    setRoleManagement(newRoleManagement);
   };
 
   const simulateAiGeneration = () => {
@@ -159,7 +529,7 @@ export default function RoleManagementView() {
       }
 
       const newRole: Role = {
-        id: `role-${Date.now()}`,
+        id: generateId(),
         name: roleName,
         description: roleDesc,
         usersCount: 0,
@@ -174,15 +544,28 @@ export default function RoleManagementView() {
 
   const acceptAiSuggestion = () => {
     if (aiSuggestion) {
-      setRoles([...roles, aiSuggestion]);
-      setSelectedRole(aiSuggestion);
+      const newRoleManagement = new Citibankdemobusinessinc.OpenBanking.RoleManagement(roleManagement.roles);
+      newRoleManagement.addRole(aiSuggestion);
+      setRoleManagement(newRoleManagement);
       setAiSuggestion(null);
       setAiPrompt('');
       setIsAiModalOpen(false);
     }
   };
 
-  const filteredRoles = roles.filter(r => r.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredRoles = roleManagement.searchRoles(searchQuery);
+
+  const handleDeleteRole = (roleId: string) => {
+    const newRoleManagement = new Citibankdemobusinessinc.OpenBanking.RoleManagement(roleManagement.roles);
+    newRoleManagement.deleteRole(roleId);
+    setRoleManagement(newRoleManagement);
+  };
+
+  const handleSelectRole = (roleId: string) => {
+    const newRoleManagement = new Citibankdemobusinessinc.OpenBanking.RoleManagement(roleManagement.roles);
+    newRoleManagement.selectRole(roleId);
+    setRoleManagement(newRoleManagement);
+  };
 
   return (
     <div className="flex flex-col h-full bg-gray-950 text-gray-100 p-6 overflow-hidden">
@@ -200,7 +583,7 @@ export default function RoleManagementView() {
           <div className="bg-gray-900 px-4 py-2 rounded-lg border border-gray-800 flex items-center gap-2">
             <Users className="w-4 h-4 text-emerald-400" />
             <span className="text-gray-300 text-sm">Total Roles:</span>
-            <span className="text-white font-bold">{roles.length}</span>
+            <span className="text-white font-bold">{roleManagement.roles.length}</span>
           </div>
           <button
             onClick={() => setIsAiModalOpen(true)}
@@ -233,17 +616,17 @@ export default function RoleManagementView() {
             {filteredRoles.map(role => (
               <motion.button
                 key={role.id}
-                onClick={() => setSelectedRole(role)}
+                onClick={() => handleSelectRole(role.id)}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 className={`w-full text-left p-4 rounded-lg border transition-all duration-200 group ${
-                  selectedRole.id === role.id 
+                  selectedRole?.id === role.id 
                     ? 'bg-emerald-500/10 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.1)]' 
                     : 'bg-transparent border-transparent hover:bg-gray-800 hover:border-gray-700'
                 }`}
               >
                 <div className="flex justify-between items-start mb-1">
-                  <span className={`font-semibold ${selectedRole.id === role.id ? 'text-emerald-400' : 'text-gray-200'}`}>
+                  <span className={`font-semibold ${selectedRole?.id === role.id ? 'text-emerald-400' : 'text-gray-200'}`}>
                     {role.name}
                   </span>
                   {role.isSystem && <Lock className="w-3 h-3 text-gray-500 mt-1" />}
@@ -270,10 +653,10 @@ export default function RoleManagementView() {
           <div className="p-6 border-b border-gray-800 bg-gray-900/80 backdrop-blur-md sticky top-0 z-10">
             <div className="flex justify-between items-start">
               <div>
-                <h2 className="text-2xl font-bold text-white mb-2">{selectedRole.name}</h2>
-                <p className="text-gray-400 text-sm max-w-xl">{selectedRole.description}</p>
+                <h2 className="text-2xl font-bold text-white mb-2">{selectedRole?.name}</h2>
+                <p className="text-gray-400 text-sm max-w-xl">{selectedRole?.description}</p>
               </div>
-              {!selectedRole.isSystem && (
+              {selectedRole && !selectedRole.isSystem && (
                 <div className="flex gap-2">
                   <button className="p-2 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-colors">
                     <Edit3 className="w-4 h-4" />
@@ -281,10 +664,9 @@ export default function RoleManagementView() {
                   <button 
                     className="p-2 hover:bg-red-900/20 rounded-lg text-gray-400 hover:text-red-400 transition-colors"
                     onClick={() => {
-                        // Confirm and delete logic would go here
-                        const newRoles = roles.filter(r => r.id !== selectedRole.id);
-                        setRoles(newRoles);
-                        setSelectedRole(newRoles[0]);
+                        if (selectedRole) {
+                            handleDeleteRole(selectedRole.id);
+                        }
                     }}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -313,14 +695,14 @@ export default function RoleManagementView() {
                 <div key={resource} className="grid grid-cols-5 gap-4 px-4 py-3 rounded-lg hover:bg-gray-800/50 transition-colors items-center group">
                   <div className="col-span-1 font-medium text-gray-300 flex items-center gap-2">
                     {resource}
-                    {selectedRole.permissions[resource] === 'full' && (
+                    {selectedRole?.permissions[resource] === 'full' && (
                        <AlertCircle className="w-3 h-3 text-red-500 opacity-50" />
                     )}
                   </div>
                   
                   {PERMISSION_LEVELS.map((level) => {
-                    const isSelected = selectedRole.permissions[resource] === level;
-                    const isSystemRole = selectedRole.isSystem && selectedRole.name === 'Super Admin';
+                    const isSelected = selectedRole?.permissions[resource] === level;
+                    const isSystemRole = selectedRole?.isSystem && selectedRole?.name === 'Super Admin';
                     
                     let activeColor = 'bg-gray-700';
                     let activeText = 'text-gray-400';
@@ -446,42 +828,4 @@ export default function RoleManagementView() {
                                 <span className="text-gray-400">{res}</span>
                                 <span className={`
                                     font-mono uppercase text-xs font-bold
-                                    ${level === 'none' ? 'text-gray-600' : ''}
-                                    ${level === 'read' ? 'text-blue-400' : ''}
-                                    ${level === 'write' ? 'text-amber-400' : ''}
-                                    ${level === 'full' ? 'text-red-400' : ''}
-                                `}>
-                                    {level}
-                                </span>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-3 justify-end">
-                      <button 
-                        onClick={() => setAiSuggestion(null)}
-                        className="px-4 py-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
-                      >
-                        Refine Prompt
-                      </button>
-                      <button 
-                        onClick={acceptAiSuggestion}
-                        className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg font-medium shadow-lg shadow-emerald-900/20"
-                      >
-                        <Check className="w-4 h-4" />
-                        Accept & Create
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-    </div>
-  );
-}
-```
+                                    ${level === 'none' ? 'text-gray-600' : ''
