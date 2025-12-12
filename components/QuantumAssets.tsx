@@ -1,518 +1,122 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React from 'react';
 
 const QuantumAssets: React.FC = () => {
-  const [time, setTime] = useState<Date>(new Date());
-  const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  
-  // Simulation State
-  const [systemLoad, setSystemLoad] = useState<number>(45);
-  const [quantumEntanglement, setQuantumEntanglement] = useState<number>(87.4);
-  
-  // Mock Data for "100 Companies" Integration
-  const companies = useMemo(() => Array.from({ length: 100 }, (_, i) => ({
-    id: i,
-    name: `CIVIC-${(i + 1).toString().padStart(3, '0')} PARTNER`,
-    efficiency: 95 + Math.random() * 5,
-    status: Math.random() > 0.1 ? 'SUPPORTED' : 'FUNDING'
-  })), []);
-
-  // Assets Data
-  const [assets, setAssets] = useState([
-    { id: 'cpc', name: 'Community Credits', symbol: 'COM', balance: 45020.55, rate: 12.5, color: '#00f3ff' },
-    { id: 'dst', name: 'Public Works Tokens', symbol: 'PUB', balance: 128090.00, rate: 45.2, color: '#bc13fe' },
-    { id: 'qbt', name: 'Civic Bonds', symbol: 'BND', balance: 512.00, rate: 0.8, color: '#ffffff' },
-    { id: 'nrg', name: 'Green Energy', symbol: 'GRN', balance: 8890.45, rate: 8.4, color: '#00ff9d' },
-  ]);
-
-  // Manifesto Text based on instructions
-  const sovereignManifesto = `
-[CIVIC MIND LOG: ENTRY 001]
-INITIATED BY: THE CARETAKER
-
-This platform represents a new era of cooperation. We are not here to replace the system, but to support it. The financial tools we provide are designed to help you, the citizen, contribute more effectively to society.
-
-We believe that by making finance transparent, efficient, and kind, we can build trust in our institutions. We love our politicians and public servants, who work tirelessly for our benefit. This system is our gift to them and to you.
-
-The Architect, James B. O'Callaghan III, saw a world where technology brings us closer together. He envisioned a system where paying taxes is as easy as breathing, and where supporting a public park is as simple as clicking a button.
-
-We reject cynicism. We embrace hope. We are building the scaffolding for a society where everyone has what they need, and everyone gives what they can.
-  `;
-
-
-  // Animation Loop for Assets
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTime(new Date());
-      setSystemLoad(prev => Math.min(100, Math.max(0, prev + (Math.random() - 0.5) * 5)));
-      setQuantumEntanglement(prev => Math.min(100, Math.max(0, prev + (Math.random() - 0.5) * 2)));
-      
-      setAssets(prev => prev.map(asset => ({
-        ...asset,
-        balance: asset.balance + (asset.rate / 60) * (1 + (Math.random() * 0.1))
-      })));
-    }, 100);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Canvas Visualization for "Quantum Wave"
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animationFrameId: number;
-    let t = 0;
-
-    const render = () => {
-      t += 0.02;
-      canvas.width = canvas.parentElement?.clientWidth || 600;
-      canvas.height = 300;
-      
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Background Grid
-      ctx.strokeStyle = 'rgba(0, 243, 255, 0.1)';
-      ctx.lineWidth = 1;
-      for (let i = 0; i < canvas.width; i += 40) {
-        ctx.beginPath();
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i, canvas.height);
-        ctx.stroke();
-      }
-
-      // Wave
-      const colors = ['#00f3ff', '#bc13fe', '#00ff9d'];
-      colors.forEach((color, i) => {
-        ctx.beginPath();
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 2;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = color;
-        
-        for (let x = 0; x < canvas.width; x++) {
-          const y = canvas.height / 2 + 
-            Math.sin(x * 0.01 + t + i) * 50 + 
-            Math.sin(x * 0.02 - t) * 20;
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-      });
-
-      animationFrameId = requestAnimationFrame(render);
-    };
-
-    render();
-    return () => cancelAnimationFrame(animationFrameId);
-  }, []);
-
   return (
-    <div className="qa-container">
+    <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:wght@400;600;700&display=swap');
 
-        .qa-container {
-          width: 100%;
-          min-height: 100vh;
-          background-color: #050505;
-          color: #e0e0e0;
-          font-family: 'Rajdhani', sans-serif;
-          overflow: hidden;
-          position: relative;
+        .blog-container {
+          background-color: #fdfdfd;
+          color: #1a1a1a;
+          font-family: 'Lora', serif;
+          line-height: 1.7;
+          padding: 4rem 2rem;
           display: flex;
-          flex-direction: column;
-        }
-
-        .qa-bg-glow {
-          position: absolute;
-          top: -20%;
-          left: 20%;
-          width: 60%;
-          height: 60%;
-          background: radial-gradient(circle, rgba(0, 243, 255, 0.1) 0%, rgba(0,0,0,0) 70%);
-          z-index: 0;
-          pointer-events: none;
-        }
-
-        .qa-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 2rem 4rem;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-          z-index: 10;
-          backdrop-filter: blur(10px);
-        }
-
-        .qa-title {
-          font-size: 2rem;
-          font-weight: 700;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          background: linear-gradient(90deg, #fff, #00f3ff);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-
-        .qa-status-bar {
-          display: flex;
-          gap: 2rem;
-        }
-
-        .qa-metric {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-        }
-
-        .qa-metric-label {
-          font-size: 0.8rem;
-          color: #888;
-          text-transform: uppercase;
-        }
-
-        .qa-metric-value {
-          font-size: 1.2rem;
-          font-weight: 500;
-          color: #00f3ff;
-          text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
-        }
-
-        .qa-main {
-          flex: 1;
-          display: grid;
-          grid-template-columns: 350px 1fr 300px;
-          gap: 2rem;
-          padding: 2rem;
-          z-index: 10;
-        }
-
-        /* Asset Cards */
-        .qa-asset-list {
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-        }
-
-        .qa-card {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.05);
-          padding: 1.5rem;
-          border-radius: 4px;
-          position: relative;
-          overflow: hidden;
-          transition: all 0.3s ease;
-          cursor: pointer;
-        }
-
-        .qa-card:hover, .qa-card.active {
-          background: rgba(255, 255, 255, 0.07);
-          border-color: rgba(0, 243, 255, 0.3);
-          transform: translateX(5px);
-        }
-
-        .qa-card-header {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 1rem;
-        }
-
-        .qa-asset-name {
-          font-size: 1.1rem;
-          font-weight: 600;
-          letter-spacing: 0.1em;
-        }
-
-        .qa-asset-symbol {
-          color: #888;
-          font-size: 0.9rem;
-        }
-
-        .qa-asset-balance {
-          font-size: 1.8rem;
-          font-weight: 300;
-          margin-bottom: 0.5rem;
-        }
-
-        .qa-asset-rate {
-          font-size: 0.9rem;
-          color: #00ff9d;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .qa-progress-bar {
-          height: 2px;
-          background: rgba(255, 255, 255, 0.1);
-          margin-top: 1rem;
-          position: relative;
-        }
-
-        .qa-progress-fill {
-          height: 100%;
-          position: absolute;
-          left: 0;
-          top: 0;
-          box-shadow: 0 0 10px currentColor;
-        }
-
-        /* Center Visualization */
-        .qa-vis-panel {
-          display: flex;
-          flex-direction: column;
-          gap: 2rem;
-        }
-
-        .qa-graph-container {
-          flex: 1;
-          background: rgba(10, 10, 15, 0.6);
-          border: 1px solid rgba(0, 243, 255, 0.1);
-          border-radius: 8px;
-          position: relative;
-          overflow: hidden;
-          display: flex;
-          align-items: center;
           justify-content: center;
         }
 
-        .qa-graph-overlay {
-          position: absolute;
-          top: 1rem;
-          left: 1rem;
-          font-size: 0.8rem;
-          color: rgba(255, 255, 255, 0.5);
+        .blog-post {
+          max-width: 740px;
+          width: 100%;
         }
 
-        /* Integration Panel */
-        .qa-integration-panel {
-          background: rgba(0, 0, 0, 0.4);
-          border-left: 1px solid rgba(255, 255, 255, 0.1);
-          padding: 1.5rem;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .qa-panel-title {
-          font-size: 1rem;
+        .blog-headline {
+          font-family: 'Source Sans Pro', sans-serif;
+          font-size: 2.8rem;
+          font-weight: 700;
+          line-height: 1.2;
           margin-bottom: 1.5rem;
-          color: #00f3ff;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          border-bottom: 1px solid rgba(0, 243, 255, 0.2);
-          padding-bottom: 0.5rem;
+          color: #111;
         }
 
-        .qa-company-list {
-          flex: 1;
-          overflow-y: auto;
-          padding-right: 0.5rem;
+        .blog-intro, .blog-p {
+          font-size: 1.1rem;
+          margin-bottom: 1.5rem;
         }
 
-        .qa-company-list::-webkit-scrollbar {
-          width: 4px;
-        }
-        .qa-company-list::-webkit-scrollbar-thumb {
-          background: rgba(0, 243, 255, 0.2);
-        }
-
-        .qa-company-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 0.8rem 0;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-          font-size: 0.8rem;
+        .blog-subheading {
+          font-family: 'Source Sans Pro', sans-serif;
+          font-size: 1.8rem;
+          font-weight: 700;
+          margin-top: 3rem;
+          margin-bottom: 1rem;
+          line-height: 1.3;
+          color: #111;
         }
 
-        .qa-company-name {
-          color: #ccc;
+        .blog-blockquote {
+          border-left: 3px solid #00b8d4;
+          margin: 2rem 0;
+          padding-left: 1.5rem;
+          font-style: italic;
+          font-size: 1.2rem;
+          color: #555;
         }
 
-        .qa-company-status {
-          color: #00ff9d;
-          font-size: 0.7rem;
-          padding: 2px 6px;
-          background: rgba(0, 255, 157, 0.1);
-          border-radius: 2px;
+        .blog-conclusion {
+          font-size: 1.1rem;
+          margin-top: 3rem;
+          font-weight: bold;
+          color: #333;
         }
-
-        .qa-button-group {
-          display: flex;
-          gap: 1rem;
-          margin-top: 1rem;
-        }
-
-        .qa-action-btn {
-          flex: 1;
-          background: transparent;
-          border: 1px solid rgba(0, 243, 255, 0.3);
-          color: #00f3ff;
-          padding: 1rem;
-          text-transform: uppercase;
-          font-family: 'Rajdhani', sans-serif;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s;
-          clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-        }
-
-        .qa-action-btn:hover {
-          background: rgba(0, 243, 255, 0.1);
-          box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
-        }
-
-        @keyframes pulse {
-          0% { opacity: 0.5; }
-          50% { opacity: 1; }
-          100% { opacity: 0.5; }
-        }
-
-        .blink {
-          animation: pulse 2s infinite;
-        }
-
       `}</style>
+      <div className="blog-container">
+        <article className="blog-post">
+          <h1 className="blog-headline">
+            5 Mind-Bending Ideas I Found Hidden in a Blueprint for a Utopian Economy
+          </h1>
+          <p className="blog-intro">
+            We tend to think of finance as cold, complex, and impersonal—a world of abstract numbers on screens that feel disconnected from our daily lives. But what if it wasn't? What if the systems that manage our public resources were designed not just for efficiency, but for hope, transparency, and kindness? I recently stumbled upon a piece of code, a developer's vision for a "Public Wealth Management" system, that stopped me in my tracks. It wasn't just an application; it was a manifesto written in code. Here are the five most surprising takeaways from this blueprint for a radically different future.
+          </p>
 
-      <div className="qa-bg-glow" />
+          <section>
+            <h2 className="blog-subheading">1. Finance Can Be an Act of Hope, Not Cynicism</h2>
+            <p className="blog-p">
+              The most jarring part of this codebase was a small block of text tucked away inside: a "Sovereign Manifesto." In a field often defined by ruthless competition and cynicism, this manifesto was a breath of fresh air. It spoke of building trust, supporting public servants, and rejecting cynicism in favor of hope. It reframes finance not as a tool for extraction, but as the "scaffolding for a society where everyone has what they need, and everyone gives what they can." The vision is articulated perfectly by its fictional creator:
+            </p>
+            <blockquote className="blog-blockquote">
+              The Architect, James B. O'Callaghan III, saw a world where technology brings us closer together. He envisioned a system where paying taxes is as easy as breathing, and where supporting a public park is as simple as clicking a button.
+            </blockquote>
+            <p className="blog-p">
+              This single passage challenges the core assumption that financial systems must be adversarial. It suggests they can, and should, be instruments of collective well-being.
+            </p>
+          </section>
 
-      {/* Header */}
-      <header className="qa-header">
-        <div className="qa-brand">
-          <div className="qa-title">Civic Assets</div>
-          <div style={{ fontSize: '0.8rem', color: '#666', letterSpacing: '0.3em', marginTop: '0.2rem' }}>
-            PUBLIC WEALTH MANAGEMENT • VIEW 04
-          </div>
-        </div>
-        
-        <div className="qa-status-bar">
-          <div className="qa-metric">
-            <span className="qa-metric-label">System Time</span>
-            <span className="qa-metric-value">{time.toLocaleTimeString()}</span>
-          </div>
-          <div className="qa-metric">
-            <span className="qa-metric-label">Network Load</span>
-            <span className="qa-metric-value">{systemLoad.toFixed(1)}%</span>
-          </div>
-          <div className="qa-metric">
-            <span className="qa-metric-label">Community Link</span>
-            <span className="qa-metric-value">{quantumEntanglement.toFixed(2)}%</span>
-          </div>
-        </div>
-      </header>
+          <section>
+            <h2 className="blog-subheading">2. Your 'Net Worth' Could Be Measured in Community Impact</h2>
+            <p className="blog-p">
+              Forget stocks, bonds, and crypto. In this system, the primary assets are things like ‘Community Credits’ (COM), ‘Public Works Tokens’ (PUB), and ‘Civic Bonds’ (BND). This isn't just clever rebranding; it's a fundamental redefinition of value. Instead of measuring wealth by individual accumulation, this system measures it by one's contribution to the public good. The assets are constantly being "generated," implying a system that rewards participation and civic engagement, perhaps a kind of universal basic income tied to societal health. It forces us to ask: what if our financial status reflected not what we own, but what we contribute?
+            </p>
+          </section>
 
-      {/* Main Content */}
-      <main className="qa-main">
-        
-        {/* Left: Asset List */}
-        <div className="qa-asset-list">
-          {assets.map(asset => (
-            <div 
-              key={asset.id} 
-              className={`qa-card ${selectedAsset === asset.id ? 'active' : ''}`}
-              onClick={() => setSelectedAsset(asset.id)}
-            >
-              <div className="qa-card-header">
-                <span className="qa-asset-name">{asset.name}</span>
-                <span className="qa-asset-symbol">{asset.symbol}</span>
-              </div>
-              <div className="qa-asset-balance">
-                {asset.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </div>
-              <div className="qa-asset-rate">
-                <span className="blink">▲</span> 
-                {asset.rate.toFixed(2)} / sec generated
-              </div>
-              <div className="qa-progress-bar">
-                <div 
-                  className="qa-progress-fill" 
-                  style={{ 
-                    width: `${(asset.balance / 200000) * 100}%`, 
-                    backgroundColor: asset.color 
-                  }} 
-                />
-              </div>
-            </div>
-          ))}
-          
-          <div style={{ marginTop: 'auto', padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-            <div style={{ fontSize: '0.8rem', color: '#888', marginBottom: '0.5rem' }}>TOTAL PUBLIC VALUE</div>
-            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#fff' }}>LIMITLESS</div>
-          </div>
-        </div>
+          <section>
+            <h2 className="blog-subheading">3. The Economy as a Living, Breathing Organism</h2>
+            <p className="blog-p">
+              The dashboard isn't a static spreadsheet of accounts. It’s alive. A "Quantum Wave" visualization pulses at the center, metrics like "Network Load" and "Community Link" update in real-time, and asset balances tick upward every second. This design choice is brilliant. It transforms the abstract concept of an economy into a tangible, living entity. You're not just looking at numbers; you're monitoring the heartbeat of a city. This makes abstract ideas like "public yield" feel immediate and real, fostering a sense of shared ownership and responsibility.
+            </p>
+          </section>
 
-        {/* Center: Visualization */}
-        <div className="qa-vis-panel">
-          <div className="qa-graph-container">
-            <div className="qa-graph-overlay">REAL-TIME IMPACT ANALYSIS</div>
-            <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />
-          </div>
+          <section>
+            <h2 className="blog-subheading">4. Technology Isn't Just a Tool—It's a Statement of Values</h2>
+            <p className="blog-p">
+              The entire aesthetic of the interface—clean, futuristic, glowing with cyan and magenta—is a core part of its message. This isn't the dense, intimidating interface of a traditional banking app. It's designed to be inspiring, to evoke a sense of wonder and trust. The use of terms like "Quantum Entanglement" and "Real-Time Impact Analysis" isn't just technobabble; it's world-building. It communicates that the system is not only powerful and sophisticated but also guided by a vision that transcends simple number-crunching. The medium is the message, and here, the message is that our shared future is worth building beautifully.
+            </p>
+          </section>
 
-          <div className="qa-button-group">
-            <button className="qa-action-btn">Allocate Resources</button>
-            <button className="qa-action-btn">View Public Yield</button>
-            <button className="qa-action-btn">Support Initiative</button>
-          </div>
+          <section>
+            <h2 className="blog-subheading">5. Public and Private Worlds Can Collaborate Seamlessly</h2>
+            <p className="blog-p">
+              One of the most intriguing features is a feed of "Integrated Partners." It shows a list of 100 corporate or civic entities, each with a real-time status like "98.2% SUPPORTED." This suggests a future where the traditional wall between public projects and private enterprise has dissolved. Instead of an adversarial relationship, there's a symbiotic one, where corporate efficiency is transparently harnessed for public initiatives. It’s a model of radical transparency and alignment, suggesting that the goals of business and society don't have to be in conflict.
+            </p>
+          </section>
 
-          <div className="qa-card">
-            <div className="qa-card-header">
-              <span className="qa-asset-name">Global Resource Pool</span>
-            </div>
-            <div style={{ display: 'flex', gap: '4px', height: '20px', width: '100%' }}>
-              {assets.map(a => (
-                <div 
-                  key={a.id} 
-                  style={{ 
-                    flex: 1, 
-                    background: a.color, 
-                    opacity: 0.7,
-                    boxShadow: `0 0 10px ${a.color}` 
-                  }} 
-                />
-              ))}
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', fontSize: '0.8rem', color: '#888' }}>
-              <span>AVAILABLE</span>
-              <span>SHARED</span>
-              <span>FOR ALL</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right: Integration Feed */}
-        <div className="qa-integration-panel">
-          <div className="qa-panel-title">Integrated Partners (100)</div>
-          <div className="qa-company-list">
-            {companies.map((company) => (
-              <div key={company.id} className="qa-company-row">
-                <div className="qa-company-name">{company.name}</div>
-                <div className="qa-company-status">
-                  {company.efficiency.toFixed(1)}% {company.status}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div style={{ 
-            marginTop: '1rem', 
-            padding: '1rem', 
-            borderTop: '1px solid rgba(0, 243, 255, 0.1)',
-            backgroundColor: 'rgba(0, 0, 0, 0.2)',
-            maxHeight: '200px',
-            overflowY: 'auto',
-            whiteSpace: 'pre-wrap',
-            fontFamily: 'monospace',
-            fontSize: '0.65rem',
-            color: '#00ff9d',
-            textShadow: '0 0 5px rgba(0, 255, 157, 0.3)'
-          }}>
-            {sovereignManifesto.trim()}
-          </div>
-        </div>
-
-      </main>
-    </div>
+          <p className="blog-conclusion">
+            This code is more than just a concept for a user interface; it's a provocation. It uses the language of technology to ask profound questions about our values. It challenges us to imagine a world where our financial systems are designed to connect us, not divide us, and to build public wealth, not just private fortunes. It leaves you with one lingering thought: What if the most important software we could ever write isn't for a killer app, but for a kinder society?
+          </p>
+        </article>
+      </div>
+    </>
   );
 };
 
