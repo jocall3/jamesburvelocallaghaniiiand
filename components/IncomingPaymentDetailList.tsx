@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { listIncomingPaymentDetails } from '../api/incomingPaymentDetails';
