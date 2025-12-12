@@ -1,4 +1,3 @@
-```typescript
 import React, { useState, useEffect } from 'react';
 import { Typography, Button, Grid, Paper, CircularProgress, Alert } from '@mui/material';
 
@@ -153,4 +152,3 @@ const SimulationsView: React.FC = () => {
 };
 
 export default SimulationsView;
-```
