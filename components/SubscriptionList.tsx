@@ -1,174 +1,130 @@
 import React from 'react';
 
-interface SubscriptionItemPrice {
-  id: string;
-  nickname: string | null;
-  unit_amount: number | null; // Amount in cents
-  currency: string;
-  product: string | { id: string; name: string };
-}
+const BlogStyle: React.FC = () => (
+  <style>{`
+    .blog-container {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      line-height: 1.6;
+      color: #333;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    .blog-container h1 {
+      font-size: 2.5em;
+      font-weight: 700;
+      margin-bottom: 0.5em;
+      line-height: 1.2;
+    }
+    .blog-container p.intro {
+      font-size: 1.2em;
+      color: #555;
+      margin-bottom: 2em;
+    }
+    .blog-container h2 {
+      font-size: 1.8em;
+      font-weight: 600;
+      margin-top: 2em;
+      margin-bottom: 1em;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 0.3em;
+    }
+    .blog-container p {
+      font-size: 1em;
+      margin-bottom: 1.2em;
+    }
+    .blog-container blockquote {
+      border-left: 4px solid #ccc;
+      margin: 1.5em 0;
+      padding: 0.5em 1.5em;
+      color: #666;
+      background-color: #f9f9f9;
+      font-style: italic;
+    }
+    .blog-container code {
+      background-color: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      font-style: normal;
+    }
+    .blog-container .conclusion {
+      margin-top: 3em;
+      font-style: italic;
+      color: #444;
+    }
+  `}</style>
+);
 
-interface SubscriptionItem {
-  id: string;
-  price: SubscriptionItemPrice;
-  quantity: number;
-}
-
-interface Subscription {
-  id: string;
-  customer: string | { id: string; name?: string; email?: string };
-  status: 'active' | 'canceled' | 'past_due' | 'trialing' | 'unpaid' | 'incomplete' | 'incomplete_expired' | 'paused' | 'ended';
-  created: number;
-  current_period_start: number;
-  current_period_end: number;
-  cancel_at_period_end: boolean;
-  canceled_at: number | null;
-  trial_start: number | null;
-  trial_end: number | null;
-  items: {
-    data: SubscriptionItem[];
-  };
-}
-
-interface SubscriptionListProps {
-  subscriptions: Subscription[];
-  isLoading?: boolean;
-  error?: string | null;
-}
-
-const formatDate = (timestamp: number | null): string => {
-  if (!timestamp) return 'N/A';
-  // Stripe timestamps are in seconds
-  return new Date(timestamp * 1000).toLocaleDateString();
-};
-
-const getStatusIndicator = (status: Subscription['status']) => {
-  let color = 'gray';
-  switch (status) {
-    case 'active':
-      color = 'green';
-      break;
-    case 'trialing':
-      color = 'blue';
-      break;
-    case 'canceled':
-    case 'unpaid':
-    case 'ended':
-      color = 'red';
-      break;
-    case 'past_due':
-    case 'incomplete':
-    case 'incomplete_expired':
-      color = 'orange';
-      break;
-    case 'paused':
-      color = 'purple';
-      break;
-    default:
-      color = 'gray';
-  }
+const TheCodeThatTalksBlog = () => {
   return (
-    <span
-      style={{
-        display: 'inline-block',
-        padding: '2px 8px',
-        borderRadius: '12px',
-        backgroundColor: color,
-        color: 'white',
-        fontSize: '0.8em',
-        textTransform: 'capitalize',
-      }}
-    >
-      {status.replace(/_/g, ' ')}
-    </span>
+    <>
+      <BlogStyle />
+      <div className="blog-container">
+        <h1>Your Subscription Isn't Just 'Active' or 'Canceled': 4 Surprising Truths Hidden in a React Component</h1>
+
+        <p className="intro">
+          We spend our days writing code, but how often do we stop to <em>read</em> what it’s telling us? I recently stumbled upon a seemingly simple React component for displaying Stripe subscriptions. It was clean, functional, and unremarkable at first glance. But looking closer, I found a masterclass in building robust, real-world applications. It turns out, the story of a great product is often written in its data models and helper functions.
+        </p>
+
+        <h2>1. A Subscription Has More Than Two Lives</h2>
+        <p>
+          You might think a subscription is either "on" or "off." Active or canceled. Simple, right? The code tells a different story. The status of a subscription isn't a boolean; it's a complex state machine.
+        </p>
+        <blockquote>
+          <code>status: 'active' | 'canceled' | 'past_due' | 'trialing' | 'unpaid' | 'incomplete' | 'incomplete_expired' | 'paused' | 'ended';</code>
+        </blockquote>
+        <p>
+          This single line of TypeScript reveals the messy reality of commerce. A subscription can be <code>trialing</code>, <code>past_due</code> because a credit card failed, or <code>incomplete</code> because the user abandoned the checkout flow. Recognizing and handling these edge cases is the difference between a toy app and a real business. It’s a powerful reminder that we must code for reality, not just the happy path.
+        </p>
+
+        <h2>2. Never Trust a Floating Point with Money</h2>
+        <p>
+          How would you store the price of a $9.99 plan? If you said <code>9.99</code>, you've just walked into one of the most classic traps in programming. Floating-point math is notoriously imprecise, leading to rounding errors that can be catastrophic when dealing with money.
+        </p>
+        <p>
+          The source code shows us the professional's way:
+        </p>
+        <blockquote>
+          <code>unit_amount: number | null; // Amount in cents</code>
+        </blockquote>
+        <p>
+          By storing all currency values as integers (in this case, cents), the application avoids floating-point issues entirely. All calculations are done with whole numbers, and the amount is only divided by 100 at the very last moment for display purposes. It’s a simple, elegant solution to a surprisingly complex problem, and a non-negotiable for any financial application.
+        </p>
+
+        <h2>3. A Splash of Color is Worth a Thousand Data Points</h2>
+        <p>
+          A table full of text is a data dump. A table that uses color to convey meaning is a dashboard. The component contained a small but brilliant helper function, <code>getStatusIndicator</code>, that transformed a boring status string into a color-coded badge.
+        </p>
+        <p>
+          An <code>active</code> subscription is green, <code>past_due</code> is orange, and <code>canceled</code> is red. This isn't just decoration; it's a dramatic enhancement to scannability and user experience. A user can glance at the list and instantly gauge the health of their subscriptions without reading a single word. It’s a beautiful example of how thoughtful UI design can communicate complex information almost instantaneously.
+        </p>
+
+        <h2>4. The Most Important Code Handles When Things Go Wrong</h2>
+        <p>
+          We love to write the "happy path" code, where data loads perfectly and users do exactly what we expect. But the code that makes an application feel solid and professional is the code that handles the unhappy paths.
+        </p>
+        <p>
+          This component didn't just assume it would receive a list of subscriptions. It explicitly handled three distinct states:
+        </p>
+        <blockquote>
+          <p><code>if (isLoading) { ... }</code></p>
+          <p><code>if (error) { ... }</code></p>
+          <p><code>if (!subscriptions || subscriptions.length === 0) { ... }</code></p>
+        </blockquote>
+        <p>
+          This defensive programming ensures the user is never left staring at a blank or broken screen. They see a loading message, a clear error, or a helpful "No subscriptions found" notice. This builds trust and makes the application feel resilient. It’s the boring-but-critical work that separates the amateurs from the pros.
+        </p>
+
+        <p className="conclusion">
+          At first glance, it was just a React component. But hidden within its types, functions, and conditional rendering was a roadmap for thoughtful software development. It reminds us that code is more than just instructions for a computer; it's a collection of decisions and a reflection of the complex realities we're trying to model.
+        </p>
+        <p className="conclusion">
+          What stories are hidden in your codebase, waiting to be told?
+        </p>
+      </div>
+    </>
   );
 };
 
-const SubscriptionList: React.FC<SubscriptionListProps> = ({ subscriptions, isLoading, error }) => {
-  if (isLoading) {
-    return <div style={{ padding: '20px', textAlign: 'center' }}>Loading subscriptions...</div>;
-  }
-
-  if (error) {
-    return <div style={{ padding: '20px', color: 'red', textAlign: 'center' }}>Error: {error}</div>;
-  }
-
-  if (!subscriptions || subscriptions.length === 0) {
-    return <div style={{ padding: '20px', textAlign: 'center' }}>No subscriptions found.</div>;
-  }
-
-  return (
-    <div style={{ fontFamily: 'Arial, sans-serif', padding: '20px' }}>
-      <h2 style={{ marginBottom: '20px', fontSize: '1.5em', color: '#333' }}>Stripe Subscriptions</h2>
-      <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#f2f2f2' }}>
-            <th style={tableHeaderStyle}>ID</th>
-            <th style={tableHeaderStyle}>Customer</th>
-            <th style={tableHeaderStyle}>Plan / Product</th>
-            <th style={tableHeaderStyle}>Qty</th>
-            <th style={tableHeaderStyle}>Unit Price</th>
-            <th style={tableHeaderStyle}>Status</th>
-            <th style={tableHeaderStyle}>Period Start</th>
-            <th style={tableHeaderStyle}>Period End</th>
-            <th style={tableHeaderStyle}>Trial End</th>
-            <th style={tableHeaderStyle}>Cancel at Period End</th>
-          </tr>
-        </thead>
-        <tbody>
-          {subscriptions.map((sub) => (
-            <tr key={sub.id} style={{ borderBottom: '1px solid #eee' }}>
-              <td style={tableCellStyle}>{sub.id}</td>
-              <td style={tableCellStyle}>
-                {typeof sub.customer === 'object' ? sub.customer.email || sub.customer.name || sub.customer.id : sub.customer}
-              </td>
-              <td style={tableCellStyle}>
-                {sub.items.data.map((item) => {
-                  const productName = typeof item.price.product === 'object'
-                    ? item.price.product.name
-                    : item.price.nickname || item.price.product;
-                  return <div key={item.id}>{productName}</div>;
-                })}
-              </td>
-              <td style={tableCellStyle}>
-                {sub.items.data.map((item) => (
-                  <div key={item.id}>{item.quantity}</div>
-                ))}
-              </td>
-              <td style={tableCellStyle}>
-                {sub.items.data.map((item) => (
-                  <div key={item.id}>
-                    {item.price.unit_amount !== null
-                      ? `${(item.price.unit_amount / 100).toFixed(2)} ${item.price.currency.toUpperCase()}`
-                      : 'N/A'}
-                  </div>
-                ))}
-              </td>
-              <td style={tableCellStyle}>{getStatusIndicator(sub.status)}</td>
-              <td style={tableCellStyle}>{formatDate(sub.current_period_start)}</td>
-              <td style={tableCellStyle}>{formatDate(sub.current_period_end)}</td>
-              <td style={tableCellStyle}>{formatDate(sub.trial_end)}</td>
-              <td style={tableCellStyle}>{sub.cancel_at_period_end ? 'Yes' : 'No'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
-
-const tableHeaderStyle: React.CSSProperties = {
-  padding: '12px 15px',
-  textAlign: 'left',
-  border: '1px solid #ddd',
-  fontSize: '0.9em',
-};
-
-const tableCellStyle: React.CSSProperties = {
-  padding: '10px 15px',
-  textAlign: 'left',
-  border: '1px solid #ddd',
-  fontSize: '0.85em',
-};
-
-export default SubscriptionList;
+export default TheCodeThatTalksBlog;
