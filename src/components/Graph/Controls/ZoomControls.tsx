@@ -1,4 +1,3 @@
-```tsx
 import React from 'react';
 import { IconButton, Stack } from '@fluentui/react';
 import { ZoomInIcon, ZoomOutIcon, ArrowUpRight8Icon, ArrowDownLeft8Icon } from '@fluentui/react-icons';
@@ -77,4 +76,3 @@ const ZoomControls: React.FC<ZoomControlsProps> = ({
 };
 
 export default ZoomControls;
-```
