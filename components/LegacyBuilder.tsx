@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 
 // --- EXPANDED CORE DATA STRUCTURES ---
