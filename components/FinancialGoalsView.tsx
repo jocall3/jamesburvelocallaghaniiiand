@@ -1,4 +1,51 @@
 // components/FinancialGoalsView.tsx
+/*
+Title: Beyond the Balance Sheet: 5 Surprising Secrets Your Financial Planning App Hides
+
+Introduction:
+Ever stared at your financial goals, wondering if you're truly on track? We all do. In a world brimming with complex algorithms and market volatility, it's easy to feel overwhelmed. But what if the very tools designed to help us navigate this landscape held deeper insights than we realize? We recently delved into the inner workings of a cutting-edge financial goals application, and what we found wasn't just code – it was a philosophy. Here are the most impactful, and sometimes counter-intuitive, takeaways that redefine how we should think about our money.
+
+1. The Crystal Ball of Coin: Embracing Uncertainty with Monte Carlo
+
+Forget simple linear projections. While knowing your future value is helpful, true financial wisdom lies in understanding the *range* of possible outcomes. This app doesn't just tell you what *might* happen; it simulates thousands of potential futures.
+
+> "The Monte Carlo simulator, a beacon in the fog of financial uncertainty. It does not predict the future, for that is folly, but rather illuminates the vast spectrum of possible futures. By embracing randomness, it grants us a glimpse into the robustness of our plans, transforming 'what if' into 'how likely.'"
+
+This is a game-changer. Instead of a single, often misleading, projection, you get a probability distribution. You learn your chances of success, and more importantly, the potential downside in a pessimistic scenario. This empowers you to adjust your strategy not just for the best case, but for a resilient financial future.
+
+2. Your Goals Aren't Islands: The Power of Interconnectedness
+
+We often set financial goals in isolation: "Save for a house," "Fund retirement," "Buy a car." But in reality, these aspirations are deeply intertwined. The code reveals a sophisticated system for linking goals, recognizing that achieving one might be a prerequisite for another, or that surplus funds from one could "overflow" into the next.
+
+This holistic view is crucial. It shifts the mindset from a series of disconnected targets to a strategic roadmap where every step contributes to a larger, integrated vision. Understanding these dependencies allows for more efficient resource allocation and a clearer path to overall financial well-being.
+
+3. The Silent Architects: Why Utility Functions are Your Financial Superheroes
+
+Behind every elegant chart and seamless interaction lies a bedrock of "utility functions." These aren't flashy, but they are the pure, predictable operations that distill complex financial logic into reusable, testable units. Think `calculateFutureValue` or `monthsBetween`.
+
+> "Utility functions are the unsung heroes of any robust application. They provide pure, predictable operations, distilling complex logic into reusable, testable units. Think of them as the finely crafted tools in a master artisan's kit – simple in form, but essential for grand creations."
+
+This insight reminds us that the foundation matters. The accuracy and reliability of these small, focused functions are what make the grand projections and AI insights trustworthy. It's a testament to the idea that precision in the small details enables success in the big picture.
+
+4. AI as Your Co-Pilot, Not Your Driver: Insights and Recalibration
+
+The app features an "AI-Generated Plan & Insights" component, but its role isn't to dictate. Instead, it acts as an intelligent co-pilot, sifting through data, identifying patterns, and offering possibilities. It suggests adjustments, not commands, empowering you to recalibrate your goals based on informed recommendations.
+
+> "AI insights are not a replacement for human judgment, but an augmentation. They sift through data, identify patterns, and offer possibilities, enabling smarter decisions and more personalized guidance."
+
+This highlights a crucial philosophy in modern financial tech: AI should enhance human decision-making, not replace it. It provides the data-driven nudges and alternative scenarios, allowing you to maintain control while benefiting from advanced analytical power.
+
+5. Beyond a Number: A Goal is a Living, Evolving Entity
+
+The `ExtendedFinancialGoal` type definition itself tells a story. A goal isn't just a target amount and a date. It encompasses a history of contributions, active recurring plans, a chosen risk profile, and a dynamic status (`on_track`, `needs_attention`, `achieved`, `behind`).
+
+This comprehensive data model reflects the reality of financial journeys. Goals are not static; they are living entities that require ongoing engagement, adjustments, and a clear understanding of their current health. It's a powerful reminder that financial planning is an active process, not a one-time setup.
+
+Conclusion:
+Peeling back the layers of this financial goals application reveals a profound approach to personal finance. It's not just about tracking numbers; it's about understanding probabilities, recognizing interconnectedness, valuing foundational precision, leveraging AI as an intelligent partner, and embracing the dynamic nature of our aspirations. These insights transform financial planning from a daunting task into an empowering journey.
+
+What aspect of your financial journey could benefit most from a deeper, more dynamic understanding?
+*/
 import React, { useContext, useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { DataContext } from '../context/DataContext';
 import Card from './Card';
@@ -111,7 +158,7 @@ export interface ExtendedFinancialGoal extends FinancialGoal {
 /**
  * Philosophical thought: Utility functions are the unsung heroes of any robust application.
  * They provide pure, predictable operations, distilling complex logic into reusable, testable units.
- * Think of them as the finely crafted tools in a master artisan's kit â€“ simple in form, but essential for grand creations.
+ * Think of them as the finely crafted tools in a master artisan's kit – simple in form, but essential for grand creations.
  *
  * Million Dollar Feature Overview: "The 'Date Whisperer' and 'Future Fortune Teller' Utilities!"
  * (Said in a jester's voice) "Hark, my friends, these humble functions, they may seem small and meek!
@@ -1560,7 +1607,7 @@ export const CreateGoalView: React.FC<{
  * (Jester voice) "Step right up, noble saver, and behold your goal's full glory!
  * No mere overview, but a 'Gallereia' of its complete story!
  * From humble pennies to soaring projections, a truly epic allegory!
- * Contributions, plans, risks, and AI wisdom â€“ all in one inventory!
+ * Contributions, plans, risks, and AI wisdom – all in one inventory!
  * Tweak, adjust, observe, and conquer, your financial victory!"
  */
 export const GoalDetailView: React.FC<{
@@ -1598,7 +1645,7 @@ export const GoalDetailView: React.FC<{
          <div>
             <div className="flex flex-col md:flex-row justify-between items-start mb-6 gap-4">
                 <div className="flex items-center gap-4">
-                     <div className="flex-shrink-0 w-16 h-16 bg-cyan-500/10 rounded-full flex items-center justify-center text-cyan-300">
+                     <div className="flex-shrink-0 w-16 h-16 bg-cyan-500/10 rounded-full flex items-center justify-center text-cyan-300 mr-4">
                          <Icon className="w-8 h-8" />
                      </div>
                      <div>
