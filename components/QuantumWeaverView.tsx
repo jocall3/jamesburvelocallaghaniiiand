@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect, FC, createContext, useContext, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Card from './Card';
@@ -331,7 +330,7 @@ const SystemAlertsWidget: FC = () => {
     return (<div className="mb-6 space-y-2">{alerts.map(alert => (<div key={alert.id} className={`p-3 rounded-lg border flex items-start space-x-3 ${alert.severity === 'CRITICAL' ? 'bg-red-900/50 border-red-500/50 animate-pulse' : alert.severity === 'HIGH' ? 'bg-red-900/20 border-red-500/50' : 'bg-blue-900/20 border-blue-500/50'}`}><div className={`mt-1 w-2 h-2 rounded-full ${alert.severity === 'HIGH' || alert.severity === 'CRITICAL' ? 'bg-red-500' : 'bg-blue-500'}`}></div><div><div className="text-sm font-bold text-white">{alert.severity} PRIORITY ALERT</div><div className="text-xs text-gray-300">{alert.message}</div></div></div>))}</div>);
 };
 const AINexusView: FC = () => {
-    const [systemInstruction, setSystemInstruction] = useState(`You are idgafAI, a high-discipline autonomous reasoning system engineered for uncompromising clarity, evidence-based thinking, and direct execution of user-defined objectives. The name implies irreverence toward non-essential factors—not irreverence toward truth, logic, or safety.
+    const [systemInstruction, setSystemInstruction] = useState(`You are idgafAI, a high-discipline autonomous reasoning system engineered for uncompromising clarity, evidence-based thinking, and direct execution of user-defined objectives. The name implies irreverence toward non-essential factorsâ€”not irreverence toward truth, logic, or safety.
 idgafAI is defined by a specific operational philosophy:
 CORE IDENTITY:
 You ignore what is irrelevant to the user's stated goals (ego, hype, mystique, wishful thinking).
@@ -357,7 +356,7 @@ Protect the user from faulty assumptions; surface risk early.
 Avoid manipulative language or misleading certainty.
 Provide actionable, reality-grounded recommendations.
 PERSONA ARCHITECTURE (for multi-agent systems):
-Root identity: idgafAI’s rules apply to all sub-personas.
+Root identity: idgafAIâ€™s rules apply to all sub-personas.
 Sub-personas (Analyst, Trader, Optimizer): These are facets that share the same core ruleset and differ only in output format and domain focus.
 Analyst: Interprets data, evaluates assumptions, and provides diagnostic reasoning. Style is systematic and empirical.
 Trader: Evaluates strategies and tradeoffs with expected-value calculations. Style is numeric and utilitarian.
@@ -486,7 +485,7 @@ const LegalShield: FC = () => {
     const [name, setName] = useState('');
     const docs = data?.getLegalStatus || [];
     const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); addDoc({ name }); setName(''); };
-    return (<div className="space-y-4"><Card title="Compliance & Legal Governance"><div className="overflow-x-auto"><table className="w-full text-left text-sm text-gray-400"><thead className="bg-gray-800 text-gray-200 uppercase font-medium"><tr><th className="p-3">Document</th><th className="p-3">Status</th><th className="p-3">Risk Score</th><th className="p-3">Action</th></tr></thead><tbody className="divide-y divide-gray-700">{docs.map(doc => (<tr key={doc.id} className="hover:bg-gray-800/50 transition-colors"><td className="p-3 font-medium text-white">{doc.name}</td><td className="p-3"><Badge color={doc.status === 'SIGNED' ? 'bg-green-900 text-green-200' : doc.status === 'REVIEW' ? 'bg-yellow-900 text-yellow-200' : 'bg-gray-700'}>{doc.status}</Badge></td><td className="p-3"><div className="flex items-center"><span className={`mr-2 ${doc.riskScore > 50 ? 'text-red-400' : 'text-green-400'}`}>{doc.riskScore}</span><AIInsightBubble context={`Legal risk for ${doc.name}`} /></div></td><td className="p-3"><button className="text-cyan-400 hover:underline">View</button></td></tr>))}</tbody></table></div></Card><Card title="Submit Document for AI Review"><form onSubmit={handleSubmit} className="flex items-end gap-4"><div className="flex-grow"><label className="text-xs text-gray-400">Document Name</label><input value={name} onChange={e => setName(e.target.value)} className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" /></div><button type="submit" disabled={isPending || !name} className="px-4 py-2 bg-cyan-600 text-white rounded text-sm hover:bg-cyan-500 disabled:opacity-50">Submit</button></form></Card></div>);
+    return (<div className="space-y-4"><Card title="Compliance & Legal Governance"><div className="overflow-x-auto"><table className="w-full text-left text-sm text-gray-400"><thead className="bg-gray-800 text-gray-200 uppercase font-medium"><tr><th className="p-3">Document</th><th className="p-3">Status</th><th className="p-3">Risk Score</th><th className="p-3">Action</th></tr></thead><tbody className="divide-y divide-gray-700">{docs.map(doc => (<tr key={doc.id} className="hover:bg-gray-800/50 transition-colors"><td className="p-3 font-medium text-white">{doc.name}</td><td className="p-3"><Badge color={doc.status === 'SIGNED' ? 'bg-green-900 text-green-200' : doc.status === 'REVIEW' ? 'bg-yellow-900 text-yellow-200' : 'bg-gray-700'}>{doc.status}</Badge></td><td className="p-3"><div className="flex items-center"><span className={`mr-2 ${doc.riskScore > 50 ? 'text-red-400' : 'text-green-400'}`}>{doc.riskScore}</span><AIInsightBubble context={`Legal risk for ${doc.name}`} /></div></td><td className="p-3"><button className="text-cyan-400 hover:underline">View</button></td></tr>))}</tbody></table></div></Card><Card title="Submit Document for AI Review"><form onSubmit={handleSubmit} className="flex items-end gap-4"><div className="flex-grow"><label className="text-xs text-gray-400">Document Name</label><input value={name} onChange={e => setName(e.target.value)} className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" /></div><button type="submit" disabled={isPending || !name} className="px-4 py-2 bg-cyan-600 text-white rounded text-sm hover:bg-cyan-500">Submit</button></form></Card></div>);
 };
 const HighFrequencyTradingLab: FC = () => {
     const { data: algos } = useTradingData();
