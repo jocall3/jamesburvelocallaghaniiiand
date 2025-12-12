@@ -1,153 +1,47 @@
-// ISO 20022 External Code Sets
-// This file defines the types used for external codes in ISO 20022 messages.
+I Deciphered the Secret Language of Global Finance. Here's What I Found.
 
-export type ExternalAcceptedReason1Code = 'ADEA' | 'NSTP' | 'SMPG';
-export type ExternalAccountIdentification1Code = 'AIIN' | 'BBAN' | 'CUID' | 'UPIC';
-export type ExternalAgentInstruction1Code = 'CHQB' | 'HOLD' | 'PHOA' | 'TELA';
-export type ExternalAgreementType1Code = 'ISDA' | 'GMRA';
-export type ExternalAuthenticationChannel1Code = 'MANU' | 'ONLI' | 'ATMA' | 'CARD' | 'INBA' | 'MOBI';
-export type ExternalAuthenticationMethod1Code = 'PKI' | 'TOKEN' | 'ACSN' | 'ADDB' | 'ADDS' | 'APKI' | 'ARNB' | 'ARPC' | 'ARQC' | 'ATCC' | 'BIOM' | 'BTHD' | 'CDCM' | 'CDHI' | 'CHDN' | 'CHSA' | 'CHSN' | 'CPSG' | 'CSCV' | 'CSEC' | 'CUID' | 'DRID' | 'DRVI' | 'EMAL' | 'EMIN' | 'EMRN' | 'FBIG' | 'FBIO' | 'FCPN' | 'FPIN' | 'IDCN' | 'MANU' | 'MOBL' | 'NBIG' | 'NPIN' | 'NTID' | 'NVSC' | 'OCHI' | 'OFPE' | 'OLDA' | 'OLDS' | 'OTHN' | 'OTHP' | 'OTPW' | 'PASS' | 'PCDV' | 'PHOM' | 'PHNB' | 'PKIS' | 'PLOB' | 'PPSG' | 'PRXY' | 'PSCD' | 'PSVE' | 'PSWD' | 'PWOR' | 'QWAC' | 'SCNL' | 'SCRT' | 'SHAF' | 'SHAT' | 'SSYN' | 'THDS' | 'AUVA' | 'TAVV' | 'TXID' | 'LAWE';
-export type ExternalAuthorityExchangeReason1Code = 'TAX' | 'LEGAL';
-export type ExternalAuthorityIdentification1Code = 'IRS' | 'FCA';
-export type ExternalBalanceSubType1Code = 'XPCD' | 'ITAV';
-export type ExternalBalanceType1Code = 'CLAV' | 'OPAV';
-export type ExternalBankTransactionDomain1Code = 'PMNT' | 'CAMT';
-export type ExternalBankTransactionFamily1Code = 'RCDT' | 'ICDT';
-export type ExternalBankTransactionSubFamily1Code = 'ESCT' | 'MOCR';
-export type ExternalBenchmarkCurveName1Code = 'LIBOR' | 'EURIBOR';
-export type ExternalBillingBalanceType1Code = 'CRDT' | 'DBIT';
-export type ExternalBillingCompensationType1Code = 'FEES';
-export type ExternalBillingRateIdentification1Code = 'FIXE' | 'FORF';
-export type ExternalCalculationAgent1Code = 'CALC';
-export type ExternalCancellationReason1Code = 'DUPL' | 'CUST';
-export type ExternalCardTransactionCategory1Code = 'POINT' | 'SALE';
-export type ExternalCashAccountType1Code = 'CACC' | 'SACC';
-export type ExternalCashClearingSystem1Code = 'USABA' | 'USCHIPS';
-export type ExternalCategoryPurpose1Code = 'BONU' | 'CASH' | 'DIVI';
-export type ExternalChannel1Code = 'SWIFT' | 'FILE';
-export type ExternalChargeType1Code = 'DEBT' | 'CRED';
-export type ExternalChequeAgentInstruction1Code = 'CHQB';
-export type ExternalChequeCancellationReason1Code = 'LOST';
-export type ExternalChequeCancellationStatus1Code = 'STOP';
-export type ExternalClaimNonReceiptRejection1Code = 'NOOR';
-export type ExternalClearingSystemIdentification1Code = 'USABA' | 'USCHIPS' | 'SWIFT';
-export type ExternalCollateralReferenceDataStatusReason1Code = 'INVA';
-export type ExternalCommunicationFormat1Code = 'MT' | 'MX';
-export type ExternalContractBalanceType1Code = 'EXPD';
-export type ExternalContractClosureReason1Code = 'TERM';
-export type ExternalCorporateActionEventType1Code = 'ACTV' | 'ATTI' | 'BRUP' | 'DFLT' | 'BONU' | 'EXRI' | 'CAPD' | 'CAPG' | 'CAPI' | 'DRCA' | 'DVCA' | 'CHAN' | 'COOP' | 'CLSA' | 'CONS' | 'CONV' | 'CREV' | 'DECR' | 'DETI' | 'DSCL' | 'DVOP' | 'DRIP' | 'DRAW' | 'DTCH' | 'EXOF' | 'REDM' | 'MCAL' | 'INCR' | 'PPMT' | 'INTR' | 'RHDI' | 'LIQU' | 'EXTM' | 'MRGR' | 'NOOF' | 'CERT' | 'ODLT' | 'OTHR' | 'PARI' | 'PCAL' | 'PRED' | 'PINK' | 'PLAC' | 'PDEF' | 'PRIO' | 'BPUT' | 'REDO' | 'REMK' | 'BIDS' | 'SPLR' | 'RHTS' | 'DVSC' | 'SHPR' | 'SMAL' | 'SOFF' | 'DVSE' | 'SPLF' | 'TREC' | 'TEND' | 'DLST' | 'SUSP' | 'EXWA' | 'WTRC' | 'WRTH' | 'ACCU' | 'INFO' | 'TNDP';
-export type ExternalCreditLineType1Code = 'REV';
-export type ExternalCreditorAgentInstruction1Code = 'PHOB';
-export type ExternalCreditorEnrolmentAmendmentReason1Code = 'BANK';
-export type ExternalCreditorEnrolmentCancellationReason1Code = 'CUST';
-export type ExternalCreditorEnrolmentStatusReason1Code = 'RJCT';
-export type ExternalCreditorReferenceType1Code = 'SCOR';
-export type ExternalDateFrequency1Code = 'DAIL' | 'WEEK';
-export type ExternalDateType1Code = 'VARI';
-export type ExternalDebtorActivationAmendmentReason1Code = 'CUST';
-export type ExternalDebtorActivationCancellationReason1Code = 'DUPL';
-export type ExternalDebtorActivationStatusReason1Code = 'RJCT';
-export type ExternalDebtorAgentInstruction1Code = 'CHQB';
-export type ExternalDeviceOperatingSystemType1Code = 'ANDR' | 'IOS';
-export type ExternalDiscountAmountType1Code = 'DISC';
-export type ExternalDocumentAmountType1Code = 'ORIG';
-export type ExternalDocumentFormat1Code = 'PDF';
-export type ExternalDocumentLineType1Code = 'LINE';
-export type ExternalDocumentPurpose1Code = 'COMM';
-export type ExternalDocumentType1Code = 'INVO';
-export type ExternalEffectiveDateParameter1Code = 'NOW';
-export type ExternalEmissionAllowanceSubProductType1Code = 'EUA';
-export type ExternalEncryptedElementIdentification1Code = 'OTHR';
-export type ExternalEnquiryRequestType1Code = 'STAT';
-export type ExternalEntitySize1Code = 'SME';
-export type ExternalEntityType1Code = 'LEI';
-export type ExternalEntryStatus1Code = 'BOOK';
-export type ExternalFinancialInstitutionIdentification1Code = 'BIC';
-export type ExternalFinancialInstrumentIdentificationType1Code = 'ISIN';
-export type ExternalFinancialInstrumentProductType1Code = 'BOND';
-export type ExternalGarnishmentType1Code = 'TAX';
-export type ExternalIncoterms1Code = 'FOB';
-export type ExternalIndustrySectorClassification1Code = 'NACE';
-export type ExternalInformationType1Code = 'INST';
-export type ExternalInstructedAgentInstruction1Code = 'PHOB';
-export type ExternalInvestigationAction1Code = 'CNCL';
-export type ExternalInvestigationActionReason1Code = 'DUPL';
-export type ExternalInvestigationExecutionConfirmation1Code = 'CNCL';
-export type ExternalInvestigationInstrument1Code = 'SWIFT';
-export type ExternalInvestigationReason1Code = 'DUPL';
-export type ExternalInvestigationReasonSubType1Code = 'DUPL';
-export type ExternalInvestigationServiceLevel1Code = 'SDVA';
-export type ExternalInvestigationStatus1Code = 'PEND';
-export type ExternalInvestigationStatusReason1Code = 'TRAN';
-export type ExternalInvestigationSubType1Code = 'MCRD';
-export type ExternalInvestigationType1Code = 'MCRD';
-export type ExternalLegalFramework1Code = 'FR';
-export type ExternalLetterType1Code = 'ACK';
-export type ExternalLocalInstrument1Code = 'CORE' | 'B2B' | 'TRF' | 'INST';
-export type ExternalMandateReason1Code = 'Q001';
-export type ExternalMandateSetupReason1Code = 'Q001';
-export type ExternalMandateStatus1Code = 'ACTV';
-export type ExternalMandateSuspensionReason1Code = 'Q001';
-export type ExternalMarketArea1Code = 'DOM';
-export type ExternalMarketInfrastructure1Code = 'TARGET';
-export type ExternalMessageFunction1Code = 'AUTT';
-export type ExternalModelFormIdentification1Code = 'MT103';
-export type ExternalNarrativeType1Code = 'REG';
-export type ExternalNotificationCancellationReason1Code = 'DUPL';
-export type ExternalNotificationSubType1Code = 'T103';
-export type ExternalNotificationType1Code = 'STAT';
-export type ExternalOrganisationIdentification1Code = 'LEI';
-export type ExternalPackagingType1Code = 'BOX';
-export type ExternalPartyRelationshipType1Code = 'AGNT';
-export type ExternalPaymentCancellationRejection1Code = 'LEGL';
-export type ExternalPaymentCompensationReason1Code = 'DUPL';
-export type ExternalPaymentControlRequestType1Code = 'LOCK';
-export type ExternalPaymentGroupStatus1Code = 'ACTC';
-export type ExternalPaymentModificationRejection1Code = 'LEGL';
-export type ExternalPaymentRole1Code = 'PYER';
-export type ExternalPaymentScenario1Code = 'CUST';
-export type ExternalPaymentTransactionStatus1Code = 'ACCP';
-export type ExternalPendingProcessingReason1Code = 'NARR';
-export type ExternalPersonIdentification1Code = 'NIDN';
-export type ExternalPostTradeEventType1Code = 'TRAD';
-export type ExternalProductType1Code = 'COMM';
-export type ExternalProxyAccountType1Code = 'TELE';
-export type ExternalPurpose1Code = 'BONU' | 'CASH' | 'DIVI' | 'CBLK' | 'CCRD' | 'CORT' | 'DCRD' | 'DVPM' | 'EPAY' | 'FCIN' | 'FCOL' | 'GP2P' | 'GOVT' | 'HEDG' | 'ICCP' | 'IDCP' | 'INTC' | 'INTE' | 'LBOX' | 'LOAN' | 'MP2B' | 'MP2P' | 'OTHR' | 'PENS' | 'RPRE' | 'RRCT' | 'RVPM' | 'SALA' | 'SECU' | 'SSBE' | 'SUPP' | 'TAXS' | 'TRAD' | 'TREA' | 'VATX' | 'WHLD' | 'SWEP' | 'TOPG' | 'ZABA' | 'VOST' | 'FCDT' | 'CIPC' | 'CONC' | 'CGWV' | 'SAVG' | 'CTDF';
-export type ExternalRatesAndTenors1Code = 'FIXE';
-export type ExternalRePresentmentReason1Code = 'AM05';
-export type ExternalReceivedReason1Code = 'A001';
-export type ExternalRegulatoryInformationType1Code = 'CNTR';
-export type ExternalRejectedReason1Code = 'AC01';
-export type ExternalRelativeTo1Code = 'ESTM';
-export type ExternalReportingSource1Code = 'BANK';
-export type ExternalRequestStatus1Code = 'ACTC';
-export type ExternalReservationType1Code = 'CARE';
-export type ExternalReturnReason1Code = 'AM01';
-export type ExternalReversalReason1Code = 'AM05';
-export type ExternalSecuritiesLendingType1Code = 'CASH';
-export type ExternalSecuritiesPurpose1Code = 'COLL';
-export type ExternalSecuritiesUpdateReason1Code = 'RECL';
-export type ExternalServiceLevel1Code = 'SEPA' | 'URGP' | 'NURG' | 'SDVA' | 'PRPT';
-export type ExternalShipmentCondition1Code = 'FOB';
-export type ExternalStatusReason1Code = 'AB01';
-export type ExternalSystemBalanceType1Code = 'OPAV';
-export type ExternalSystemErrorHandling1Code = 'X001';
-export type ExternalSystemEventType1Code = 'ASTI';
-export type ExternalSystemMemberType1Code = 'DRCT';
-export type ExternalSystemPartyType1Code = 'CSD';
-export type ExternalTaxAmountType1Code = 'CITY';
-export type ExternalTechnicalInputChannel1Code = 'SWIFT';
-export type ExternalTradeMarket1Code = 'XOFF';
-export type ExternalTradeTransactionCondition1Code = 'BCPD';
-export type ExternalTypeOfParty1Code = 'ALIA';
-export type ExternalUnableToApplyIncorrectData1Code = 'IN01';
-export type ExternalUnableToApplyMissingData1Code = 'MS01';
-export type ExternalUnderlyingTradeTransactionType1Code = 'COMM';
-export type ExternalUndertakingAmountType1Code = 'ORIG';
-export type ExternalUndertakingDocumentType1Code = 'COOL';
-export type ExternalUndertakingDocumentType2Code = 'COOL';
-export type ExternalUndertakingStatusCategory1Code = 'ACTC';
-export type ExternalUndertakingType1Code = 'BILL';
-export type ExternalUnitOfMeasure1Code = 'KGM';
-export type ExternalValidationRuleIdentification1Code = 'OTHR';
-export type ExternalVerificationReason1Code = 'AM05';
+Ever wondered what *really* happens when you send money, receive your salary, or buy a stock? We see a simple confirmation on our screen, but beneath that surface lies a hidden world of immense complexity. It’s a world that runs on a secret language—a universal standard that allows banks in Tokyo, New York, and Berlin to speak to each other flawlessly.
+
+This language is called ISO 20022, and it’s essentially the digital DNA of the global financial system. I recently looked at a file containing its "external code sets"—the core vocabulary of this language. What I found wasn't just a dry list of acronyms; it was a fascinating blueprint of how our world works. Here are the five most surprising takeaways.
+
+**1. The Global Economy Runs on a Four-Letter Vocabulary**
+
+Behind every major financial transaction is a simple, four-letter code. Think of it as a universal hashtag for money. When your salary lands in your account, banks don't write "salary payment for Jane Doe." Instead, they use the code `SALA`. Paying your taxes? That’s `TAXS`. A corporate bonus? `BONU`.
+
+This might seem trivial, but it’s the bedrock of global commerce. This standardized vocabulary eliminates ambiguity, allowing trillions of dollars to move across borders every day with precision and speed. It’s a quiet, ruthlessly efficient language that ensures when a bank in one country talks about a `DIVI` (dividend), every other bank knows exactly what it means. The complexity of our economy is built on the simplicity of these codes.
+
+**2. Your Entire Financial Life Can Be Summed Up in Acronyms**
+
+The scope of these codes is staggering. They don't just cover simple payments; they codify nearly every significant financial event imaginable in the life of a person or a corporation.
+
+The system has a code for a corporate merger (`MRGR`), a bankruptcy (`BRUP`), and a company's liquidation (`LIQU`). On a personal level, it defines codes for pension payments (`PENS`), loan disbursements (`LOAN`), and even government social security benefits (`SSBE`). It’s a humbling realization: the most pivotal moments of our financial lives, from career milestones to retirement, are abstracted into a few characters for a machine to read. We are, in the language of global finance, a collection of data points.
+
+**3. The System is Obsessed With Failure**
+
+You might think a financial system would be focused on success, but these codes reveal an obsession with the opposite. There is a vast and incredibly specific vocabulary for when things go wrong.
+
+There are codes for a payment being a `DUPL` (duplicate), for a cancellation being rejected for a `LEGL` (legal) reason, or for a claim being denied because the `NOOR` (no original) document was ever received. There are dozens of codes for investigations, rejections, and errors.
+
+This isn't a sign of a broken system; it's the mark of a resilient one. In a network this vast, failures are inevitable. The key to stability isn't preventing every error, but having a precise, unambiguous way to communicate *what* went wrong and *why*. This meticulous catalog of failure is what prevents a small error from cascading into a global crisis.
+
+**4. Ancient Tech and Modern Fintech Live Side-by-Side**
+
+The financial system is a living museum of technology. While it’s racing towards the future, it can’t let go of the past. This is beautifully illustrated in the codes.
+
+In the same list, you’ll find a code for a `CHQB` (a cheque to be physically posted to the beneficiary) and `TELA` (an instruction given by telephone). These sit right alongside codes for modern authentication methods like `BIOM` (biometrics), `OTPW` (one-time password), and mobile operating systems like `ANDR` (Android) and `IOS`.
+
+This tells us that the global financial system is a layered creation, built on decades of innovation. It has to accommodate the person still writing a cheque in a small town just as seamlessly as the person paying with their face in a smart city. It’s a bridge connecting every era of commerce.
+
+**5. The Codes Are a Blueprint for the Future of Money**
+
+If you want to know where finance is headed, look at the new words being added to its language. The ISO 20022 codes offer a clear glimpse into the future.
+
+The proliferation of advanced security codes—like `QWAC` (Qualified Website Authentication Certificate) and `PKIS` (Public Key Infrastructure)—shows a system grappling with the challenges of digital identity and security. The existence of "proxy account" types, like using a `TELE` (telephone number) to receive funds, points to a future where payments are tied to our digital identities, not just clunky bank account numbers.
+
+This standard isn't static; it's a living document that evolves with our technology and behavior. It’s quietly laying the tracks for the next generation of finance, long before those innovations become mainstream.
+
+**A Final Thought**
+
+A file of code, on its face, is just data. But hidden within these cryptic acronyms is the story of our modern world—a story of global cooperation, human behavior, and the relentless march of technology. It’s a reminder that the systems that power our lives are often invisible, speaking a language we never hear.
+
+The next time you tap your phone to pay for coffee, take a moment to appreciate the silent, coded conversation happening in the background. And ask yourself: what other invisible languages are shaping our world?
