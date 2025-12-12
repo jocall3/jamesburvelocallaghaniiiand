@@ -558,14 +558,14 @@ const ForexArena: React.FC = () => {
                     { id: 'FOREX_ARENA', label: 'Forex Arena', icon: '📈' },
                     { id: 'AI_CHAT', label: 'Neural Chat', icon: '🧠' },
                     { id: 'GEMINI_INSIGHTS', label: 'Gemini Insights', icon: '💎' },
-                    { id: 'THINKING_VISUALIZER', label: 'Thinking Visualizer', icon: '🌀' },
+                    { id: 'THINKING_VISUALIZER', label: 'Thinking Visualizer', icon: '🌐' },
                     { id: 'GLOBAL_KPIS', label: 'Global KPIs', icon: '📊' },
-                    { id: 'MARKET_ANALYSIS', label: 'Market Analysis', icon: '🌐' },
-                    { id: 'TRADE_LOGS', label: 'Trade Logs', icon: '📜' },
+                    { id: 'MARKET_ANALYSIS', label: 'Market Analysis', icon: '🌍' },
+                    { id: 'TRADE_LOGS', label: 'Trade Logs', icon: '📝' },
                     { id: 'AI_CONFIG', label: 'AI Configuration', icon: '⚙️' },
                     { id: 'PROFILE', label: 'Executive Profile', icon: '👤' },
                     { id: 'SYSTEM_HEALTH', label: 'System Health', icon: '❤️‍🩹' },
-                    { id: 'MULTIMODAL_ANALYSIS', label: 'Multimodal Analysis', icon: '📷' },
+                    { id: 'MULTIMODAL_ANALYSIS', label: 'Multimodal Analysis', icon: '📸' },
                     { id: 'SENTIMENT_STREAM', label: 'Sentiment Stream', icon: '📰' },
                     { id: 'RISK_SIMULATOR', label: 'Risk Simulator', icon: '🎲' },
                     { id: 'COMPLIANCE_AI', label: 'Compliance AI', icon: '⚖️' },
@@ -823,7 +823,7 @@ const ForexArena: React.FC = () => {
                             {process.steps.map((step, index) => (
                                 <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                     <span style={{ color: step.status === 'COMPLETED' ? '#64ffda' : step.status === 'RUNNING' ? '#fdbb2d' : '#8892b0', width: '20px' }}>
-                                        {step.status === 'COMPLETED' ? '✓' : step.status === 'RUNNING' ? '...' : '○'}
+                                        {step.status === 'COMPLETED' ? '✔' : step.status === 'RUNNING' ? '...' : '○'}
                                     </span>
                                     <span style={{ color: '#ccd6f6', flex: 1 }}>{step.name}</span>
                                     {step.durationMs && <span style={{ color: '#8892b0', fontSize: '0.8rem' }}>{step.durationMs.toFixed(0)}ms</span>}
