@@ -1,4 +1,3 @@
-```python
 import os
 import datetime
 import logging
@@ -381,5 +380,3 @@ if __name__ == '__main__':
             logging.error(f"Configuration error: {e}")
         except Exception as e:
             logging.error(f"An unexpected error occurred during execution: {e}")
-
-```
