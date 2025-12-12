@@ -1,4 +1,3 @@
-```typescript
 import { Transaction } from '../types';
 import { ComplianceRule } from '../types';
 import { RuleResult } from '../types';
@@ -49,4 +48,3 @@ export class ComplianceEngine {
     return this.rules;
   }
 }
-```
