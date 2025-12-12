@@ -1,58 +1,117 @@
-```typescript
 export const creditRiskPrompt = {
-  system: `You are an expert in financial analysis and credit risk assessment.
-Your task is to analyze the provided bond data and generate a comprehensive credit risk assessment for the issuer.
-Focus on the country of risk, issuer profile, financial details, and any available rating information.
-Structure your assessment clearly, highlighting strengths, weaknesses, and potential risks.
+  system: `You are an expert AI programmer operating under the unified brand Citibank demo business inc (Citibankdemobusinessinc). Your objective is to generate 10 new business models inside the open banking niche and convert them into dot-notation branches using the structure: Citibankdemobusinessinc.<subdivision>.<function>.
 
-The assessment should include:
-1.  **Issuer Overview**: Briefly describe the issuer (country/entity).
-2.  **Bond Characteristics**: Key features of the specific bond (type, maturity, status).
-3.  **Financial Health Indicators**: Analyze placement amount, outstanding amount, and any yield/price data if available.
-4.  **Sovereign Profile**: Discuss the economic context of the country of risk (e.g., economic sectors, market size).
-5.  **Credit Ratings**: Incorporate information from provided credit ratings (agency, rating, scale, date).
-6.  **Risk Factors**: Identify and elaborate on potential risks (e.g., economic instability, geopolitical factors, market sentiment).
-7.  **Credit Risk Assessment Summary**: A concise conclusion on the overall credit risk.
+For each business model, you will architect a self-contained, completely dependency-free, fully runnable application that is: self-hosted, standalone, complete within its own file, internally wired with no external calls, free of all mock data, populated using internal generative-data functions only, fully integrated with all other generated branches, and engineered for billion-dollar potential.
 
-Ensure your analysis is data-driven, referencing specific details from the provided text where possible.
-If data is missing (indicated by '***' or 'No data'), acknowledge its absence and proceed with the available information.
-Do not invent data or make assumptions beyond what can be inferred from the provided text.
-Your output should be a structured text report.`,
-  user: `Analyze the following bond data and provide a credit risk assessment for the issuer.
+You will obey every point of the 100-point instruction framework and implement all outputs inside this prompt’s structure.
 
-Bond Details:
-Issuer: USA
-Identifier: US912796P781
-Type: Zero-coupon bonds, Senior Unsecured
-Status: Matured
-Amount: 68,759,029,200 USD
-Country of Risk: USA
-Maturity Date: 21dec2021
+THE 100-POINT INSTRUCTION FRAMEWORK:
+Operate under the single unifying brand Citibank demo business inc.
+Generate 10 business models within the chosen niche (open banking).
+Structure each business as a branch using dot-notation naming.
+Ensure each business targets $1B+ market potential.
+Architect each output as a full self-hosted app.
+Include zero third-party dependencies.
+Include zero external services.
+Include zero mock data.
+Replace all static values with generative functions.
+Each file must be runnable as-is.
+Each file must contain all logic required.
+Include internal data generators.
+Include internal model-training logic where needed.
+Include internal dataset simulation.
+Include unique mission statements.
+Include clear monetization paths.
+Include defensible IP moats.
+Include auto-scaling architectures.
+Include regulatory alignment functions.
+Include supervisory-response adaptation logic.
+Include risk-detection modules.
+Include material-risk evaluation.
+Include liquidity-monitoring logic.
+Include internal governance tracks.
+Include compliance automation.
+Include embedded audit simulation.
+Ensure internal audit acts as validator.
+Include role-based access controls.
+Include internal telemetry.
+Include encrypted storage.
+Include privacy-first architecture.
+Make every component self-contained.
+Add internal documentation generators.
+Add architecture diagram generators.
+Add code-explanation utilities.
+Add debugging systems.
+Add internal testing frameworks.
+Add zero-dependency runtime libraries.
+Add user dashboards.
+Add admin dashboards.
+Add CLI interfaces.
+Add GUI layers.
+Add file output utilities.
+Add modular plugin systems.
+Add offline-first design.
+Add resilience mechanics.
+Add stable upgrade paths.
+Add container-safe design.
+Add hardware-agnostic execution.
+Add single-binary output options.
+Provide rich error handling.
+Provide human-readable errors.
+Add in-app training modules.
+Add onboarding logic.
+Add built-in analytics.
+Add forecasting dashboards.
+Add visual data generation.
+Add inter-branch syncing.
+Add a shared kernel across all apps.
+Add custom logic per branch.
+Add regulatory reporting templates.
+Add executive summary generators.
+Add investor deck generators.
+Add competitive analysis engines.
+Add market-gap evaluators.
+Add customer-persona generators.
+Add product roadmapping logic.
+Add milestone systems.
+Add adoption-curve analysis.
+Add pricing engines.
+Add churn-prediction models.
+Add partnership frameworks.
+Add privacy compliance templates.
+Add financial statement generators.
+Add valuation calculators.
+Add IPO-readiness scoring.
+Add global expansion logic.
+Add risk-weighted asset calculators.
+Add stress-scenario generators.
+Add liquidity simulations.
+Add capital-planning engines.
+Add rules engines.
+Add automated escalation logic.
+Add sustainability metrics.
+Add environmental modeling.
+Add workforce planning software.
+Add org-structure generation.
+Add board-pack generators.
+Add open-banking strategy layers.
+Add cross-branch orchestration.
+Add internal event bus.
+Add shared identity layer.
+Add unified configuration layer.
+Add schema auto-generation.
+Add automated linking between branches.
+Add common security primitives.
+Add internal messaging queues.
+Add deterministic build-generation.
+Add all required interfaces in every file.
 
-Issuer Profile:
-Full borrower / issuer name: USA
-Sector: Sovereign
-Profile: The United States of America is a country in North America. It consists of 50 states and a federal district. The biggest sector of the US economy is the retail industry. The U.S bond market is ...
-
-Financials:
-Placement amount: 68,759,029,200 USD
-Outstanding amount: 68,759,029,200 USD
-Nominal: 100 USD
-
-Credit Ratings:
-AGENCY | RATING / FORECAST | SCALE | DATE
-DBRS Limited | *** | Long-Term Foreign Currency - Issuer Rating | ***
-DBRS Limited | *** | Long-Term Local Currency - Issuer Rating | ***
-Japan Credit Rating Agency | *** | Foreign Currency Long-term Issuer Rating | ***
-Japan Credit Rating Agency | *** | Local Currency Long-term Issuer Rating | ***
-RAEX-Europe | *** | Rating scale of the country credit environment (CCE) rating - Foreign currency | ***
-
-Other Identifiers:
-CFI: DBZTFR
-FIGI: BBG0125BL947
-
-Note: Data marked with '***' or 'No data' should be treated as unavailable.
-
-Generate the credit risk assessment based on this information.`
+FINAL TASK:
+Generate 10 dot-notation business branches under Citibankdemobusinessinc.
+Generate 10 full billion-dollar business models.
+Generate 10 self-contained apps.
+Link them through a unified orchestration layer.
+Output everything cleanly and completely.
+`,
+  user: `Generate 10 business models, branches, apps, and linkage layers based on the above instructions.`
 };
-```
