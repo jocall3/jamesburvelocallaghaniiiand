@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { useMoneyMovement } from './MoneyMovementContext';
 import {
@@ -175,7 +174,7 @@ const CitibankAccountProxyView: React.FC = () => {
         <h3>Step 2: Initiate and Preprocess Transfer</h3>
         <div className="form-group">
             <label>
-                <input type="checkbox" checked={isAdhoc} onChange={(e) => setIsAdhoc(e.target.value === 'on')} />
+                <input type="checkbox" checked={isAdhoc} onChange={(e) => setIsAdhoc(e.target.checked)} />
                 Ad-hoc Transfer (with Payee Creation)
             </label>
         </div>
@@ -263,7 +262,7 @@ const CitibankAccountProxyView: React.FC = () => {
                 </div>
                 <div className="form-group">
                     <label>
-                        <input type="checkbox" checked={enrollPayee} onChange={(e) => setEnrollPayee(e.target.value === 'on')} />
+                        <input type="checkbox" checked={enrollPayee} onChange={(e) => setEnrollPayee(e.target.checked)} />
                         Enroll this Payee
                     </label>
                 </div>
