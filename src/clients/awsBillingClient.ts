@@ -184,7 +184,7 @@ export class AwsBillingClient {
    * This is suitable for small text files but should be used with caution for large files
    * like full CUR reports, as it loads the entire content into memory.
    * @param stream - The Readable stream to convert.
-   * @returns A Promise that resolves with the string content of the stream.
+   * @returns a Promise that resolves with the string content of the stream.
    */
   public async streamToString(stream: Readable): Promise<string> {
     return new Promise((resolve, reject) => {
