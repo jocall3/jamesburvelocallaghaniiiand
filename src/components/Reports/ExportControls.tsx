@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 
 export interface Application {
@@ -86,4 +85,3 @@ const ExportControls: React.FC<ExportControlsProps> = ({ data, filename = 'appli
 };
 
 export default ExportControls;
-```
