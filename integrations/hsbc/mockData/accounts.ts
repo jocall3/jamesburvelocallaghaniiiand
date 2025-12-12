@@ -148,7 +148,7 @@ export const mockHsbcAccounts: HsbcAccount[] = [
     sortCode: '40-11-00',
     currency: 'GBP',
     balance: -250.55, // In overdraft
-    availableBalance: 749.45, // Assuming £1000 overdraft
+    availableBalance: 749.45, // Assuming Â£1000 overdraft
     nickname: 'Student Account',
     status: 'Active',
     openedDate: '2023-09-05T09:30:00Z',
