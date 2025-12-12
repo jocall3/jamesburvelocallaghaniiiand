@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Card from './Card';
 import { Calendar, CheckCircle, Clock, AlertOctagon, FileText, ChevronRight } from 'lucide-react';
@@ -103,7 +102,7 @@ const CorporateActionsNexusView: React.FC = () => {
                                         </div>
                                         <div>
                                             <h4 className="font-bold text-white">{action.securityName}</h4>
-                                            <p className="text-sm text-gray-400">{action.type} • {action.securityTicker}</p>
+                                            <p className="text-sm text-gray-400">{action.type} â€¢ {action.securityTicker}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-6">
