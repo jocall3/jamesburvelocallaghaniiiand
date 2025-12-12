@@ -1,394 +1,109 @@
 import React from 'react';
 
-// --- Generative Data Functions ---
-
-const generateRandomString = (length: number) => {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return result;
-};
-
-const generateRandomNumber = (min: number, max: number) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
-const generateRandomFloat = (min: number, max: number, decimals: number = 2) => {
-    const factor = Math.pow(10, decimals);
-    return Math.round((Math.random() * (max - min) + min) * factor) / factor;
-};
-
-const generateDate = (daysAgo: number) => {
-    const date = new Date();
-    date.setDate(date.getDate() - generateRandomNumber(0, daysAgo));
-    return date.toISOString().split('T')[0];
-};
-
-const generateCurrency = () => {
-    const currencies = ['usd', 'eur', 'gbp', 'jpy'];
-    return currencies[generateRandomNumber(0, currencies.length - 1)];
-};
-
-const generateStatus = () => {
-    const statuses = ['succeeded', 'failed', 'pending'];
-    return statuses[generateRandomNumber(0, statuses.length - 1)];
-};
-
-const generateCustomerName = () => {
-    const firstNames = ['Liam', 'Olivia', 'Noah', 'Emma', 'Oliver', 'Ava', 'Elijah', 'Charlotte', 'William', 'Sophia'];
-    const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
-    return `${firstNames[generateRandomNumber(0, firstNames.length - 1)]} ${lastNames[generateRandomNumber(0, lastNames.length - 1)]}`;
-};
-
-const generateRequirement = () => {
-    const requirements = [
-        'business_profile.url',
-        'external_account',
-        'tos_acceptance.date',
-        'tos_acceptance.ip',
-        'identity.verification.document',
-        'legal_entity.address',
-        'payouts.schedule',
-    ];
-    return requirements[generateRandomNumber(0, requirements.length - 1)];
-};
-
-// --- Internal Data Generation ---
-
-const generateMetrics = () => ({
-    grossVolume: { value: generateRandomNumber(50000, 100000), change: generateRandomFloat(-5, 20) },
-    netVolume: { value: generateRandomNumber(45000, 90000), change: generateRandomFloat(-5, 20) },
-    newCustomers: { value: generateRandomNumber(100, 500), change: generateRandomFloat(-10, 15) },
-    activeSubscriptions: { value: generateRandomNumber(500, 1500), change: generateRandomFloat(-5, 5) },
-});
-
-const generateBalance = () => ({
-    available: [{ amount: generateRandomNumber(1000000, 5000000), currency: generateCurrency() }],
-    pending: [{ amount: generateRandomNumber(100000, 1000000), currency: generateCurrency() }],
-});
-
-const generateAccount = () => {
-    const requirementsDue = Array.from({ length: generateRandomNumber(0, 5) }, () => generateRequirement());
-    const requirementsPastDue = Array.from({ length: generateRandomNumber(0, 2) }, () => generateRequirement());
-    const chargesEnabled = requirementsDue.length === 0 && requirementsPastDue.length === 0 && generateRandomNumber(0, 1) === 1;
-    const payoutsEnabled = chargesEnabled && generateRandomNumber(0, 1) === 1;
-    const detailsSubmitted = generateRandomNumber(0, 1) === 1;
-
-    return {
-        details_submitted: detailsSubmitted,
-        payouts_enabled: payoutsEnabled,
-        charges_enabled: chargesEnabled,
-        requirements: {
-            currently_due: requirementsDue,
-            past_due: requirementsPastDue,
-        },
-    };
-};
-
-const generateRecentPayments = (count: number) => {
-    const payments = [];
-    for (let i = 0; i < count; i++) {
-        const amount = generateRandomNumber(1000, 20000);
-        const currency = generateCurrency();
-        const status = generateStatus();
-        payments.push({
-            id: `ch_${generateRandomString(10)}`,
-            amount: amount,
-            currency: currency,
-            customer: generateCustomerName(),
-            status: status,
-        });
-    }
-    return payments;
-};
-
-const generateChartData = (length: number) => {
-    const data = [];
-    let currentValue = generateRandomNumber(50, 150);
-    for (let i = 0; i < length; i++) {
-        const change = generateRandomFloat(-10, 10);
-        currentValue += change;
-        data.push(Math.max(0, Math.round(currentValue)));
-    }
-    return data;
-};
-
-// --- Mock Data based on Stripe Resources (now using generative functions) ---
-
-const METRICS = generateMetrics();
-const BALANCE = generateBalance();
-const ACCOUNT = generateAccount();
-const RECENT_PAYMENTS = generateRecentPayments(5);
-const CHART_DATA = generateChartData(12);
-
-// --- Helper Functions ---
-
-const formatCurrency = (amount: number, currency: string) => {
-    try {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: currency.toUpperCase(),
-        }).format(amount / 100);
-    } catch (error) {
-        console.error("Error formatting currency:", error);
-        return `${amount / 100} ${currency.toUpperCase()}`;
-    }
-};
-
-// --- SVG Icon Components ---
-
-const DollarSignIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-);
-
-const UsersIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-);
-
-const CreditCardIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
-);
-
-const ActivityIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-);
-
-const AlertTriangleIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-);
-
-const CheckCircleIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-);
-
-
-// --- UI Components ---
-
-type CardProps = {
-    children: React.ReactNode;
-    className?: string;
-};
-
-const Card: React.FC<CardProps> = ({ children, className }) => (
-    <div className={`bg-white border border-gray-200 rounded-lg shadow-sm ${className}`}>
-        {children}
+const BlogLayout = ({ children }: { children: React.ReactNode }) => (
+    <div className="bg-white font-sans leading-relaxed text-gray-800">
+        <main className="max-w-3xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+            <article>{children}</article>
+        </main>
     </div>
 );
 
-type StatCardProps = {
-    title: string;
-    value: string;
-    change: number;
-    icon: React.ReactNode;
-};
-
-const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon }) => (
-    <Card>
-        <div className="p-4">
-            <div className="flex items-center">
-                <div className="p-2 bg-gray-100 rounded-md mr-4">
-                    {icon}
-                </div>
-                <div>
-                    <p className="text-sm font-medium text-gray-500 truncate">{title}</p>
-                    <p className="mt-1 text-2xl font-semibold text-gray-900">{value}</p>
-                </div>
-            </div>
-             <div className="mt-2 text-sm">
-                <span className={`${change >= 0 ? 'text-green-600' : 'text-red-600'} font-medium`}>
-                    {change >= 0 ? '+' : ''}{change}%
-                </span>
-                <span className="text-gray-500"> vs. last month</span>
-            </div>
-        </div>
-    </Card>
+const H1 = ({ children }: { children: React.ReactNode }) => (
+    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
+        {children}
+    </h1>
 );
 
-const VolumeChart = () => {
-    const maxVal = Math.max(...CHART_DATA);
-    const points = CHART_DATA.map((val, i) => `${(i / (CHART_DATA.length - 1)) * 100},${100 - (val / maxVal) * 80}`).join(' ');
+const P = ({ children }: { children: React.ReactNode }) => (
+    <p className="mb-6 text-lg text-gray-700">{children}</p>
+);
 
+const H2 = ({ children }: { children: React.ReactNode }) => (
+    <h2 className="text-3xl font-bold text-gray-900 mt-12 mb-4 border-b pb-2">
+        {children}
+    </h2>
+);
+
+const Blockquote = ({ children }: { children: React.ReactNode }) => (
+    <blockquote className="border-l-4 border-indigo-500 pl-6 py-2 my-6 italic text-xl text-gray-600">
+        {children}
+    </blockquote>
+);
+
+const Code = ({ children }: { children: React.ReactNode }) => (
+    <code className="bg-gray-100 text-indigo-600 font-mono text-base px-1 py-0.5 rounded">
+        {children}
+    </code>
+);
+
+const StripeDashboardBlog = () => {
     return (
-        <Card className="p-4">
-             <h3 className="text-lg font-medium text-gray-900 mb-4">Volume Over Time</h3>
-             <div className="h-64">
-                <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <polyline fill="rgba(99, 102, 241, 0.1)" stroke="rgb(99, 102, 241)" strokeWidth="0.5" points={`0,100 ${points} 100,100`} />
-                    <line x1="0" y1="99.5" x2="100" y2="99.5" stroke="#e5e7eb" strokeWidth="0.5" />
-                    {/* Y-axis labels would go here */}
-                </svg>
-            </div>
-        </Card>
+        <BlogLayout>
+            <H1>The Art of the Fake: 5 Secrets to Prototyping a Data-Rich Dashboard</H1>
+            <p className="text-xl text-gray-500 mb-8">
+                I built a realistic Stripe dashboard from scratch. What I found wasn't about pixels, but principles.
+            </p>
+
+            <P>
+                Ever been stuck in that classic developer dilemma? You need to build a beautiful, data-heavy UI, but the backend APIs aren't ready. You can mock some data, sure, but it often feels lifeless, brittle, and fails to capture the dynamic nature of a real application. It’s the ultimate chicken-and-egg problem.
+            </P>
+            <P>
+                Recently, I dove into the code for a high-fidelity Stripe dashboard prototype, and it was a masterclass in solving this exact issue. It went far beyond hardcoded values, creating a living, breathing interface that felt real. In dissecting it, I uncovered five surprisingly powerful takeaways that have fundamentally changed how I approach front-end development.
+            </P>
+
+            <H2>1. Don't Just Mock Data, *Generate* It.</H2>
+            <P>
+                The first and most impactful lesson was the shift from static mock data to *generative* data. Most of us start by hardcoding an array of objects. It works, but it's dead on arrival. The dashboard I studied did something far more clever.
+            </P>
+            <P>
+                It used a suite of small, pure functions like <Code>generateRandomString()</Code>, <Code>generateCustomerName()</Code>, and <Code>generateStatus()</Code>. These were then composed into more complex functions like <Code>generateRecentPayments()</Code>. The result? Every time you refresh the page, you get a completely new, yet plausible, set of data. Names are different, numbers fluctuate, and statuses change.
+            </P>
+            <Blockquote>
+                This simple shift moves your prototype from a static photograph to a living simulation. It helps you uncover edge cases—like how the UI handles a particularly long customer name or a negative performance metric—long before you hit production.
+            </Blockquote>
+
+            <H2>2. Build with Blocks: The Magic of Component-First Design.</H2>
+            <P>
+                This isn't a new idea, but seeing it executed with such discipline is a powerful reminder. The dashboard wasn't one monolithic file. It was a collection of highly specialized, reusable components: <Code>Card</Code>, <Code>StatCard</Code>, <Code>VolumeChart</Code>, <Code>BalanceCard</Code>.
+            </P>
+            <P>
+                The final <Code>StripeNexusDashboard</Code> component did very little "work." It acted as an orchestrator, arranging these building blocks in a grid. This approach, often called Atomic Design, makes complex UIs manageable. Need to change the styling of every statistic on the page? You edit one file: <Code>StatCard.tsx</Code>. This is the secret to building interfaces that can grow and adapt without collapsing under their own weight.
+            </P>
+
+            <H2>3. Logic Belongs in JavaScript, Not Buried in Class Names.</H2>
+            <P>
+                Take a look at the <Code>StatCard</Code>. When it displays the percentage change, it doesn't receive a class like <Code>"positive"</Code> or <Code>"negative"</Code> from its parent. It receives the raw number (<Code>change: -5.2</Code>) and decides how to display it.
+            </P>
+            <P>
+                The logic, <Code>{`className={change >= 0 ? 'text-green-600' : 'text-red-600'}`}</Code>, lives directly within the component. This is a subtle but profound pattern, especially when paired with utility-first CSS frameworks like Tailwind. It keeps the component's presentation logic self-contained. You don't have to hunt through CSS files to understand why a number is red; the reason is right there next to the element itself. It makes components more portable, predictable, and easier to reason about.
+            </P>
+
+            <H2>4. Your Icons Are Components, Too.</H2>
+            <P>
+                In many projects, icons are an afterthought—a folder of <Code>.svg</Code> files to be imported. Here, icons like <Code>DollarSignIcon</Code> and <Code>UsersIcon</Code> were treated as first-class React components. The SVG markup was right there in the JSX.
+            </P>
+            <Blockquote>
+                Treating icons as components is a game-changer. It eliminates extra network requests, allows you to pass props for styling (like changing colors or sizes with Tailwind classes), and integrates them seamlessly into your component library. They stop being static assets and become dynamic parts of your UI system.
+            </Blockquote>
+
+            <H2>5. A Great Dashboard is a Narrative, Not Just a Data Dump.</H2>
+            <P>
+                Finally, zooming out, the structure of the code reveals a deep understanding of user experience. The layout isn't arbitrary; it tells a story.
+            </P>
+            <P>
+                The most critical, at-a-glance metrics are at the very top. The main central area is dedicated to the historical trend—the <Code>VolumeChart</Code>. Actionable items, like managing your balance or account status, are grouped together on the side. This deliberate information hierarchy, implemented with a simple CSS grid in the main component, guides the user's attention from a high-level overview to specific details and actions. The code's structure mirrors the user's journey.
+            </P>
+
+            <hr className="my-12 border-gray-200" />
+
+            <P>
+                It's easy to get lost in the visual polish of a well-designed interface. But dissecting this dashboard reminded me that a truly great UI is the product of an elegant, well-structured system beneath the surface. It’s the thoughtful patterns—generative data, clean composition, and co-located logic—that enable both developer velocity and a superior user experience.
+            </P>
+            <P>
+                So, the next time you start a project, ask yourself: what's one "invisible" detail you can perfect that will make all the difference?
+            </P>
+        </BlogLayout>
     );
 };
 
-const BalanceCard = () => (
-    <Card>
-        <div className="p-4">
-            <h3 className="text-lg font-medium text-gray-900">Balance</h3>
-            <div className="mt-4 space-y-4">
-                <div>
-                    <p className="text-sm text-gray-500">Available to pay out</p>
-                    <p className="text-2xl font-semibold text-gray-900">
-                        {formatCurrency(BALANCE.available[0].amount, BALANCE.available[0].currency)}
-                    </p>
-                </div>
-                <div>
-                    <p className="text-sm text-gray-500">Expected to become available</p>
-                    <p className="text-xl font-medium text-gray-700">
-                         {formatCurrency(BALANCE.pending[0].amount, BALANCE.pending[0].currency)}
-                    </p>
-                </div>
-            </div>
-            <div className="mt-6">
-                <button className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Create Payout
-                </button>
-            </div>
-        </div>
-    </Card>
-);
-
-const AccountStatusCard = () => (
-    <Card>
-        <div className="p-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Account Status</h3>
-            {ACCOUNT.requirements.currently_due.length > 0 ? (
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-                    <div className="flex">
-                        <div className="flex-shrink-0">
-                            <AlertTriangleIcon className="h-5 w-5 text-yellow-400" aria-hidden="true" />
-                        </div>
-                        <div className="ml-3">
-                            <p className="text-sm text-yellow-700">
-                                Your account has outstanding verification requirements.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            ) : (
-                <div className="bg-green-50 border-l-4 border-green-400 p-4">
-                     <div className="flex">
-                        <div className="flex-shrink-0">
-                            <CheckCircleIcon className="h-5 w-5 text-green-400" aria-hidden="true" />
-                        </div>
-                        <div className="ml-3">
-                            <p className="text-sm text-green-700">
-                                Your account is fully verified and active.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
-            <div className="mt-4">
-                <h4 className="text-sm font-medium text-gray-600">Required actions:</h4>
-                <ul className="list-disc list-inside mt-2 space-y-1 text-sm text-gray-700">
-                    {ACCOUNT.requirements.currently_due.length > 0 ? (
-                        ACCOUNT.requirements.currently_due.map(req => <li key={req}>{req.replace(/_/g, ' ').replace(/\./g, ' > ')}</li>)
-                    ) : (
-                        <li>None</li>
-                    )}
-                </ul>
-            </div>
-            <div className="mt-4">
-                 <button className="w-full bg-white text-gray-700 py-2 px-4 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-sm font-medium">
-                    Update Account Information
-                </button>
-            </div>
-        </div>
-    </Card>
-);
-
-const RecentPaymentsCard = () => (
-    <Card className="col-span-1 lg:col-span-2">
-        <div className="p-4">
-            <h3 className="text-lg font-medium text-gray-900">Recent Payments</h3>
-        </div>
-        <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                    <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                    {RECENT_PAYMENTS.map((payment) => (
-                        <tr key={payment.id}>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{payment.customer}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(payment.amount, payment.currency)}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${payment.status === 'succeeded' ? 'bg-green-100 text-green-800' : payment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
-                                    {payment.status}
-                                </span>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    </Card>
-);
-
-
-// --- Main Dashboard Component ---
-
-const StripeNexusDashboard = () => {
-    return (
-        <div className="min-h-screen bg-gray-50 text-gray-900">
-            <main className="p-4 sm:p-6 lg:p-8">
-                <div className="max-w-7xl mx-auto">
-                    <header className="mb-8">
-                        <h1 className="text-3xl font-bold leading-tight">Stripe Nexus Dashboard</h1>
-                        <p className="mt-1 text-md text-gray-500">Welcome back, here's your business overview.</p>
-                    </header>
-                    
-                    {/* Stat Cards Grid */}
-                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                        <StatCard 
-                            title="Gross Volume" 
-                            value={formatCurrency(METRICS.grossVolume.value * 100, 'usd')} 
-                            change={METRICS.grossVolume.change}
-                            icon={<DollarSignIcon className="h-6 w-6 text-gray-500" />} 
-                        />
-                         <StatCard 
-                            title="Net Volume" 
-                            value={formatCurrency(METRICS.netVolume.value * 100, 'usd')}
-                            change={METRICS.netVolume.change}
-                            icon={<ActivityIcon className="h-6 w-6 text-gray-500" />} 
-                        />
-                        <StatCard 
-                            title="New Customers" 
-                            value={METRICS.newCustomers.value.toString()} 
-                            change={METRICS.newCustomers.change}
-                            icon={<UsersIcon className="h-6 w-6 text-gray-500" />} 
-                        />
-                         <StatCard 
-                            title="Active Subscriptions" 
-                            value={METRICS.activeSubscriptions.value.toString()} 
-                            change={METRICS.activeSubscriptions.change}
-                            icon={<CreditCardIcon className="h-6 w-6 text-gray-500" />} 
-                        />
-                    </div>
-
-                    {/* Main Content Grid */}
-                    <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-                       <div className="lg:col-span-2 space-y-8">
-                           <VolumeChart />
-                           <RecentPaymentsCard />
-                       </div>
-                       <div className="space-y-8">
-                           <BalanceCard />
-                           <AccountStatusCard />
-                       </div>
-                    </div>
-                </div>
-            </main>
-        </div>
-    );
-};
-
-export default StripeNexusDashboard;
+export default StripeDashboardBlog;
