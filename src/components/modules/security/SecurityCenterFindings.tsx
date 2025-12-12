@@ -1,4 +1,3 @@
-```tsx
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -140,4 +139,3 @@ const SecurityCenterFindings = () => {
 };
 
 export default SecurityCenterFindings;
-```
