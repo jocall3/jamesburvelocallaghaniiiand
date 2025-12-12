@@ -1,436 +1,139 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import {
-  TextField,
-  Button,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Grid,
-  Typography,
-  Paper,
-  TextareaAutosize,
-  Box,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Alert,
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
+import React from 'react';
+import { Box, Typography, Paper, Divider } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
-// Assuming ISO 20022 code types are defined elsewhere or imported.
-// For this specific file generation, we'll use placeholders/mocked types
-// based on the schema provided, although in a real project, these would
-// be generated or imported types.
+const BlogPostContainer = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(4),
+  maxWidth: '800px',
+  margin: 'auto',
+  marginTop: theme.spacing(5),
+  fontFamily: '"Georgia", "Times New Roman", serif',
+  lineHeight: 1.7,
+  color: theme.palette.text.primary,
+  backgroundColor: '#fff',
+}));
 
-type ExternalCodeType = string; // Placeholder for actual union types from schema definitions
+const Headline = styled(Typography)(({ theme }) => ({
+  fontFamily: '"Helvetica Neue", "Arial", sans-serif',
+  fontWeight: 700,
+  marginBottom: theme.spacing(2),
+  textAlign: 'center',
+  color: theme.palette.text.primary,
+}));
 
-interface PaymentInstruction {
-  id: number;
-  instrId: string;
-  endToEndId: string;
-  amt: string;
-  ccy: string;
-  instrDt: string;
-  debtorName: string;
-  debtorIban: string;
-  creditorName: string;
-  creditorIban: string;
-  serviceLevel: ExternalCodeType;
-  purpose: ExternalCodeType;
-  localInstrument: ExternalCodeType;
-}
+const Subheading = styled(Typography)(({ theme }) => ({
+  fontFamily: '"Helvetica Neue", "Arial", sans-serif',
+  fontWeight: 600,
+  marginTop: theme.spacing(4),
+  marginBottom: theme.spacing(2),
+  color: theme.palette.text.primary,
+}));
 
-// Mocked/Placeholder external code lists for form population
-const mockServiceLevelCodes: ExternalCodeType[] = ['SEPA', 'URGP', 'INST', 'NURG'];
-const mockPurposeCodes: ExternalCodeType[] = ['CASH', 'TREA', 'SUPP', 'GOVT'];
-const mockLocalInstrumentCodes: ExternalCodeType[] = ['CORE', 'B2B', 'TRF', 'INST'];
+const BodyText = styled(Typography)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  fontSize: '1.1rem',
+  color: theme.palette.text.secondary,
+}));
+
+const Blockquote = styled('blockquote')(({ theme }) => ({
+  borderLeft: `4px solid ${theme.palette.primary.main}`,
+  paddingLeft: theme.spacing(3),
+  margin: theme.spacing(3, 0),
+  fontStyle: 'italic',
+  color: theme.palette.text.secondary,
+  fontSize: '1.1rem',
+}));
+
+const Code = styled('code')(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[800],
+  padding: '2px 6px',
+  borderRadius: '4px',
+  fontFamily: 'monospace',
+  fontSize: '0.95em',
+}));
 
 const PaymentInitiationForm: React.FC = () => {
-  const [isBulk, setIsBulk] = useState(false);
-  const [instructions, setInstructions] = useState<PaymentInstruction[]>([]);
-  const [newInstruction, setNewInstruction] = useState<Omit<PaymentInstruction, 'id'>>({
-    instrId: '',
-    endToEndId: '',
-    amt: '',
-    ccy: 'EUR',
-    instrDt: new Date().toISOString().substring(0, 10),
-    debtorName: '',
-    debtorIban: '',
-    creditorName: '',
-    creditorIban: '',
-    serviceLevel: 'SEPA',
-    purpose: 'CASH',
-    localInstrument: 'CORE',
-  });
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-
-  const handleNewInstructionChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setNewInstruction((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const validateInstruction = (instr: Omit<PaymentInstruction, 'id'>): boolean => {
-    if (!instr.instrId || !instr.endToEndId || !instr.amt || !instr.ccy || !instr.instrDt ||
-        !instr.debtorName || !instr.debtorIban || !instr.creditorName || !instr.creditorIban ||
-        !instr.serviceLevel || !instr.purpose || !instr.localInstrument) {
-      setError('All fields must be filled.');
-      return false;
-    }
-    if (isNaN(parseFloat(instr.amt)) || parseFloat(instr.amt) <= 0) {
-      setError('Amount must be a positive number.');
-      return false;
-    }
-    setError(null);
-    return true;
-  };
-
-  const addInstruction = useCallback(() => {
-    if (validateInstruction(newInstruction)) {
-      const instructionToAdd: PaymentInstruction = {
-        ...newInstruction,
-        id: Date.now(), // Simple unique ID
-      };
-      setInstructions((prev) => [...prev, instructionToAdd]);
-      setNewInstruction((prev) => ({
-        ...prev,
-        instrId: '',
-        endToEndId: '',
-      })); // Clear IDs for the next entry if adding multiple one by one
-      setMessage('Instruction added successfully.');
-      setTimeout(() => setMessage(null), 3000);
-    }
-  }, [newInstruction]);
-
-  const removeInstruction = useCallback((id: number) => {
-    setInstructions((prev) => prev.filter((instr) => instr.id !== id));
-  }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (instructions.length === 0) {
-      setError('No payment instructions to submit.');
-      return;
-    }
-
-    console.log('Submitting Payment Instructions (Simulated pain.001 generation):', instructions);
-    
-    // In a real application, this would trigger the pain.001 XML generation/API call
-    setError(null);
-    setMessage(`Successfully submitted ${instructions.length} payment instruction(s) for processing.`);
-    setInstructions([]);
-    setNewInstruction({
-        instrId: '',
-        endToEndId: '',
-        amt: '',
-        ccy: 'EUR',
-        instrDt: new Date().toISOString().substring(0, 10),
-        debtorName: '',
-        debtorIban: '',
-        creditorName: '',
-        creditorIban: '',
-        serviceLevel: 'SEPA',
-        purpose: 'CASH',
-        localInstrument: 'CORE',
-    });
-  };
-
-  const formFields = useMemo(() => (
-    <>
-      <Grid item xs={12} sm={6} md={4}>
-        <TextField
-          fullWidth
-          label="Instruction ID (MsgId)"
-          name="instrId"
-          value={newInstruction.instrId}
-          onChange={handleNewInstructionChange}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6} md={4}>
-        <TextField
-          fullWidth
-          label="End To End ID"
-          name="endToEndId"
-          value={newInstruction.endToEndId}
-          onChange={handleNewInstructionChange}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6} md={4}>
-        <TextField
-          fullWidth
-          label="Amount"
-          name="amt"
-          type="number"
-          InputProps={{ inputProps: { min: 0.01, step: '0.01' } }}
-          value={newInstruction.amt}
-          onChange={handleNewInstructionChange}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6} md={4}>
-        <TextField
-          fullWidth
-          label="Currency (ISOCode)"
-          name="ccy"
-          value={newInstruction.ccy}
-          onChange={handleNewInstructionChange}
-          required
-          inputProps={{ maxLength: 3 }}
-        />
-      </Grid>
-      <Grid item xs={12} sm={6} md={4}>
-        <TextField
-          fullWidth
-          label="Requested Execution Date"
-          name="instrDt"
-          type="date"
-          value={newInstruction.instrDt}
-          onChange={handleNewInstructionChange}
-          required
-          InputLabelProps={{ shrink: true }}
-        />
-      </Grid>
-
-      <Grid item xs={12} md={12}>
-        <Typography variant="subtitle1" sx={{ mb: 1 }}>Debtor Details</Typography>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="Debtor Name"
-          name="debtorName"
-          value={newInstruction.debtorName}
-          onChange={handleNewInstructionChange}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="Debtor IBAN"
-          name="debtorIban"
-          value={newInstruction.debtorIban}
-          onChange={handleNewInstructionChange}
-          required
-        />
-      </Grid>
-
-      <Grid item xs={12} md={12}>
-        <Typography variant="subtitle1" sx={{ mb: 1 }}>Creditor Details</Typography>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="Creditor Name"
-          name="creditorName"
-          value={newInstruction.creditorName}
-          onChange={handleNewInstructionChange}
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          label="Creditor IBAN"
-          name="creditorIban"
-          value={newInstruction.creditorIban}
-          onChange={handleNewInstructionChange}
-          required
-        />
-      </Grid>
-
-      <Grid item xs={12} md={12}>
-        <Typography variant="subtitle1" sx={{ mb: 1 }}>Classification (External Codes)</Typography>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <FormControl fullWidth required>
-          <InputLabel id="serviceLevelLabel">Service Level (SvcLvl)</InputLabel>
-          <Select
-            labelId="serviceLevelLabel"
-            name="serviceLevel"
-            value={newInstruction.serviceLevel}
-            label="Service Level (SvcLvl)"
-            onChange={(e) => setNewInstruction((prev) => ({ ...prev, serviceLevel: e.target.value as ExternalCodeType }))}
-          >
-            {mockServiceLevelCodes.map((code) => (
-              <MenuItem key={code} value={code}>{code}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <FormControl fullWidth required>
-          <InputLabel id="purposeLabel">Purpose (Purp)</InputLabel>
-          <Select
-            labelId="purposeLabel"
-            name="purpose"
-            value={newInstruction.purpose}
-            label="Purpose (Purp)"
-            onChange={(e) => setNewInstruction((prev) => ({ ...prev, purpose: e.target.value as ExternalCodeType }))}
-          >
-            {mockPurposeCodes.map((code) => (
-              <MenuItem key={code} value={code}>{code}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <FormControl fullWidth required>
-          <InputLabel id="localInstrumentLabel">Local Instrument (LclInstrm)</InputLabel>
-          <Select
-            labelId="localInstrumentLabel"
-            name="localInstrument"
-            value={newInstruction.localInstrument}
-            label="Local Instrument (LclInstrm)"
-            onChange={(e) => setNewInstruction((prev) => ({ ...prev, localInstrument: e.target.value as ExternalCodeType }))}
-          >
-            {mockLocalInstrumentCodes.map((code) => (
-              <MenuItem key={code} value={code}>{code}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-      {/* Placeholder for unstructured remittance information */}
-      <Grid item xs={12}>
-        <FormControl fullWidth>
-          <InputLabel>Remittance Information (Ustrd)</InputLabel>
-          <TextareaAutosize
-            minRows={3}
-            name="remittanceInfo"
-            placeholder="Enter unstructured remittance information here..."
-            style={{ width: '100%', padding: '10px', borderRadius: '4px', borderColor: '#ccc' }}
-            // Note: Remittance info is not in the base mock structure, added here as common field
-          />
-        </FormControl>
-      </Grid>
-    </>
-  ), [newInstruction]);
-
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>
-        Payment Initiation ({isBulk ? 'Bulk' : 'Single'})
-      </Typography>
+    <Box sx={{ p: 3, backgroundColor: '#f4f6f8', minHeight: '100vh' }}>
+      <BlogPostContainer elevation={3}>
+        <Headline variant="h3" component="h1">
+          5 Things This Payment Form Taught Me About Modern Software (And Money)
+        </Headline>
+        <BodyText variant="subtitle1" sx={{ textAlign: 'center', color: 'text.secondary', mb: 4 }}>
+          Peeking under the hood of a simple React component reveals the hidden complexity of our financial world.
+        </BodyText>
 
-      <FormControl sx={{ mb: 2 }}>
-        <Button
-          variant={isBulk ? "outlined" : "contained"}
-          onClick={() => setIsBulk(false)}
-        >
-          Single Payment
-        </Button>
-        <Button
-          variant={isBulk ? "contained" : "outlined"}
-          onClick={() => setIsBulk(true)}
-          sx={{ ml: 1 }}
-        >
-          Bulk Payment
-        </Button>
-      </FormControl>
+        <BodyText>
+          We’ve all been there: filling out a form online to send money. It seems simple enough—enter an amount, an account number, and click "Submit." But what’s really going on behind that clean interface? I recently dove into the code for a seemingly straightforward payment initiation form, and what I found was a fascinating microcosm of modern software development, financial standards, and user-centric design. It turns out, that simple form is doing a lot more heavy lifting than you might think.
+        </BodyText>
+        <BodyText>
+          Here are the five most surprising takeaways from deconstructing a single React component.
+        </BodyText>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-      {message && (
-        <Alert severity="success" sx={{ mb: 2 }}>
-          {message}
-        </Alert>
-      )}
+        <Divider sx={{ my: 4 }} />
 
-      <Paper sx={{ p: 3, mb: 4 }}>
-        <Typography variant="h6" gutterBottom>
-          {isBulk ? 'Add Instruction to Batch' : 'New Payment Instruction'}
-        </Typography>
-        <Grid container spacing={3}>
-          {formFields}
-          
-          <Grid item xs={12}>
-            {isBulk ? (
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={addInstruction}
-                disabled={!newInstruction.instrId || !newInstruction.amt} // Minimal check for bulk entry
-              >
-                Add to Batch
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                disabled={instructions.length === 0 && (!newInstruction.instrId || !newInstruction.amt)}
-              >
-                Submit Single Payment (Simulate pain.001)
-              </Button>
-            )}
-          </Grid>
-        </Grid>
-      </Paper>
+        <Subheading variant="h5" component="h2">
+          1. One Form, Two Worlds: The Single vs. Bulk Payment Divide
+        </Subheading>
+        <BodyText>
+          The first thing that stood out was a simple toggle: "Single Payment" or "Bulk Payment." This isn't just a cosmetic choice; it represents a fundamental split in user needs. An individual might be paying a single bill, but a business needs to process payroll for hundreds of employees. The code elegantly handles both scenarios within the same interface, dynamically changing to either submit a single instruction or to collect multiple instructions into a "batch." It’s a brilliant reminder that great design often means accommodating vastly different workflows with minimal friction.
+        </BodyText>
 
-      {isBulk && instructions.length > 0 && (
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Payment Batch ({instructions.length} Items)
-          </Typography>
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Instr ID</TableCell>
-                  <TableCell>End-to-End ID</TableCell>
-                  <TableCell>Amount</TableCell>
-                  <TableCell>Creditor IBAN</TableCell>
-                  <TableCell>Service Level</TableCell>
-                  <TableCell>Purpose</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {instructions.map((instr) => (
-                  <TableRow key={instr.id}>
-                    <TableCell>{instr.instrId}</TableCell>
-                    <TableCell>{instr.endToEndId}</TableCell>
-                    <TableCell>{instr.amt} {instr.ccy}</TableCell>
-                    <TableCell>{instr.creditorIban.substring(0, 25)}...</TableCell>
-                    <TableCell>{instr.serviceLevel}</TableCell>
-                    <TableCell>{instr.purpose}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => removeInstruction(instr.id)}
-                        color="error"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ mt: 3 }}
-            onClick={handleSubmit}
-          >
-            Finalize and Submit Batch (Simulate pain.001)
-          </Button>
-        </Paper>
-      )}
+        <Subheading variant="h5" component="h2">
+          2. The Anatomy of a Transaction is Deeper Than You Think
+        </Subheading>
+        <BodyText>
+          When you send money, you probably think of a "to," a "from," and an "amount." The code reveals a much richer story. A single payment instruction isn't just a few fields; it's a structured object with properties like <Code>serviceLevel</Code>, <Code>purpose</Code>, and <Code>localInstrument</Code>. These aren't arbitrary labels; they are likely codes from the ISO 20022 standard, the global language of financial messaging.
+        </BodyText>
+        <Blockquote>
+          A payment isn't just a command to "send money." It's a detailed message that tells the banking system *how* to send it (e.g., <Code>SEPA</Code>, <Code>URGP</Code>), *why* it's being sent (<Code>CASH</Code>, <Code>SUPP</Code>), and under what local rules (<Code>CORE</Code>, <Code>B2B</Code>).
+        </Blockquote>
+        <BodyText>
+          This level of detail is what allows billions of dollars to move reliably across the globe every day. The form isn't just collecting data; it's composing a precise, standardized financial message.
+        </BodyText>
+
+        <Subheading variant="h5" component="h2">
+          3. The First Line of Defense: Your Browser is the Gatekeeper
+        </Subheading>
+        <BodyText>
+          Before your payment instruction ever touches a server, it's scrutinized. The code contains a <Code>validateInstruction</Code> function that checks for common errors right in your browser. Is the amount a positive number? Are all the required fields filled out? This is client-side validation, and it’s crucial.
+        </BodyText>
+        <BodyText>
+          It provides instant feedback to the user, preventing the frustration of submitting a form only to have it rejected seconds later. More importantly, it acts as a gatekeeper, ensuring that only well-formed, sensible data is sent to the backend. This reduces server load and protects the integrity of the system from the very first click. It’s a simple concept with a massive impact on both user experience and system robustness.
+        </BodyText>
+
+        <Subheading variant="h5" component="h2">
+          4. The Unseen Choreography of React Hooks
+        </Subheading>
+        <BodyText>
+          To a non-developer, lines like <Code>useState</Code>, <Code>useCallback</Code>, and <Code>useMemo</Code> might look like cryptic jargon. But in the context of this form, they are the choreographers of a complex dance. <Code>useState</Code> is the memory, holding everything from the debtor's IBAN to the list of bulk instructions. <Code>useCallback</Code> ensures that functions, like adding or removing an instruction, are efficient and don't cause unnecessary re-renders. And <Code>useMemo</Code> cleverly prevents the form fields from being rebuilt from scratch every time you type a single character.
+        </BodyText>
+        <BodyText>
+          This isn't just about making the code work; it's about making it performant and scalable. It’s a testament to how modern frontend frameworks are designed to manage complexity gracefully, ensuring the user experience remains smooth even when the underlying logic is intricate.
+        </BodyText>
+
+        <Subheading variant="h5" component="h2">
+          5. Building on Trust (and Mocks): The Secret to Parallel Development
+        </Subheading>
+        <BodyText>
+          One of the most insightful parts of the code was the presence of "mocked" data. The lists of available service levels and purpose codes weren't being fetched from a live database; they were hardcoded as placeholders (e.g., <Code>mockServiceLevelCodes</Code>). This might seem like a shortcut, but it's a powerful professional development strategy.
+        </BodyText>
+        <Blockquote>
+          By using mocks, the frontend team can build and test the entire user interface without having to wait for the backend team to build the corresponding APIs. It's a form of "contract" between teams, allowing them to work in parallel and integrate their work seamlessly later.
+        </Blockquote>
+        <BodyText>
+          This approach dramatically speeds up development and is a cornerstone of how complex applications are built by large teams.
+        </BodyText>
+
+        <Divider sx={{ my: 4 }} />
+
+        <BodyText>
+          At first glance, it was just a form. But by looking at the code, it became a window into the worlds of international finance, robust software architecture, and collaborative development. It’s a powerful reminder that even the most mundane digital interactions are often built on layers of incredible complexity and thoughtful design.
+        </BodyText>
+        <BodyText sx={{ fontWeight: 'bold', mt: 3, color: 'text.primary' }}>
+          It leaves me wondering: what other everyday interfaces are hiding a world of complexity, waiting to be discovered, just beneath the surface?
+        </BodyText>
+      </BlogPostContainer>
     </Box>
   );
 };
