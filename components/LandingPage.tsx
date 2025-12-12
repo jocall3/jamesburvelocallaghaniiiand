@@ -1,248 +1,15 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { 
-    Brain, Layers, Zap, Globe, Cpu, BookOpen, Eye,
-    ArrowRight, CheckCircle, Lock, ChevronRight,
-    Activity, Shield, Server, Database, Network,
-    Code, Terminal, Layout, Box
-} from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import Card from './Card'; 
-
-type Tab = 'CURRICULUM' | 'ORCHESTRATION' | 'SIMULATION' | 'SOURCE';
+import React from 'react';
+import { Eye } from 'lucide-react';
 
 const LandingPage: React.FC<{ onLoginClick?: () => void }> = ({ onLoginClick }) => {
-    const navigate = useNavigate();
-    const { isAuthenticated } = useAuth();
-    const [activeTab, setActiveTab] = useState<Tab>('CURRICULUM');
-
-    const handleEnterClass = (path: string) => {
-        if (isAuthenticated) {
-            navigate(path);
+    // A simple handler for navigation clicks in a static context.
+    const handleNavClick = (path: string) => {
+        if (onLoginClick) {
+            onLoginClick();
         } else {
-            if (onLoginClick) onLoginClick();
-            else navigate('/login');
-        }
-    };
-
-    const renderContent = () => {
-        switch(activeTab) {
-            case 'CURRICULUM':
-                return (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className="text-center max-w-3xl mx-auto mb-8">
-                            <h2 className="text-3xl font-bold text-white mb-4">Study Modules</h2>
-                            <p className="text-gray-400">
-                                Explore the functional modules of the Mind's Eye. Each section represents a core competency of the modern financial stack, mapped to an educational curriculum.
-                            </p>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <Card className="hover:border-cyan-500 transition-all cursor-pointer group bg-gray-900/50 border-gray-800" onClick={() => handleEnterClass('/dashboard/crypto')}>
-                                <div className="flex items-start justify-between mb-4">
-                                    <div className="p-3 rounded-lg bg-purple-500/10 text-purple-400">
-                                        <Cpu size={24} />
-                                    </div>
-                                    <span className="text-xs font-mono text-gray-500">CLASS 101</span>
-                                </div>
-                                <h3 className="text-xl font-bold text-white mb-2">Quantum Ledger Dynamics</h3>
-                                <p className="text-sm text-gray-400 mb-4">
-                                    An introduction to decentralized asset management and cryptographic verification.
-                                </p>
-                                <div className="flex items-center text-cyan-400 text-sm font-medium group-hover:translate-x-2 transition-transform">
-                                    Begin Module <ChevronRight size={16} />
-                                </div>
-                            </Card>
-
-                            <Card className="hover:border-cyan-500 transition-all cursor-pointer group bg-gray-900/50 border-gray-800" onClick={() => handleEnterClass('/dashboard/hft')}>
-                                <div className="flex items-start justify-between mb-4">
-                                    <div className="p-3 rounded-lg bg-green-500/10 text-green-400">
-                                        <Activity size={24} />
-                                    </div>
-                                    <span className="text-xs font-mono text-gray-500">CLASS 202</span>
-                                </div>
-                                <h3 className="text-xl font-bold text-white mb-2">High Frequency Trading</h3>
-                                <p className="text-sm text-gray-400 mb-4">
-                                    Advanced algorithmic execution and market microstructure analysis.
-                                </p>
-                                <div className="flex items-center text-cyan-400 text-sm font-medium group-hover:translate-x-2 transition-transform">
-                                    Begin Module <ChevronRight size={16} />
-                                </div>
-                            </Card>
-
-                            <Card className="hover:border-cyan-500 transition-all cursor-pointer group bg-gray-900/50 border-gray-800" onClick={() => handleEnterClass('/dashboard/treasury')}>
-                                <div className="flex items-start justify-between mb-4">
-                                    <div className="p-3 rounded-lg bg-blue-500/10 text-blue-400">
-                                        <Shield size={24} />
-                                    </div>
-                                    <span className="text-xs font-mono text-gray-500">CLASS 303</span>
-                                </div>
-                                <h3 className="text-xl font-bold text-white mb-2">Sovereign Treasury</h3>
-                                <p className="text-sm text-gray-400 mb-4">
-                                    Resource allocation, risk management, and long-term capital preservation.
-                                </p>
-                                <div className="flex items-center text-cyan-400 text-sm font-medium group-hover:translate-x-2 transition-transform">
-                                    Begin Module <ChevronRight size={16} />
-                                </div>
-                            </Card>
-
-                            <Card className="hover:border-cyan-500 transition-all cursor-pointer group bg-gray-900/50 border-gray-800" onClick={() => handleEnterClass('/dashboard')}>
-                                <div className="flex items-start justify-between mb-4">
-                                    <div className="p-3 rounded-lg bg-orange-500/10 text-orange-400">
-                                        <Layout size={24} />
-                                    </div>
-                                    <span className="text-xs font-mono text-gray-500">CLASS 404</span>
-                                </div>
-                                <h3 className="text-xl font-bold text-white mb-2">System Architecture</h3>
-                                <p className="text-sm text-gray-400 mb-4">
-                                    Overview of the Mind's Eye dashboard and integrated systems.
-                                </p>
-                                <div className="flex items-center text-cyan-400 text-sm font-medium group-hover:translate-x-2 transition-transform">
-                                    Begin Module <ChevronRight size={16} />
-                                </div>
-                            </Card>
-                        </div>
-                    </div>
-                );
-            case 'ORCHESTRATION':
-                return (
-                    <div className="space-y-12 animate-in fade-in slide-in-from-right-4 duration-500">
-                        <div className="text-center">
-                            <h2 className="text-3xl font-bold text-white mb-4">The Orchestration Layer</h2>
-                            <p className="text-gray-400 max-w-2xl mx-auto">
-                                How the Mind's Eye connects disparate data sources into a unified cognitive model.
-                            </p>
-                        </div>
-
-                        <div className="relative bg-gray-900/50 border border-gray-800 rounded-2xl p-8 md:p-12 overflow-hidden">
-                            {/* Visual Representation */}
-                            <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
-                                {/* Sources */}
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg border border-gray-700 w-48">
-                                        <Database size={20} className="text-blue-400" />
-                                        <span className="text-sm font-mono text-gray-300">Stripe API</span>
-                                    </div>
-                                    <div className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg border border-gray-700 w-48">
-                                        <Server size={20} className="text-green-400" />
-                                        <span className="text-sm font-mono text-gray-300">Plaid Connect</span>
-                                    </div>
-                                    <div className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg border border-gray-700 w-48">
-                                        <Globe size={20} className="text-purple-400" />
-                                        <span className="text-sm font-mono text-gray-300">Market Data</span>
-                                    </div>
-                                </div>
-
-                                {/* Connection Lines (Visual only, simplified for CSS) */}
-                                <div className="hidden md:flex flex-col gap-2 items-center justify-center opacity-50">
-                                    <div className="w-16 h-0.5 bg-gradient-to-r from-gray-700 to-cyan-500"></div>
-                                    <div className="w-16 h-0.5 bg-gradient-to-r from-gray-700 to-cyan-500"></div>
-                                    <div className="w-16 h-0.5 bg-gradient-to-r from-gray-700 to-cyan-500"></div>
-                                </div>
-
-                                {/* The Brain */}
-                                <div className="relative">
-                                    <div className="absolute inset-0 bg-cyan-500/20 blur-3xl rounded-full"></div>
-                                    <div className="w-32 h-32 bg-gray-950 border-2 border-cyan-500/50 rounded-full flex items-center justify-center shadow-2xl shadow-cyan-500/20 relative z-10">
-                                        <Brain size={48} className="text-cyan-400 animate-pulse" />
-                                    </div>
-                                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                                        <span className="text-xs font-mono text-cyan-400">GEMINI CORE</span>
-                                    </div>
-                                </div>
-
-                                {/* Output */}
-                                <div className="hidden md:flex items-center opacity-50">
-                                    <div className="w-16 h-0.5 bg-gradient-to-r from-cyan-500 to-gray-700"></div>
-                                </div>
-
-                                <div className="p-6 bg-gray-800/50 border border-gray-700 rounded-xl text-center w-48">
-                                    <Layers size={32} className="text-white mx-auto mb-2" />
-                                    <span className="text-sm font-bold text-white">Unified UI</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
-                                <Zap className="text-yellow-400 mb-4" size={24} />
-                                <h4 className="font-bold text-white mb-2">Real-time Ingestion</h4>
-                                <p className="text-sm text-gray-400">Webhooks and websocket connections stream data directly into the context window.</p>
-                            </div>
-                            <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
-                                <Brain className="text-cyan-400 mb-4" size={24} />
-                                <h4 className="font-bold text-white mb-2">Cognitive Processing</h4>
-                                <p className="text-sm text-gray-400">LLMs analyze patterns, detect anomalies, and suggest optimizations.</p>
-                            </div>
-                            <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
-                                <Eye className="text-purple-400 mb-4" size={24} />
-                                <h4 className="font-bold text-white mb-2">Visual Synthesis</h4>
-                                <p className="text-sm text-gray-400">Complex data is rendered into intuitive dashboards for human decision making.</p>
-                            </div>
-                        </div>
-                    </div>
-                );
-            case 'SIMULATION':
-                return (
-                    <div className="max-w-4xl mx-auto text-center space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className="inline-flex items-center justify-center p-4 bg-yellow-500/10 rounded-full mb-4">
-                            <Terminal size={48} className="text-yellow-500" />
-                        </div>
-                        <h2 className="text-4xl font-bold text-white">This is a Simulation</h2>
-                        <div className="prose prose-invert prose-lg mx-auto text-gray-300">
-                            <p>
-                                You are viewing a <strong>Demo Environment</strong>. The data you seeâ€”balances, transactions, and market movementsâ€”is simulated for educational purposes.
-                            </p>
-                            <p>
-                                This platform is designed as a <strong>Living Textbook</strong>. It demonstrates how modern financial applications are architected, how they handle state, and how they integrate with AI.
-                            </p>
-                            <p>
-                                While the code is production-grade, the environment is a sandbox. Feel free to explore, click, and experiment. You cannot break the simulation.
-                            </p>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto mt-8">
-                            <div className="p-4 border border-gray-800 rounded-lg bg-gray-900/50">
-                                <h4 className="font-bold text-white mb-1">Safe Environment</h4>
-                                <p className="text-xs text-gray-500">No real funds are at risk.</p>
-                            </div>
-                            <div className="p-4 border border-gray-800 rounded-lg bg-gray-900/50">
-                                <h4 className="font-bold text-white mb-1">Interactive Learning</h4>
-                                <p className="text-xs text-gray-500">Learn by doing, not just reading.</p>
-                            </div>
-                        </div>
-                    </div>
-                );
-            case 'SOURCE':
-                return (
-                    <div className="max-w-4xl mx-auto bg-gray-900 border border-gray-800 rounded-2xl p-8 md:p-12 animate-in fade-in duration-500 relative">
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-cyan-500"></div>
-                        <div className="flex items-center gap-3 mb-8">
-                            <BookOpen className="text-cyan-400" size={32} />
-                            <h2 className="text-3xl font-bold text-white">Foundational Texts</h2>
-                        </div>
-                        
-                        <div className="space-y-8">
-                            <div className="prose prose-invert prose-lg text-gray-300">
-                                <h3 className="text-xl font-bold text-white">The Physics of Value</h3>
-                                <p>
-                                    Value is not static; it is a vector quantity, possessing both magnitude and direction. In the digital age, value flows like energy through a circuit. 
-                                    To harness it, we must understand the resistance (regulation), the voltage (demand), and the current (liquidity).
-                                </p>
-                                <p>
-                                    Mind's Eye Orchestration provides the schematics for this new physics. It is a tool for visualizing the invisible forces that shape our economy.
-                                </p>
-                            </div>
-
-                            <div className="p-6 bg-black/30 rounded-xl border-l-4 border-cyan-500">
-                                <h4 className="font-bold text-white mb-2">Core Axioms</h4>
-                                <ul className="space-y-2 text-sm text-gray-400">
-                                    <li>1. Information Asymmetry is the root of all profit and loss.</li>
-                                    <li>2. Automation is the only hedge against complexity.</li>
-                                    <li>3. The interface is the product; the code is the truth.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                );
+            // Fallback for standalone use, though routing is not part of this component.
+            console.log(`Redirecting to ${path}`);
+            window.location.href = path;
         }
     };
 
@@ -261,63 +28,85 @@ const LandingPage: React.FC<{ onLoginClick?: () => void }> = ({ onLoginClick }) 
                         </div>
                     </div>
                     
-                    <div className="hidden md:flex gap-1 p-1 bg-gray-900 rounded-xl border border-gray-800">
-                        {(['CURRICULUM', 'ORCHESTRATION', 'SIMULATION', 'SOURCE'] as Tab[]).map((tab) => (
-                            <button 
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-                                    activeTab === tab 
-                                    ? 'bg-gray-800 text-white shadow-sm' 
-                                    : 'text-gray-500 hover:text-gray-300'
-                                }`}
-                            >
-                                {tab}
-                            </button>
-                        ))}
-                    </div>
-
                     <div className="flex items-center gap-4">
-                        <button onClick={() => onLoginClick ? onLoginClick() : navigate('/login')} className="text-sm font-bold text-gray-400 hover:text-white transition-colors">
+                        <button onClick={() => handleNavClick('/login')} className="text-sm font-bold text-gray-400 hover:text-white transition-colors">
                             Log In
                         </button>
-                        <button onClick={() => onLoginClick ? onLoginClick() : navigate('/login')} className="bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2 rounded-lg text-sm font-bold transition-colors shadow-lg shadow-cyan-500/20">
+                        <button onClick={() => handleNavClick('/login')} className="bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2 rounded-lg text-sm font-bold transition-colors shadow-lg shadow-cyan-500/20">
                             Enter Demo
                         </button>
                     </div>
                 </div>
             </nav>
 
-            {/* Mobile Nav (Simplified) */}
-            <div className="md:hidden fixed bottom-0 w-full bg-gray-900 border-t border-gray-800 z-50 px-4 py-3 flex justify-between overflow-x-auto">
-                 {(['CURRICULUM', 'ORCHESTRATION', 'SIMULATION', 'SOURCE'] as Tab[]).map((tab) => (
-                    <button 
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`flex flex-col items-center gap-1 px-2 ${activeTab === tab ? 'text-cyan-400' : 'text-gray-500'}`}
-                    >
-                        {tab === 'CURRICULUM' && <BookOpen size={16} />}
-                        {tab === 'ORCHESTRATION' && <Layers size={16} />}
-                        {tab === 'SIMULATION' && <Zap size={16} />}
-                        {tab === 'SOURCE' && <Code size={16} />}
-                        <span className="text-[10px] font-bold">{tab.substring(0, 4)}</span>
-                    </button>
-                ))}
-            </div>
+            {/* Main Content - The Blog Post */}
+            <main className="pt-32 pb-24 px-6 max-w-4xl mx-auto">
+                <article className="prose prose-invert prose-lg max-w-none">
+                    {/* Headline */}
+                    <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 mb-6 tracking-tight">
+                        I Explored a Futuristic AI Finance Dashboard. Here Are 4 Things It Taught Me About Money's Future.
+                    </h1>
 
-            {/* Header / Hero Section */}
-            <header className="pt-32 pb-12 px-6 text-center">
-                <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 mb-4 tracking-tight">
-                    Mind's Eye Orchestration
-                </h1>
-                <p className="text-xl text-cyan-400 font-mono tracking-widest uppercase opacity-80">
-                    The Template for the Future
-                </p>
-            </header>
+                    {/* Introduction */}
+                    <p className="text-xl text-gray-400 leading-relaxed">
+                        We're told that the future of finance is a dizzying storm of algorithms, blockchains, and artificial intelligence. It feels complex, opaque, and frankly, a little intimidating. But what if you could peek behind the curtain? I recently stumbled upon a project called Mind's Eye Orchestration—a simulated financial dashboard—and it wasn't just a demo. It was a "living textbook," and its source code held some surprisingly profound lessons.
+                    </p>
+                    <p className="text-gray-400">
+                        Here are the four most impactful takeaways that shifted my perspective on technology, value, and the future of our digital economy.
+                    </p>
 
-            {/* Main Content */}
-            <main className="pb-32 px-6 max-w-7xl mx-auto min-h-[60vh]">
-                {renderContent()}
+                    <hr className="my-12 border-gray-800" />
+
+                    {/* Takeaway 1 */}
+                    <h2 className="text-3xl font-bold text-white">1. The Best Way to Learn About Risk is to Remove It</h2>
+                    <p>
+                        The first thing you notice about Mind's Eye is a bold declaration: "This is a Simulation." All the data—the transactions, market movements, and balances—is fake. My initial thought was, "What's the point?" But then it clicked. The greatest barrier to understanding complex systems isn't their complexity; it's the fear of consequence.
+                    </p>
+                    <p>
+                        By creating a production-grade sandbox, the platform transforms a high-stakes environment into a playground for curiosity. You can explore high-frequency trading algorithms or decentralized asset management without risking a single dollar. This isn't just a feature; it's a fundamental statement about education. The future of learning complex, high-risk subjects isn't about reading textbooks; it's about building sophisticated, safe environments to experiment within.
+                    </p>
+
+                    {/* Takeaway 2 */}
+                    <h2 className="text-3xl font-bold text-white">2. Value Isn't a Number; It's a Vector</h2>
+                    <p>
+                        Buried in the project's "Foundational Texts" was a line that stopped me in my tracks. It reframes the entire concept of value in the digital age.
+                    </p>
+                    <blockquote className="border-l-4 border-cyan-500 pl-6 text-xl italic text-gray-300">
+                        Value is not static; it is a vector quantity, possessing both magnitude and direction. In the digital age, value flows like energy through a circuit. To harness it, we must understand the resistance (regulation), the voltage (demand), and the current (liquidity).
+                    </blockquote>
+                    <p>
+                        This is a powerful mental model. We're used to thinking of money as a static number in an account. But this perspective sees it as a dynamic force, a current flowing through a global circuit. An AI-driven system like Mind's Eye isn't just tracking balances; it's "visualizing the invisible forces that shape our economy." It's a paradigm shift from accounting to physics.
+                    </p>
+
+                    {/* Takeaway 3 */}
+                    <h2 className="text-3xl font-bold text-white">3. The Interface is the Product</h2>
+                    <p>
+                        The system is built on a core axiom: "The interface is the product; the code is the truth." In an era of information overload, the ultimate value isn't just access to data, but its coherent synthesis. The "Orchestration Layer" of Mind's Eye does exactly this: it ingests data from disparate sources, uses an AI core to process it, and renders it all in a unified, intuitive dashboard.
+                    </p>
+                    <p>
+                        The technical complexity under the hood is immense, but the user doesn't feel it. That's the point. The product isn't the powerful AI or the real-time data streams; it's the calm, clear visualization that allows for human decision-making. As our world gets more complex, the most valuable products will be those that create simplicity.
+                    </p>
+
+                    {/* Takeaway 4 */}
+                    <h2 className="text-3xl font-bold text-white">4. Automation is the Only Hedge Against Complexity</h2>
+                    <p>
+                        Another of the project's axioms is that "Automation is the only hedge against complexity." This might sound dystopian, but it's deeply practical. The sheer volume and velocity of financial data have long surpassed human-scale comprehension. We can't keep up, and we don't have to.
+                    </p>
+                    <p>
+                        The role of AI and automation, as framed here, isn't to replace human judgment but to augment it. The system handles the relentless task of pattern recognition and anomaly detection, freeing up the human operator to focus on strategy and higher-level decisions. It's not about man versus machine, but man *with* machine, using automation as a powerful tool to navigate a world too complex to manage alone.
+                    </p>
+
+                    <hr className="my-12 border-gray-800" />
+
+                    {/* Conclusion */}
+                    <h2 className="text-3xl font-bold text-white">A Glimpse of What's Next</h2>
+                    <p>
+                        Exploring Mind's Eye felt like reading a blueprint for the next generation of digital tools. It's a future where learning is experiential, value is dynamic, and complexity is managed through elegant design and intelligent automation. It's a reminder that the most powerful technologies aren't just about processing power; they're about providing clarity.
+                    </p>
+                    <p className="text-cyan-400 font-medium">
+                        It leaves me with one final question: If our tools shape our thinking, what new thoughts will we be able to think when our dashboards are no longer just calculators, but cognitive partners?
+                    </p>
+                </article>
             </main>
 
             {/* Footer */}
@@ -328,7 +117,7 @@ const LandingPage: React.FC<{ onLoginClick?: () => void }> = ({ onLoginClick }) 
                         <span className="font-bold text-gray-400">Mind's Eye Orchestration</span>
                     </div>
                     <div className="text-xs text-gray-600 font-mono">
-                        COPYRIGHT Â© 2025 MIND'S EYE ORCHESTRATION.
+                        COPYRIGHT © 2025 MIND'S EYE ORCHESTRATION.
                     </div>
                 </div>
             </footer>
