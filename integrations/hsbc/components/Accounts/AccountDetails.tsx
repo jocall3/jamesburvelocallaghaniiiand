@@ -55,7 +55,7 @@ export interface AccountDetailsProps {
  * Formats a number as a currency string.
  * @param amount The numeric amount.
  * @param currency The ISO currency code.
- * @returns A formatted currency string (e.g., "£1,234.56").
+ * @returns A formatted currency string (e.g., "Â£1,234.56").
  */
 const formatCurrency = (amount: number, currency: string): string => {
   return new Intl.NumberFormat('en-GB', {
@@ -80,14 +80,14 @@ const formatDate = (isoDate: string): string => {
 /**
  * Masks an account number for display, showing only the last few digits.
  * @param accountNumber The full account number.
- * @returns A masked account number (e.g., "•••• 1234").
+ * @returns A masked account number (e.g., "â¢â¢â¢â¢ 1234").
  */
 const maskAccountNumber = (accountNumber: string): string => {
   if (accountNumber.length <= 4) {
     return accountNumber;
   }
   const lastFour = accountNumber.slice(-4);
-  return `•••• ${lastFour}`;
+  return `â¢â¢â¢â¢ ${lastFour}`;
 };
 
 
