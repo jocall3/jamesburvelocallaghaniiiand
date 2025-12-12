@@ -371,4 +371,3 @@ const DemoBankDevOpsView: React.FC = () => {
 };
 
 export default DemoBankDevOpsView;
-```
