@@ -1,244 +1,97 @@
 import React from 'react';
 
-interface CarrierText {
-  footer_body: string | null;
-  footer_title: string | null;
-  header_body: string | null;
-  header_title: string | null;
-}
-
-interface PhysicalBundle {
-    features: {
-      card_logo: 'unsupported' | 'optional' | 'required';
-      carrier_text: 'unsupported' | 'optional' | 'required';
-      second_line: 'unsupported' | 'optional' | 'required';
-    };
-    id: string;
-    livemode: boolean;
-    name: string;
-    object: 'issuing.physical_bundle';
-    status: string;
-    type: 'custom' | 'standard';
-}
-
-
-interface PersonalizationDesign {
-  id: string;
-  object: 'issuing.personalization_design';
-  name: string | null;
-  status: 'rejected' | 'active' | 'pending' | string;
-  card_logo: string | null; // Represents Stripe File ID for the logo
-  carrier_text: CarrierText;
-  physical_bundle: PhysicalBundle;
-}
-
-interface CardDesignVisualizerProps {
-  design: PersonalizationDesign;
-  cardholderName?: string;
-}
-
-// --- Internal Utility Components/Styling ---
-
-const CARD_WIDTH = '400px';
-const CARD_HEIGHT = '250px';
-
-const cardStyle: React.CSSProperties = {
-  width: CARD_WIDTH,
-  height: CARD_HEIGHT,
-  borderRadius: '15px',
-  background: 'linear-gradient(135deg, #00529B, #003B70)',
-  boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)',
-  color: 'white',
-  padding: '20px',
-  position: 'relative',
-  fontFamily: 'monospace',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
-  overflow: 'hidden',
-};
-
-const chipStyle: React.CSSProperties = {
-  width: '45px',
-  height: '35px',
-  borderRadius: '5px',
-  background: '#c0c0c0',
-  boxShadow: 'inset 0 0 5px rgba(0, 0, 0, 0.3)',
-  position: 'absolute',
-  top: '30px',
-  left: '30px',
-};
-
-const logoContainerStyle: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  height: '40px',
-};
-
-const statusIndicatorStyle = (status: string): React.CSSProperties => {
-  let color = 'gray';
-  switch (status.toLowerCase()) {
-    case 'active':
-      color = '#00ff7f'; 
-      break;
-    case 'pending':
-      color = '#ffff00';
-      break;
-    case 'rejected':
-      color = '#ff4d4d';
-      break;
-  }
-  return {
-    fontSize: '10px',
-    padding: '4px 8px',
-    borderRadius: '8px',
-    border: `1px solid ${color}`,
-    color: color,
-    textTransform: 'uppercase',
-    fontWeight: 'bold',
-    marginLeft: '10px'
-  };
-};
-
-const cardTextRowStyle: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'flex-end',
-};
-
-// Mock Citibankdemobusinessinc Logo (Text representation)
-const CitibankdemobusinessincLogo: React.FC = () => (
-  <span style={{ fontSize: '10px', fontWeight: 'bold', letterSpacing: '0.5px', opacity: 0.8 }}>
-    Citibankdemobusinessinc
-  </span>
-);
-
-// --- Main Component ---
-
-const CardDesignVisualizer: React.FC<CardDesignVisualizerProps> = ({ design, cardholderName = 'JANE DOE' }) => {
-  const { status, name, card_logo } = design;
-
-  const renderClientLogo = () => {
-    if (card_logo) {
-      return (
-        <div style={{
-          width: '50px',
-          height: '30px',
-          border: '1px solid white',
-          borderRadius: '5px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginLeft: '10px',
-          fontSize: '10px',
-          backgroundColor: '#ffffff10',
-        }}>
-          Client Logo
-        </div>
-      );
-    }
-    return null;
-  };
-
-  const getStatusText = (s: string) => {
-      switch (s.toLowerCase()) {
-          case 'active': return 'Approved';
-          case 'pending': return 'Review Pending';
-          case 'rejected': return 'Rejected';
-          default: return 'Draft';
-      }
-  }
-
+const BlogContent: React.FC = () => {
   return (
-    <div style={{ padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
-      <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#333' }}>
-        Physical Card Preview: {name || design.id}
-      </h3>
-      
-      <div style={cardStyle}>
-        
-        {/* Row 1: Chip and Client Logos */}
-        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
-            <div style={chipStyle} />
-            <div style={logoContainerStyle}>
-                {renderClientLogo()}
-            </div>
-        </div>
+    <div style={{ fontFamily: 'Arial, sans-serif', maxWidth: '800px', margin: 'auto', lineHeight: '1.6', color: '#333', padding: '20px' }}>
+      <h1 style={{ fontSize: '2.5em', marginBottom: '0.5em', color: '#00529B', textAlign: 'center' }}>
+        Unveiling the Hidden World of Card Design: 4 Surprising Takeaways from a Simple Visualizer
+      </h1>
 
+      <p style={{ fontSize: '1.1em', marginBottom: '1.5em', color: '#555' }}>
+        We swipe, tap, and insert them daily, often without a second thought. Credit and debit cards are ubiquitous,
+        but have you ever paused to consider the intricate dance of design, technology, and regulation that brings
+        each physical card to life? It's far more than just a pretty picture on plastic. Dive with us into the
+        fascinating details revealed by a seemingly simple "Card Design Visualizer" component, and discover the
+        surprising complexities lurking beneath the surface.
+      </p>
 
-        {/* Row 2: Card Number Placeholder */}
-        <div style={{ 
-            fontSize: '24px', 
-            letterSpacing: '3px', 
-            textAlign: 'center', 
-            margin: '20px 0', 
-            opacity: 0.9,
-            fontWeight: 500
-        }}>
-          **** **** **** 4242
-        </div>
+      <h2 style={{ fontSize: '1.8em', marginTop: '2em', marginBottom: '0.8em', color: '#003B70' }}>
+        <strong>1. The "PersonalizationDesign": A Digital Blueprint with a Lifecycle</strong>
+      </h2>
+      <p>
+        At the heart of every unique card is something called a <code>PersonalizationDesign</code>. This isn't just a static
+        image file; it's a structured digital blueprint, an <code>issuing.personalization_design</code> object, that dictates
+        every visual and textual element of your card. What's truly insightful is its <code>status</code> field: <code>'active'</code>,
+        <code>'pending'</code>, or <code>'rejected'</code>.
+      </p>
+      <p>
+        This reveals a crucial truth: card designs aren't just approved once and forgotten. They undergo a rigorous
+        lifecycle, often involving multiple stakeholders and compliance checks. A "pending" status means it's
+        awaiting review, while "rejected" implies it didn't meet specific criteria – perhaps brand guidelines,
+        regulatory requirements, or technical specifications. This dynamic status underscores the serious
+        implications of financial product design, where every detail must be perfect and compliant.
+      </p>
 
-        {/* Row 3: Holder Name, Expiry */}
-        <div style={cardTextRowStyle}>
-          <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
-            <span style={{ fontSize: '10px', opacity: 0.6 }}>Valid Thru</span>
-            <span style={{ fontSize: '16px', fontWeight: 'bold', marginTop: '3px' }}>
-              08/30
-            </span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right' }}>
-            <span style={{ fontSize: '10px', opacity: 0.6 }}>Cardholder Name</span>
-            <span style={{ fontSize: '16px', fontWeight: 'bold', textTransform: 'uppercase', marginTop: '3px' }}>
-              {cardholderName}
-            </span>
-          </div>
-        </div>
-        
-        {/* Overlay the logo and Status */}
-        <div style={{ 
-            position: 'absolute', 
-            bottom: '10px', 
-            left: '20px', 
-            display: 'flex', 
-            alignItems: 'center' 
-        }}>
-            <span style={{ fontSize: '10px', opacity: 0.5, marginRight: '10px' }}>Design ID: {design.id.slice(0, 10)}...</span>
-            <div style={statusIndicatorStyle(status)}>
-                {getStatusText(status)}
-            </div>
-        </div>
+      <h2 style={{ fontSize: '1.8em', marginTop: '2em', marginBottom: '0.8em', color: '#003B70' }}>
+        <strong>2. Beyond Aesthetics: The Granular Control of "Carrier Text"</strong>
+      </h2>
+      <p>
+        When you receive a new card, it often comes with a letter or a small booklet. Have you ever noticed the
+        specific text on these accompanying materials? This isn't an afterthought; it's meticulously planned and
+        configured through something called <code>CarrierText</code>.
+      </p>
+      <p>
+        The <code>CarrierText</code> interface, with its <code>footer_body</code>, <code>footer_title</code>, <code>header_body</code>, and <code>header_title</code> fields,
+        highlights an often-overlooked aspect of the customer experience. It's not just about the card itself, but
+        the entire package and communication surrounding it. This level of detail ensures brand consistency and
+        regulatory messaging are maintained across all touchpoints, demonstrating a holistic approach to product
+        delivery that extends far beyond the plastic in your wallet.
+      </p>
 
-        <div style={{ position: 'absolute', bottom: '10px', right: '20px' }}>
-            <CitibankdemobusinessincLogo />
-        </div>
-      </div>
+      <h2 style={{ fontSize: '1.8em', marginTop: '2em', marginBottom: '0.8em', color: '#003B70' }}>
+        <strong>3. The "Physical Bundle": Unpacking the Card's DNA</strong>
+      </h2>
+      <p>
+        Ever wondered why some cards have certain features (like a specific logo placement or a second line of text)
+        while others don't? The <code>PhysicalBundle</code> object holds the key. Specifically, its <code>features</code> property, which
+        defines whether <code>card_logo</code>, <code>carrier_text</code>, or <code>second_line</code> are <code>'unsupported'</code>, <code>'optional'</code>, or <code>'required'</code>.
+      </p>
+      <p>
+        This is a powerful insight into the manufacturing constraints and capabilities behind physical cards. Not all
+        card types or production lines can support every feature. This means designers aren't just working with a blank
+        canvas; they're operating within a framework of technical possibilities and limitations dictated by the
+        "physical bundle." It's a fascinating blend of digital design and real-world manufacturing constraints,
+        ensuring that what's designed can actually be produced.
+      </p>
 
-      {/* Auxiliary information display */}
-      <div style={{ 
-          marginTop: '25px', 
-          border: '1px solid #e0e0e0', 
-          padding: '15px', 
-          borderRadius: '5px', 
-          width: CARD_WIDTH,
-          backgroundColor: 'white',
-          color: '#333',
-          fontSize: '12px'
-      }}>
-          <p style={{ margin: 0, fontWeight: 'bold', marginBottom: '10px' }}>Carrier Text Configuration:</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              <div><strong>Header Title:</strong> {design.carrier_text.header_title || 'â€”'}</div>
-              <div><strong>Footer Title:</strong> {design.carrier_text.footer_title || 'â€”'}</div>
-              <div><strong>Header Body:</strong> {design.carrier_text.header_body || 'â€”'}</div>
-              <div><strong>Footer Body:</strong> {design.carrier_text.footer_body || 'â€”'}</div>
-          </div>
-          <p style={{ margin: '10px 0 0 0', fontWeight: 'bold' }}>Rejection Reasons:</p>
-          <p style={{ margin: '5px 0 0 0', color: design.status === 'rejected' ? 'red' : 'green' }}>
-            Card Logo: {design.status === 'rejected' ? 'Rejected by issuing.personalization_design' : 'N/A'}
-          </p>
-      </div>
+      <h2 style={{ fontSize: '1.8em', marginTop: '2em', marginBottom: '0.8em', color: '#003B70' }}>
+        <strong>4. The Visualizer: Bridging Code and Creativity</strong>
+      </h2>
+      <p>
+        Finally, the <code>CardDesignVisualizer</code> component itself is a testament to the power of developer tools. It takes
+        all these complex interfaces and configurations – <code>PersonalizationDesign</code>, <code>CarrierText</code>, <code>PhysicalBundle</code> –
+        and renders them into a tangible, visual representation of the final card.
+      </p>
+      <p>
+        This component acts as a critical bridge, translating abstract data structures into a concrete preview. For
+        product managers, designers, and compliance officers, such a tool is invaluable. It allows them to quickly
+        iterate, verify, and approve designs without needing to wait for physical prototypes, significantly
+        accelerating the development and deployment of new financial products. It's where the technical backend meets
+        the user-facing aesthetic, making complex systems accessible and manageable.
+      </p>
+
+      <p style={{ fontSize: '1.1em', marginTop: '2em', marginBottom: '1.5em', color: '#555' }}>
+        From the rigorous lifecycle of a <code>PersonalizationDesign</code> to the granular control over <code>CarrierText</code> and the
+        manufacturing realities of a <code>PhysicalBundle</code>, the world of card design is a rich tapestry of technical
+        detail and strategic decision-making. The <code>CardDesignVisualizer</code> pulls back the curtain, revealing that
+        even the simplest objects in our daily lives are often the culmination of sophisticated engineering and
+        thoughtful design.
+      </p>
+      <p style={{ fontSize: '1.1em', fontStyle: 'italic', color: '#00529B', textAlign: 'center' }}>
+        What other everyday objects do you think hide such surprising layers of complexity beneath their familiar surfaces?
+      </p>
     </div>
   );
 };
 
-export default CardDesignVisualizer;
+export default BlogContent;
