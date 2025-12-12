@@ -1,4 +1,3 @@
-```typescript
 /**
  * Represents a person entity and their associated relationships,
  * including demographic information, contact details, and social connections.
@@ -1431,4 +1430,3 @@ export type {
     RelationshipGraph,
     AffiliationGraph,
 };
-```
