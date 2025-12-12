@@ -35,6 +35,35 @@ const UserProfile: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  // --- Internal Data Generation Functions ---
+  const generateUserId = () => `user-${Math.random().toString(36).substr(2, 9)}`;
+  const generateRandomName = (type: 'first' | 'last') => {
+    const names = type === 'first' ? ['Alice', 'Bob', 'Charlie', 'Diana', 'Ethan'] : ['Smith', 'Johnson', 'Williams', 'Jones', 'Brown'];
+    return names[Math.floor(Math.random() * names.length)];
+  };
+  const generateRandomEmail = (firstName: string, lastName: string) => `${firstName.toLowerCase()}.${lastName.toLowerCase()}@citibankdemobusinessinc.com`;
+  const generateRandomBio = () => {
+    const bios = [
+      'Innovating the future of finance.',
+      'Passionate about customer-centric solutions.',
+      'Driving digital transformation in banking.',
+      'Dedicated to empowering financial well-being.',
+      'Building secure and accessible financial tools.'
+    ];
+    return bios[Math.floor(Math.random() * bios.length)];
+  };
+  const generateProfilePictureUrl = (seed: string) => `https://api.dicebear.com/7.x/initials/svg?seed=${seed}`;
+  const generateRandomTheme = () => {
+    const themes: UserPreferences['theme'][] = ['light', 'dark', 'system'];
+    return themes[Math.floor(Math.random() * themes.length)];
+  };
+  const generateRandomBoolean = () => Math.random() > 0.5;
+  const generateRandomLanguage = () => {
+    const languages = ['en-US', 'es-ES', 'fr-FR', 'de-DE', 'zh-CN'];
+    return languages[Math.floor(Math.random() * languages.length)];
+  };
+  const generateLastPasswordChange = () => new Date(Date.now() - Math.random() * 1000 * 60 * 60 * 24 * 365).toISOString();
+
   // Simulate fetching user data
   useEffect(() => {
     const fetchUserData = async () => {
@@ -44,26 +73,29 @@ const UserProfile: React.FC = () => {
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 800));
 
-        // Mock data
+        // Use internal generative functions
+        const userId = generateUserId();
+        const firstName = generateRandomName('first');
+        const lastName = generateRandomName('last');
         const mockProfile: UserProfileData = {
-          id: 'user-123',
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john.doe@example.com',
-          bio: 'Passionate developer and tech enthusiast. Always learning new things!',
-          profilePictureUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=JD',
+          id: userId,
+          firstName: firstName,
+          lastName: lastName,
+          email: generateRandomEmail(firstName, lastName),
+          bio: generateRandomBio(),
+          profilePictureUrl: generateProfilePictureUrl(firstName.charAt(0) + lastName.charAt(0)),
         };
 
         const mockPreferences: UserPreferences = {
-          theme: 'system',
-          emailNotifications: true,
-          pushNotifications: false,
-          language: 'en-US',
+          theme: generateRandomTheme(),
+          emailNotifications: generateRandomBoolean(),
+          pushNotifications: generateRandomBoolean(),
+          language: generateRandomLanguage(),
         };
 
         const mockAccount: UserAccountDetails = {
-          lastPasswordChange: new Date().toISOString(),
-          twoFactorEnabled: false,
+          lastPasswordChange: generateLastPasswordChange(),
+          twoFactorEnabled: generateRandomBoolean(),
         };
 
         setProfile(mockProfile);
