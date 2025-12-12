@@ -135,7 +135,7 @@ export const useJPMorganChaseData = (
           // Example: /api/jpmorganchase/accounts/{accountId}/transactions
           url = `${JPMC_API_BASE_URL}/accounts/${accountId}/transactions`;
         } else if (dataType === 'investments') {
-          // Example: /api/jpmorganchase/accounts/{accountId}/investments
+          // Example: /api/jpmorganchase/accounts/{accountId}/investments`;
           url = `${JPMC_API_BASE_URL}/accounts/${accountId}/investments`;
         } else {
           // For other data types, accountId might be a query parameter
