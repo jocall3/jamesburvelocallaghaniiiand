@@ -1,4 +1,3 @@
-```typescript
 import { Libp2p } from 'libp2p';
 import { Kademlia } from '@libp2p/kad-dht';
 import { PeerId } from '@libp2p/interfaces/peer-id';
@@ -110,4 +109,3 @@ export class KademliaDHTProvider {
     this.kad = null;
   }
 }
-```
