@@ -1,5 +1,3 @@
-
-
 import type { Transaction, Asset, BudgetCategory, Subscription, CreditScore, UpcomingBill, SavingsGoal, MarketMover, FinancialGoal, CryptoAsset, PaymentOperation, CorporateCard, CorporateTransaction, RewardPoints, Notification, RewardItem, APIStatus, CreditFactor, PaymentOrder, Invoice, ComplianceCase, FinancialAnomaly, User, Post, Comment, LendingPoolStats, AppIntegration, Counterparty, ExternalAccount, BiometricData, LoginAttempt, AIAgent, SynapticVault, MarqetaUser, MarqetaCardProduct, MarqetaCard, ComplianceRule, Business } from '../types';
 import { View } from '../types';
 import React from 'react';
