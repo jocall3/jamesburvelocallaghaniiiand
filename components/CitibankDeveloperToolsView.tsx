@@ -1,95 +1,77 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import axios, { AxiosRequestConfig, Method } from 'axios';
-import { useMoneyMovement } from './MoneyMovementContext';
-
-export interface ApiLogEntry {
-  id: string;
-  timestamp: string;
-  method: Method;
-  path: string;
-  status: number | 'Error';
-  response?: any;
-  requestBody?: any;
-}
-
-type Listener = (logs: ApiLogEntry[]) => void;
-
-class ApiLogger {
-  private logEntries: ApiLogEntry[] = [];
-  private listeners: Set<Listener> = new Set();
-  private readonly MAX_LOG_SIZE = 50;
-
-  public addLog(entry: Omit<ApiLogEntry, 'id' | 'timestamp'>) {
-    const newEntry: ApiLogEntry = {
-      ...entry,
-      id: crypto.randomUUID(),
-      timestamp: new Date().toISOString(),
-    };
-    this.logEntries.unshift(newEntry);
-    if (this.logEntries.length > this.MAX_LOG_SIZE) {
-      this.logEntries.pop();
-    }
-    this.notifyListeners();
-  }
-
-  public getLogs(): ApiLogEntry[] {
-    return [...this.logEntries];
-  }
-
-  public subscribe(listener: Listener): () => void {
-    this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
-  }
-
-  private notifyListeners() {
-    this.listeners.forEach(listener => listener(this.getLogs()));
-  }
-}
-
-export const apiLogger = new ApiLogger();
-
-const useApiLog = () => {
-  const [logs, setLogs] = useState<ApiLogEntry[]>(apiLogger.getLogs());
-  useEffect(() => {
-    const unsubscribe = apiLogger.subscribe(setLogs);
-    return unsubscribe;
-  }, []);
-  return logs;
-};
+import React from 'react';
 
 const CitibankDeveloperToolsView: React.FC = () => {
-  const { accessToken, uuid } = useMoneyMovement();
-  const logs = useApiLog();
-  
   return (
-    <div className="p-6 bg-gray-50 min-h-screen text-black">
-        <h2 className="text-2xl font-bold mb-4">Developer Tools</h2>
-        <div className="bg-white p-4 rounded shadow mb-6">
-            <h3 className="text-lg font-bold mb-2">Current Context</h3>
-            <p><strong>Access Token:</strong> {accessToken ? `${accessToken.substring(0, 10)}...` : 'None'}</p>
-            <p><strong>UUID:</strong> {uuid}</p>
-        </div>
+    <div className="blog-container p-6 max-w-3xl mx-auto bg-white shadow-lg rounded-lg my-8 font-sans text-gray-800 leading-relaxed">
+      <h1 className="text-4xl font-extrabold text-center mb-6 text-blue-700">
+        Beyond the Console: 5 Surprising Lessons from Building In-Browser Developer Tools
+      </h1>
 
-        <div className="bg-white p-4 rounded shadow">
-            <h3 className="text-lg font-bold mb-2">API Logs</h3>
-            <div className="overflow-y-auto h-96 border rounded">
-                {logs.map(log => (
-                    <div key={log.id} className="border-b p-2 hover:bg-gray-100">
-                        <div className="flex justify-between">
-                            <span className={`font-bold ${log.status === 200 ? 'text-green-600' : 'text-red-600'}`}>{log.method} {log.status}</span>
-                            <span className="text-sm text-gray-500">{new Date(log.timestamp).toLocaleTimeString()}</span>
-                        </div>
-                        <div className="text-sm truncate">{log.path}</div>
-                        <details>
-                            <summary className="cursor-pointer text-blue-500 text-sm">View Details</summary>
-                            <pre className="text-xs bg-gray-800 text-white p-2 rounded mt-1 overflow-x-auto">
-                                {JSON.stringify(log.response || log.requestBody, null, 2)}
-                            </pre>
-                        </details>
-                    </div>
-                ))}
-            </div>
-        </div>
+      <p className="text-lg mb-6 text-center text-gray-600">
+        Ever found yourself lost in a sea of console logs, trying to piece together what your application is *really* doing? We've all been there. While browser developer tools are indispensable, sometimes the most powerful insights come from tools built right into your application. Let's dive into a fascinating example of client-side developer tooling and uncover some counter-intuitive lessons that can elevate your debugging and understanding.
+      </p>
+
+      <h2 className="text-2xl font-bold mt-8 mb-4 text-blue-600">
+        1. The Power of In-App Observability: Why Your Browser Needs Its Own Dev Tools
+      </h2>
+      <p className="mb-4">
+        We often rely on server-side logs or external monitoring services to understand our application's behavior. But what if you could see exactly what's happening at the user's fingertips, in real-time, within the application itself? The original code for a "Citibank Developer Tools View" demonstrates this beautifully. It provides an immediate, local window into API calls and application context (like access tokens and UUIDs).
+      </p>
+      <p className="mb-4">
+        This isn't just about convenience; it's about context. Seeing API requests and responses directly alongside the UI that triggered them offers a level of insight that external tools often struggle to match. It empowers developers to debug faster, understand user flows more deeply, and even allows power users to self-diagnose issues.
+      </p>
+
+      <h2 className="text-2xl font-bold mt-8 mb-4 text-blue-600">
+        2. Elegant State Management with the Observer Pattern (No Redux Required!)
+      </h2>
+      <p className="mb-4">
+        Keeping a UI component updated with real-time data, like a stream of API logs, can often lead to complex state management solutions. However, the `ApiLogger` class in our example uses a classic, yet often underappreciated, pattern: the Observer Pattern.
+      </p>
+      <blockquote className="border-l-4 border-blue-400 pl-4 italic my-4 text-gray-700">
+        "The `ApiLogger` maintains a list of 'listeners' and notifies them whenever a new log entry is added. This decouples the logging mechanism from the UI, allowing any component to 'subscribe' for updates without tight coupling."
+      </blockquote>
+      <p className="mb-4">
+        This approach is incredibly clean and efficient for specific, self-contained features. It avoids the overhead of larger state management libraries while providing a robust way to synchronize data across interested components. It's a powerful reminder that sometimes, simpler, foundational patterns are all you need.
+      </p>
+
+      <h2 className="text-2xl font-bold mt-8 mb-4 text-blue-600">
+        3. Ephemeral Insights: The Art of In-Memory Logging
+      </h2>
+      <p className="mb-4">
+        One might assume that a logging system should persist data indefinitely. Yet, the `ApiLogger` explicitly limits its log entries to a `MAX_LOG_SIZE` of 50, effectively making it an in-memory, rotating buffer. This might seem counter-intuitive, but for a client-side developer tool, it's a brilliant design choice.
+      </p>
+      <p className="mb-4">
+        Why? Performance, privacy, and focus. Storing too many logs in the browser can consume significant memory. Limiting the size ensures the tool remains lightweight. Furthermore, for a developer tool, the most recent interactions are often the most relevant. This ephemeral nature keeps the focus on immediate activity without cluttering the interface or risking sensitive data persistence beyond the session.
+      </p>
+
+      <h2 className="text-2xl font-bold mt-8 mb-4 text-blue-600">
+        4. Context is King: Seamless Data Flow with React Hooks
+      </h2>
+      <p className="mb-4">
+        The original component effortlessly accesses an `accessToken` and `uuid` via `useMoneyMovement()` and the API logs via `useApiLog()`. This highlights the elegance of React's Context API and custom hooks for managing application-wide data and logic.
+      </p>
+      <p className="mb-4">
+        Instead of prop-drilling or relying on complex global stores for every piece of data, Context provides a clean way to inject necessary information (like user authentication details or shared logging instances) deep into the component tree. Custom hooks then encapsulate the logic for consuming and interacting with this context, making components cleaner and more reusable. It's a testament to how modern React simplifies complex data flows.
+      </p>
+
+      <h2 className="text-2xl font-bold mt-8 mb-4 text-blue-600">
+        5. Security by Design (Even in Dev Tools): A Gentle Reminder
+      </h2>
+      <p className="mb-4">
+        While the developer tools view is incredibly useful, it also exposes potentially sensitive information like truncated access tokens and UUIDs. This implicitly underscores a critical lesson: even internal developer tools require careful consideration of security.
+      </p>
+      <p className="mb-4">
+        In a production environment, such a view would ideally be behind strict access controls, perhaps only visible to authenticated administrators or disabled entirely. It serves as a powerful reminder that any interface, no matter how internal, that displays sensitive application state or user data must be designed with security as a paramount concern.
+      </p>
+
+      <div className="mt-8 pt-6 border-t border-gray-200 text-center text-gray-600">
+        <p className="mb-4">
+          From elegant state management to the strategic use of ephemeral data, the humble client-side developer tool offers a wealth of insights into robust application design. It reminds us that sometimes the most impactful solutions are those built with simplicity and directness in mind.
+        </p>
+        <p className="font-semibold text-lg">
+          What hidden insights could your application reveal if you gave it its own voice?
+        </p>
+      </div>
     </div>
   );
 };
