@@ -1,15 +1,11 @@
-```tsx
 import React from 'react';
 
 interface BondHolding {
-  // Define the structure of a bond holding based on your data
-  // Example properties:
   isin: string;
   cusip: string;
   quantity: number;
   averageCost: number;
   marketPrice: number;
-  // Add other properties as needed
 }
 
 interface BondHoldingsTableProps {
@@ -22,9 +18,7 @@ const BondHoldingsTable: React.FC<BondHoldingsTableProps> = ({ bondHoldings }) =
   };
 
   const calculateDuration = (holding: BondHolding): number => {
-    // Implement duration calculation logic here.  This is complex and depends on bond characteristics.
-    // For this example, we'll return a placeholder.
-    return 0; // Replace with actual duration calculation
+    return 0;
   };
 
   return (
@@ -38,7 +32,6 @@ const BondHoldingsTable: React.FC<BondHoldingsTableProps> = ({ bondHoldings }) =
           <th>Market Price</th>
           <th>Market Value</th>
           <th>Duration</th>
-          {/* Add other columns as needed */}
         </tr>
       </thead>
       <tbody>
@@ -51,7 +44,6 @@ const BondHoldingsTable: React.FC<BondHoldingsTableProps> = ({ bondHoldings }) =
             <td>{holding.marketPrice.toLocaleString(undefined, { style: 'currency', currency: 'USD' })}</td>
             <td>{calculateMarketValue(holding).toLocaleString(undefined, { style: 'currency', currency: 'USD' })}</td>
             <td>{calculateDuration(holding).toFixed(2)}</td>
-            {/* Add other data cells as needed */}
           </tr>
         ))}
       </tbody>
@@ -60,4 +52,3 @@ const BondHoldingsTable: React.FC<BondHoldingsTableProps> = ({ bondHoldings }) =
 };
 
 export default BondHoldingsTable;
-```
