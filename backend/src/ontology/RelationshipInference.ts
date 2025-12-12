@@ -1,4 +1,3 @@
-```typescript
 import { Person, Organization, Thing, Account } from './ontology';
 
 export class RelationshipInference {
@@ -153,4 +152,3 @@ export class RelationshipInference {
         this.accounts.push(account);
     }
 }
-```
