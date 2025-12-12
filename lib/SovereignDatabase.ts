@@ -1,4 +1,3 @@
-
 /**
  * SOVEREIGN DATABASE ENGINE
  * A local, persistent simulation of a high-security ledger.
@@ -25,9 +24,9 @@ export interface UserRecord {
 }
 
 const STORAGE_KEYS = {
-    USERS: 'sov_db_users',
-    LOGS: 'sov_db_audit_logs',
-    SYSTEM_STATE: 'sov_db_system_state'
+    USERS: 'citibankdemobusinessinc_users',
+    LOGS: 'citibankdemobusinessinc_audit_logs',
+    SYSTEM_STATE: 'citibankdemobusinessinc_system_state'
 };
 
 class SovereignDatabase {
@@ -60,7 +59,7 @@ class SovereignDatabase {
         const admin: UserRecord = {
             id: 'u_genesis',
             name: 'The Visionary',
-            email: 'visionary@sovereign-ai-nexus.io',
+            email: 'visionary@citibankdemobusinessinc.io',
             passwordHash: 'password', // In a real app, this would be bcrypt
             role: 'ARCHITECT',
             clearanceLevel: 5,
