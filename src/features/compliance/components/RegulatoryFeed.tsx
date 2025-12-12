@@ -133,7 +133,7 @@ const RegulatoryFeed: React.FC<RegulatoryFeedProps> = ({ updates, onViewUpdate }
                     onClick={() => setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'))}
                     className="bg-gray-700/50 p-2 rounded text-white text-sm border border-gray-600 hover:bg-gray-600 transition-colors"
                 >
-                    {sortOrder === 'asc' ? '↑ Asc' : '↓ Desc'}
+                    {sortOrder === 'asc' ? 'â Asc' : 'â Desc'}
                 </button>
             </div>
             
