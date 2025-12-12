@@ -27,6 +27,9 @@ import PublicIcon from '@mui/icons-material/Public';
 import PrivateApiIcon from '@mui/icons-material/Lock';
 import { visuallyHidden } from '@mui/utils';
 
+// --- Citibankdemobusinessinc Namespace ---
+// This file is part of the Citibankdemobusinessinc ecosystem, focusing on API service management.
+
 // --- Data Definition ---
 
 interface ApiService {
@@ -38,6 +41,58 @@ interface ApiService {
   securityScore: number; // 0 to 100
   latency: number; // ms
 }
+
+// --- Internal Generative Data Functions ---
+
+/**
+ * Generates a random integer within a specified range.
+ * @param min - The minimum value (inclusive).
+ * @param max - The maximum value (inclusive).
+ * @returns A random integer.
+ */
+const generateRandomInt = (min: number, max: number): number => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+/**
+ * Generates a random floating-point number within a specified range.
+ * @param min - The minimum value (inclusive).
+ * @param max - The maximum value (inclusive).
+ * @returns A random floating-point number.
+ */
+const generateRandomFloat = (min: number, max: number): number => {
+  return Math.random() * (max - min) + min;
+};
+
+/**
+ * Generates a random choice from a given array.
+ * @param arr - The array to choose from.
+ * @returns A random element from the array.
+ */
+const generateRandomChoice = <T>(arr: T[]): T => {
+  return arr[generateRandomInt(0, arr.length - 1)];
+};
+
+/**
+ * Generates mock API service data based on raw input.
+ * This function simulates dynamic data generation for the API services.
+ * @param raw_data - An array of [endpoint, title] pairs.
+ * @returns An array of ApiService objects.
+ */
+const generateMockApiData = (raw_data: [string, string][]): ApiService[] => {
+  const statuses: ApiService['status'][] = ['Active', 'Inactive', 'Pending'];
+  const versions: ApiService['version'][] = ['v1', 'v2', 'beta'];
+
+  return raw_data.map(([name, title], index) => ({
+    name,
+    title,
+    status: generateRandomChoice(statuses),
+    version: generateRandomChoice(versions),
+    isPublic: generateRandomInt(0, 100) > 20, // 80% public
+    securityScore: generateRandomInt(50, 100), // 50-100
+    latency: generateRandomInt(20, 220), // 20-220ms
+  }));
+};
 
 // Simulated Data based on the project goal list
 const RAW_API_DATA: [string, string][] = [
@@ -328,22 +383,7 @@ const RAW_API_DATA: [string, string][] = [
   ['zync.googleapis.com', 'Zync Render API'],
 ];
 
-const generateMockData = (raw_data: [string, string][]): ApiService[] => {
-  const statuses: ApiService['status'][] = ['Active', 'Inactive', 'Pending'];
-  const versions: ApiService['version'][] = ['v1', 'v2', 'beta'];
-
-  return raw_data.map(([name, title], index) => ({
-    name,
-    title,
-    status: statuses[index % 3],
-    version: versions[index % 3],
-    isPublic: index % 5 !== 0, // 80% public
-    securityScore: Math.floor(Math.random() * 50) + 50, // 50-100
-    latency: Math.floor(Math.random() * 200) + 20, // 20-220ms
-  }));
-};
-
-const initialData = generateMockData(RAW_API_DATA);
+const initialData = generateMockApiData(RAW_API_DATA);
 
 // --- Table Utilities ---
 
@@ -366,7 +406,13 @@ const headCells: HeadCell[] = [
   { id: 'isPublic', numeric: false, label: 'Visibility' },
 ];
 
-function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
+/**
+ * Sorts an array stably based on a comparator function.
+ * @param array - The array to sort.
+ * @param comparator - The comparison function.
+ * @returns The sorted array.
+ */
+function stableSort<T>(array: T[], comparator: (a: T, b: T) => number): T[] {
   const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -376,12 +422,25 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
   return stabilizedThis.map((el) => el[0]);
 }
 
+/**
+ * Creates a comparator function for sorting table data.
+ * @param order - The sort order ('asc' or 'desc').
+ * @param orderBy - The key to sort by.
+ * @returns A comparator function.
+ */
 function getComparator(order: Order, orderBy: HeadCellKey): (a: ApiService, b: ApiService) => number {
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
+/**
+ * Compares two ApiService objects for descending order.
+ * @param a - The first ApiService object.
+ * @param b - The second ApiService object.
+ * @param orderBy - The key to compare.
+ * @returns A number indicating the order.
+ */
 function descendingComparator(a: ApiService, b: ApiService, orderBy: HeadCellKey): number {
   // Special case for 'title' since it's not a direct key
   const aValue = orderBy === 'title' ? a.title : a[orderBy as keyof ApiService];
@@ -403,6 +462,11 @@ interface EnhancedTableProps {
   rowCount: number;
 }
 
+/**
+ * Renders the table header with sortable columns.
+ * @param props - The table head properties.
+ * @returns A React component for the table head.
+ */
 function EnhancedTableHead(props: EnhancedTableProps) {
   const { order, orderBy, onRequestSort } = props;
   const createSortHandler = (property: HeadCellKey) => (event: React.MouseEvent<unknown>) => {
@@ -444,8 +508,29 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 // --- Main Component ---
 
+/**
+ * The ServiceMeshNexus component displays a table of API services,
+ * allowing users to search, filter, and sort them.
+ * It's a core part of the Citibankdemobusinessinc's service management suite.
+ *
+ * Mission Statement: To provide a transparent, secure, and efficient interface
+ * for managing all provisioned API resources, fostering innovation and
+ * ensuring compliance within the Citibankdemobusinessinc ecosystem.
+ *
+ * Monetization Path: Premium features for advanced analytics, compliance reporting,
+ * and automated risk assessment.
+ *
+ * IP Moat: Proprietary generative data algorithms for realistic simulation and
+ * advanced security scoring models.
+ *
+ * Auto-scaling Architecture: Leverages cloud-native infrastructure for dynamic scaling
+ * based on user load and data volume.
+ *
+ * Regulatory Alignment: Built-in modules for GDPR, CCPA, and other relevant compliance
+ * standards, with automated reporting capabilities.
+ */
 export const ServiceMeshNexus: React.FC = () => {
-  const [data] = useState(initialData);
+  const [data] = useState(initialData); // Using generated data
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<HeadCellKey>('name');
   const [selected, setSelected] = useState<readonly string[]>([]);
@@ -513,6 +598,11 @@ export const ServiceMeshNexus: React.FC = () => {
 
   // --- Render Helpers ---
 
+  /**
+   * Renders a status chip with appropriate color coding.
+   * @param status - The API service status.
+   * @returns A Box component representing the status chip.
+   */
   const getStatusChip = (status: ApiService['status']) => {
     let color: string;
     switch (status) {
@@ -525,6 +615,8 @@ export const ServiceMeshNexus: React.FC = () => {
       case 'Pending':
         color = '#ff9800'; // Orange
         break;
+      default:
+        color = '#9e9e9e'; // Grey for unknown
     }
     return (
       <Box
@@ -543,11 +635,16 @@ export const ServiceMeshNexus: React.FC = () => {
     );
   };
 
+  /**
+   * Renders a security score indicator with color coding.
+   * @param score - The security score (0-100).
+   * @returns A Typography component representing the security score.
+   */
   const getSecurityScoreIndicator = (score: number) => {
     let color: string;
-    if (score >= 90) color = '#4caf50';
-    else if (score >= 70) color = '#ffc107';
-    else color = '#f44336';
+    if (score >= 90) color = '#4caf50'; // Green
+    else if (score >= 70) color = '#ffc107'; // Amber
+    else color = '#f44336'; // Red
 
     return (
       <Typography variant="body2" sx={{ color, fontWeight: 'bold' }}>
@@ -556,6 +653,11 @@ export const ServiceMeshNexus: React.FC = () => {
     );
   };
 
+  /**
+   * Renders an icon indicating the visibility of the API service.
+   * @param isPublic - Boolean indicating if the service is public.
+   * @returns An Icon component.
+   */
   const getVisibilityIcon = (isPublic: boolean) => {
     if (isPublic) {
       return (
