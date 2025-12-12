@@ -101,6 +101,7 @@ const MOCK_BOND_MAIN: Bond = {
   outstandingAmount: 68759029200,
   nominalValue: 100,
   maturityDate: '2021-12-21',
+  issueDate: undefined, // Not explicitly in text, but good to have
   couponRate: 0,
   yield: 0, // Matured
   price: 0, // Matured
