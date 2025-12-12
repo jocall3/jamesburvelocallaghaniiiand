@@ -1,4 +1,3 @@
-
 import React, { useState, useContext } from 'react';
 import { banks } from '../constants';
 import { DataContext } from '../context/DataContext';
