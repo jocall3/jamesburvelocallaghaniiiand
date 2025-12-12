@@ -1,4 +1,3 @@
-```tsx
 import React, { useMemo } from 'react';
 import {
   SafeAreaView,
@@ -349,4 +348,3 @@ const styles = StyleSheet.create({
 });
 
 export default App;
-```
