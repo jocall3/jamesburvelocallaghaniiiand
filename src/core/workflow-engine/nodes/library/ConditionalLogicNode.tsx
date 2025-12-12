@@ -1,4 +1,3 @@
-```tsx
 import React, { useState } from 'react';
 import { Handle, Position } from 'reactflow';
 import { Box, TextField, Button, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
@@ -103,4 +102,3 @@ const ConditionalLogicNode: React.FC<ConditionalLogicNodeProps> = ({ id, data })
 };
 
 export default ConditionalLogicNode;
-```
