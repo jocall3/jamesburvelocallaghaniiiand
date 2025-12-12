@@ -1,4 +1,3 @@
-```typescript
 import React, { useState, useMemo } from 'react';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { useTheme } from '@mui/material/styles';
@@ -60,4 +59,3 @@ const BondDataGrid: React.FC<BondDataGridProps> = ({ bondData }) => {
 };
 
 export default BondDataGrid;
-```
