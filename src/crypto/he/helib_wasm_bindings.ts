@@ -1,4 +1,3 @@
-```typescript
 // src/crypto/he/helib_wasm_bindings.ts
 
 // This file will contain the WASM bindings for HElib.
@@ -166,4 +165,3 @@ class HElibCiphertext {
 
 // Export the loading function and the wrapper classes.
 export { loadHElibWASM, HElibContext, HElibKeyPair, HElibCiphertext };
-```
