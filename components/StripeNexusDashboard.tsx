@@ -1,52 +1,140 @@
-
 import React from 'react';
 
-// --- Mock Data based on Stripe Resources ---
+// --- Generative Data Functions ---
 
-const MOCK_METRICS = {
-    grossVolume: { value: 71897, change: 12.2 },
-    netVolume: { value: 65432, change: 11.8 },
-    newCustomers: { value: 215, change: 8.5 },
-    activeSubscriptions: { value: 842, change: -1.2 },
+const generateRandomString = (length: number) => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
 };
 
-const MOCK_BALANCE = {
-    available: [{ amount: 1254000, currency: 'usd' }],
-    pending: [{ amount: 312050, currency: 'usd' }],
+const generateRandomNumber = (min: number, max: number) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-const MOCK_ACCOUNT = {
-    details_submitted: false,
-    payouts_enabled: false,
-    charges_enabled: true,
-    requirements: {
-      currently_due: [
+const generateRandomFloat = (min: number, max: number, decimals: number = 2) => {
+    const factor = Math.pow(10, decimals);
+    return Math.round((Math.random() * (max - min) + min) * factor) / factor;
+};
+
+const generateDate = (daysAgo: number) => {
+    const date = new Date();
+    date.setDate(date.getDate() - generateRandomNumber(0, daysAgo));
+    return date.toISOString().split('T')[0];
+};
+
+const generateCurrency = () => {
+    const currencies = ['usd', 'eur', 'gbp', 'jpy'];
+    return currencies[generateRandomNumber(0, currencies.length - 1)];
+};
+
+const generateStatus = () => {
+    const statuses = ['succeeded', 'failed', 'pending'];
+    return statuses[generateRandomNumber(0, statuses.length - 1)];
+};
+
+const generateCustomerName = () => {
+    const firstNames = ['Liam', 'Olivia', 'Noah', 'Emma', 'Oliver', 'Ava', 'Elijah', 'Charlotte', 'William', 'Sophia'];
+    const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
+    return `${firstNames[generateRandomNumber(0, firstNames.length - 1)]} ${lastNames[generateRandomNumber(0, lastNames.length - 1)]}`;
+};
+
+const generateRequirement = () => {
+    const requirements = [
         'business_profile.url',
         'external_account',
         'tos_acceptance.date',
         'tos_acceptance.ip',
-      ],
-      past_due: [],
-    },
+        'identity.verification.document',
+        'legal_entity.address',
+        'payouts.schedule',
+    ];
+    return requirements[generateRandomNumber(0, requirements.length - 1)];
 };
 
-const MOCK_RECENT_PAYMENTS = [
-    { id: 'ch_1', amount: 9999, currency: 'usd', customer: 'Liam Johnson', status: 'succeeded' },
-    { id: 'ch_2', amount: 4500, currency: 'usd', customer: 'Olivia Smith', status: 'succeeded' },
-    { id: 'ch_3', amount: 12000, currency: 'usd', customer: 'Noah Williams', status: 'failed' },
-    { id: 'ch_4', amount: 2500, currency: 'usd', customer: 'Emma Brown', status: 'succeeded' },
-    { id: 'ch_5', amount: 7850, currency: 'usd', customer: 'Ava Jones', status: 'succeeded' },
-];
+// --- Internal Data Generation ---
 
-const MOCK_CHART_DATA = [30, 40, 45, 50, 49, 60, 70, 91, 125, 110, 130, 150];
+const generateMetrics = () => ({
+    grossVolume: { value: generateRandomNumber(50000, 100000), change: generateRandomFloat(-5, 20) },
+    netVolume: { value: generateRandomNumber(45000, 90000), change: generateRandomFloat(-5, 20) },
+    newCustomers: { value: generateRandomNumber(100, 500), change: generateRandomFloat(-10, 15) },
+    activeSubscriptions: { value: generateRandomNumber(500, 1500), change: generateRandomFloat(-5, 5) },
+});
+
+const generateBalance = () => ({
+    available: [{ amount: generateRandomNumber(1000000, 5000000), currency: generateCurrency() }],
+    pending: [{ amount: generateRandomNumber(100000, 1000000), currency: generateCurrency() }],
+});
+
+const generateAccount = () => {
+    const requirementsDue = Array.from({ length: generateRandomNumber(0, 5) }, () => generateRequirement());
+    const requirementsPastDue = Array.from({ length: generateRandomNumber(0, 2) }, () => generateRequirement());
+    const chargesEnabled = requirementsDue.length === 0 && requirementsPastDue.length === 0 && generateRandomNumber(0, 1) === 1;
+    const payoutsEnabled = chargesEnabled && generateRandomNumber(0, 1) === 1;
+    const detailsSubmitted = generateRandomNumber(0, 1) === 1;
+
+    return {
+        details_submitted: detailsSubmitted,
+        payouts_enabled: payoutsEnabled,
+        charges_enabled: chargesEnabled,
+        requirements: {
+            currently_due: requirementsDue,
+            past_due: requirementsPastDue,
+        },
+    };
+};
+
+const generateRecentPayments = (count: number) => {
+    const payments = [];
+    for (let i = 0; i < count; i++) {
+        const amount = generateRandomNumber(1000, 20000);
+        const currency = generateCurrency();
+        const status = generateStatus();
+        payments.push({
+            id: `ch_${generateRandomString(10)}`,
+            amount: amount,
+            currency: currency,
+            customer: generateCustomerName(),
+            status: status,
+        });
+    }
+    return payments;
+};
+
+const generateChartData = (length: number) => {
+    const data = [];
+    let currentValue = generateRandomNumber(50, 150);
+    for (let i = 0; i < length; i++) {
+        const change = generateRandomFloat(-10, 10);
+        currentValue += change;
+        data.push(Math.max(0, Math.round(currentValue)));
+    }
+    return data;
+};
+
+// --- Mock Data based on Stripe Resources (now using generative functions) ---
+
+const METRICS = generateMetrics();
+const BALANCE = generateBalance();
+const ACCOUNT = generateAccount();
+const RECENT_PAYMENTS = generateRecentPayments(5);
+const CHART_DATA = generateChartData(12);
 
 // --- Helper Functions ---
 
 const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: currency.toUpperCase(),
-    }).format(amount / 100);
+    try {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: currency.toUpperCase(),
+        }).format(amount / 100);
+    } catch (error) {
+        console.error("Error formatting currency:", error);
+        return `${amount / 100} ${currency.toUpperCase()}`;
+    }
 };
 
 // --- SVG Icon Components ---
@@ -119,8 +207,8 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon }) => (
 );
 
 const VolumeChart = () => {
-    const maxVal = Math.max(...MOCK_CHART_DATA);
-    const points = MOCK_CHART_DATA.map((val, i) => `${(i / (MOCK_CHART_DATA.length - 1)) * 100},${100 - (val / maxVal) * 80}`).join(' ');
+    const maxVal = Math.max(...CHART_DATA);
+    const points = CHART_DATA.map((val, i) => `${(i / (CHART_DATA.length - 1)) * 100},${100 - (val / maxVal) * 80}`).join(' ');
 
     return (
         <Card className="p-4">
@@ -144,13 +232,13 @@ const BalanceCard = () => (
                 <div>
                     <p className="text-sm text-gray-500">Available to pay out</p>
                     <p className="text-2xl font-semibold text-gray-900">
-                        {formatCurrency(MOCK_BALANCE.available[0].amount, MOCK_BALANCE.available[0].currency)}
+                        {formatCurrency(BALANCE.available[0].amount, BALANCE.available[0].currency)}
                     </p>
                 </div>
                 <div>
                     <p className="text-sm text-gray-500">Expected to become available</p>
                     <p className="text-xl font-medium text-gray-700">
-                         {formatCurrency(MOCK_BALANCE.pending[0].amount, MOCK_BALANCE.pending[0].currency)}
+                         {formatCurrency(BALANCE.pending[0].amount, BALANCE.pending[0].currency)}
                     </p>
                 </div>
             </div>
@@ -167,7 +255,7 @@ const AccountStatusCard = () => (
     <Card>
         <div className="p-4">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Account Status</h3>
-            {MOCK_ACCOUNT.requirements.currently_due.length > 0 ? (
+            {ACCOUNT.requirements.currently_due.length > 0 ? (
                 <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                     <div className="flex">
                         <div className="flex-shrink-0">
@@ -197,8 +285,8 @@ const AccountStatusCard = () => (
             <div className="mt-4">
                 <h4 className="text-sm font-medium text-gray-600">Required actions:</h4>
                 <ul className="list-disc list-inside mt-2 space-y-1 text-sm text-gray-700">
-                    {MOCK_ACCOUNT.requirements.currently_due.length > 0 ? (
-                        MOCK_ACCOUNT.requirements.currently_due.map(req => <li key={req}>{req.replace(/_/g, ' ').replace(/\./g, ' > ')}</li>)
+                    {ACCOUNT.requirements.currently_due.length > 0 ? (
+                        ACCOUNT.requirements.currently_due.map(req => <li key={req}>{req.replace(/_/g, ' ').replace(/\./g, ' > ')}</li>)
                     ) : (
                         <li>None</li>
                     )}
@@ -228,12 +316,12 @@ const RecentPaymentsCard = () => (
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                    {MOCK_RECENT_PAYMENTS.map((payment) => (
+                    {RECENT_PAYMENTS.map((payment) => (
                         <tr key={payment.id}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{payment.customer}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(payment.amount, payment.currency)}</td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${payment.status === 'succeeded' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${payment.status === 'succeeded' ? 'bg-green-100 text-green-800' : payment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
                                     {payment.status}
                                 </span>
                             </td>
@@ -262,26 +350,26 @@ const StripeNexusDashboard = () => {
                     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                         <StatCard 
                             title="Gross Volume" 
-                            value={formatCurrency(MOCK_METRICS.grossVolume.value * 100, 'usd')} 
-                            change={MOCK_METRICS.grossVolume.change}
+                            value={formatCurrency(METRICS.grossVolume.value * 100, 'usd')} 
+                            change={METRICS.grossVolume.change}
                             icon={<DollarSignIcon className="h-6 w-6 text-gray-500" />} 
                         />
                          <StatCard 
                             title="Net Volume" 
-                            value={formatCurrency(MOCK_METRICS.netVolume.value * 100, 'usd')}
-                            change={MOCK_METRICS.netVolume.change}
+                            value={formatCurrency(METRICS.netVolume.value * 100, 'usd')}
+                            change={METRICS.netVolume.change}
                             icon={<ActivityIcon className="h-6 w-6 text-gray-500" />} 
                         />
                         <StatCard 
                             title="New Customers" 
-                            value={MOCK_METRICS.newCustomers.value.toString()} 
-                            change={MOCK_METRICS.newCustomers.change}
+                            value={METRICS.newCustomers.value.toString()} 
+                            change={METRICS.newCustomers.change}
                             icon={<UsersIcon className="h-6 w-6 text-gray-500" />} 
                         />
                          <StatCard 
                             title="Active Subscriptions" 
-                            value={MOCK_METRICS.activeSubscriptions.value.toString()} 
-                            change={MOCK_METRICS.activeSubscriptions.change}
+                            value={METRICS.activeSubscriptions.value.toString()} 
+                            change={METRICS.activeSubscriptions.change}
                             icon={<CreditCardIcon className="h-6 w-6 text-gray-500" />} 
                         />
                     </div>
