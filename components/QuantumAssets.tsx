@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 const QuantumAssets: React.FC = () => {
@@ -423,7 +422,7 @@ We reject cynicism. We embrace hope. We are building the scaffolding for a socie
                 {asset.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <div className="qa-asset-rate">
-                <span className="blink">â–²</span> 
+                <span className="blink">▲</span> 
                 {asset.rate.toFixed(2)} / sec generated
               </div>
               <div className="qa-progress-bar">
