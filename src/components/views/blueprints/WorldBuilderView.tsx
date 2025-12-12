@@ -1,4 +1,3 @@
-```tsx
 import React, { useState, useEffect } from 'react';
 
 const WorldBuilderView: React.FC = () => {
@@ -107,4 +106,3 @@ const WorldBuilderView: React.FC = () => {
 };
 
 export default WorldBuilderView;
-```
