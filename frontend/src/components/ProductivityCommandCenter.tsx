@@ -1,4 +1,3 @@
-```typescript
 import React, { useState, useEffect } from 'react';
 import {
   Container,
@@ -47,83 +46,77 @@ interface DriveFile {
   webViewLink: string;
 }
 
-// --- Mock API Calls ---
-// In a real application, these would use the Google API client library
-// and handle OAuth2 authentication.
+// --- Internal Generative Data Functions ---
 
-const mockCalendarEvents: CalendarEvent[] = [
-  {
-    id: 'cal1',
-    summary: 'Q3 Financial Report Deadline',
-    start: { date: new Date(new Date().setDate(new Date().getDate() + 5)).toISOString().split('T')[0] },
-    htmlLink: 'https://calendar.google.com/',
-  },
-  {
-    id: 'cal2',
-    summary: 'Board Meeting: Review Q2 Performance',
-    start: { dateTime: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString() },
-    htmlLink: 'https://calendar.google.com/',
-  },
-  {
-    id: 'cal3',
-    summary: 'Finalize Budget for Next Fiscal Year',
-    start: { dateTime: new Date(new Date().setDate(new Date().getDate() + 14)).toISOString() },
-    htmlLink: 'https://calendar.google.com/',
-  },
-  {
-    id: 'cal4',
-    summary: 'Audit Committee Sync',
-    start: { dateTime: new Date(new Date().setDate(new Date().getDate() + 2)).toISOString() },
-    htmlLink: 'https://calendar.google.com/',
-  },
-];
+const generateRandomString = (length: number = 10): string => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+};
 
-const mockDriveFiles: DriveFile[] = [
-  {
-    id: 'drv1',
-    name: 'Q3_Financial_Projections_v2.gsheet',
-    mimeType: 'application/vnd.google-apps.spreadsheet',
-    modifiedTime: new Date(new Date().setDate(new Date().getDate() - 2)).toISOString(),
-    webViewLink: 'https://docs.google.com/spreadsheets/',
-  },
-  {
-    id: 'drv2',
-    name: 'Q2_Performance_Summary.gdoc',
-    mimeType: 'application/vnd.google-apps.document',
-    modifiedTime: new Date(new Date().setDate(new Date().getDate() - 10)).toISOString(),
-    webViewLink: 'https://docs.google.com/document/',
-  },
-    {
-    id: 'drv3',
-    name: '2024_Budget_Planning_Draft.gdoc',
-    mimeType: 'application/vnd.google-apps.document',
-    modifiedTime: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(),
-    webViewLink: 'https://docs.google.com/document/',
-  },
-  {
-    id: 'drv4',
-    name: 'Archived Reports Q1-2023',
-    mimeType: 'application/vnd.google-apps.folder',
-    modifiedTime: new Date(new Date().setDate(new Date().getDate() - 90)).toISOString(),
-    webViewLink: 'https://drive.google.com/drive/folders/',
-  },
-];
+const generateDateInFuture = (days: number): string => {
+  return new Date(new Date().setDate(new Date().getDate() + days)).toISOString();
+};
+
+const generateDateInPast = (days: number): string => {
+  return new Date(new Date().setDate(new Date().getDate() - days)).toISOString();
+};
+
+const generateMockCalendarEvent = (): CalendarEvent => {
+  const isDateTime = Math.random() > 0.5;
+  const daysToAdd = Math.floor(Math.random() * 30) + 1;
+  const start = isDateTime
+    ? { dateTime: generateDateInFuture(daysToAdd) }
+    : { date: generateDateInFuture(daysToAdd).split('T')[0] };
+  return {
+    id: `cal_${generateRandomString(8)}`,
+    summary: `Generated Event: ${generateRandomString(20)}`,
+    start: start,
+    htmlLink: 'https://calendar.citibankdemobusinessinc.com/',
+  };
+};
+
+const generateMockDriveFile = (): DriveFile => {
+  const mimeTypes = [
+    'application/vnd.google-apps.spreadsheet',
+    'application/vnd.google-apps.document',
+    'application/vnd.google-apps.folder',
+    'application/pdf',
+    'text/plain',
+  ];
+  const mimeType = mimeTypes[Math.floor(Math.random() * mimeTypes.length)];
+  const nameParts = mimeType.split('.');
+  const extension = nameParts[nameParts.length - 1].replace('google-apps-', '');
+  const fileName = `${generateRandomString(15)}.${extension}`;
+
+  return {
+    id: `drv_${generateRandomString(8)}`,
+    name: fileName,
+    mimeType: mimeType,
+    modifiedTime: generateDateInPast(Math.floor(Math.random() * 180)),
+    webViewLink: 'https://drive.citibankdemobusinessinc.com/',
+  };
+};
+
+// --- Mock API Calls (Internal Generative) ---
 
 const fetchCalendarEvents = async (): Promise<CalendarEvent[]> => {
-  console.log('Fetching calendar events...');
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  // In a real app, you'd handle potential API errors here
-  // if (Math.random() > 0.8) throw new Error("Failed to fetch calendar data.");
-  return mockCalendarEvents.sort((a, b) => new Date(a.start.dateTime || a.start.date || 0).getTime() - new Date(b.start.dateTime || b.start.date || 0).getTime());
+  console.log('Fetching generated calendar events...');
+  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+  const count = Math.floor(Math.random() * 5) + 3; // 3 to 7 events
+  const events = Array.from({ length: count }, generateMockCalendarEvent);
+  return events.sort((a, b) => new Date(a.start.dateTime || a.start.date || 0).getTime() - new Date(b.start.dateTime || b.start.date || 0).getTime());
 };
 
 const fetchDriveFiles = async (): Promise<DriveFile[]> => {
-  console.log('Fetching Drive files...');
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1200));
-  // if (Math.random() > 0.8) throw new Error("Failed to fetch Drive files.");
-  return mockDriveFiles.sort((a,b) => new Date(b.modifiedTime).getTime() - new Date(a.modifiedTime).getTime());
+  console.log('Fetching generated Drive files...');
+  await new Promise(resolve => setTimeout(resolve, 700)); // Simulate network delay
+  const count = Math.floor(Math.random() * 7) + 5; // 5 to 11 files
+  const files = Array.from({ length: count }, generateMockDriveFile);
+  return files.sort((a,b) => new Date(b.modifiedTime).getTime() - new Date(a.modifiedTime).getTime());
 };
 
 // --- Helper Functions ---
@@ -141,6 +134,22 @@ const getFileIcon = (mimeType: string) => {
     if (mimeType.includes('folder')) return <FolderIcon sx={{color: '#757575'}} />;
     return <DescriptionIcon color="disabled" />;
 }
+
+// --- Business Model Specific Functions ---
+// These functions would be specific to the business model and its operations.
+// For this example, we'll keep them generic as they are placeholders.
+
+const createNewFinancialReport = () => {
+  console.log('Action: Creating a new financial report.');
+  // In a real app, this would trigger internal logic to create a new document/spreadsheet.
+  alert('Action: Create a new financial report from a template.');
+};
+
+const scheduleNewMeeting = () => {
+  console.log('Action: Scheduling a new meeting.');
+  // In a real app, this would open a pre-populated internal scheduling interface.
+  window.open('https://calendar.citibankdemobusinessinc.com/schedule', '_blank');
+};
 
 // --- Main Component ---
 const ProductivityCommandCenter: React.FC = () => {
@@ -160,7 +169,7 @@ const ProductivityCommandCenter: React.FC = () => {
       setCalendarEvents(events);
       setDriveFiles(files);
     } catch (err) {
-      setError('Failed to load dashboard data. Please check your connection to Google services.');
+      setError('Failed to load dashboard data. Please check your connection to internal services.');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -171,22 +180,12 @@ const ProductivityCommandCenter: React.FC = () => {
     loadDashboardData();
   }, []);
 
-  const handleCreateReport = () => {
-    // In a real app, this would trigger the Google Drive API to create a new spreadsheet from a template
-    alert('Action: Create a new financial report from a template.');
-  };
-
-  const handleScheduleMeeting = () => {
-    // This would open a pre-populated Google Calendar event creation page
-    window.open('https://calendar.google.com/calendar/r/eventedit', '_blank');
-  };
-
   const renderContent = () => {
     if (isLoading) {
       return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
           <CircularProgress />
-          <Typography variant="h6" sx={{ ml: 2 }}>Syncing with Google Workspace...</Typography>
+          <Typography variant="h6" sx={{ ml: 2 }}>Syncing with Citibankdemobusinessinc services...</Typography>
         </Box>
       );
     }
@@ -211,7 +210,7 @@ const ProductivityCommandCenter: React.FC = () => {
                   variant="outlined"
                   size="small"
                   startIcon={<AddIcon />}
-                  onClick={handleScheduleMeeting}
+                  onClick={scheduleNewMeeting}
                 >
                   Schedule
                 </Button>
@@ -254,7 +253,7 @@ const ProductivityCommandCenter: React.FC = () => {
                   variant="contained"
                   size="small"
                   startIcon={<AddIcon />}
-                  onClick={handleCreateReport}
+                  onClick={createNewFinancialReport}
                 >
                   New Report
                 </Button>
@@ -311,4 +310,3 @@ const ProductivityCommandCenter: React.FC = () => {
 };
 
 export default ProductivityCommandCenter;
-```
