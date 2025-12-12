@@ -1,4 +1,3 @@
-```typescript
 import { createLibp2p } from 'libp2p';
 import { TCP } from '@libp2p/tcp';
 import { WebSockets } from '@libp2p/websockets';
@@ -192,4 +191,3 @@ export class KademliaP2PNode {
     return this.libp2p.peerId.toString();
   }
 }
-```
