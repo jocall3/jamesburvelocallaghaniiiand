@@ -1,6 +1,6 @@
 /**
  * @file Centralized configuration file for application-wide settings, API endpoints, feature flags, and environment variables.
- * @description This file consolidates all configuration for the OmniConnect application,
+ * @description This file consolidates all configuration for the Citibankdemobusinessinc ecosystem,
  * providing a single source of truth for environment-specific values. It is designed to be
  * immutable to prevent runtime modifications.
  */
@@ -34,31 +34,38 @@ const CURRENT_ENV = getCurrentEnvironment();
 // --- Type Definitions ---
 
 /**
- * Configuration for a single third-party API service.
+ * Configuration for a single internal service.
  */
-interface ApiServiceConfig {
-  readonly baseUrl: string;
-  readonly apiKey?: string;
-  readonly clientId?: string;
-  readonly clientSecret?: string;
-  readonly scopes: readonly string[];
+interface InternalServiceConfig {
+  readonly name: string;
+  readonly version: string;
+  readonly port: number;
+  readonly protocol: 'http' | 'https';
+  readonly host: string;
 }
 
 /**
- * A collection of all integrated third-party API configurations.
+ * A collection of all integrated internal service configurations.
  */
-interface ApiEndpoints {
-  readonly google: ApiServiceConfig;
-  readonly meta: ApiServiceConfig; // Facebook, Instagram, WhatsApp
-  readonly apple: ApiServiceConfig;
-  readonly amazon: ApiServiceConfig; // AWS, Alexa, etc.
-  readonly microsoft: ApiServiceConfig; // Azure, Office 365, etc.
-  readonly x_twitter: ApiServiceConfig;
-  readonly tiktok: ApiServiceConfig;
-  readonly openai: ApiServiceConfig;
-  readonly github: ApiServiceConfig;
-  readonly slack: ApiServiceConfig;
-  readonly stripe: Pick<ApiServiceConfig, 'apiKey' | 'baseUrl'>;
+interface InternalServices {
+  readonly dataGenerator: InternalServiceConfig;
+  readonly modelTrainer: InternalServiceConfig;
+  readonly datasetSimulator: InternalServiceConfig;
+  readonly governance: InternalServiceConfig;
+  readonly compliance: InternalServiceConfig;
+  readonly audit: InternalServiceConfig;
+  readonly security: InternalServiceConfig;
+  readonly telemetry: InternalServiceConfig;
+  readonly privacy: InternalServiceConfig;
+  readonly documentation: InternalServiceConfig;
+  readonly testing: InternalServiceConfig;
+  readonly orchestration: InternalServiceConfig;
+  readonly sharedKernel: InternalServiceConfig;
+  readonly eventBus: InternalServiceConfig;
+  readonly identity: InternalServiceConfig;
+  readonly configuration: InternalServiceConfig;
+  readonly schema: InternalServiceConfig;
+  readonly messaging: InternalServiceConfig;
 }
 
 /**
@@ -66,17 +73,29 @@ interface ApiEndpoints {
  */
 interface FeatureFlags {
   readonly [key: string]: boolean;
-  readonly enableGoogleAuth: boolean;
-  readonly enableMetaGraph: boolean;
-  readonly enableAppleSignIn: boolean;
-  readonly enableMicrosoftGraph: boolean;
-  readonly enableStripePayments: boolean;
+  readonly enableDataGeneration: boolean;
+  readonly enableModelTraining: boolean;
+  readonly enableDatasetSimulation: boolean;
+  readonly enableGovernance: boolean;
+  readonly enableCompliance: boolean;
+  readonly enableAudit: boolean;
+  readonly enableSecurity: boolean;
+  readonly enableTelemetry: boolean;
+  readonly enablePrivacy: boolean;
+  readonly enableDocumentation: boolean;
+  readonly enableTesting: boolean;
+  readonly enableOrchestration: boolean;
+  readonly enableSharedKernel: boolean;
+  readonly enableEventBus: boolean;
+  readonly enableIdentity: boolean;
+  readonly enableConfiguration: boolean;
+  readonly enableSchema: boolean;
+  readonly enableMessaging: boolean;
   readonly enableExperimentalFeatures: boolean;
-  readonly useMockApi: boolean;
 }
 
 /**
- * The main application configuration interface.
+ * The main application configuration interface for the Citibankdemobusinessinc ecosystem.
  */
 export interface AppConfig {
   readonly app: {
@@ -88,7 +107,7 @@ export interface AppConfig {
   readonly environment: Environment;
   readonly isProduction: boolean;
   readonly isDevelopment: boolean;
-  readonly api: ApiEndpoints;
+  readonly internalServices: InternalServices;
   readonly featureFlags: FeatureFlags;
 }
 
@@ -114,13 +133,86 @@ const getEnvVar = (key: string, defaultValue?: string): string => {
 
 const baseConfig = {
   app: {
-    name: 'OmniConnect',
+    name: 'Citibankdemobusinessinc',
     version: getEnvVar('npm_package_version', '1.0.0'),
-    contactEmail: 'support@omniconnect.io',
+    contactEmail: 'support@citibankdemobusinessinc.com',
   },
   environment: CURRENT_ENV,
   isProduction: CURRENT_ENV === Environment.Production,
   isDevelopment: CURRENT_ENV === Environment.Development,
+};
+
+// --- Internal Service Definitions ---
+
+const internalServiceBase = {
+  protocol: 'http' as const,
+  host: 'localhost',
+};
+
+const internalServicesConfig: { [key in Environment]?: Partial<Omit<AppConfig, keyof typeof baseConfig>>['internalServices'] } = {
+  [Environment.Development]: {
+    dataGenerator: { ...internalServiceBase, name: 'DataGenerator', version: '1.0.0', port: 3001 },
+    modelTrainer: { ...internalServiceBase, name: 'ModelTrainer', version: '1.0.0', port: 3002 },
+    datasetSimulator: { ...internalServiceBase, name: 'DatasetSimulator', version: '1.0.0', port: 3003 },
+    governance: { ...internalServiceBase, name: 'Governance', version: '1.0.0', port: 3004 },
+    compliance: { ...internalServiceBase, name: 'Compliance', version: '1.0.0', port: 3005 },
+    audit: { ...internalServiceBase, name: 'Audit', version: '1.0.0', port: 3006 },
+    security: { ...internalServiceBase, name: 'Security', version: '1.0.0', port: 3007 },
+    telemetry: { ...internalServiceBase, name: 'Telemetry', version: '1.0.0', port: 3008 },
+    privacy: { ...internalServiceBase, name: 'Privacy', version: '1.0.0', port: 3009 },
+    documentation: { ...internalServiceBase, name: 'Documentation', version: '1.0.0', port: 3010 },
+    testing: { ...internalServiceBase, name: 'Testing', version: '1.0.0', port: 3011 },
+    orchestration: { ...internalServiceBase, name: 'Orchestration', version: '1.0.0', port: 3012 },
+    sharedKernel: { ...internalServiceBase, name: 'SharedKernel', version: '1.0.0', port: 3013 },
+    eventBus: { ...internalServiceBase, name: 'EventBus', version: '1.0.0', port: 3014 },
+    identity: { ...internalServiceBase, name: 'Identity', version: '1.0.0', port: 3015 },
+    configuration: { ...internalServiceBase, name: 'Configuration', version: '1.0.0', port: 3016 },
+    schema: { ...internalServiceBase, name: 'Schema', version: '1.0.0', port: 3017 },
+    messaging: { ...internalServiceBase, name: 'Messaging', version: '1.0.0', port: 3018 },
+  },
+  [Environment.Production]: {
+    dataGenerator: { ...internalServiceBase, name: 'DataGenerator', version: '1.0.0', port: 8081 },
+    modelTrainer: { ...internalServiceBase, name: 'ModelTrainer', version: '1.0.0', port: 8082 },
+    datasetSimulator: { ...internalServiceBase, name: 'DatasetSimulator', version: '1.0.0', port: 8083 },
+    governance: { ...internalServiceBase, name: 'Governance', version: '1.0.0', port: 8084 },
+    compliance: { ...internalServiceBase, name: 'Compliance', version: '1.0.0', port: 8085 },
+    audit: { ...internalServiceBase, name: 'Audit', version: '1.0.0', port: 8086 },
+    security: { ...internalServiceBase, name: 'Security', version: '1.0.0', port: 8087 },
+    telemetry: { ...internalServiceBase, name: 'Telemetry', version: '1.0.0', port: 8088 },
+    privacy: { ...internalServiceBase, name: 'Privacy', version: '1.0.0', port: 8089 },
+    documentation: { ...internalServiceBase, name: 'Documentation', version: '1.0.0', port: 8090 },
+    testing: { ...internalServiceBase, name: 'Testing', version: '1.0.0', port: 8091 },
+    orchestration: { ...internalServiceBase, name: 'Orchestration', version: '1.0.0', port: 8092 },
+    sharedKernel: { ...internalServiceBase, name: 'SharedKernel', version: '1.0.0', port: 8093 },
+    eventBus: { ...internalServiceBase, name: 'EventBus', version: '1.0.0', port: 8094 },
+    identity: { ...internalServiceBase, name: 'Identity', version: '1.0.0', port: 8095 },
+    configuration: { ...internalServiceBase, name: 'Configuration', version: '1.0.0', port: 8096 },
+    schema: { ...internalServiceBase, name: 'Schema', version: '1.0.0', port: 8097 },
+    messaging: { ...internalServiceBase, name: 'Messaging', version: '1.0.0', port: 8098 },
+  },
+};
+
+// Staging can inherit from development and override specific values if needed
+internalServicesConfig.staging = {
+  ...internalServicesConfig.development,
+  dataGenerator: { ...internalServicesConfig.development.dataGenerator, port: 4001 },
+  modelTrainer: { ...internalServicesConfig.development.modelTrainer, port: 4002 },
+  datasetSimulator: { ...internalServicesConfig.development.datasetSimulator, port: 4003 },
+  governance: { ...internalServicesConfig.development.governance, port: 4004 },
+  compliance: { ...internalServicesConfig.development.compliance, port: 4005 },
+  audit: { ...internalServicesConfig.development.audit, port: 4006 },
+  security: { ...internalServicesConfig.development.security, port: 4007 },
+  telemetry: { ...internalServicesConfig.development.telemetry, port: 4008 },
+  privacy: { ...internalServicesConfig.development.privacy, port: 4009 },
+  documentation: { ...internalServicesConfig.development.documentation, port: 4010 },
+  testing: { ...internalServicesConfig.development.testing, port: 4011 },
+  orchestration: { ...internalServicesConfig.development.orchestration, port: 4012 },
+  sharedKernel: { ...internalServicesConfig.development.sharedKernel, port: 4013 },
+  eventBus: { ...internalServicesConfig.development.eventBus, port: 4014 },
+  identity: { ...internalServicesConfig.development.identity, port: 4015 },
+  configuration: { ...internalServicesConfig.development.configuration, port: 4016 },
+  schema: { ...internalServicesConfig.development.schema, port: 4017 },
+  messaging: { ...internalServicesConfig.development.messaging, port: 4018 },
 };
 
 // --- Environment-Specific Configurations ---
@@ -130,159 +222,53 @@ const environmentConfigs: { [key in Environment]?: Partial<Omit<AppConfig, keyof
     app: {
       domain: 'http://localhost:3000',
     },
-    api: {
-      google: {
-        baseUrl: 'https://www.googleapis.com',
-        clientId: getEnvVar('DEV_GOOGLE_CLIENT_ID'),
-        clientSecret: getEnvVar('DEV_GOOGLE_CLIENT_SECRET'),
-        scopes: ['profile', 'email', 'openid', 'https://www.googleapis.com/auth/drive.readonly'],
-      },
-      meta: {
-        baseUrl: 'https://graph.facebook.com/v19.0',
-        clientId: getEnvVar('DEV_META_CLIENT_ID'),
-        clientSecret: getEnvVar('DEV_META_CLIENT_SECRET'),
-        scopes: ['public_profile', 'email'],
-      },
-      apple: {
-        baseUrl: 'https://appleid.apple.com',
-        clientId: getEnvVar('DEV_APPLE_CLIENT_ID'),
-        clientSecret: getEnvVar('DEV_APPLE_CLIENT_SECRET'),
-        scopes: ['name', 'email'],
-      },
-      amazon: {
-        baseUrl: 'https://api.amazon.com',
-        clientId: getEnvVar('DEV_AMAZON_CLIENT_ID'),
-        clientSecret: getEnvVar('DEV_AMAZON_CLIENT_SECRET'),
-        scopes: ['profile'],
-      },
-      microsoft: {
-        baseUrl: 'https://graph.microsoft.com/v1.0',
-        clientId: getEnvVar('DEV_MICROSOFT_CLIENT_ID'),
-        clientSecret: getEnvVar('DEV_MICROSOFT_CLIENT_SECRET'),
-        scopes: ['User.Read', 'Mail.Read'],
-      },
-      x_twitter: {
-        baseUrl: 'https://api.twitter.com/2',
-        clientId: getEnvVar('DEV_TWITTER_CLIENT_ID'),
-        clientSecret: getEnvVar('DEV_TWITTER_CLIENT_SECRET'),
-        scopes: ['tweet.read', 'users.read', 'offline.access'],
-      },
-      tiktok: {
-        baseUrl: 'https://open-api.tiktok.com',
-        clientId: getEnvVar('DEV_TIKTOK_CLIENT_ID'),
-        clientSecret: getEnvVar('DEV_TIKTOK_CLIENT_SECRET'),
-        scopes: ['user.info.basic'],
-      },
-      openai: {
-        baseUrl: 'https://api.openai.com/v1',
-        apiKey: getEnvVar('DEV_OPENAI_API_KEY'),
-        scopes: [],
-      },
-      github: {
-        baseUrl: 'https://api.github.com',
-        clientId: getEnvVar('DEV_GITHUB_CLIENT_ID'),
-        clientSecret: getEnvVar('DEV_GITHUB_CLIENT_SECRET'),
-        scopes: ['read:user', 'user:email', 'repo'],
-      },
-      slack: {
-        baseUrl: 'https://slack.com/api',
-        clientId: getEnvVar('DEV_SLACK_CLIENT_ID'),
-        clientSecret: getEnvVar('DEV_SLACK_CLIENT_SECRET'),
-        scopes: ['channels:read', 'chat:write'],
-      },
-      stripe: {
-        baseUrl: 'https://api.stripe.com',
-        apiKey: getEnvVar('DEV_STRIPE_SECRET_KEY'),
-      },
-    },
     featureFlags: {
-      enableGoogleAuth: true,
-      enableMetaGraph: true,
-      enableAppleSignIn: true,
-      enableMicrosoftGraph: true,
-      enableStripePayments: true,
+      enableDataGeneration: true,
+      enableModelTraining: true,
+      enableDatasetSimulation: true,
+      enableGovernance: true,
+      enableCompliance: true,
+      enableAudit: true,
+      enableSecurity: true,
+      enableTelemetry: true,
+      enablePrivacy: true,
+      enableDocumentation: true,
+      enableTesting: true,
+      enableOrchestration: true,
+      enableSharedKernel: true,
+      enableEventBus: true,
+      enableIdentity: true,
+      enableConfiguration: true,
+      enableSchema: true,
+      enableMessaging: true,
       enableExperimentalFeatures: true,
-      useMockApi: true,
     },
   },
 
   [Environment.Production]: {
     app: {
-      domain: 'https://app.omniconnect.io',
-    },
-    api: {
-      google: {
-        baseUrl: 'https://www.googleapis.com',
-        clientId: getEnvVar('PROD_GOOGLE_CLIENT_ID'),
-        clientSecret: getEnvVar('PROD_GOOGLE_CLIENT_SECRET'),
-        scopes: ['profile', 'email', 'openid', 'https://www.googleapis.com/auth/drive.readonly'],
-      },
-      meta: {
-        baseUrl: 'https://graph.facebook.com/v19.0',
-        clientId: getEnvVar('PROD_META_CLIENT_ID'),
-        clientSecret: getEnvVar('PROD_META_CLIENT_SECRET'),
-        scopes: ['public_profile', 'email'],
-      },
-      apple: {
-        baseUrl: 'https://appleid.apple.com',
-        clientId: getEnvVar('PROD_APPLE_CLIENT_ID'),
-        clientSecret: getEnvVar('PROD_APPLE_CLIENT_SECRET'),
-        scopes: ['name', 'email'],
-      },
-      amazon: {
-        baseUrl: 'https://api.amazon.com',
-        clientId: getEnvVar('PROD_AMAZON_CLIENT_ID'),
-        clientSecret: getEnvVar('PROD_AMAZON_CLIENT_SECRET'),
-        scopes: ['profile'],
-      },
-      microsoft: {
-        baseUrl: 'https://graph.microsoft.com/v1.0',
-        clientId: getEnvVar('PROD_MICROSOFT_CLIENT_ID'),
-        clientSecret: getEnvVar('PROD_MICROSOFT_CLIENT_SECRET'),
-        scopes: ['User.Read', 'Mail.Read'],
-      },
-      x_twitter: {
-        baseUrl: 'https://api.twitter.com/2',
-        clientId: getEnvVar('PROD_TWITTER_CLIENT_ID'),
-        clientSecret: getEnvVar('PROD_TWITTER_CLIENT_SECRET'),
-        scopes: ['tweet.read', 'users.read', 'offline.access'],
-      },
-      tiktok: {
-        baseUrl: 'https://open-api.tiktok.com',
-        clientId: getEnvVar('PROD_TIKTOK_CLIENT_ID'),
-        clientSecret: getEnvVar('PROD_TIKTOK_CLIENT_SECRET'),
-        scopes: ['user.info.basic'],
-      },
-      openai: {
-        baseUrl: 'https://api.openai.com/v1',
-        apiKey: getEnvVar('PROD_OPENAI_API_KEY'),
-        scopes: [],
-      },
-      github: {
-        baseUrl: 'https://api.github.com',
-        clientId: getEnvVar('PROD_GITHUB_CLIENT_ID'),
-        clientSecret: getEnvVar('PROD_GITHUB_CLIENT_SECRET'),
-        scopes: ['read:user', 'user:email', 'repo'],
-      },
-      slack: {
-        baseUrl: 'https://slack.com/api',
-        clientId: getEnvVar('PROD_SLACK_CLIENT_ID'),
-        clientSecret: getEnvVar('PROD_SLACK_CLIENT_SECRET'),
-        scopes: ['channels:read', 'chat:write'],
-      },
-      stripe: {
-        baseUrl: 'https://api.stripe.com',
-        apiKey: getEnvVar('PROD_STRIPE_SECRET_KEY'),
-      },
+      domain: 'https://app.citibankdemobusinessinc.com',
     },
     featureFlags: {
-      enableGoogleAuth: true,
-      enableMetaGraph: true,
-      enableAppleSignIn: true,
-      enableMicrosoftGraph: true,
-      enableStripePayments: true,
+      enableDataGeneration: true,
+      enableModelTraining: true,
+      enableDatasetSimulation: true,
+      enableGovernance: true,
+      enableCompliance: true,
+      enableAudit: true,
+      enableSecurity: true,
+      enableTelemetry: true,
+      enablePrivacy: true,
+      enableDocumentation: true,
+      enableTesting: true,
+      enableOrchestration: true,
+      enableSharedKernel: true,
+      enableEventBus: true,
+      enableIdentity: true,
+      enableConfiguration: true,
+      enableSchema: true,
+      enableMessaging: true,
       enableExperimentalFeatures: false,
-      useMockApi: false,
     },
   },
 };
@@ -291,17 +277,18 @@ const environmentConfigs: { [key in Environment]?: Partial<Omit<AppConfig, keyof
 environmentConfigs.staging = {
   ...environmentConfigs.development,
   app: {
-    domain: 'https://staging.omniconnect.io',
+    domain: 'https://staging.citibankdemobusinessinc.com',
   },
   featureFlags: {
     ...environmentConfigs.development.featureFlags,
-    useMockApi: false,
+    enableExperimentalFeatures: false,
   },
 };
 
 // --- Merging and Exporting ---
 
 const envConfig = environmentConfigs[CURRENT_ENV] || environmentConfigs[Environment.Development];
+const envInternalServices = internalServicesConfig[CURRENT_ENV] || internalServicesConfig[Environment.Development];
 
 const mergedConfig: AppConfig = {
   ...baseConfig,
@@ -309,12 +296,12 @@ const mergedConfig: AppConfig = {
     ...baseConfig.app,
     ...envConfig.app,
   },
-  api: envConfig.api as ApiEndpoints,
+  internalServices: envInternalServices as InternalServices,
   featureFlags: envConfig.featureFlags as FeatureFlags,
 };
 
 /**
- * The frozen, immutable application configuration object.
+ * The frozen, immutable application configuration object for the Citibankdemobusinessinc ecosystem.
  */
 export const appConfig: AppConfig = Object.freeze(mergedConfig);
 
