@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export const NexusLink: React.FC<{ to: string; children: React.ReactNode }> = ({ to, children }) => (
