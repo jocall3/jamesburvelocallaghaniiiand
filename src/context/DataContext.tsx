@@ -1,6 +1,9 @@
 import React, { createContext, useState, ReactNode } from 'react';
 import { addMonths, addDays } from 'date-fns';
 
+// Define the unified brand namespace
+const BRAND_NAMESPACE = "Citibankdemobusinessinc";
+
 // --- Type Definitions ---
 export interface License {
     id: string;
@@ -139,11 +142,11 @@ export interface Jurisdiction {
     primaryRegulator: string;
 }
 
-// --- Mock Data Generation ---
+// --- Internal Generative Data Functions ---
 let nextId = 1000;
 const generateId = () => `_${nextId++}_${Date.now()}`;
 
-export const mockJurisdictions: Jurisdiction[] = [
+export const CoreJurisdictions: Jurisdiction[] = [
     { id: 'JUR001', name: 'California', countryCode: 'US', currency: 'USD', isEEA: false, primaryRegulator: 'DFPI' },
     { id: 'JUR002', name: 'New York', countryCode: 'US', currency: 'USD', isEEA: false, primaryRegulator: 'DFS' },
     { id: 'JUR003', name: 'United Kingdom', countryCode: 'GB', currency: 'GBP', isEEA: true, primaryRegulator: 'FCA' },
@@ -153,17 +156,17 @@ export const mockJurisdictions: Jurisdiction[] = [
     { id: 'JUR007', name: 'Singapore', countryCode: 'SG', currency: 'SGD', isEEA: false, primaryRegulator: 'MAS' },
 ];
 
-const createMockLicense = (overrides?: Partial<License>): License => {
+const generateLicenseData = (overrides?: Partial<License>): License => {
     const id = generateId();
     const issue = addMonths(new Date(), -Math.floor(Math.random() * 24));
     const expiry = addMonths(issue, Math.floor(Math.random() * 36) + 12); // 1 to 4 years
     const statusOptions: License['status'][] = ['Active', 'Pending Renewal', 'Expired', 'Revoked'];
     const selectedStatus = statusOptions[Math.floor(Math.random() * statusOptions.length)];
-    const jurisdiction = mockJurisdictions[Math.floor(Math.random() * mockJurisdictions.length)];
+    const jurisdiction = CoreJurisdictions[Math.floor(Math.random() * CoreJurisdictions.length)];
 
     return {
         id: `LIC-${id}`,
-        name: `Money Transmitter License ${jurisdiction.name}`,
+        name: `${BRAND_NAMESPACE} Money Transmitter License ${jurisdiction.name}`,
         jurisdiction: jurisdiction.name,
         status: selectedStatus,
         expiryDate: expiry.toISOString(),
@@ -186,16 +189,16 @@ const createMockLicense = (overrides?: Partial<License>): License => {
     };
 };
 
-const createMockPolicy = (overrides?: Partial<CompliancePolicy>): CompliancePolicy => {
+const generatePolicyData = (overrides?: Partial<CompliancePolicy>): CompliancePolicy => {
     const id = generateId();
     const categoryOptions: CompliancePolicy['category'][] = ['AML', 'KYC', 'Sanctions', 'Consumer Protection', 'Data Privacy', 'Operational Risk'];
     const effective = addMonths(new Date(), -Math.floor(Math.random() * 18));
     const review = addMonths(effective, 12 + Math.floor(Math.random() * 24));
-    const jurisdictionIds = Array.from({ length: Math.floor(Math.random() * 3) + 1 }, () => mockJurisdictions[Math.floor(Math.random() * mockJurisdictions.length)].id);
+    const jurisdictionIds = Array.from({ length: Math.floor(Math.random() * 3) + 1 }, () => CoreJurisdictions[Math.floor(Math.random() * CoreJurisdictions.length)].id);
 
     return {
         id: `POL-${id}`,
-        name: `Anti-Money Laundering Policy v${Math.floor(Math.random() * 3) + 1}.0`,
+        name: `${BRAND_NAMESPACE} Policy: Anti-Money Laundering v${Math.floor(Math.random() * 3) + 1}.0`,
         description: "Comprehensive policy outlining procedures to prevent money laundering activities.",
         category: categoryOptions[Math.floor(Math.random() * categoryOptions.length)],
         version: `${Math.floor(Math.random() * 3) + 1}.0`,
@@ -212,16 +215,16 @@ const createMockPolicy = (overrides?: Partial<CompliancePolicy>): CompliancePoli
     };
 };
 
-const createMockRegulatoryUpdate = (overrides?: Partial<RegulatoryUpdate>): RegulatoryUpdate => {
+const generateRegulatoryUpdateData = (overrides?: Partial<RegulatoryUpdate>): RegulatoryUpdate => {
     const id = generateId();
     const severityOptions: RegulatoryUpdate['severity'][] = ['High', 'Medium', 'Low'];
     const statusOptions: RegulatoryUpdate['status'][] = ['New', 'Under Review', 'Impact Assessed', 'Implemented'];
     const publication = addDays(new Date(), -Math.floor(Math.random() * 90));
-    const jurisdictionIds = Array.from({ length: Math.floor(Math.random() * 2) + 1 }, () => mockJurisdictions[Math.floor(Math.random() * mockJurisdictions.length)].id);
+    const jurisdictionIds = Array.from({ length: Math.floor(Math.random() * 2) + 1 }, () => CoreJurisdictions[Math.floor(Math.random() * CoreJurisdictions.length)].id);
 
     return {
         id: `REG-${id}`,
-        title: `New AML Directive for ${jurisdictionIds.map(jid => mockJurisdictions.find(j => j.id === jid)?.name).join(', ')}`,
+        title: `Reg Update: New AML Directive for ${jurisdictionIds.map(jid => CoreJurisdictions.find(j => j.id === jid)?.name).join(', ')}`,
         source: "EU Parliament",
         publicationDate: publication.toISOString(),
         summary: "New directive introduces stricter requirements for customer due diligence and suspicious transaction reporting.",
@@ -256,23 +259,23 @@ export const DataContext = createContext<DataContextType | undefined>(undefined)
 
 // --- Provider Component ---
 export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    // Initialize with mock data
+    // Initialize using internal generative functions
     const [licenses, setLicenses] = useState<License[]>(() => 
-        Array.from({ length: 50 }, (_, i) => createMockLicense({
-            name: `License ${i + 1} - ${mockJurisdictions[i % mockJurisdictions.length].name}`,
+        Array.from({ length: 50 }, (_, i) => generateLicenseData({
+            name: `License ${i + 1} - ${CoreJurisdictions[i % CoreJurisdictions.length].name}`,
             status: i % 5 === 0 ? 'Expired' : (i % 7 === 0 ? 'Pending Renewal' : 'Active'),
         }))
     );
 
     const [policies, setPolicies] = useState<CompliancePolicy[]>(() => 
-        Array.from({ length: 30 }, (_, i) => createMockPolicy({
+        Array.from({ length: 30 }, (_, i) => generatePolicyData({
             name: `Policy ${i + 1} - ${['AML', 'KYC', 'Data Privacy'][i % 3]}`,
             status: i % 10 === 0 ? 'Draft' : 'Active',
         }))
     );
 
     const [regulatoryUpdates, setRegulatoryUpdates] = useState<RegulatoryUpdate[]>(() => 
-        Array.from({ length: 40 }, (_, i) => createMockRegulatoryUpdate({
+        Array.from({ length: 40 }, (_, i) => generateRegulatoryUpdateData({
             title: `Reg Update ${i + 1}: ${['New Reporting', 'Customer Due Diligence', 'Sanctions Update'][i % 3]}`,
             severity: ['High', 'Medium', 'Low'][i % 3],
         }))
@@ -281,8 +284,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [complianceChecks, setComplianceChecks] = useState<ComplianceCheckResult[]>([]);
     const [riskAssessments, setRiskAssessments] = useState<RiskAssessment[]>([]);
     
-    // Jurisdictions are static in this mock setup
-    const jurisdictions = mockJurisdictions;
+    // Jurisdictions are static in this setup, sourced from CoreJurisdictions
+    const jurisdictions = CoreJurisdictions;
 
     const value: DataContextType = {
         licenses,
