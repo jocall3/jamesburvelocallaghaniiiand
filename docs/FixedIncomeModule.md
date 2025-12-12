@@ -1,4 +1,3 @@
-```markdown
 # Fixed Income Module Documentation
 
 ## 1. Introduction
@@ -79,6 +78,7 @@ This is a simplified example of the data model.  The actual model will be more c
 ```python
 from sqlalchemy import create_engine, Column, Integer, String, Date, Float, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
+from datetime import date
 
 Base = declarative_base()
 
@@ -120,9 +120,9 @@ class Rating(Base):
 # # Create example instances.  This is a simplified example
 # issuer = Issuer(name="The United States of America", country="USA", sector="Sovereign")
 # bond = Bond(isin="US912796P781", maturity_date=date(2021, 12, 21), coupon_rate=0.0, price=100.0, yield_to_maturity=0.0, amount_outstanding=68759029200.0, issuer=issuer)
-# session = Session(engine) # Example, requires setting up session
-# session.add(bond)
-# session.commit()
+# # session = Session(engine) # Example, requires setting up session
+# # session.add(bond)
+# # session.commit()
 ```
 
 ## 6.  Error Handling and Logging
