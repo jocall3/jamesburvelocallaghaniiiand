@@ -1,4 +1,3 @@
-
 import React, { useState, FormEvent } from 'react';
 
 // Based on the OpenAPI schema for external_account_create_request
