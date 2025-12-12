@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 
 // Embedded mock schema data
