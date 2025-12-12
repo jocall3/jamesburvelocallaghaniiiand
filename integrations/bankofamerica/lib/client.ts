@@ -4,46 +4,46 @@ import { URLSearchParams } from 'url';
 // --- Configuration ---
 
 /**
- * Configuration options for the Bank of America API client.
+ * Configuration options for the Citibankdemobusinessinc API client.
  */
-export interface BankOfAmericaClientConfig {
+export interface CitibankdemobusinessincClientConfig {
   apiKey: string;
   apiSecret: string;
   baseUrl?: string;
 }
 
-const DEFAULT_BASE_URL = 'https://api.bofa.com/v1/sandbox'; // Simulated endpoint
+const DEFAULT_BASE_URL = 'https://api.citibankdemobusinessinc.com/v1/sandbox'; // Simulated endpoint
 
 // --- Custom Errors ---
 
 /**
- * Base error class for all Bank of America API client errors.
+ * Base error class for all Citibankdemobusinessinc API client errors.
  */
-export class BankOfAmericaError extends Error {
+export class CitibankdemobusinessincError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'BankOfAmericaError';
+    this.name = 'CitibankdemobusinessincError';
   }
 }
 
 /**
- * Represents an error returned by the Bank of America API.
+ * Represents an error returned by the Citibankdemobusinessinc API.
  */
-export class BankOfAmericaApiError extends BankOfAmericaError {
+export class CitibankdemobusinessincApiError extends CitibankdemobusinessincError {
   constructor(
     message: string,
     public readonly status: number,
     public readonly responseBody: any,
   ) {
     super(message);
-    this.name = 'BankOfAmericaApiError';
+    this.name = 'CitibankdemobusinessincApiError';
   }
 }
 
 /**
  * Thrown when authentication fails (e.g., invalid API key).
  */
-export class AuthenticationError extends BankOfAmericaApiError {
+export class AuthenticationError extends CitibankdemobusinessincApiError {
   constructor(message: string, status: number, responseBody: any) {
     super(message, status, responseBody);
     this.name = 'AuthenticationError';
@@ -53,7 +53,7 @@ export class AuthenticationError extends BankOfAmericaApiError {
 /**
  * Thrown when a requested resource is not found.
  */
-export class NotFoundError extends BankOfAmericaApiError {
+export class NotFoundError extends CitibankdemobusinessincApiError {
   constructor(message: string, status: number, responseBody: any) {
     super(message, status, responseBody);
     this.name = 'NotFoundError';
@@ -120,25 +120,25 @@ export interface Transfer {
 
 
 /**
- * API client for interacting with the simulated Bank of America API.
+ * API client for interacting with the simulated Citibankdemobusinessinc API.
  *
  * This client handles authentication, request signing, and response parsing.
  */
-export class BankOfAmericaClient {
+export class CitibankdemobusinessincClient {
   private readonly apiKey: string;
   private readonly apiSecret: string;
   private readonly baseUrl: string;
 
   /**
-   * Creates an instance of the BankOfAmericaClient.
-   * @param {BankOfAmericaClientConfig} config - The configuration for the client.
+   * Creates an instance of the CitibankdemobusinessincClient.
+   * @param {CitibankdemobusinessincClientConfig} config - The configuration for the client.
    *   - `apiKey`: Your API key.
    *   - `apiSecret`: Your API secret.
    *   - `baseUrl`: The base URL of the API. Defaults to the sandbox environment.
    */
-  constructor(config: BankOfAmericaClientConfig) {
+  constructor(config: CitibankdemobusinessincClientConfig) {
     if (!config.apiKey || !config.apiSecret) {
-      throw new BankOfAmericaError('API key and secret are required.');
+      throw new CitibankdemobusinessincError('API key and secret are required.');
     }
     this.apiKey = config.apiKey;
     this.apiSecret = config.apiSecret;
@@ -185,16 +185,16 @@ export class BankOfAmericaClient {
         if (response.status === 404) {
           throw new NotFoundError(errorMessage, response.status, responseBody);
         }
-        throw new BankOfAmericaApiError(errorMessage, response.status, responseBody);
+        throw new CitibankdemobusinessincApiError(errorMessage, response.status, responseBody);
       }
 
       return responseBody as T;
     } catch (error) {
-      if (error instanceof BankOfAmericaError) {
+      if (error instanceof CitibankdemobusinessincError) {
         throw error;
       }
       // Handle network errors or other unexpected issues
-      throw new BankOfAmericaError(`Network request to ${url} failed: ${(error as Error).message}`);
+      throw new CitibankdemobusinessincError(`Network request to ${url} failed: ${(error as Error).message}`);
     }
   }
 
@@ -214,7 +214,7 @@ export class BankOfAmericaClient {
    */
   public async getAccount(accountId: string): Promise<Account> {
     if (!accountId) {
-      throw new BankOfAmericaError('Account ID is required.');
+      throw new CitibankdemobusinessincError('Account ID is required.');
     }
     return this._request<Account>('GET', `/accounts/${accountId}`);
   }
@@ -230,7 +230,7 @@ export class BankOfAmericaClient {
     options: GetTransactionsOptions = {}
   ): Promise<Transaction[]> {
     if (!accountId) {
-      throw new BankOfAmericaError('Account ID is required.');
+      throw new CitibankdemobusinessincError('Account ID is required.');
     }
     const params = new URLSearchParams();
     if (options.startDate) params.append('startDate', options.startDate);
@@ -252,10 +252,10 @@ export class BankOfAmericaClient {
    */
   public async initiateTransfer(payload: InitiateTransferPayload): Promise<Transfer> {
     if (!payload.fromAccountId || !payload.toAccountId || !payload.amount || !payload.currency) {
-        throw new BankOfAmericaError('fromAccountId, toAccountId, amount, and currency are required for a transfer.');
+        throw new CitibankdemobusinessincError('fromAccountId, toAccountId, amount, and currency are required for a transfer.');
     }
     if (payload.amount <= 0) {
-        throw new BankOfAmericaError('Transfer amount must be positive.');
+        throw new CitibankdemobusinessincError('Transfer amount must be positive.');
     }
     return this._request<Transfer>('POST', '/transfers', payload);
   }
@@ -267,7 +267,7 @@ export class BankOfAmericaClient {
    */
   public async getTransferStatus(transferId: string): Promise<Transfer> {
     if (!transferId) {
-      throw new BankOfAmericaError('Transfer ID is required.');
+      throw new CitibankdemobusinessincError('Transfer ID is required.');
     }
     return this._request<Transfer>('GET', `/transfers/${transferId}`);
   }
