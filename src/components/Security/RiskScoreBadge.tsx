@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 import { Box, Typography, styled } from '@mui/material';
 
@@ -44,4 +43,3 @@ const RiskScoreBadge: React.FC<RiskScoreBadgeProps> = ({ riskScore }) => {
 };
 
 export default RiskScoreBadge;
-```
