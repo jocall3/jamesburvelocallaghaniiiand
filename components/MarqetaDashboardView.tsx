@@ -523,7 +523,7 @@ const MarqetaDashboardView: React.FC = () => {
                 {isConfigOpen && (
                     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
                         <Card title="System Configuration" className="max-w-lg w-full relative">
-                            <button onClick={() => setIsConfigOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
+                            <button onClick={() => setIsConfigOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-white">âœ•</button>
                             <div className="p-6 space-y-6">
                                 <div>
                                     <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2"><Link className="w-4 h-4"/>API Credentials</label>
