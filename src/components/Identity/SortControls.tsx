@@ -1,6 +1,4 @@
-```tsx
 import React from 'react';
-import { useSort } from './useSort';
 import { SortOrder } from './types';
 
 interface SortControlsProps {
@@ -22,14 +20,14 @@ const SortControls: React.FC<SortControlsProps> = ({ onSortChange, sortBy, sortO
 
   return (
     <div className="sort-controls">
-      <button 
+      <button
         onClick={() => handleSort('displayName')}
         className={`sort-button ${sortBy === 'displayName' ? 'active' : ''}`}
       >
-        Name 
+        Name
         {sortBy === 'displayName' && (sortOrder === 'asc' ? '▲' : '▼')}
       </button>
-      <button 
+      <button
         onClick={() => handleSort('createdDateTime')}
         className={`sort-button ${sortBy === 'createdDateTime' ? 'active' : ''}`}
       >
@@ -41,4 +39,3 @@ const SortControls: React.FC<SortControlsProps> = ({ onSortChange, sortBy, sortO
 };
 
 export default SortControls;
-```
