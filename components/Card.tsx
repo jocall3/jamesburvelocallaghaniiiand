@@ -1,4 +1,3 @@
-
 // components/Card.tsx
 // This component has been significantly re-architected to function as a highly
 // versatile and state-aware container, in alignment with production-grade standards
