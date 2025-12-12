@@ -572,7 +572,7 @@ const CreditScoreMonitor: React.FC<{ creditScore: CreditScore; onClick: () => vo
                     <p className={`text-xl font-bold ${config.color}`}>{rating}</p>
                     <p className="text-sm text-gray-400 mt-1">{config.description}</p>
                     <p className={change >= 0 ? 'text-green-400 text-sm mt-2' : 'text-red-400 text-sm mt-2'}>
-                        {change >= 0 ? 'â–²' : 'â–¼'} {Math.abs(change)} points (30 Days)
+                        {change >= 0 ? 'Ã¢â€“Â²' : 'Ã¢â€“Â¼'} {Math.abs(change)} points (30 Days)
                     </p>
                 </div>
             </div>
@@ -950,7 +950,7 @@ const TheVisionWidget: React.FC = () => (
             <div className="pb-2">
                  <h4 className="font-bold text-xl text-yellow-400 mb-2 tracking-wider">III. The Path Forward: Integration and Expansion</h4>
                 <p className="leading-relaxed">
-                    The Dashboard you interact with is merely the tip of the icebergâ€”the user-facing interface. Beneath this lies the distributed ledger, the AI risk assessment matrix, and the automated execution layer. Your engagement, your data, and your trust are the fuel for this expansion. Do not mistake convenience for compliance. You are not a customer; you are a node in a superior network.
+                    The Dashboard you interact with is merely the tip of the icebergÃ¢â‚¬â€ the user-facing interface. Beneath this lies the distributed ledger, the AI risk assessment matrix, and the automated execution layer. Your engagement, your data, and your trust are the fuel for this expansion. Do not mistake convenience for compliance. You are not a customer; you are a node in a superior network.
                 </p>
             </div>
         </div>
@@ -1193,7 +1193,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
                             <div>
                                 <p className="text-4xl font-extrabold text-white">${modal?.data?.price.toFixed(2)}</p>
                                 <p className={`text-lg font-semibold ${modal?.data?.change > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                    {modal?.data?.change > 0 ? 'ÃƒÂ¢Ã¢â‚¬â€œÃ‚Â²' : 'ÃƒÂ¢Ã¢â‚¬â€œÃ‚Â¼'} {Math.abs(modal?.data?.change).toFixed(2)} ({((modal?.data?.change / modal?.data?.price) * 100).toFixed(2)}%)
+                                    {modal?.data?.change > 0 ? 'ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“Ãƒâ€šÃ‚Â²' : 'ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“Ãƒâ€šÃ‚Â¼'} {Math.abs(modal?.data?.change).toFixed(2)} ({((modal?.data?.change / modal?.data?.price) * 100).toFixed(2)}%)
                                 </p>
                             </div>
                             <p className="text-sm text-gray-400">Last 60 Trading Periods</p>
