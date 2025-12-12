@@ -1,4 +1,3 @@
-```typescript
 import { Eth } from 'web3-eth';
 import { Transaction } from 'web3-eth-contract';
 
@@ -100,4 +99,3 @@ export class ContextWindowManager {
         return text.substring(0, maxLength - '...'.length) + '...';
     }
 }
-```
