@@ -1,3 +1,4 @@
+// integrations/hsbc/components/HSBCDashboardView.tsx
 import React from 'react';
 import { Box, Typography, Grid, Paper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
