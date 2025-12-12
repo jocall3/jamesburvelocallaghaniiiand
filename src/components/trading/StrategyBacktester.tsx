@@ -1,4 +1,3 @@
-```tsx
 import React, { useState, useEffect } from 'react';
 import { Strategy } from './TradingStrategy';
 import { StockData } from './StockData';
@@ -121,4 +120,3 @@ const StrategyBacktester: React.FC<StrategyBacktesterProps> = ({ strategies, sto
 };
 
 export default StrategyBacktester;
-```
