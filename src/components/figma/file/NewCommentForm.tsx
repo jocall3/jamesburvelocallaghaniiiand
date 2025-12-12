@@ -1,4 +1,3 @@
-```tsx
 import React, { useState } from 'react';
 
 interface NewCommentFormProps {
@@ -40,4 +39,3 @@ const NewCommentForm: React.FC<NewCommentFormProps> = ({ fileKey, parentCommentI
 };
 
 export default NewCommentForm;
-```
