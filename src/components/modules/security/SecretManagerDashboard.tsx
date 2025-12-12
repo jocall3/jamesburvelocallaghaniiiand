@@ -1,4 +1,3 @@
-```typescript
 import React, { useState, useEffect } from 'react';
 import {
   ListSecretsRequest,
@@ -262,4 +261,3 @@ const SecretManagerDashboard: React.FC<SecretManagerDashboardProps> = ({ project
 };
 
 export default SecretManagerDashboard;
-```
