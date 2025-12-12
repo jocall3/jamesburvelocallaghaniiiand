@@ -1,4 +1,3 @@
-```tsx
 import React, { useState, useEffect } from 'react';
 import { Card, Typography, Slider, Input, Button } from '@material-tailwind/react';
 
@@ -102,4 +101,3 @@ const SonicAlchemyView: React.FC = () => {
 };
 
 export default SonicAlchemyView;
-```
