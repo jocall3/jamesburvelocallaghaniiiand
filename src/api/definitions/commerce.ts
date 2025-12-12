@@ -720,3 +720,449 @@ export const CommerceDefinitions: Record<string, ExtendedOpenAPIV3_1> = {
   amazon: amazonSpApi,
   square: squareApi
 };
+
+// ---- Citibankdemobusinessinc Business Models ----
+
+// 1. Citibankdemobusinessinc.openbanking.apiAggregator
+// Mission: To aggregate and standardize open banking APIs for seamless integration.
+// Monetization: Subscription fees for API access and premium features.
+// IP Moat: Proprietary standardization algorithms and integration tools.
+
+export const Citibankdemobusinessinc_openbanking_apiAggregator: ExtendedOpenAPIV3_1 = {
+  openapi: '3.1.0',
+  info: {
+    title: 'Citibankdemobusinessinc Open Banking API Aggregator',
+    version: '1.0.0',
+    description: 'Aggregates and standardizes open banking APIs.',
+  },
+  servers: [
+    {
+      url: 'https://api.citibankdemobusinessinc.com/openbanking',
+      description: 'Production Server'
+    }
+  ],
+  security: [{ googleAuth: [] }],
+  paths: {
+    '/accounts': {
+      get: {
+        operationId: 'getAccounts',
+        summary: 'Retrieve a list of accounts',
+        responses: {
+          '200': {
+            description: 'List of accounts',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      accountId: { type: 'string' },
+                      accountType: { type: 'string' },
+                      balance: { type: 'number' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  components: commonComponents
+};
+
+// 2. Citibankdemobusinessinc.dataInsights.spendingAnalyzer
+// Mission: To provide personalized spending insights and financial advice.
+// Monetization: Premium subscriptions for advanced analytics and personalized recommendations.
+// IP Moat: Proprietary algorithms for analyzing spending patterns and predicting financial needs.
+
+export const Citibankdemobusinessinc_dataInsights_spendingAnalyzer: ExtendedOpenAPIV3_1 = {
+  openapi: '3.1.0',
+  info: {
+    title: 'Citibankdemobusinessinc Spending Analyzer API',
+    version: '1.0.0',
+    description: 'Provides personalized spending insights and financial advice.',
+  },
+  servers: [
+    {
+      url: 'https://api.citibankdemobusinessinc.com/spending',
+      description: 'Production Server'
+    }
+  ],
+  security: [{ googleAuth: [] }],
+  paths: {
+    '/analyze': {
+      post: {
+        operationId: 'analyzeSpending',
+        summary: 'Analyze spending patterns',
+        requestBody: {
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  transactions: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        date: { type: 'string', format: 'date' },
+                        amount: { type: 'number' },
+                        category: { type: 'string' }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': {
+            description: 'Spending analysis results',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    totalSpending: { type: 'number' },
+                    categoryBreakdown: { type: 'object' }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  components: commonComponents
+};
+
+// 3. Citibankdemobusinessinc.payments.instantTransfer
+// Mission: To enable instant and secure money transfers between accounts.
+// Monetization: Transaction fees for each transfer.
+// IP Moat: Proprietary security protocols and fraud detection systems.
+
+export const Citibankdemobusinessinc_payments_instantTransfer: ExtendedOpenAPIV3_1 = {
+  openapi: '3.1.0',
+  info: {
+    title: 'Citibankdemobusinessinc Instant Transfer API',
+    version: '1.0.0',
+    description: 'Enables instant and secure money transfers between accounts.',
+  },
+  servers: [
+    {
+      url: 'https://api.citibankdemobusinessinc.com/transfer',
+      description: 'Production Server'
+    }
+  ],
+  security: [{ googleAuth: [] }],
+  paths: {
+    '/transfer': {
+      post: {
+        operationId: 'transferMoney',
+        summary: 'Transfer money between accounts',
+        requestBody: {
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  fromAccount: { type: 'string' },
+                  toAccount: { type: 'string' },
+                  amount: { type: 'number' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': {
+            description: 'Transfer confirmation',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    transactionId: { type: 'string' },
+                    status: { type: 'string' }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  components: commonComponents
+};
+
+// 4. Citibankdemobusinessinc.lending.microLoans
+// Mission: To provide quick and easy access to micro-loans for small businesses.
+// Monetization: Interest rates on loans.
+// IP Moat: Proprietary credit scoring algorithms and risk assessment models.
+
+export const Citibankdemobusinessinc_lending_microLoans: ExtendedOpenAPIV3_1 = {
+  openapi: '3.1.0',
+  info: {
+    title: 'Citibankdemobusinessinc Micro Loans API',
+    version: '1.0.0',
+    description: 'Provides quick and easy access to micro-loans for small businesses.',
+  },
+  servers: [
+    {
+      url: 'https://api.citibankdemobusinessinc.com/loans',
+      description: 'Production Server'
+    }
+  ],
+  security: [{ googleAuth: [] }],
+  paths: {
+    '/apply': {
+      post: {
+        operationId: 'applyForLoan',
+        summary: 'Apply for a micro-loan',
+        requestBody: {
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  businessName: { type: 'string' },
+                  loanAmount: { type: 'number' },
+                  creditScore: { type: 'integer' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': {
+            description: 'Loan application status',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    applicationId: { type: 'string' },
+                    status: { type: 'string' }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  components: commonComponents
+};
+
+// 5. Citibankdemobusinessinc.investments.roboAdvisor
+// Mission: To offer automated investment advice and portfolio management.
+// Monetization: Management fees based on assets under management.
+// IP Moat: Proprietary algorithms for asset allocation and risk management.
+
+export const Citibankdemobusinessinc_investments_roboAdvisor: ExtendedOpenAPIV3_1 = {
+  openapi: '3.1.0',
+  info: {
+    title: 'Citibankdemobusinessinc Robo Advisor API',
+    version: '1.0.0',
+    description: 'Offers automated investment advice and portfolio management.',
+  },
+  servers: [
+    {
+      url: 'https://api.citibankdemobusinessinc.com/invest',
+      description: 'Production Server'
+    }
+  ],
+  security: [{ googleAuth: [] }],
+  paths: {
+    '/portfolio': {
+      post: {
+        operationId: 'createPortfolio',
+        summary: 'Create an investment portfolio',
+        requestBody: {
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  riskTolerance: { type: 'string' },
+                  investmentAmount: { type: 'number' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': {
+            description: 'Portfolio details',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    portfolioId: { type: 'string' },
+                    assetAllocation: { type: 'object' }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  components: commonComponents
+};
+
+// 6. Citibankdemobusinessinc.insurance.personalizedPolicies
+// Mission: To provide personalized insurance policies based on individual needs.
+// Monetization: Premiums on insurance policies.
+// IP Moat: Proprietary algorithms for risk assessment and policy customization.
+
+export const Citibankdemobusinessinc_insurance_personalizedPolicies: ExtendedOpenAPIV3_1 = {
+  openapi: '3.1.0',
+  info: {
+    title: 'Citibankdemobusinessinc Personalized Policies API',
+    version: '1.0.0',
+    description: 'Provides personalized insurance policies based on individual needs.',
+  },
+  servers: [
+    {
+      url: 'https://api.citibankdemobusinessinc.com/insurance',
+      description: 'Production Server'
+    }
+  ],
+  security: [{ googleAuth: [] }],
+  paths: {
+    '/quote': {
+      post: {
+        operationId: 'getInsuranceQuote',
+        summary: 'Get an insurance quote',
+        requestBody: {
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  age: { type: 'integer' },
+                  location: { type: 'string' },
+                  coverageType: { type: 'string' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': {
+            description: 'Insurance quote details',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    quoteId: { type: 'string' },
+                    premium: { type: 'number' },
+                    coverageDetails: { type: 'object' }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  components: commonComponents
+};
+
+// 7. Citibankdemobusinessinc.realEstate.mortgageCalculator
+// Mission: To offer a comprehensive mortgage calculator and pre-approval service.
+// Monetization: Referral fees from mortgage lenders.
+// IP Moat: Proprietary algorithms for calculating mortgage rates and assessing creditworthiness.
+
+export const Citibankdemobusinessinc_realEstate_mortgageCalculator: ExtendedOpenAPIV3_1 = {
+  openapi: '3.1.0',
+  info: {
+    title: 'Citibankdemobusinessinc Mortgage Calculator API',
+    version: '1.0.0',
+    description: 'Offers a comprehensive mortgage calculator and pre-approval service.',
+  },
+  servers: [
+    {
+      url: 'https://api.citibankdemobusinessinc.com/mortgage',
+      description: 'Production Server'
+    }
+  ],
+  security: [{ googleAuth: [] }],
+  paths: {
+    '/calculate': {
+      post: {
+        operationId: 'calculateMortgage',
+        summary: 'Calculate mortgage payments',
+        requestBody: {
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  propertyValue: { type: 'number' },
+                  downPayment: { type: 'number' },
+                  interestRate: { type: 'number' },
+                  loanTerm: { type: 'integer' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': {
+            description: 'Mortgage calculation results',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    monthlyPayment: { type: 'number' },
+                    totalInterest: { type: 'number' }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  components: commonComponents
+};
+
+// 8. Citibankdemobusinessinc.education.studentLoanRefinancing
+// Mission: To provide student loan refinancing options with competitive rates.
+// Monetization: Interest rates on refinanced loans.
+// IP Moat: Proprietary algorithms for assessing credit risk and offering personalized rates.
+
+export const Citibankdemobusinessinc_education_studentLoanRefinancing: ExtendedOpenAPIV3_1 = {
+  openapi: '3.1.0',
+  info: {
+    title: 'Citibankdemobusinessinc Student Loan Refinancing API',
+    version: '1.0.0',
+    description: 'Provides student loan refinancing options with competitive rates.',
+  },
+  servers: [
+    {
+      url: 'https://api.citibankdemobusinessinc.com/refinance',
+      description: 'Production Server'
+    }
+  ],
+  security: [{ googleAuth: [] }],
+  paths: {
+    '/apply': {
+      post: {
+        operationId: 'applyForRefinancing',
+        summary: 'Apply for student
