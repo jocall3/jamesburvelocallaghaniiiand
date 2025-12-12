@@ -1,4 +1,3 @@
-```tsx
 import React from 'react';
 import { Tooltip } from 'react-tooltip';
 
@@ -49,4 +48,3 @@ const NodeTooltip: React.FC<NodeTooltipProps> = ({
 };
 
 export default NodeTooltip;
-```
