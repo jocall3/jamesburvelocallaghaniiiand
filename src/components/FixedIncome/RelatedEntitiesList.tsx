@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 
 interface RelatedEntity {
@@ -42,4 +41,3 @@ const RelatedEntitiesList: React.FC<RelatedEntitiesListProps> = ({ entities }) =
 };
 
 export default RelatedEntitiesList;
-```
