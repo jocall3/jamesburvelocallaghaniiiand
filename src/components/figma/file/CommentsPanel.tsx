@@ -1,4 +1,3 @@
-```tsx
 import React from 'react';
 
 const CommentsPanel: React.FC = () => {
@@ -12,4 +11,3 @@ const CommentsPanel: React.FC = () => {
 };
 
 export default CommentsPanel;
-```
