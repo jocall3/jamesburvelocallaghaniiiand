@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 import {
   Dialog,
@@ -144,4 +143,3 @@ const ViolationAlert: React.FC<ViolationAlertProps> = ({
 };
 
 export default ViolationAlert;
-```
