@@ -1,375 +1,107 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Outlet, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { Cpu, AlertTriangle } from 'lucide-react';
+import React from 'react';
 
-// Contexts
-import { AuthProvider, AuthContext } from '../context/AuthContext';
-import { DataProvider, DataContext } from '../context/DataContext';
-import { StripeDataProvider } from './StripeDataContext';
-
-// Layout
-import Sidebar from './Sidebar';
-import Header from './Header';
-import { View } from '../types';
-import { PlaidClient } from '../lib/plaidClient';
-
-
-// --- ALL VIEW COMPONENTS ---
-import AccountDetails from './AccountDetails';
-import AccountList from './AccountList';
-import AccountsDashboardView from './AccountsDashboardView';
-import AccountStatementGrid from './AccountStatementGrid';
-import AccountsView from './AccountsView';
-import { AccountVerificationModal } from './AccountVerificationModal';
-import ACHDetailsDisplay from './ACHDetailsDisplay';
-import AIAdStudioView from './AIAdStudioView';
-import AIAdvisorView from './AIAdvisorView';
-import AICommandLog from './AICommandLog';
-import { AIInsights } from './AIInsights';
-import AIPredictionWidget from './AIPredictionWidget';
-import AlgoTradingLab from './AlgoTradingLab';
-import APIIntegrationView from './APIIntegrationView';
-import ApiPlaygroundView from './ApiPlaygroundView';
-import ArtCollectibles from './ArtCollectibles';
-import AssetCatalog from './AssetCatalog';
-import AutomatedSweepRules from './AutomatedSweepRules';
-import BalanceReportChart from './BalanceReportChart';
-import BalanceTransactionTable from './BalanceTransactionTable';
-import BudgetsView from './BudgetsView';
-import CardDesignVisualizer from './CardDesignVisualizer';
-import CardholderManagement from './CardholderManagement';
-import { ChargeDetailModal } from './ChargeDetailModal';
-import ChargeList from './ChargeList';
-import CitibankAccountProxyView from './CitibankAccountProxyView';
-import CitibankAccountsView from './CitibankAccountsView';
-import CitibankBillPayView from './CitibankBillPayView';
-import CitibankCrossBorderView from './CitibankCrossBorderView';
-import CitibankDeveloperToolsView from './CitibankDeveloperToolsView';
-import CitibankEligibilityView from './CitibankEligibilityView';
-import CitibankPayeeManagementView from './CitibankPayeeManagementView';
-import CitibankStandingInstructionsView from './CitibankStandingInstructionsView';
-import CitibankUnmaskedDataView from './CitibankUnmaskedDataView';
-import CommoditiesExchange from './CommoditiesExchange';
-import ComplianceAlertCard from './ComplianceAlertCard';
-import { ComplianceOracleView } from './ComplianceOracleView';
-import ConciergeService from './ConciergeService';
-import ConductorConfigurationView from './ConductorConfigurationView';
-import CorporateActionsNexusView from './CorporateActionsNexusView';
-import CorporateCommandView from './CorporateCommandView';
-import CounterpartyDashboardView from './CounterpartyDashboardView';
-import CounterpartyDetails from './CounterpartyDetails';
-import { CounterpartyForm } from './CounterpartyForm';
-import CounterpartyList from './CounterpartyList';
-import CreditHealthView from './CreditHealthView';
-import { CreditNoteLedger } from './CreditNoteLedger';
-import CryptoView from './CryptoView';
-import CustomerDashboard from './CustomerDashboard';
-import Dashboard from './Dashboard';
-import { DealFlow } from './DealFlow';
-import DerivativesDesk from './DerivativesDesk';
-import DeveloperHubView from './DeveloperHubView';
-import DisruptionIndexMeter from './DisruptionIndexMeter';
-import DocumentUploader from './DocumentUploader';
-import { DownloadLink } from './DownloadLink';
-import EarlyFraudWarningFeed from './EarlyFraudWarningFeed';
-import ElectionChoiceForm from './ElectionChoiceForm';
-import EventNotificationCard from './EventNotificationCard';
-import ExpectedPaymentsTable from './ExpectedPaymentsTable';
-import ExternalAccountCard from './ExternalAccountCard';
-import ExternalAccountForm from './ExternalAccountForm';
-import ExternalAccountsTable from './ExternalAccountsTable';
-import { FinancialAccountCard } from './FinancialAccountCard';
-import FinancialDemocracyView from './FinancialDemocracyView';
-import FinancialGoalsView from './FinancialGoalsView';
-import FinancialReportingView from './FinancialReportingView';
-import ForexArena from './ForexArena';
-import GEIN_DashboardView from './GEIN_DashboardView';
-import GlobalMarketMap from './GlobalMarketMap';
-import GlobalPositionMap from './GlobalPositionMap';
-import GlobalSsiHubView from './GlobalSsiHubView';
-import IdentityView from './IdentityView';
-import ImpactTracker from './ImpactTracker';
-import IncomingPaymentDetailList from './IncomingPaymentDetailList';
-import { InvestmentForm } from './InvestmentForm';
-import InvestmentPortfolio from './InvestmentPortfolio';
-import InvestmentsView from './InvestmentsView';
-import InvoiceFinancingRequest from './InvoiceFinancingRequest';
-import LegacyBuilder from './LegacyBuilder';
-import { LoginView } from './LoginView';
-import MarketplaceView from './MarketplaceView';
-import MarqetaDashboardView from './MarqetaDashboardView';
-import ModernTreasuryView from './ModernTreasuryView';
-import OpenBankingView from './OpenBankingView';
-import PaymentInitiationForm from './PaymentInitiationForm';
-import PaymentMethodDetails from './PaymentMethodDetails';
-import PaymentOrderForm from './PaymentOrderForm';
-import PayoutsDashboard from './PayoutsDashboard';
-import PersonalizationView from './PersonalizationView';
-import PhilanthropyHub from './PhilanthropyHub';
-import PlaidCRAMonitoringView from './PlaidCRAMonitoringView';
-import PlaidDashboardView from './PlaidDashboardView';
-import PlaidIdentityView from './PlaidIdentityView';
-import { PlaidInstitutionsExplorer } from './PlaidInstitutionsExplorer';
-import { PlaidItemManagementView } from './PlaidItemManagementView';
-import PlaidMainDashboard from './PlaidMainDashboard';
-import PnLChart from './PnLChart';
-import { PortfolioCompanyDetails } from './PortfolioCompanyDetails';
-import { PortfolioCompanyList } from './PortfolioCompanyList';
-import PrivateEquityLounge from './PrivateEquityLounge';
-import QuantumAssets from './QuantumAssets';
-import QuantumWeaverView from './QuantumWeaverView';
-import RealEstateEmpire from './RealEstateEmpire';
-import RecentTransactions from './RecentTransactions';
-import ReconciliationHubView from './ReconciliationHubView';
-import RefundForm from './RefundForm';
-import RemittanceInfoEditor from './RemittanceInfoEditor';
-import ReportingView from './ReportingView';
-import { ReportRunGenerator } from './ReportRunGenerator';
-import ReportStatusIndicator from './ReportStatusIndicator';
-import ResourceGraphView from './ResourceGraphView';
-import SchemaExplorer from './SchemaExplorer';
-import SecurityComplianceView from './SecurityComplianceView';
-import SecurityView from './SecurityView';
-import SendMoneyView from './SendMoneyView';
-import SettingsView from './SettingsView';
-import SovereignWealth from './SovereignWealth';
-import SpendingAnalysisChart from './SpendingAnalysisChart';
-import SsiEditorForm from './SsiEditorForm';
-import SSOView from './SSOView';
-import StrategyEditor from './StrategyEditor';
-import StripeDashboardView from './StripeDashboardView';
-import StripeNexusDashboard from './StripeNexusDashboard';
-import StripeNexusView from './StripeNexusView';
-import StripeStatusBadge from './StripeStatusBadge';
-import StructuredPurposeInput from './StructuredPurposeInput';
-import SubscriptionList from './SubscriptionList';
-import TaxOptimizationChamber from './TaxOptimizationChamber';
-import TheVisionView from './TheVisionView';
-import TimeSeriesChart from './TimeSeriesChart';
-import TradeConfirmationModal from './TradeConfirmationModal';
-import TransactionFilter from './TransactionFilter';
-import TransactionList from './TransactionList';
-import TransactionsView from './TransactionsView';
-import { TreasuryTransactionList } from './TreasuryTransactionList';
-import TreasuryView from './TreasuryView';
-import UniversalObjectInspector from './UniversalObjectInspector';
-import VentureCapitalDesk from './VentureCapitalDesk';
-import VentureCapitalDeskView from './VentureCapitalDeskView';
-import VerificationReportsView from './VerificationReportsView';
-import VirtualAccountForm from './VirtualAccountForm';
-import VirtualAccountsDashboard from './VirtualAccountsDashboard';
-import VirtualAccountsTable from './VirtualAccountsTable';
-import VoiceControl from './VoiceControl';
-import WealthTimeline from './WealthTimeline';
-import WebhookSimulator from './WebhookSimulator';
-import LandingPage from './LandingPage';
-import TheBookView from './TheBookView';
-import KnowledgeBaseView from './KnowledgeBaseView';
-
-// --- Error Boundary ---
-interface ErrorBoundaryProps { children: React.ReactNode; }
-interface ErrorBoundaryState { hasError: boolean; }
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  state: ErrorBoundaryState = { hasError: false };
-  constructor(props: ErrorBoundaryProps) { super(props); }
-  static getDerivedStateFromError(error: Error) { console.error("ErrorBoundary caught:", error); return { hasError: true }; }
-  render() { return this.state.hasError ? <h1>Something went wrong.</h1> : this.props.children; }
-}
-
-// --- Layout ---
-const SAppLayout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const dataContext = useContext(DataContext);
-  const { isAuthenticated } = useContext(AuthContext)!;
-
-  if (!dataContext) {
-    return <div>Error: DataContext not found.</div>;
-  }
-
-  const { isLoading, error, activeView, setActiveView } = dataContext;
-
-  if (isLoading) {
-    return (
-        <div className="h-screen w-screen flex flex-col items-center justify-center bg-gray-950 text-white gap-4">
-            <Cpu className="w-16 h-16 text-cyan-400 animate-pulse" />
-            <h1 className="text-2xl font-bold tracking-wider">INITIALIZING SOVEREIGN AI NEXUS...</h1>
-            <p className="text-gray-400 font-mono">Generating financial universe from quantum foam...</p>
-            <div className="w-64 h-2 bg-gray-800 rounded-full overflow-hidden mt-2">
-                <div className="h-2 bg-gradient-to-r from-cyan-500 to-purple-500 animate-pulse-fast-x"></div>
-            </div>
-            <style>{`
-                .animate-pulse-fast-x {
-                    animation: pulse-x 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-                }
-                @keyframes pulse-x {
-                    0%, 100% { transform: translateX(-100%); }
-                    50% { transform: translateX(100%); }
-                }
-            `}</style>
-        </div>
-    );
-  }
-
-  if (error) {
-      return (
-        <div className="h-screen w-screen flex flex-col items-center justify-center bg-red-950 text-red-300 gap-4 p-8">
-            <AlertTriangle className="w-16 h-16 text-red-500" />
-            <h1 className="text-3xl font-bold">SYSTEM INITIALIZATION FAILURE</h1>
-            <p className="text-red-400 max-w-md text-center bg-red-500/10 p-4 rounded-lg border border-red-500/30">
-                A critical error occurred while generating the initial simulation state from the AI core.
-            </p>
-            <p className="text-sm font-mono text-gray-500 max-w-xl text-center break-words">{error}</p>
-            <button onClick={() => window.location.reload()} className="mt-4 px-6 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700">REINITIALIZE</button>
-        </div>
-      );
-  }
-  
-  if (!isAuthenticated) {
-      return <Navigate to="/login" replace />;
-  }
-
+const BlogView = () => {
   return (
-    <div className="flex h-screen bg-gray-900 text-white overflow-hidden font-sans">
-      <Sidebar 
-        isOpen={isSidebarOpen} 
-        setIsOpen={setIsSidebarOpen} 
-      />
-      <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-        <Header onMenuClick={() => setIsSidebarOpen(true)} />
-        
-        <main className="w-full flex-grow p-6">
-            {/* 
-              This section conditionally renders the 'Active View' from DataContext.
-              This mimics a single-page app dashboard where the sidebar controls the content area.
-            */}
-            {activeView === View.Dashboard && <Dashboard />}
-            {activeView === View.Transactions && <TransactionsView />}
-            {activeView === View.SendMoney && <SendMoneyView setActiveView={setActiveView} />}
-            {activeView === View.Budgets && <BudgetsView />}
-            {activeView === View.FinancialGoals && <FinancialGoalsView />}
-            {activeView === View.CreditHealth && <CreditHealthView />}
-            {activeView === View.Investments && <InvestmentsView />}
-            {activeView === View.CryptoWeb3 && <CryptoView />}
-            {activeView === View.AlgoTradingLab && <AlgoTradingLab />}
-            {activeView === View.ForexArena && <ForexArena />}
-            {activeView === View.CommoditiesExchange && <CommoditiesExchange />}
-            {activeView === View.RealEstateEmpire && <RealEstateEmpire />}
-            {activeView === View.ArtCollectibles && <ArtCollectibles />}
-            {activeView === View.DerivativesDesk && <DerivativesDesk />}
-            {activeView === View.VentureCapital && <VentureCapitalDesk />}
-            {activeView === View.PrivateEquity && <PrivateEquityLounge />}
-            {activeView === View.TaxOptimization && <TaxOptimizationChamber />}
-            {activeView === View.LegacyBuilder && <LegacyBuilder />}
-            {activeView === View.CorporateCommand && <CorporateCommandView setActiveView={setActiveView} />}
-            {activeView === View.ModernTreasury && <ModernTreasuryView />}
-            {activeView === View.OpenBanking && <OpenBankingView />}
-            {activeView === View.FinancialDemocracy && <FinancialDemocracyView />}
-            {activeView === View.AIAdStudio && <AIAdStudioView />}
-            {activeView === View.QuantumWeaver && <QuantumWeaverView />}
-            {activeView === View.AgentMarketplace && <MarketplaceView />}
-            {activeView === View.APIStatus && <APIIntegrationView />}
-            {activeView === View.Settings && <SettingsView />}
-            {activeView === View.DataNetwork && <PlaidDashboardView />}
-            {activeView === View.Payments && <StripeDashboardView />}
-            {activeView === View.CardPrograms && <MarqetaDashboardView />}
-            {activeView === View.SSO && <SSOView />}
-            {activeView === View.ConciergeService && <ConciergeService />}
-            {activeView === View.SovereignWealth && <SovereignWealth />}
-            {activeView === View.Philanthropy && <PhilanthropyHub />}
-            {activeView === View.Personalization && <PersonalizationView />}
-            {activeView === View.TheVision && <TheVisionView />}
-            {activeView === View.AIAdvisor && <AIAdvisorView />}
-            {activeView === View.SecurityCenter && <SecurityView />}
-            
-            {/* New Educational Views */}
-            {activeView === View.TheBook && <TheBookView />}
-            {activeView === View.KnowledgeBase && <KnowledgeBaseView />}
-            
-            {/* Render component based on route if not covered by activeView switch (fallback) */}
-            <Outlet />
-        </main>
-      </div>
-      
-      <VoiceControl setActiveView={setActiveView} />
+    <div style={{ fontFamily: 'Georgia, serif', lineHeight: 1.6, color: '#333', maxWidth: '740px', margin: '0 auto', padding: '2rem' }}>
+      <header>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+          We Deconstructed a Massive React App. Here Are 5 Architectural Secrets We Uncovered.
+        </h1>
+        <p style={{ color: '#666', marginTop: 0 }}>
+          Beyond the UI, a complex web of patterns determines if an application soars or sinks. What we found inside this financial dashboard was a masterclass in modern engineering.
+        </p>
+      </header>
+
+      <article>
+        <p style={{ fontSize: '1.1rem', marginTop: '2rem' }}>
+          Ever peek behind the curtain of a truly complex piece of software? We did. We got our hands on the main application file for a sophisticated financial technology platform—a sprawling nexus of dashboards, data visualizations, and transaction management. At first glance, it’s an intimidating wall of code. But look closer, and you’ll find elegant solutions to some of the toughest problems in front-end development.
+        </p>
+        <p style={{ fontSize: '1.1rem' }}>
+          Forget abstract theory. These are battle-tested patterns from the digital trenches. Here are the five most surprising takeaways that will change how you think about building React applications.
+        </p>
+
+        <section style={{ marginTop: '3rem' }}>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 700 }}>1. Your App Isn't a Monolith; It's a Metropolis of Micro-Components.</h2>
+          <p>
+            The first thing that hits you is the import list. It’s not a list; it’s a manifest. We counted over 150 unique components being pulled into a single layout file. From `AIPredictionWidget` to `QuantumWeaverView`, every conceivable piece of the UI is its own self-contained universe.
+          </p>
+          <blockquote style={{ borderLeft: '3px solid #ccc', paddingLeft: '1rem', margin: '1.5rem 0', fontStyle: 'italic', color: '#555' }}>
+            This isn't just about reusability. It's about cognitive load. When your application is a city of small, single-purpose buildings instead of one giant skyscraper, it's infinitely easier to navigate, debug, and expand. You can renovate the `CardholderManagement` component without worrying that you’ll knock out the plumbing in the `RealEstateEmpire` view.
+          </blockquote>
+          <p>
+            This radical componentization is the bedrock of a scalable and maintainable system. It’s a powerful reminder that the goal isn't just to make it work, but to make it understandable for the next developer—which might just be you, six months from now.
+          </p>
+        </section>
+
+        <section style={{ marginTop: '3rem' }}>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 700 }}>2. The Illusion of Pages: State-Driven Views vs. Traditional Routing.</h2>
+          <p>
+            In many apps, navigating from the dashboard to the transactions page means changing the URL and letting a router render a new component. This app does something different, and it’s brilliantly simple. Instead of relying solely on URL-based routing for its main content, it uses a single piece of state: `activeView`.
+          </p>
+          <p>
+            The main layout is essentially a giant conditional block that checks this state and renders the appropriate component. Clicking a sidebar item doesn't just change a link; it calls `setActiveView(View.Transactions)`, instantly swapping the entire content of the main panel.
+          </p>
+          <pre style={{ backgroundColor: '#f5f5f5', padding: '1rem', borderRadius: '4px', overflowX: 'auto', fontSize: '0.9rem', color: '#444' }}>
+            {`
+{activeView === View.Dashboard && <Dashboard />}
+{activeView === View.Transactions && <TransactionsView />}
+{activeView === View.SendMoney && <SendMoneyView />}
+// ... and so on for dozens of views
+            `}
+          </pre>
+          <p>
+            Why is this so impactful? It creates a lightning-fast, app-like feel. There's no page reload, no router lag. It’s a state machine, not a collection of web pages. This approach is perfect for complex, contained environments like a user dashboard where the "app" is the destination, not just a stop along the way.
+          </p>
+        </section>
+
+        <section style={{ marginTop: '3rem' }}>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 700 }}>3. Forget Prop Drilling: The Context API is the Central Nervous System.</h2>
+          <p>
+            How do you get critical data like user authentication status or shared application data to 150 different components without passing props down a dozen levels? The answer is woven right into the app's foundation: a multi-layered Context sandwich.
+          </p>
+          <p>
+            The entire application is wrapped in providers like `AuthProvider`, `DataProvider`, and `StripeDataProvider`. This creates a global nervous system. Any component, no matter how deeply nested, can tap directly into the most vital information—authentication status, core financial data, loading states—without the messy and brittle process of "prop drilling."
+          </p>
+          <blockquote style={{ borderLeft: '3px solid #ccc', paddingLeft: '1rem', margin: '1.5rem 0', fontStyle: 'italic', color: '#555' }}>
+            This is architecture as liberation. It decouples components from their parents, allowing them to be more independent and reusable. A component doesn't need to know *where* it lives, only that it has access to the central data streams it needs to function.
+          </blockquote>
+        </section>
+
+        <section style={{ marginTop: '3rem' }}>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 700 }}>4. Plan for Failure, Not Just Success: The Art of the Loading and Error State.</h2>
+          <p>
+            A perfect user experience is often defined by what happens when things *aren't* perfect. This application doesn't just hope for the best; it meticulously plans for the worst. Before the main layout even attempts to render, it checks for `isLoading` and `error` states pulled from its core `DataContext`.
+          </p>
+          <p>
+            The result? Instead of a blank screen or a cryptic crash, the user sees a beautifully designed loading animation ("Generating financial universe from quantum foam...") or a clear, actionable error screen ("SYSTEM INITIALIZATION FAILURE"). These aren't afterthoughts; they are first-class citizens of the user experience.
+          </p>
+          <p>
+            This approach demonstrates a deep empathy for the user. It acknowledges that delays and errors happen, and it chooses to communicate clearly and gracefully rather than leaving the user in a state of confusion.
+          </p>
+        </section>
+
+        <section style={{ marginTop: '3rem' }}>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 700 }}>5. Don't Repeat Yourself: The Elegant Power of Wrapper Components.</h2>
+          <p>
+            Tucked away at the bottom of the file are a few small, unassuming helper functions: `Wrapper`, `ModalWrapper`, and `DataContextWrapper`. These might look minor, but they are a powerful tool for abstraction and code cleanliness, often referred to as Higher-Order Components (HOCs).
+          </p>
+          <p>
+            Instead of manually wiring up context or state to every single component in the (currently small) routing section, these wrappers do it automatically. Need to pass data from the `DataContext` to a component? Just wrap it in `DataContextWrapper`. This pattern keeps the routing logic clean and readable while handling the repetitive boilerplate behind the scenes. It's a simple but profound way to write cleaner, more maintainable code.
+          </p>
+        </section>
+
+        <footer style={{ marginTop: '4rem', borderTop: '1px solid #eee', paddingTop: '2rem' }}>
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 700 }}>The Code Beneath the Code</h3>
+          <p>
+            Looking at the architecture of a complex application is like studying the blueprints of a skyscraper. You see the deliberate choices, the trade-offs, and the foundational principles that allow something so massive to stand strong. From its city of micro-components to its state-driven UI and robust error handling, this codebase is a testament to thoughtful engineering.
+          </p>
+          <p>
+            It leaves us with a final, powerful question: Are we just building features, or are we building resilient, understandable, and elegant systems?
+          </p>
+        </footer>
+      </article>
     </div>
   );
 };
 
-// --- Wrapper Components for Props ---
-const Wrapper = (Component: React.FC<any>, props: any = {}) => {
-  const WrappedComponent = () => <Component {...props} />;
-  return <WrappedComponent />;
-};
-const ModalWrapper = (Component: React.FC<any>, props: any = {}) => {
-    const [isOpen, setIsOpen] = useState(true);
-    const WrappedComponent = () => <Component isOpen={isOpen} onClose={() => setIsOpen(false)} {...props} />;
-    return <WrappedComponent />;
-};
-const DataContextWrapper = (Component: React.FC<any>, extraProps: any = {}) => {
-    const dataContext = useContext(DataContext);
-    const mockContext = { 
-        setActiveView: () => {}, 
-        impactData: { treesPlanted: 0, progressToNextTree: 0 },
-    };
-    const props = { ...(dataContext || mockContext), ...extraProps };
-    const WrappedComponent = () => <Component {...props} />;
-    return <WrappedComponent />;
-};
-
-const theme = createTheme({ palette: { mode: 'dark' } });
-
-// --- Protected Route Helper ---
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    const { isAuthenticated } = useContext(AuthContext)!;
-    if (!isAuthenticated) {
-        return <Navigate to="/login" replace />;
-    }
-    return <>{children}</>;
-};
-
-// --- Main App Component ---
-function SApp() {
-  const mockPlaidClient = new PlaidClient();
-
-  return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <DataProvider>
-          <StripeDataProvider>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
-              <Router>
-                <Routes>
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/login" element={<LoginView />} />
-                  <Route path="/sso" element={<SSOView />} />
-                  
-                  {/* Protected Routes Wrapper */}
-                  <Route element={
-                      <ProtectedRoute>
-                          <SAppLayout />
-                      </ProtectedRoute>
-                  }>
-                    {/* The Dashboard is the default view for the app layout */}
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    
-                    {/* Dynamically Generated Routes */}
-                    <Route path="/account-details" element={Wrapper(AccountDetails, { accountId: '1', customerId: 'c1' })} />
-                    <Route path="/account-list" element={Wrapper(AccountList, { accounts: [] })} />
-                    <Route path="/accounts-dashboard" element={<AccountsDashboardView />} />
-                    
-                    <Route path="*" element={<Dashboard />} />
-                  </Route>
-                </Routes>
-              </Router>
-            </ThemeProvider>
-          </StripeDataProvider>
-        </DataProvider>
-      </AuthProvider>
-    </ErrorBoundary>
-  );
-}
-
-export default SApp;
+export default BlogView;
