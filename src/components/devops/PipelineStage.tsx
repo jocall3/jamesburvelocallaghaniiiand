@@ -112,4 +112,3 @@ const PipelineStage: React.FC<PipelineStageProps> = ({
 };
 
 export default PipelineStage;
-```
