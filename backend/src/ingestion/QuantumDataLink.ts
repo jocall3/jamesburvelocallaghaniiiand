@@ -1,4 +1,3 @@
-```typescript
 import { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
 import { createGunzip } from 'zlib';
@@ -91,5 +90,3 @@ export class QuantumDataLink {
 
 
 class TransformStream extends TransformStream<Uint8Array, string> { }
-
-```
