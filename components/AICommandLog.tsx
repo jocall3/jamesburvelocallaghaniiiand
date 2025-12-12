@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 // Type definition for a command log entry
@@ -11,6 +10,7 @@ type CommandLogEntry = {
 
 // Mock data for AI command log
 const commandLogData: CommandLogEntry[] = [
+  { id: 9, command: "Generate a 10-branch ecosystem for Citibankdemobusinessinc to make open banking the U.S. standard.", timestamp: "Just now", status: "Pending" },
   { id: 1, command: "Generate Q4 2023 balance report for 'Operating Account'", timestamp: "2 minutes ago", status: "Completed" },
   { id: 2, command: "Initiate a $10,000 wire transfer to 'Vendor ABC'", timestamp: "15 minutes ago", status: "Completed" },
   { id: 3, command: "List all pending payment orders over $5,000", timestamp: "1 hour ago", status: "Completed" },
