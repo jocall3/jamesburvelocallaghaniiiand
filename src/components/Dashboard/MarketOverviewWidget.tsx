@@ -1,4 +1,3 @@
-```tsx
 import React from 'react';
 import { FiArrowUpRight, FiArrowDownRight, FiMoreHorizontal } from 'react-icons/fi';
 
@@ -17,21 +16,36 @@ type CentralBankRate = {
   lastChange: string;
 };
 
-// --- MOCK DATA ---
-const sovereignDebtData: SovereignDebt[] = [
-  { country: 'USA', flag: '🇺🇸', yield: 4.51, change: 0.02 },
-  { country: 'Germany', flag: '🇩🇪', yield: 2.58, change: -0.01 },
-  { country: 'Japan', flag: '🇯🇵', yield: 0.94, change: 0.01 },
-  { country: 'UK', flag: '🇬🇧', yield: 4.25, change: -0.03 },
-  { country: 'China', flag: '🇨🇳', yield: 2.31, change: 0.00 },
-];
+// --- DATA GENERATION FUNCTIONS ---
+const generateRandomNumber = (min: number, max: number): number => {
+  return Math.random() * (max - min) + min;
+};
 
-const centralBankRatesData: CentralBankRate[] = [
-  { bank: 'US Fed', region: '🇺🇸', rate: 5.50, lastChange: 'Jul \'23' },
-  { bank: 'ECB', region: '🇪🇺', rate: 4.50, lastChange: 'Sep \'23' },
-  { bank: 'BoJ', region: '🇯🇵', rate: 0.10, lastChange: 'Mar \'24' },
-  { bank: 'BoE', region: '🇬🇧', rate: 5.25, lastChange: 'Aug \'23' },
-];
+const generateSovereignDebtData = (): SovereignDebt[] => {
+  const countries = ['USA', 'Germany', 'Japan', 'UK', 'China', 'France', 'Italy', 'Canada', 'Australia', 'Brazil'];
+  const flags = ['ðºð¸', 'ð©ðª', 'ð¯ðµ', 'ð¬ð§', 'ð¨ð³', 'ð«ð·', 'ð®ð¹', 'ð¨ð¦', 'ð¦ðº', 'ð§ð·'];
+
+  return countries.map((country, index) => ({
+    country,
+    flag: flags[index],
+    yield: generateRandomNumber(0.5, 5.5),
+    change: generateRandomNumber(-0.1, 0.1),
+  }));
+};
+
+const generateCentralBankRatesData = (): CentralBankRate[] => {
+  const banks = ['US Fed', 'ECB', 'BoJ', 'BoE', 'PBOC', 'SNB', 'RBA', 'BOC', 'RBI', 'SARB'];
+  const regions = ['ðºð¸', 'ðªðº', 'ð¯ðµ', 'ð¬ð§', 'ð¨ð³', 'ð¨ð­', 'ð¦ðº', 'ð¨ð¦', 'ð®ð²', 'ð¿ð¦'];
+  const lastChangeMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const currentYear = new Date().getFullYear();
+
+  return banks.map((bank, index) => ({
+    bank,
+    region: regions[index],
+    rate: generateRandomNumber(0, 6),
+    lastChange: `${lastChangeMonths[Math.floor(Math.random() * lastChangeMonths.length)]} '${currentYear - Math.floor(Math.random() * 2)}`,
+  }));
+};
 
 // --- HELPER COMPONENTS & FUNCTIONS ---
 const getChangeColor = (change: number): string => {
@@ -53,6 +67,20 @@ const ChangeIndicator: React.FC<{ change: number }> = ({ change }) => {
 
 // --- MAIN COMPONENT ---
 const MarketOverviewWidget: React.FC = () => {
+  // --- STATE ---
+  const [sovereignDebtData, setSovereignDebtData] = React.useState<SovereignDebt[]>(generateSovereignDebtData());
+  const [centralBankRatesData, setCentralBankRatesData] = React.useState<CentralBankRate[]>(generateCentralBankRatesData());
+
+  // --- AUTO-REFRESH LOGIC ---
+  React.useEffect(() => {
+    const intervalId = setInterval(() => {
+      setSovereignDebtData(generateSovereignDebtData());
+      setCentralBankRatesData(generateCentralBankRatesData());
+    }, 60000); // Refresh every 60 seconds
+
+    return () => clearInterval(intervalId); // Clean up interval on unmount
+  }, []);
+
   return (
     <div className="bg-white dark:bg-gray-900/70 p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-800">
       {/* Header */}
@@ -117,4 +145,3 @@ const MarketOverviewWidget: React.FC = () => {
 };
 
 export default MarketOverviewWidget;
-```
