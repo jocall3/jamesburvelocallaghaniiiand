@@ -36,97 +36,471 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-// --- Mock Data Structures ---
+// --- Citibankdemobusinessinc Core ---
 
-interface CapitalProject {
-  id: number;
-  name: string;
-  status: 'Planning' | 'In Progress' | 'Completed' | 'On Hold';
-  budget: number; // in millions
-  actualSpend: number; // in millions
-  startDate: string; // YYYY-MM-DD
-  endDate: string; // YYYY-MM-DD
-  roiForecast: number; // percentage
-  milestones: Milestone[];
-  documents: Document[];
+namespace Citibankdemobusinessinc {
+
+  // --- Utility Functions ---
+  const generateRandomNumber = (min: number, max: number): number => {
+    return Math.random() * (max - min) + min;
+  };
+
+  const generateRandomDate = (start: Date, end: Date): string => {
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString().slice(0, 10);
+  };
+
+  const generateRandomStatus = (): 'Planning' | 'In Progress' | 'Completed' | 'On Hold' => {
+    const statuses: ('Planning' | 'In Progress' | 'Completed' | 'On Hold')[] = ['Planning', 'In Progress', 'Completed', 'On Hold'];
+    return statuses[Math.floor(Math.random() * statuses.length)];
+  };
+
+  const generateLoremIpsum = (words: number): string => {
+    const lorem = 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum';
+    const wordList = lorem.split(' ');
+    let result = '';
+    for (let i = 0; i < words; i++) {
+      result += wordList[Math.floor(Math.random() * wordList.length)] + ' ';
+    }
+    return result.trim();
+  };
+
+  // --- Data Structures ---
+
+  export interface CapitalProject {
+    id: number;
+    name: string;
+    status: 'Planning' | 'In Progress' | 'Completed' | 'On Hold';
+    budget: number; // in millions
+    actualSpend: number; // in millions
+    startDate: string; // YYYY-MM-DD
+    endDate: string; // YYYY-MM-DD
+    roiForecast: number; // percentage
+    milestones: Milestone[];
+    documents: Document[];
+  }
+
+  export interface Milestone {
+    id: number;
+    name: string;
+    date: string; // YYYY-MM-DD
+    isCompleted: boolean;
+  }
+
+  export interface Document {
+    id: number;
+    name: string;
+    type: 'Blueprint' | 'Permit' | 'Contract';
+    url: string;
+  }
+
+  // --- Data Generators ---
+
+  export const generateCapitalProject = (id: number): CapitalProject => {
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setFullYear(startDate.getFullYear() + Math.floor(generateRandomNumber(1, 5)));
+
+    const budget = generateRandomNumber(50, 2000); // Millions
+    const actualSpend = Math.min(budget, generateRandomNumber(0, budget * 0.8));
+
+    return {
+      id: id,
+      name: `Project ${id}: ${generateLoremIpsum(3)}`,
+      status: generateRandomStatus(),
+      budget: budget,
+      actualSpend: actualSpend,
+      startDate: generateRandomDate(startDate, endDate),
+      endDate: generateRandomDate(startDate, endDate),
+      roiForecast: generateRandomNumber(5, 30),
+      milestones: generateMilestones(Math.floor(generateRandomNumber(2, 6))),
+      documents: generateDocuments(Math.floor(generateRandomNumber(1, 4))),
+    };
+  };
+
+  const generateMilestones = (count: number): Milestone[] => {
+    const milestones: Milestone[] = [];
+    for (let i = 1; i <= count; i++) {
+      milestones.push({
+        id: i,
+        name: `Milestone ${i}: ${generateLoremIpsum(2)}`,
+        date: generateRandomDate(new Date(), new Date(new Date().getFullYear() + 3, 0, 0)),
+        isCompleted: Math.random() < 0.7,
+      });
+    }
+    return milestones;
+  };
+
+  const generateDocuments = (count: number): Document[] => {
+    const documentTypes: ('Blueprint' | 'Permit' | 'Contract')[] = ['Blueprint', 'Permit', 'Contract'];
+    const documents: Document[] = [];
+    for (let i = 1; i <= count; i++) {
+      const type = documentTypes[Math.floor(Math.random() * documentTypes.length)];
+      documents.push({
+        id: i,
+        name: `Document_${i}_${generateLoremIpsum(1).toUpperCase()}.${type.slice(0, 3).toUpperCase()}`,
+        type: type,
+        url: '#', // Placeholder
+      });
+    }
+    return documents;
+  };
+
+  // --- Business Models ---
+
+  export namespace Viewit {
+    export const missionStatement = "To revolutionize visual data accessibility and understanding for capital project stakeholders.";
+
+    export interface MovieplayformProps {
+      projects: CapitalProject[];
+    }
+
+    export const Movieplayform: React.FC<MovieplayformProps> = ({ projects }) => {
+      return (
+        <Card>
+          <CardHeader title="Viewit.Movieplayform: Visual Project Overview" />
+          <CardContent>
+            <Typography variant="body1">
+              Interactive visual platform for exploring project timelines and dependencies.
+            </Typography>
+            {projects.map(project => (
+              <Typography key={project.id} variant="subtitle2">
+                {project.name} - {project.status}
+              </Typography>
+            ))}
+          </CardContent>
+        </Card>
+      );
+    };
+  }
+
+  export namespace Riskdetect {
+    export const missionStatement = "To proactively identify and mitigate risks in capital projects through advanced analytics.";
+
+    export interface PredictiveAnalyticsDashboardProps {
+      projects: CapitalProject[];
+    }
+
+    export const PredictiveAnalyticsDashboard: React.FC<PredictiveAnalyticsDashboardProps> = ({ projects }) => {
+      const riskScore = (project: CapitalProject) => {
+        let score = 0;
+        if (project.status === 'On Hold') score += 50;
+        if (project.actualSpend > project.budget) score += 30;
+        if (new Date(project.endDate) < new Date()) score += 20;
+        return score;
+      };
+
+      return (
+        <Card>
+          <CardHeader title="Riskdetect.PredictiveAnalyticsDashboard: Project Risk Assessment" />
+          <CardContent>
+            <Typography variant="body1">
+              Real-time risk assessment and predictive analytics for proactive risk management.
+            </Typography>
+            {projects.map(project => (
+              <Typography key={project.id} variant="subtitle2">
+                {project.name} - Risk Score: {riskScore(project)}
+              </Typography>
+            ))}
+          </CardContent>
+        </Card>
+      );
+    };
+  }
+
+  export namespace Budgetflow {
+    export const missionStatement = "To optimize capital allocation and budget management through intelligent financial workflows.";
+
+    export interface BudgetOptimizationToolProps {
+      projects: CapitalProject[];
+    }
+
+    export const BudgetOptimizationTool: React.FC<BudgetOptimizationToolProps> = ({ projects }) => {
+      const optimizedBudget = (project: CapitalProject) => {
+        // Simplified optimization logic
+        return project.budget * (1 + (project.roiForecast / 100));
+      };
+
+      return (
+        <Card>
+          <CardHeader title="Budgetflow.BudgetOptimizationTool: Smart Budget Allocation" />
+          <CardContent>
+            <Typography variant="body1">
+              Intelligent tools for optimizing budget allocation and financial forecasting.
+            </Typography>
+            {projects.map(project => (
+              <Typography key={project.id} variant="subtitle2">
+                {project.name} - Optimized Budget: ${optimizedBudget(project).toFixed(1)}M
+              </Typography>
+            ))}
+          </CardContent>
+        </Card>
+      );
+    };
+  }
+
+  export namespace Compliancetrust {
+    export const missionStatement = "To ensure regulatory compliance and transparency in capital project execution.";
+
+    export interface ComplianceAuditDashboardProps {
+      projects: CapitalProject[];
+    }
+
+    export const ComplianceAuditDashboard: React.FC<ComplianceAuditDashboardProps> = ({ projects }) => {
+      const isCompliant = (project: CapitalProject) => {
+        // Simplified compliance check
+        return project.documents.length > 0 && project.status !== 'On Hold';
+      };
+
+      return (
+        <Card>
+          <CardHeader title="Compliancetrust.ComplianceAuditDashboard: Regulatory Compliance Monitoring" />
+          <CardContent>
+            <Typography variant="body1">
+              Automated compliance monitoring and audit trails for regulatory adherence.
+            </Typography>
+            {projects.map(project => (
+              <Typography key={project.id} variant="subtitle2">
+                {project.name} - Compliant: {isCompliant(project) ? 'Yes' : 'No'}
+              </Typography>
+            ))}
+          </CardContent>
+        </Card>
+      );
+    };
+  }
+
+  export namespace Supplynet {
+    export const missionStatement = "To streamline supply chain management and procurement processes for capital projects.";
+
+    export interface VendorManagementSystemProps {
+      projects: CapitalProject[];
+    }
+
+    export const VendorManagementSystem: React.FC<VendorManagementSystemProps> = ({ projects }) => {
+      const vendorCount = () => Math.floor(generateRandomNumber(5, 20));
+
+      return (
+        <Card>
+          <CardHeader title="Supplynet.VendorManagementSystem: Streamlined Procurement" />
+          <CardContent>
+            <Typography variant="body1">
+              Integrated vendor management and procurement platform for efficient supply chain operations.
+            </Typography>
+            {projects.map(project => (
+              <Typography key={project.id} variant="subtitle2">
+                {project.name} - Vendors: {vendorCount()}
+              </Typography>
+            ))}
+          </CardContent>
+        </Card>
+      );
+    };
+  }
+
+  export namespace Workforcemax {
+    export const missionStatement = "To optimize workforce allocation and productivity in capital project execution.";
+
+    export interface ResourceAllocationToolProps {
+      projects: CapitalProject[];
+    }
+
+    export const ResourceAllocationTool: React.FC<ResourceAllocationToolProps> = ({ projects }) => {
+      const resourceCount = () => Math.floor(generateRandomNumber(10, 50));
+
+      return (
+        <Card>
+          <CardHeader title="Workforcemax.ResourceAllocationTool: Optimized Workforce Management" />
+          <CardContent>
+            <Typography variant="body1">
+              Intelligent resource allocation and workforce management tools for maximizing productivity.
+            </Typography>
+            {projects.map(project => (
+              <Typography key={project.id} variant="subtitle2">
+                {project.name} - Resources: {resourceCount()}
+              </Typography>
+            ))}
+          </CardContent>
+        </Card>
+      );
+    };
+  }
+
+  export namespace Sustainbuild {
+    export const missionStatement = "To promote sustainable practices and environmental responsibility in capital projects.";
+
+    export interface EnvironmentalImpactDashboardProps {
+      projects: CapitalProject[];
+    }
+
+    export const EnvironmentalImpactDashboard: React.FC<EnvironmentalImpactDashboardProps> = ({ projects }) => {
+      const carbonFootprint = () => generateRandomNumber(100, 1000).toFixed(1);
+
+      return (
+        <Card>
+          <CardHeader title="Sustainbuild.EnvironmentalImpactDashboard: Sustainable Project Monitoring" />
+          <CardContent>
+            <Typography variant="body1">
+              Real-time monitoring of environmental impact and sustainability metrics.
+            </Typography>
+            {projects.map(project => (
+              <Typography key={project.id} variant="subtitle2">
+                {project.name} - Carbon Footprint: {carbonFootprint()} tons
+              </Typography>
+            ))}
+          </CardContent>
+        </Card>
+      );
+    };
+  }
+
+  export namespace Governwise {
+    export const missionStatement = "To provide robust governance and oversight mechanisms for capital project portfolios.";
+
+    export interface GovernanceOversightPlatformProps {
+      projects: CapitalProject[];
+    }
+
+    export const GovernanceOversightPlatform: React.FC<GovernanceOversightPlatformProps> = ({ projects }) => {
+      const auditScore = () => generateRandomNumber(70, 100).toFixed(0);
+
+      return (
+        <Card>
+          <CardHeader title="Governwise.GovernanceOversightPlatform: Enhanced Project Governance" />
+          <CardContent>
+            <Typography variant="body1">
+              Comprehensive governance and oversight platform for ensuring project success.
+            </Typography>
+            {projects.map(project => (
+              <Typography key={project.id} variant="subtitle2">
+                {project.name} - Audit Score: {auditScore()}
+              </Typography>
+            ))}
+          </CardContent>
+        </Card>
+      );
+    };
+  }
+
+  export namespace Innovatebuild {
+    export const missionStatement = "To foster innovation and technological advancement in capital project design and execution.";
+
+    export interface TechnologyAdoptionPlatformProps {
+      projects: CapitalProject[];
+    }
+
+    export const TechnologyAdoptionPlatform: React.FC<TechnologyAdoptionPlatformProps> = ({ projects }) => {
+      const innovationIndex = () => generateRandomNumber(50, 90).toFixed(0);
+
+      return (
+        <Card>
+          <CardHeader title="Innovatebuild.TechnologyAdoptionPlatform: Driving Innovation" />
+          <CardContent>
+            <Typography variant="body1">
+              Platform for promoting the adoption of innovative technologies in capital projects.
+            </Typography>
+            {projects.map(project => (
+              <Typography key={project.id} variant="subtitle2">
+                {project.name} - Innovation Index: {innovationIndex()}
+              </Typography>
+            ))}
+          </CardContent>
+        </Card>
+      );
+    };
+  }
+
+  export namespace Stakeholdercorp {
+    export const missionStatement = "To enhance stakeholder engagement and communication throughout the capital project lifecycle.";
+
+    export interface StakeholderEngagementPortalProps {
+      projects: CapitalProject[];
+    }
+
+    export const StakeholderEngagementPortal: React.FC<StakeholderEngagementPortalProps> = ({ projects }) => {
+      const engagementLevel = () => ['High', 'Medium', 'Low'][Math.floor(generateRandomNumber(0, 3))];
+
+      return (
+        <Card>
+          <CardHeader title="Stakeholdercorp.StakeholderEngagementPortal: Enhanced Communication" />
+          <CardContent>
+            <Typography variant="body1">
+              Portal for facilitating stakeholder engagement and communication.
+            </Typography>
+            {projects.map(project => (
+              <Typography key={project.id} variant="subtitle2">
+                {project.name} - Engagement: {engagementLevel()}
+              </Typography>
+            ))}
+          </CardContent>
+        </Card>
+      );
+    };
+  }
+
+  // --- Orchestration Layer ---
+
+  export interface CitibankdemobusinessincProps {
+    numberOfProjects: number;
+  }
+
+  export const CitibankdemobusinessincOrchestrator: React.FC<CitibankdemobusinessincProps> = ({ numberOfProjects }) => {
+    const [projects, setProjects] = useState<CapitalProject[]>(() => {
+      const initialProjects: CapitalProject[] = [];
+      for (let i = 1; i <= numberOfProjects; i++) {
+        initialProjects.push(generateCapitalProject(i));
+      }
+      return initialProjects;
+    });
+
+    return (
+      <Box>
+        <Typography variant="h3" gutterBottom>
+          Citibankdemobusinessinc: Open Banking for Capital Projects
+        </Typography>
+        <Typography variant="subtitle1" paragraph>
+          Unifying platform for managing capital projects with integrated financial and operational tools.
+        </Typography>
+
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
+            <Viewit.Movieplayform projects={projects} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Riskdetect.PredictiveAnalyticsDashboard projects={projects} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Budgetflow.BudgetOptimizationTool projects={projects} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Compliancetrust.ComplianceAuditDashboard projects={projects} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Supplynet.VendorManagementSystem projects={projects} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Workforcemax.ResourceAllocationTool projects={projects} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Sustainbuild.EnvironmentalImpactDashboard projects={projects} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Governwise.GovernanceOversightPlatform projects={projects} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Innovatebuild.TechnologyAdoptionPlatform projects={projects} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Stakeholdercorp.StakeholderEngagementPortal projects={projects} />
+          </Grid>
+        </Grid>
+      </Box>
+    );
+  };
 }
-
-interface Milestone {
-  id: number;
-  name: string;
-  date: string; // YYYY-MM-DD
-  isCompleted: boolean;
-}
-
-interface Document {
-  id: number;
-  name: string;
-  type: 'Blueprint' | 'Permit' | 'Contract';
-  url: string;
-}
-
-// --- Mock Data ---
-
-const MOCK_PROJECTS: CapitalProject[] = [
-  {
-    id: 101,
-    name: 'Global HQ Expansion - Phase I',
-    status: 'In Progress',
-    budget: 500,
-    actualSpend: 320,
-    startDate: '2023-01-15',
-    endDate: '2025-12-31',
-    roiForecast: 18.5,
-    milestones: [
-      { id: 1, name: 'Land Acquisition Complete', date: '2023-03-01', isCompleted: true },
-      { id: 2, name: 'Foundation Poured', date: '2023-10-20', isCompleted: true },
-      { id: 3, name: 'Structural Steel Erection', date: '2024-06-01', isCompleted: false },
-      { id: 4, name: 'Interior Fit-Out Start', date: '2025-01-15', isCompleted: false },
-    ],
-    documents: [
-      { id: 1001, name: 'HQ_Blueprint_V3.pdf', type: 'Blueprint', url: '#' },
-      { id: 1002, name: 'Zoning_Permit_A12.pdf', type: 'Permit', url: '#' },
-      { id: 1003, name: 'Construction_Contract_2023.docx', type: 'Contract', url: '#' },
-    ],
-  },
-  {
-    id: 102,
-    name: 'European Manufacturing Hub',
-    status: 'Planning',
-    budget: 1200,
-    actualSpend: 50,
-    startDate: '2024-09-01',
-    endDate: '2027-06-30',
-    roiForecast: 22.1,
-    milestones: [
-      { id: 5, name: 'Feasibility Study Approved', date: '2024-05-10', isCompleted: true },
-      { id: 6, name: 'Financing Secured', date: '2024-11-01', isCompleted: false },
-    ],
-    documents: [
-      { id: 2001, name: 'EMH_Site_Survey.pdf', type: 'Blueprint', url: '#' },
-    ],
-  },
-  {
-    id: 103,
-    name: 'Data Center Upgrade - West Coast',
-    status: 'Completed',
-    budget: 150,
-    actualSpend: 145,
-    startDate: '2022-05-01',
-    endDate: '2023-11-30',
-    roiForecast: 15.0,
-    milestones: [
-      { id: 7, name: 'Go-Live', date: '2023-11-15', isCompleted: true },
-    ],
-    documents: [
-      { id: 3001, name: 'Final_Acceptance_Report.pdf', type: 'Contract', url: '#' },
-    ],
-  },
-];
 
 // --- Utility Components ---
 
-const getStatusColor = (status: CapitalProject['status']) => {
+const getStatusColor = (status: Citibankdemobusinessinc.CapitalProject['status']) => {
   switch (status) {
     case 'In Progress':
       return 'primary';
@@ -165,13 +539,13 @@ const FinancialWidget: React.FC<FinancialWidgetProps> = ({ title, value, trend }
 
 // --- Main View Components ---
 
-const ProjectCard: React.FC<{ project: CapitalProject }> = ({ project }) => {
+const ProjectCard: React.FC<{ project: Citibankdemobusinessinc.CapitalProject }> = ({ project }) => {
   const progress = (project.actualSpend / project.budget) * 100;
   const isOverBudget = project.actualSpend > project.budget;
 
   const [openDetails, setOpenDetails] = useState(false);
 
-  const handleDownload = (doc: Document) => {
+  const handleDownload = (doc: Citibankdemobusinessinc.Document) => {
     console.log(`Downloading document: ${doc.name} from ${doc.url}`);
     alert(`Simulating download for: ${doc.name}`);
   };
@@ -287,7 +661,13 @@ const ProjectCard: React.FC<{ project: CapitalProject }> = ({ project }) => {
 // --- Dashboard View Component ---
 
 const CapitalProjectsDashboardView: React.FC = () => {
-  const [projects] = useState<CapitalProject[]>(MOCK_PROJECTS);
+  const [projects] = useState<Citibankdemobusinessinc.CapitalProject[]>(() => {
+    const initialProjects: Citibankdemobusinessinc.CapitalProject[] = [];
+    for (let i = 1; i <= 3; i++) {
+      initialProjects.push(Citibankdemobusinessinc.generateCapitalProject(i));
+    }
+    return initialProjects;
+  });
 
   // --- Financial Aggregations ---
   const totalBudget = useMemo(() => projects.reduce((sum, p) => sum + p.budget, 0), [projects]);
@@ -380,6 +760,9 @@ const CapitalProjectsDashboardView: React.FC = () => {
           </Box>
         </CardContent>
       </Card>
+
+      {/* 4. Citibankdemobusinessinc Orchestrator */}
+      <Citibankdemobusinessinc.CitibankdemobusinessincOrchestrator numberOfProjects={5} />
     </Box>
   );
 };
