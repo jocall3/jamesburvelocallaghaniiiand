@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 import { Card, CardContent, Typography, Grid, Avatar, Box, LinearProgress } from '@mui/material';
 import { styled } from '@mui/system';
@@ -100,4 +99,3 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent }) => {
 };
 
 export default AgentCard;
-```
