@@ -17,6 +17,32 @@ import { Invention, InventionCategory, InventionStatus } from '../../../types/mo
 import Chip from '../../../components/Chip';
 import { useMockData } from '../../../hooks/useMockData';
 
+// --- UNIFIED BRANDING ---
+const BRAND_NAME = "Citibankdemobusinessinc";
+
+// --- KERNEL FUNCTIONS ---
+const generateRandomId = (): string => {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+};
+
+const generateRandomNumber = (min: number, max: number): number => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+const generateRandomDate = (start: Date, end: Date): Date => {
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+};
+
+const generateRandomBoolean = (): boolean => {
+    return Math.random() < 0.5;
+};
+
+const generateRandomEnumValue = <T>(enumObj: { [key: string]: T }): T => {
+    const enumValues = Object.values(enumObj) as T[];
+    const randomIndex = Math.floor(Math.random() * enumValues.length);
+    return enumValues[randomIndex];
+};
+
 // --- MOCK DATA & TYPES ---
 
 type SortKey = 'title' | 'date' | 'status';
@@ -423,3 +449,366 @@ const InventionsView: React.FC = () => {
 };
 
 export default InventionsView;
+
+// --- BUSINESS MODELS ---
+
+// 1. Citibankdemobusinessinc.creditrisk.aiunderwriting
+namespace Citibankdemobusinessinc.creditrisk {
+    export namespace aiunderwriting {
+        // Mission: Revolutionize credit risk assessment using AI to provide faster, more accurate, and inclusive underwriting decisions.
+        // Monetization: Subscription fees for access to the AI underwriting platform, tiered based on usage and features.
+        // IP Moat: Proprietary AI algorithms trained on unique datasets, protected by patents and trade secrets.
+
+        interface CreditApplication {
+            id: string;
+            applicantName: string;
+            creditScore: number;
+            income: number;
+            employmentHistory: string;
+            loanAmount: number;
+            loanPurpose: string;
+        }
+
+        interface UnderwritingResult {
+            applicationId: string;
+            approvalStatus: boolean;
+            interestRate: number;
+            creditLimit: number;
+            riskScore: number;
+        }
+
+        const simulateCreditApplication = (): CreditApplication => {
+            return {
+                id: generateRandomId(),
+                applicantName: `Applicant ${generateRandomNumber(1, 100)}`,
+                creditScore: generateRandomNumber(300, 850),
+                income: generateRandomNumber(30000, 200000),
+                employmentHistory: `Employed for ${generateRandomNumber(1, 10)} years`,
+                loanAmount: generateRandomNumber(1000, 100000),
+                loanPurpose: `Purpose ${generateRandomNumber(1, 5)}`
+            };
+        };
+
+        const trainAiModel = (): any => {
+            // Simulate model training
+            console.log("Training AI model for credit risk assessment...");
+            return { trained: true };
+        };
+
+        const assessCreditRisk = (application: CreditApplication, model: any): UnderwritingResult => {
+            // Simulate AI-driven credit risk assessment
+            if (!model.trained) {
+                throw new Error("AI model not trained.");
+            }
+
+            const riskScore = (850 - application.creditScore) + (application.loanAmount / application.income * 1000);
+            const approvalStatus = riskScore < 700;
+            const interestRate = approvalStatus ? 0.05 + (riskScore / 10000) : 0.15;
+            const creditLimit = approvalStatus ? application.income * 0.2 : 0;
+
+            return {
+                applicationId: application.id,
+                approvalStatus,
+                interestRate,
+                creditLimit,
+                riskScore
+            };
+        };
+
+        export const runAiUnderwriting = (): void => {
+            const application = simulateCreditApplication();
+            const model = trainAiModel();
+            const result = assessCreditRisk(application, model);
+
+            console.log("Credit Application:", application);
+            console.log("Underwriting Result:", result);
+        };
+    }
+}
+
+// 2. Citibankdemobusinessinc.frauddetect.realtimealerts
+namespace Citibankdemobusinessinc.frauddetect {
+    export namespace realtimealerts {
+        // Mission: Provide real-time fraud detection and alerting to minimize financial losses and protect customers.
+        // Monetization: Transaction-based fees for fraud detection services, volume discounts for high-transaction clients.
+        // IP Moat: Advanced anomaly detection algorithms, behavioral biometrics, and machine learning models.
+
+        interface Transaction {
+            id: string;
+            accountId: string;
+            amount: number;
+            timestamp: string;
+            location: string;
+            transactionType: string;
+        }
+
+        interface FraudAlert {
+            transactionId: string;
+            accountId: string;
+            alertType: string;
+            riskScore: number;
+            timestamp: string;
+        }
+
+        const simulateTransaction = (): Transaction => {
+            return {
+                id: generateRandomId(),
+                accountId: `ACC-${generateRandomNumber(1000, 9999)}`,
+                amount: generateRandomNumber(10, 1000),
+                timestamp: new Date().toISOString(),
+                location: `Location ${generateRandomNumber(1, 10)}`,
+                transactionType: `Type ${generateRandomNumber(1, 5)}`
+            };
+        };
+
+        const trainFraudDetectionModel = (): any => {
+            // Simulate model training
+            console.log("Training fraud detection model...");
+            return { trained: true };
+        };
+
+        const detectFraud = (transaction: Transaction, model: any): FraudAlert | null => {
+            // Simulate fraud detection logic
+            if (!model.trained) {
+                throw new Error("Fraud detection model not trained.");
+            }
+
+            const riskScore = transaction.amount > 500 ? generateRandomNumber(60, 95) : generateRandomNumber(5, 40);
+            if (riskScore > 75) {
+                return {
+                    transactionId: transaction.id,
+                    accountId: transaction.accountId,
+                    alertType: "High Risk Transaction",
+                    riskScore,
+                    timestamp: new Date().toISOString()
+                };
+            }
+            return null;
+        };
+
+        export const runRealtimeAlerts = (): void => {
+            const transaction = simulateTransaction();
+            const model = trainFraudDetectionModel();
+            const alert = detectFraud(transaction, model);
+
+            console.log("Transaction:", transaction);
+            if (alert) {
+                console.log("Fraud Alert:", alert);
+            } else {
+                console.log("No fraud detected.");
+            }
+        };
+    }
+}
+
+// 3. Citibankdemobusinessinc.wealthmgmt.aiadvisor
+namespace Citibankdemobusinessinc.wealthmgmt {
+    export namespace aiadvisor {
+        // Mission: Provide personalized investment advice and portfolio management using AI to help clients achieve their financial goals.
+        // Monetization: Percentage-based management fees on assets under management (AUM), performance-based fees for exceeding benchmarks.
+        // IP Moat: Proprietary AI algorithms for portfolio optimization, risk management, and market forecasting.
+
+        interface ClientProfile {
+            id: string;
+            age: number;
+            income: number;
+            riskTolerance: string;
+            investmentGoals: string[];
+            assets: number;
+        }
+
+        interface InvestmentRecommendation {
+            assetAllocation: { [assetClass: string]: number };
+            expectedReturn: number;
+            riskScore: number;
+        }
+
+        const simulateClientProfile = (): ClientProfile => {
+            return {
+                id: generateRandomId(),
+                age: generateRandomNumber(25, 70),
+                income: generateRandomNumber(50000, 500000),
+                riskTolerance: ["Low", "Medium", "High"][generateRandomNumber(0, 2)],
+                investmentGoals: ["Retirement", "Education", "Wealth Accumulation"],
+                assets: generateRandomNumber(10000, 1000000)
+            };
+        };
+
+        const trainInvestmentModel = (): any => {
+            // Simulate model training
+            console.log("Training investment model...");
+            return { trained: true };
+        };
+
+        const generateInvestmentRecommendation = (profile: ClientProfile, model: any): InvestmentRecommendation => {
+            // Simulate AI-driven investment recommendation
+            if (!model.trained) {
+                throw new Error("Investment model not trained.");
+            }
+
+            const assetAllocation: { [assetClass: string]: number } = {
+                "Stocks": generateRandomNumber(20, 70),
+                "Bonds": generateRandomNumber(10, 50),
+                "Real Estate": generateRandomNumber(0, 20),
+                "Alternatives": generateRandomNumber(0, 10)
+            };
+            const expectedReturn = 0.05 + (profile.assets / 1000000 * 0.02);
+            const riskScore = profile.riskTolerance === "High" ? generateRandomNumber(60, 80) : generateRandomNumber(20, 50);
+
+            return {
+                assetAllocation,
+                expectedReturn,
+                riskScore
+            };
+        };
+
+        export const runAiAdvisor = (): void => {
+            const profile = simulateClientProfile();
+            const model = trainInvestmentModel();
+            const recommendation = generateInvestmentRecommendation(profile, model);
+
+            console.log("Client Profile:", profile);
+            console.log("Investment Recommendation:", recommendation);
+        };
+    }
+}
+
+// 4. Citibankdemobusinessinc.regtech.complianceai
+namespace Citibankdemobusinessinc.regtech {
+    export namespace complianceai {
+        // Mission: Automate regulatory compliance processes using AI to reduce costs, improve accuracy, and ensure adherence to regulations.
+        // Monetization: Subscription fees for access to the compliance AI platform, tiered based on the number of regulations covered and the volume of data processed.
+        // IP Moat: Proprietary AI algorithms for regulatory text analysis, compliance rule generation, and automated reporting.
+
+        interface RegulatoryRequirement {
+            id: string;
+            regulationName: string;
+            description: string;
+            jurisdiction: string;
+            effectiveDate: string;
+        }
+
+        interface ComplianceAssessment {
+            requirementId: string;
+            status: string;
+            dueDate: string;
+            assessmentResult: string;
+        }
+
+        const simulateRegulatoryRequirement = (): RegulatoryRequirement => {
+            return {
+                id: generateRandomId(),
+                regulationName: `Regulation ${generateRandomNumber(1, 20)}`,
+                description: `Description of regulation ${generateRandomNumber(1, 10)}`,
+                jurisdiction: ["US", "EU", "UK"][generateRandomNumber(0, 2)],
+                effectiveDate: new Date().toISOString()
+            };
+        };
+
+        const trainComplianceModel = (): any => {
+            // Simulate model training
+            console.log("Training compliance model...");
+            return { trained: true };
+        };
+
+        const assessCompliance = (requirement: RegulatoryRequirement, model: any): ComplianceAssessment => {
+            // Simulate AI-driven compliance assessment
+            if (!model.trained) {
+                throw new Error("Compliance model not trained.");
+            }
+
+            const status = ["Compliant", "Non-Compliant", "In Progress"][generateRandomNumber(0, 2)];
+            const dueDate = new Date(Date.now() + generateRandomNumber(30, 365) * 86400000).toISOString();
+            const assessmentResult = `Assessment result ${generateRandomNumber(1, 10)}`;
+
+            return {
+                requirementId: requirement.id,
+                status,
+                dueDate,
+                assessmentResult
+            };
+        };
+
+        export const runComplianceAi = (): void => {
+            const requirement = simulateRegulatoryRequirement();
+            const model = trainComplianceModel();
+            const assessment = assessCompliance(requirement, model);
+
+            console.log("Regulatory Requirement:", requirement);
+            console.log("Compliance Assessment:", assessment);
+        };
+    }
+}
+
+// 5. Citibankdemobusinessinc.custserv.chatbot
+namespace Citibankdemobusinessinc.custserv {
+    export namespace chatbot {
+        // Mission: Provide 24/7 customer support using AI-powered chatbots to answer questions, resolve issues, and improve customer satisfaction.
+        // Monetization: Cost savings from reduced customer service staff, increased customer retention, and upselling opportunities.
+        // IP Moat: Proprietary natural language processing (NLP) and machine learning models for understanding and responding to customer inquiries.
+
+        interface CustomerInquiry {
+            id: string;
+            customerId: string;
+            timestamp: string;
+            message: string;
+        }
+
+        interface ChatbotResponse {
+            inquiryId: string;
+            response: string;
+            resolutionStatus: string;
+        }
+
+        const simulateCustomerInquiry = (): CustomerInquiry => {
+            return {
+                id: generateRandomId(),
+                customerId: `CUST-${generateRandomNumber(1000, 9999)}`,
+                timestamp: new Date().toISOString(),
+                message: `Customer inquiry ${generateRandomNumber(1, 10)}`
+            };
+        };
+
+        const trainChatbotModel = (): any => {
+            // Simulate model training
+            console.log("Training chatbot model...");
+            return { trained: true };
+        };
+
+        const generateChatbotResponse = (inquiry: CustomerInquiry, model: any): ChatbotResponse => {
+            // Simulate AI-driven chatbot response
+            if (!model.trained) {
+                throw new Error("Chatbot model not trained.");
+            }
+
+            const response = `Chatbot response to inquiry ${generateRandomNumber(1, 10)}`;
+            const resolutionStatus = ["Resolved", "Pending", "Escalated"][generateRandomNumber(0, 2)];
+
+            return {
+                inquiryId: inquiry.id,
+                response,
+                resolutionStatus
+            };
+        };
+
+        export const runChatbot = (): void => {
+            const inquiry = simulateCustomerInquiry();
+            const model = trainChatbotModel();
+            const response = generateChatbotResponse(inquiry, model);
+
+            console.log("Customer Inquiry:", inquiry);
+            console.log("Chatbot Response:", response);
+        };
+    }
+}
+
+// 6. Citibankdemobusinessinc.marketintel.aisentiment
+namespace Citibankdemobusinessinc.marketintel {
+    export namespace aisentiment {
+        // Mission: Provide real-time market sentiment analysis using AI to help traders and investors make informed decisions.
+        // Monetization: Subscription fees for access to the sentiment analysis platform, tiered based on the number of data sources and the frequency of updates.
+        // IP Moat: Proprietary NLP and machine learning models for sentiment analysis, trained on diverse datasets.
+
+        interface MarketData {
+            id: string;
+            timestamp: string;
