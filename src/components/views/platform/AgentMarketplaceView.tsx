@@ -1,9 +1,76 @@
-```tsx
 import React, { useState, Fragment, useMemo } from 'react';
 import { Transition } from '@headlessui/react';
 
-// Re-using icons from a central source would be ideal, but for this self-contained file,
-// we'll define them here to represent each agent's function.
+// ========================================================================================================================
+// SHARED KERNEL (Citibankdemobusinessinc.core)
+// ========================================================================================================================
+
+// Utility function for generating random numbers within a range
+const getRandomNumber = (min: number, max: number): number => {
+    return Math.random() * (max - min) + min;
+};
+
+// Utility function for generating random strings
+const getRandomString = (length: number): string => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+};
+
+// Generic type for configuration schema
+type ConfigSchemaItem = {
+    key: string;
+    label: string;
+    type: 'slider' | 'select' | 'toggle' | 'number';
+    options?: { value: string; label: string }[];
+    min?: number;
+    max?: number;
+    step?: number;
+};
+
+// Generic type for agent configuration
+type AgentConfig = {
+    [key: string]: string | number | boolean;
+};
+
+// Generic interface for agents
+interface Agent {
+    id: string;
+    name: string;
+    description: string;
+    longDescription: string;
+    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+    tags: string[];
+    status: AgentStatus;
+    config: AgentConfig;
+    configSchema: ConfigSchemaItem[];
+    missionStatement: string;
+    monetizationPaths: string[];
+    defensibleIPMoats: string[];
+    autoScalingArchitecture: string;
+    regulatoryAlignmentFunctions: string[];
+    supervisoryResponseAdaptationLogic: string[];
+    riskDetectionModules: string[];
+    materialRiskEvaluation: string[];
+    liquidityMonitoringLogic: string[];
+    internalGovernanceTracks: string[];
+    complianceAutomation: string[];
+    embeddedAuditSimulation: string;
+    roleBasedAccessControls: string;
+    internalTelemetry: string;
+    encryptedStorage: string;
+    privacyFirstArchitecture: string;
+}
+
+type AgentStatus = 'Available' | 'Deployed' | 'Inactive';
+
+// ========================================================================================================================
+// ICON DEFINITIONS (Shared across all agents)
+// ========================================================================================================================
+
 const SentinelIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
@@ -34,351 +101,204 @@ const AmbassadorIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
     </svg>
 );
+const CatalystIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-2.25a3.375 3.375 0 00-3.375-3.375H3.75m16.5 14.25v2.625a3.375 3.375 0 01-3.375 3.375h-1.5a1.125 1.125 0 00-1.125 1.125v2.25a3.375 3.375 0 01-3.375 3.375H3.75m16.5-14.25h-1.125c-.621 0-1.141.395-1.141.892l.092 1.783c.041.892.074 1.783.074 2.675v.192a.375.375 0 00.375.375h1.5a.375.375 0 00.375-.375v-.192c0-.892.033-1.783.074-2.675l.092-1.783c.025-.497-.495-.892-1.116-.892zM9.75 14.25h-1.125c-.621 0-1.141.395-1.141.892l.092 1.783c.041.892.074 1.783.074 2.675v.192a.375.375 0 00.375.375h1.5a.375.375 0 00.375-.375v-.192c0-.892.033-1.783.074-2.675l.092-1.783c.025-.497-.495-.892-1.116-.892zM6 7.5h12m-1.5 8.25h9" />
+    </svg>
+);
+const NavigatorIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+    </svg>
+);
+const AlchemistIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-4.037m-7.32-1.732a5.003 5.003 0 00-2.538-3.848m-2.825 2.54a1.5 1.5 0 01-.718-.375 1.5 1.5 0 01-.797-1.425 5.035 5.035 0 00-2.422 3.282m19.075-8.393a5.004 5.004 0 00-2.538 3.848m-2.825-2.54a1.5 1.5 0 01-.718.375 1.5 1.5 0 01-.797 1.425 5.035 5.035 0 00-2.422-3.282M3 3.662C3 3.091 3.542 2.55 4.113 2.55h1.624c.717 0 1.307.59 1.307 1.307 0 .68-.522 1.24-1.165 1.294m7.133 0c-.643-.054-1.165-.614-1.165-1.294 0-.717.59-1.307 1.307-1.307h1.624c.571 0 1.113.542 1.113 1.113 0 .571-.542 1.113-1.113 1.113m-2.277 0h3.455" />
+    </svg>
+);
+const CartographerIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.76c0 1.607.716 3.024 1.94 4.076a49.586 49.586 0 006.455 4.244c.026.04.049.08.073.12M2.25 12.76c0-1.607.716-3.024 1.94-4.076a48.574 48.574 0 015.665-3.24M9 21c0-.424.118-.83.321-1.186a48.246 48.246 0 006.357-4.435c.029-.04.056-.076.08-.116M2.25 12.76h15.75m-15.75 0a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0zm15.75 0h1.5m0 0a3.375 3.375 0 10-6.75 0 3.375 3.375 0 006.75 0z" />
+    </svg>
+);
 
-
-type AgentStatus = 'Available' | 'Deployed' | 'Inactive';
-
-type AgentConfig = {
-    [key: string]: string | number | boolean;
-};
-
-interface Agent {
-    id: string;
-    name: string;
-    description: string;
-    longDescription: string;
-    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-    tags: string[];
-    status: AgentStatus;
-    config: AgentConfig;
-    configSchema: {
-        key: string;
-        label: string;
-        type: 'slider' | 'select' | 'toggle';
-        options?: { value: string; label: string }[];
-        min?: number;
-        max?: number;
-    }[];
-}
-
-const initialAgents: Agent[] = [
+// ========================================================================================================================
+// Citibankdemobusinessinc.openbanking.sentinel
+// ========================================================================================================================
+const generateSentinelConfigSchema = (): ConfigSchemaItem[] => [
+    { key: 'vigilance', label: 'Vigilance Level', type: 'slider', min: 1, max: 5, step: 1 },
     {
-        id: 'sentinel',
-        name: 'The Sentinel',
-        description: 'Guardian of system integrity and security.',
-        longDescription: 'Monitors all system activity in real-time to detect, analyze, and neutralize threats. The Sentinel operates on the principle of proactive defense, ensuring the sovereignty of your digital domain against both internal anomalies and external intrusions.',
-        icon: SentinelIcon,
-        tags: ['Security', 'Real-time', 'Proactive Defense'],
-        status: 'Available',
-        config: { vigilance: 3, response: 'freeze' },
-        configSchema: [
-            { key: 'vigilance', label: 'Vigilance Level', type: 'slider', min: 1, max: 5 },
-            { key: 'response', label: 'Response Protocol', type: 'select', options: [
-                { value: 'alert', label: 'Alert Only' },
-                { value: 'freeze', label: 'Alert & Freeze' },
-                { value: 'remediate', label: 'Alert & Auto-Remediate' },
-            ]},
-        ],
+        key: 'response', label: 'Response Protocol', type: 'select', options: [
+            { value: 'alert', label: 'Alert Only' },
+            { value: 'freeze', label: 'Alert & Freeze' },
+            { value: 'remediate', label: 'Alert & Auto-Remediate' },
+        ]
     },
-    {
-        id: 'steward',
-        name: 'The Steward',
-        description: 'Manager of resources and financial efficiency.',
-        longDescription: 'An agent dedicated to the optimization of resources. The Steward analyzes cash flow, budgets, and asset allocation to provide strategic recommendations that align with your long-term financial objectives, ensuring sustainable growth and stability.',
-        icon: StewardIcon,
-        tags: ['Finance', 'Optimization', 'Strategy'],
-        status: 'Available',
-        config: { focus: 'stability', frequency: 'weekly' },
-        configSchema: [
-            { key: 'focus', label: 'Optimization Focus', type: 'select', options: [
-                { value: 'growth', label: 'Aggressive Growth' },
-                { value: 'stability', label: 'Balanced Stability' },
-                { value: 'preservation', label: 'Capital Preservation' },
-            ]},
-            { key: 'frequency', label: 'Reporting Frequency', type: 'select', options: [
-                { value: 'daily', label: 'Daily' },
-                { value: 'weekly', label: 'Weekly' },
-                { value: 'monthly', label: 'Monthly' },
-            ]},
-        ],
-    },
-    {
-        id: 'oracle',
-        name: 'The Oracle',
-        description: 'Simulator of futures and analyst of probabilities.',
-        longDescription: 'The Oracle processes vast datasets and your stated goals to run complex simulations of potential futures. It does not predict, but illuminates the probable consequences of decisions, allowing for more informed and strategic long-term planning.',
-        icon: OracleIcon,
-        tags: ['Forecasting', 'Simulation', 'Decision Support'],
-        status: 'Available',
-        config: { horizon: 'long_term', appetite: 3 },
-        configSchema: [
-            { key: 'horizon', label: 'Simulation Horizon', type: 'select', options: [
-                { value: 'short_term', label: 'Short-Term (1-12 Mo)' },
-                { value: 'medium_term', label: 'Medium-Term (1-5 Yr)' },
-                { value: 'long_term', label: 'Long-Term (5+ Yr)' },
-            ]},
-            { key: 'appetite', label: 'Risk Appetite', type: 'slider', min: 1, max: 5 },
-        ],
-    },
-    {
-        id: 'chronicler',
-        name: 'The Chronicler',
-        description: 'Keeper of the immutable record and historian of actions.',
-        longDescription: 'Ensures every transaction, decision, and system event is recorded with perfect fidelity. The Chronicler maintains the integrity of the ledger, providing a single source of truth and enabling flawless auditability and historical analysis.',
-        icon: ChroniclerIcon,
-        tags: ['Data Integrity', 'Audit', 'History'],
-        status: 'Available',
-        config: { level: 'detailed', categorization: true },
-        configSchema: [
-            { key: 'level', label: 'Logging Level', type: 'select', options: [
-                { value: 'concise', label: 'Concise' },
-                { value: 'detailed', label: 'Detailed' },
-                { value: 'verbose', label: 'Verbose' },
-            ]},
-            { key: 'categorization', label: 'Enable AI Auto-Categorization', type: 'toggle' },
-        ],
-    },
-    {
-        id: 'muse',
-        name: 'The Muse',
-        description: 'Generator of novel ideas and creative strategies.',
-        longDescription: 'The Muse analyzes market trends, your personal assets, and stated interests to generate novel investment ideas, business concepts, and creative solutions. It is designed to break conventional thinking and introduce you to new avenues of potential.',
-        icon: MuseIcon,
-        tags: ['Creativity', 'Ideation', 'Growth'],
-        status: 'Available',
-        config: { spectrum: 'exploratory' },
-        configSchema: [
-            { key: 'spectrum', label: 'Creativity Spectrum', type: 'select', options: [
-                { value: 'grounded', label: 'Grounded & Practical' },
-                { value: 'exploratory', label: 'Exploratory & Novel' },
-                { value: 'unconstrained', label: 'Unconstrained & Abstract' },
-            ]},
-        ],
-    },
-    {
-        id: 'ambassador',
-        name: 'The Ambassador',
-        description: 'Diplomat for external integrations and data treaties.',
-        longDescription: 'Manages all connections to third-party services, ensuring secure and efficient data exchange. The Ambassador operates under the principle of Zero Trust and Least Privilege, negotiating data treaties that strengthen your ecosystem without compromising its security.',
-        icon: AmbassadorIcon,
-        tags: ['Integration', 'API', 'Security'],
-        status: 'Available',
-        config: { stance: 'cautious' },
-        configSchema: [
-            { key: 'stance', label: 'Negotiation Stance', type: 'select', options: [
-                { value: 'open', label: 'Open' },
-                { value: 'cautious', label: 'Cautious' },
-                { value: 'strict', label: 'Strict (Least Privilege)' },
-            ]},
-        ],
-    },
+    { key: 'log_anomalies', label: 'Log Detected Anomalies', type: 'toggle' },
+    { key: 'max_concurrent_checks', label: 'Max Concurrent Checks', type: 'number', min: 100, max: 10000, step: 100 },
 ];
 
-const AgentMarketplaceView: React.FC = () => {
-    const [agents, setAgents] = useState<Agent[]>(initialAgents);
-    const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
-    const [tempConfig, setTempConfig] = useState<AgentConfig | null>(null);
-
-    const handleSelectAgent = (agent: Agent) => {
-        setSelectedAgent(agent);
-        setTempConfig(agent.config);
-    };
-
-    const handleCloseModal = () => {
-        setSelectedAgent(null);
-        setTempConfig(null);
-    };
-
-    const handleConfigChange = (key: string, value: string | number | boolean) => {
-        if (tempConfig) {
-            setTempConfig({ ...tempConfig, [key]: value });
-        }
-    };
-
-    const handleDeploy = () => {
-        if (selectedAgent && tempConfig) {
-            setAgents(agents.map(a => 
-                a.id === selectedAgent.id 
-                    ? { ...a, status: 'Deployed', config: tempConfig } 
-                    : a
-            ));
-            handleCloseModal();
-        }
-    };
-    
-    const handleRecall = () => {
-        if (selectedAgent) {
-            setAgents(agents.map(a => 
-                a.id === selectedAgent.id 
-                    ? { ...a, status: 'Available' } 
-                    : a
-            ));
-            handleCloseModal();
-        }
-    };
-
-    const deployedCount = useMemo(() => agents.filter(a => a.status === 'Deployed').length, [agents]);
-    const availableCount = useMemo(() => agents.filter(a => a.status === 'Available').length, [agents]);
-
-    return (
-        <div className="bg-transparent text-gray-200 min-h-full">
-            <header className="mb-8">
-                <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Agent Marketplace</h1>
-                <p className="mt-2 text-lg text-gray-400">Assemble your council of specialized AI agents. Each agent is a dedicated instrument designed to amplify a specific facet of your will.</p>
-                <div className="mt-4 flex items-center space-x-6 text-sm">
-                    <div className="flex items-center">
-                        <span className="h-2 w-2 rounded-full bg-cyan-400 mr-2"></span>
-                        <span>{deployedCount} Deployed</span>
-                    </div>
-                    <div className="flex items-center">
-                        <span className="h-2 w-2 rounded-full bg-gray-500 mr-2"></span>
-                        <span>{availableCount} Available</span>
-                    </div>
-                </div>
-            </header>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {agents.map(agent => (
-                    <div
-                        key={agent.id}
-                        onClick={() => handleSelectAgent(agent)}
-                        className="relative bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-lg p-6 cursor-pointer transition-all duration-300 hover:border-cyan-400/50 hover:scale-[1.02] hover:bg-gray-800/50"
-                    >
-                        <div className={`absolute top-4 right-4 flex items-center text-xs font-semibold px-2 py-1 rounded-full ${
-                            agent.status === 'Deployed' ? 'bg-cyan-500/10 text-cyan-400' : 'bg-gray-600/20 text-gray-400'
-                        }`}>
-                            <span className={`h-2 w-2 rounded-full mr-2 ${
-                                agent.status === 'Deployed' ? 'bg-cyan-400' : 'bg-gray-500'
-                            }`}></span>
-                            {agent.status}
-                        </div>
-                        
-                        <div className="flex items-center mb-4">
-                            <agent.icon className="h-10 w-10 text-cyan-400 mr-4" />
-                            <div>
-                                <h2 className="text-xl font-bold text-white">{agent.name}</h2>
-                                <p className="text-gray-400 text-sm">{agent.description}</p>
-                            </div>
-                        </div>
-                        
-                        <div className="flex flex-wrap gap-2 mt-4">
-                            {agent.tags.map(tag => (
-                                <span key={tag} className="text-xs bg-gray-700/50 text-gray-300 px-2 py-1 rounded">
-                                    {tag}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            <Transition show={!!selectedAgent} as={Fragment}>
-                <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                    <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0"
-                            enterTo="opacity-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                        >
-                            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" aria-hidden="true" onClick={handleCloseModal}></div>
-                        </Transition.Child>
-
-                        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                            enterTo="opacity-100 translate-y-0 sm:scale-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                        >
-                            <div className="inline-block align-bottom bg-gray-900 border border-gray-700 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                                {selectedAgent && tempConfig && (
-                                    <>
-                                        <div className="px-6 py-5 bg-gray-800/50 border-b border-gray-700">
-                                            <div className="flex items-center">
-                                                <selectedAgent.icon className="h-10 w-10 text-cyan-400 mr-4" />
-                                                <div>
-                                                    <h3 className="text-2xl font-bold leading-6 text-white" id="modal-title">{selectedAgent.name}</h3>
-                                                    <p className="mt-1 text-sm text-gray-400">{selectedAgent.description}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="px-6 py-6">
-                                            <p className="text-gray-300 mb-6">{selectedAgent.longDescription}</p>
-                                            
-                                            <h4 className="text-lg font-semibold text-white mb-4 border-b border-gray-700 pb-2">Configuration</h4>
-                                            <div className="space-y-6">
-                                                {selectedAgent.configSchema.map(schema => (
-                                                    <div key={schema.key}>
-                                                        <label className="block text-sm font-medium text-gray-300 mb-2">{schema.label}</label>
-                                                        {schema.type === 'slider' && (
-                                                            <div className="flex items-center space-x-4">
-                                                                <span className="text-xs text-gray-500">Low</span>
-                                                                <input
-                                                                    type="range"
-                                                                    min={schema.min}
-                                                                    max={schema.max}
-                                                                    value={tempConfig[schema.key] as number}
-                                                                    onChange={(e) => handleConfigChange(schema.key, parseInt(e.target.value, 10))}
-                                                                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
-                                                                />
-                                                                <span className="text-xs text-gray-500">High</span>
-                                                            </div>
-                                                        )}
-                                                        {schema.type === 'select' && schema.options && (
-                                                            <select
-                                                                value={tempConfig[schema.key] as string}
-                                                                onChange={(e) => handleConfigChange(schema.key, e.target.value)}
-                                                                className="w-full bg-gray-800 border border-gray-600 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm"
-                                                            >
-                                                                {schema.options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                                                            </select>
-                                                        )}
-                                                        {schema.type === 'toggle' && (
-                                                           <label className="relative inline-flex items-center cursor-pointer">
-                                                               <input type="checkbox" checked={tempConfig[schema.key] as boolean} onChange={(e) => handleConfigChange(schema.key, e.target.checked)} className="sr-only peer" />
-                                                               <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
-                                                           </label>
-                                                        )}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="bg-gray-800/50 px-6 py-4 flex justify-between items-center">
-                                            <div className="text-sm">
-                                                <span className="font-semibold text-gray-300">Status: </span>
-                                                <span className={`font-bold ${selectedAgent.status === 'Deployed' ? 'text-cyan-400' : 'text-gray-400'}`}>
-                                                    {selectedAgent.status}
-                                                </span>
-                                            </div>
-                                            <div className="flex space-x-3">
-                                                {selectedAgent.status === 'Deployed' && (
-                                                    <button type="button" onClick={handleRecall} className="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-yellow-600/80 text-base font-medium text-white hover:bg-yellow-700/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 sm:text-sm">
-                                                        Recall
-                                                    </button>
-                                                )}
-                                                <button type="button" onClick={handleDeploy} className="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-cyan-600 text-base font-medium text-white hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 sm:text-sm">
-                                                    {selectedAgent.status === 'Deployed' ? 'Update' : 'Deploy'}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        </Transition.Child>
-                    </div>
-                </div>
-            </Transition>
-        </div>
-    );
+const Citibankdemobusinessinc_openbanking_sentinel: Agent = {
+    id: 'sentinel',
+    name: 'The Sentinel',
+    description: 'Guardian of system integrity and security.',
+    longDescription: 'Monitors all system activity in real-time to detect, analyze, and neutralize threats. The Sentinel operates on the principle of proactive defense, ensuring the sovereignty of your digital domain against both internal anomalies and external intrusions.',
+    icon: SentinelIcon,
+    tags: ['Security', 'Real-time', 'Proactive Defense'],
+    status: 'Available',
+    config: { vigilance: 3, response: 'freeze', log_anomalies: true, max_concurrent_checks: 1000 },
+    configSchema: generateSentinelConfigSchema(),
+    missionStatement: 'To ensure the unwavering security and integrity of the open banking ecosystem through proactive threat detection and neutralization.',
+    monetizationPaths: ['Premium security audits', 'Real-time threat intelligence subscriptions', 'Incident response services'],
+    defensibleIPMoats: ['Proprietary anomaly detection algorithms', 'Behavioral analysis models', 'Real-time threat signature database'],
+    autoScalingArchitecture: 'Kubernetes-based auto-scaling with dynamic resource allocation based on threat levels.',
+    regulatoryAlignmentFunctions: ['GDPR compliance checks', 'CCPA compliance checks', 'KYC/AML transaction monitoring'],
+    supervisoryResponseAdaptationLogic: ['Automated escalation to security teams', 'Adaptive response protocols based on threat severity', 'Real-time reporting to regulatory bodies'],
+    riskDetectionModules: ['Network intrusion detection', 'Application vulnerability scanning', 'Data leakage prevention'],
+    materialRiskEvaluation: ['Quantification of potential financial losses', 'Reputational damage assessment', 'Legal liability analysis'],
+    liquidityMonitoringLogic: ['Real-time monitoring of transaction volumes', 'Detection of unusual spending patterns', 'Automated alerts for liquidity breaches'],
+    internalGovernanceTracks: ['Security policy enforcement', 'Access control management', 'Audit trail maintenance'],
+    complianceAutomation: ['Automated generation of compliance reports', 'Real-time monitoring of regulatory changes', 'Automated policy updates'],
+    embeddedAuditSimulation: 'Simulates security breaches and compliance violations to identify weaknesses and improve defenses.',
+    roleBasedAccessControls: 'Granular access controls based on user roles and responsibilities.',
+    internalTelemetry: 'Comprehensive monitoring of system performance and security events.',
+    encryptedStorage: 'End-to-end encryption of all sensitive data at rest and in transit.',
+    privacyFirstArchitecture: 'Designed with privacy as a core principle, minimizing data collection and maximizing user control.',
 };
 
-export default AgentMarketplaceView;
-```
+// ========================================================================================================================
+// Citibankdemobusinessinc.openbanking.steward
+// ========================================================================================================================
+const generateStewardConfigSchema = (): ConfigSchemaItem[] => [
+    {
+        key: 'focus', label: 'Optimization Focus', type: 'select', options: [
+            { value: 'growth', label: 'Aggressive Growth' },
+            { value: 'stability', label: 'Balanced Stability' },
+            { value: 'preservation', label: 'Capital Preservation' },
+        ]
+    },
+    {
+        key: 'frequency', label: 'Reporting Frequency', type: 'select', options: [
+            { value: 'daily', label: 'Daily' },
+            { value: 'weekly', label: 'Weekly' },
+            { value: 'monthly', label: 'Monthly' },
+        ]
+    },
+    { key: 'risk_tolerance', label: 'Risk Tolerance', type: 'slider', min: 1, max: 10, step: 1 },
+    { key: 'automation_level', label: 'Automation Level', type: 'number', min: 0, max: 100, step: 10 },
+];
+
+const Citibankdemobusinessinc_openbanking_steward: Agent = {
+    id: 'steward',
+    name: 'The Steward',
+    description: 'Manager of resources and financial efficiency.',
+    longDescription: 'An agent dedicated to the optimization of resources. The Steward analyzes cash flow, budgets, and asset allocation to provide strategic recommendations that align with your long-term financial objectives, ensuring sustainable growth and stability.',
+    icon: StewardIcon,
+    tags: ['Finance', 'Optimization', 'Strategy'],
+    status: 'Available',
+    config: { focus: 'stability', frequency: 'weekly', risk_tolerance: 5, automation_level: 70 },
+    configSchema: generateStewardConfigSchema(),
+    missionStatement: 'To optimize resource allocation and financial efficiency, ensuring sustainable growth and stability within the open banking ecosystem.',
+    monetizationPaths: ['Performance-based advisory fees', 'Subscription-based financial planning tools', 'Customized financial reports'],
+    defensibleIPMoats: ['Proprietary financial modeling algorithms', 'AI-powered investment recommendations', 'Automated risk assessment tools'],
+    autoScalingArchitecture: 'Serverless architecture with dynamic scaling based on transaction volumes and user activity.',
+    regulatoryAlignmentFunctions: ['Compliance with financial regulations', 'Automated tax reporting', 'Fraud detection and prevention'],
+    supervisoryResponseAdaptationLogic: ['Automated alerts for regulatory breaches', 'Adaptive investment strategies based on market conditions', 'Real-time reporting to financial institutions'],
+    riskDetectionModules: ['Credit risk assessment', 'Market risk analysis', 'Operational risk management'],
+    materialRiskEvaluation: ['Quantification of potential financial losses', 'Reputational damage assessment', 'Legal liability analysis'],
+    liquidityMonitoringLogic: ['Real-time monitoring of cash flow', 'Detection of unusual spending patterns', 'Automated alerts for liquidity breaches'],
+    internalGovernanceTracks: ['Financial policy enforcement', 'Budget management', 'Audit trail maintenance'],
+    complianceAutomation: ['Automated generation of compliance reports', 'Real-time monitoring of regulatory changes', 'Automated policy updates'],
+    embeddedAuditSimulation: 'Simulates financial crises and regulatory changes to identify weaknesses and improve resilience.',
+    roleBasedAccessControls: 'Granular access controls based on user roles and responsibilities.',
+    internalTelemetry: 'Comprehensive monitoring of financial performance and system health.',
+    encryptedStorage: 'End-to-end encryption of all financial data at rest and in transit.',
+    privacyFirstArchitecture: 'Designed with privacy as a core principle, minimizing data collection and maximizing user control.',
+};
+
+// ========================================================================================================================
+// Citibankdemobusinessinc.openbanking.oracle
+// ========================================================================================================================
+const generateOracleConfigSchema = (): ConfigSchemaItem[] => [
+    {
+        key: 'horizon', label: 'Simulation Horizon', type: 'select', options: [
+            { value: 'short_term', label: 'Short-Term (1-12 Mo)' },
+            { value: 'medium_term', label: 'Medium-Term (1-5 Yr)' },
+            { value: 'long_term', label: 'Long-Term (5+ Yr)' },
+        ]
+    },
+    { key: 'appetite', label: 'Risk Appetite', type: 'slider', min: 1, max: 5, step: 1 },
+    { key: 'num_simulations', label: 'Number of Simulations', type: 'number', min: 100, max: 10000, step: 100 },
+    { key: 'model_accuracy', label: 'Model Accuracy (%)', type: 'number', min: 50, max: 99, step: 1 },
+];
+
+const Citibankdemobusinessinc_openbanking_oracle: Agent = {
+    id: 'oracle',
+    name: 'The Oracle',
+    description: 'Simulator of futures and analyst of probabilities.',
+    longDescription: 'The Oracle processes vast datasets and your stated goals to run complex simulations of potential futures. It does not predict, but illuminates the probable consequences of decisions, allowing for more informed and strategic long-term planning.',
+    icon: OracleIcon,
+    tags: ['Forecasting', 'Simulation', 'Decision Support'],
+    status: 'Available',
+    config: { horizon: 'long_term', appetite: 3, num_simulations: 1000, model_accuracy: 95 },
+    configSchema: generateOracleConfigSchema(),
+    missionStatement: 'To illuminate the probable consequences of decisions through complex simulations, enabling informed and strategic long-term planning within the open banking ecosystem.',
+    monetizationPaths: ['Subscription-based access to simulation tools', 'Customized scenario planning services', 'Risk assessment reports'],
+    defensibleIPMoats: ['Proprietary simulation algorithms', 'AI-powered forecasting models', 'Real-time data analytics platform'],
+    autoScalingArchitecture: 'Distributed computing architecture with dynamic scaling based on simulation complexity and data volume.',
+    regulatoryAlignmentFunctions: ['Compliance with financial regulations', 'Stress testing of financial models', 'Risk disclosure reporting'],
+    supervisoryResponseAdaptationLogic: ['Automated alerts for high-risk scenarios', 'Adaptive simulation parameters based on market conditions', 'Real-time reporting to regulatory bodies'],
+    riskDetectionModules: ['Market risk analysis', 'Credit risk assessment', 'Operational risk management'],
+    materialRiskEvaluation: ['Quantification of potential financial losses', 'Reputational damage assessment', 'Legal liability analysis'],
+    liquidityMonitoringLogic: ['Real-time monitoring of cash flow', 'Detection of unusual spending patterns', 'Automated alerts for liquidity breaches'],
+    internalGovernanceTracks: ['Model validation', 'Scenario planning', 'Audit trail maintenance'],
+    complianceAutomation: ['Automated generation of compliance reports', 'Real-time monitoring of regulatory changes', 'Automated policy updates'],
+    embeddedAuditSimulation: 'Simulates market crashes and regulatory changes to identify vulnerabilities and improve resilience.',
+    roleBasedAccessControls: 'Granular access controls based on user roles and responsibilities.',
+    internalTelemetry: 'Comprehensive monitoring of simulation performance and data accuracy.',
+    encryptedStorage: 'End-to-end encryption of all simulation data at rest and in transit.',
+    privacyFirstArchitecture: 'Designed with privacy as a core principle, minimizing data collection and maximizing user control.',
+};
+
+// ========================================================================================================================
+// Citibankdemobusinessinc.openbanking.chronicler
+// ========================================================================================================================
+const generateChroniclerConfigSchema = (): ConfigSchemaItem[] => [
+    {
+        key: 'level', label: 'Logging Level', type: 'select', options: [
+            { value: 'concise', label: 'Concise' },
+            { value: 'detailed', label: 'Detailed' },
+            { value: 'verbose', label: 'Verbose' },
+        ]
+    },
+    { key: 'categorization', label: 'Enable AI Auto-Categorization', type: 'toggle' },
+    { key: 'data_retention', label: 'Data Retention (Days)', type: 'number', min: 30, max: 365, step: 30 },
+    { key: 'encryption_enabled', label: 'Enable Encryption', type: 'toggle' },
+];
+
+const Citibankdemobusinessinc_openbanking_chronicler: Agent = {
+    id: 'chronicler',
+    name: 'The Chronicler',
+    description: 'Keeper of the immutable record and historian of actions.',
+    longDescription: 'Ensures every transaction, decision, and system event is recorded with perfect fidelity. The Chronicler maintains the integrity of the ledger, providing a single source of truth and enabling flawless auditability and historical analysis.',
+    icon: ChroniclerIcon,
+    tags: ['Data Integrity', 'Audit', 'History'],
+    status: 'Available',
+    config: { level: 'detailed', categorization: true, data_retention: 90, encryption_enabled: true },
+    configSchema: generateChroniclerConfigSchema(),
+    missionStatement: 'To maintain an immutable record of all transactions and system events, ensuring data integrity and enabling flawless auditability within the open banking ecosystem.',
+    monetizationPaths: ['Audit trail subscriptions', 'Data analytics services', 'Compliance reporting tools'],
+    defensibleIPMoats: ['Proprietary data indexing algorithms', 'AI-powered anomaly detection', 'Secure data storage infrastructure'],
+    autoScalingArchitecture: 'Scalable data storage architecture with dynamic scaling based on data volume and query frequency.',
+    regulatoryAlignmentFunctions: ['Compliance with data retention policies', 'Automated audit trail generation', 'Data privacy compliance'],
+    supervisoryResponseAdaptationLogic: ['Automated alerts for data breaches', 'Adaptive data retention policies based on regulatory requirements', 'Real-time reporting to regulatory bodies'],
+    riskDetectionModules: ['Data integrity monitoring', 'Access control auditing', 'Data leakage prevention'],
+    materialRiskEvaluation: ['Quantification of potential financial losses', 'Reputational damage assessment', 'Legal liability analysis'],
+    liquidityMonitoringLogic: ['Real-time monitoring of data access patterns', 'Detection of unusual data retrieval activities', 'Automated alerts for data breaches'],
+    internalGovernanceTracks: ['Data governance policy enforcement', 'Access control management', 'Audit trail maintenance'],
+    complianceAutomation: ['Automated generation of compliance reports', 'Real-time monitoring of regulatory changes', 'Automated policy updates'],
+    embeddedAuditSimulation: 'Simulates data breaches and compliance violations to identify weaknesses and improve data security.',
+    roleBasedAccessControls: 'Granular access controls based on user roles and responsibilities.',
+    internalTelemetry: 'Comprehensive monitoring of data storage and retrieval performance.',
+    encryptedStorage: 'End-to-end encryption of all data at rest and in transit.',
+    privacyFirstArchitecture: 'Designed with privacy
