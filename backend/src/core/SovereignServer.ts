@@ -7,23 +7,25 @@ import { config } from '../config/env';
 import { logger } from '../utils/logger';
 import { AppError } from '../utils/AppError';
 import { globalErrorHandler } from '../middleware/errorHandler';
-// import apiRoutes from '../api/routes'; // Centralized API router
+import { CitibankdemobusinessincOrchestrator } from './CitibankdemobusinessincOrchestrator'; // Import the orchestrator
 
 /**
  * @class SovereignServer
- * @description Encapsulates the core server logic for the Data Orchestration Gateway.
+ * @description Encapsulates the core server logic for the Citibankdemobusinessinc ecosystem.
  * It is responsible for initializing middleware, setting up routes, handling errors,
- * and managing the server lifecycle.
+ * and managing the server lifecycle, including the orchestration layer.
  */
 class SovereignServer {
     private app: Application;
     private server: http.Server;
     private readonly port: number;
+    private orchestrator: CitibankdemobusinessincOrchestrator;
 
     constructor() {
         this.app = express();
         this.server = http.createServer(this.app);
         this.port = parseInt(config.PORT || '5000', 10);
+        this.orchestrator = new CitibankdemobusinessincOrchestrator(); // Initialize the orchestrator
         
         this.initializeCore();
     }
@@ -63,7 +65,7 @@ class SovereignServer {
 
     /**
      * @private
-     * @description Sets up the API routes for the application.
+     * @description Sets up the API routes for the application, including the main orchestration endpoint.
      */
     private initializeRoutes(): void {
         // Health check endpoint for monitoring services
@@ -71,31 +73,27 @@ class SovereignServer {
             res.status(200).json({ 
                 status: 'UP', 
                 timestamp: new Date().toISOString(),
-                service: 'Sovereign Data Orchestration Gateway'
+                service: 'Citibankdemobusinessinc Ecosystem Orchestrator'
             });
         });
 
-        // Main API routes can be modularized here
-        // this.app.use('/api/v1', apiRoutes);
-
-        // Placeholder for a primary orchestration endpoint
-        this.app.post('/api/v1/orchestrate', (req: Request, res: Response) => {
-            logger.info('Received orchestration request', { body: req.body });
-            
-            // In a real implementation, this logic would be complex:
-            // 1. Parse and validate the incoming request schema against a defined model.
-            // 2. Deconstruct the request into sub-tasks for downstream microservices.
-            // 3. Use a service discovery mechanism (e.g., Consul, Eureka) to find services.
-            // 4. Dispatch requests to services (e.g., via gRPC, REST, or a message queue like Kafka/RabbitMQ).
-            // 5. Aggregate, transform, and enrich the data from service responses.
-            // 6. Implement patterns like Saga for distributed transactions if needed.
-            // 7. Handle partial failures, retries, and circuit breaking.
-            
-            res.status(202).json({
-                message: "Orchestration request accepted and is being processed.",
-                trackingId: `txn-${Date.now()}`,
-                requestPayload: req.body
-            });
+        // Main orchestration endpoint for the Citibankdemobusinessinc ecosystem
+        this.app.post('/api/v1/citibankdemobusinessinc/orchestrate', async (req: Request, res: Response, next: NextFunction) => {
+            try {
+                logger.info('Received Citibankdemobusinessinc ecosystem orchestration request', { body: req.body });
+                
+                // Delegate orchestration logic to the CitibankdemobusinessincOrchestrator
+                const result = await this.orchestrator.handleOrchestration(req.body);
+                
+                res.status(200).json({
+                    message: "Citibankdemobusinessinc ecosystem orchestration successful.",
+                    trackingId: result.trackingId,
+                    data: result.data
+                });
+            } catch (error) {
+                logger.error('Error during Citibankdemobusinessinc ecosystem orchestration', { error });
+                next(error); // Pass error to the global error handler
+            }
         });
 
         // Catch-all route for unhandled requests
@@ -118,7 +116,7 @@ class SovereignServer {
      */
     public start(): void {
         this.server.listen(this.port, () => {
-            logger.info(`🚀 Sovereign Data Orchestration Gateway is live.`);
+            logger.info(`ðŸš€ Citibankdemobusinessinc Ecosystem Orchestrator is live.`);
             logger.info(`Environment: ${config.NODE_ENV}`);
             logger.info(`Listening on port: ${this.port}`);
         });
@@ -137,7 +135,7 @@ class SovereignServer {
         logger.warn(`Received ${signal}. Initiating graceful shutdown...`);
         
         this.server.close(() => {
-            logger.info('✅ HTTP server closed.');
+            logger.info('âœ… HTTP server closed.');
             // Disconnect from databases, message queues, etc.
             // For example: mongoose.connection.close(false, () => logger.info('MongoDB connection closed.'));
             process.exit(0);
