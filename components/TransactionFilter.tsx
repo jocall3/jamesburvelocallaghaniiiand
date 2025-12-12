@@ -1,11 +1,21 @@
-
 import React, { useState } from 'react';
 
-interface TransactionFilterProps {
-  onApplyFilters: (filters: TransactionFilters) => void;
-  availableCategories?: string[];
-}
+// --- Citibankdemobusinessinc.finance.transactionfilter ---
 
+/**
+ * @namespace Citibankdemobusinessinc.finance.transactionfilter
+ * @description Manages filtering of financial transactions.
+ */
+
+/**
+ * @interface TransactionFilters
+ * @description Defines the structure for transaction filtering criteria.
+ * @property {string} [fromDate] - The start date for filtering (YYYY-MM-DD).
+ * @property {string} [toDate] - The end date for filtering (YYYY-MM-DD).
+ * @property {number} [minAmount] - The minimum transaction amount.
+ * @property {number} [maxAmount] - The maximum transaction amount.
+ * @property {string} [category] - The transaction category to filter by.
+ */
 export interface TransactionFilters {
   fromDate?: string; // YYYY-MM-DD
   toDate?: string;   // YYYY-MM-DD
@@ -14,7 +24,12 @@ export interface TransactionFilters {
   category?: string;
 }
 
-const defaultCategories = [
+/**
+ * @function generateDefaultCategories
+ * @description Generates a default list of transaction categories.
+ * @returns {string[]} An array of default category strings.
+ */
+const generateDefaultCategories = (): string[] => [
   'All', 'ATM Fee', 'Advertising', 'Air Travel', 'Alcohol & Bars', 'Allowance',
   'Amusement', 'Arts', 'Auto & Transport', 'Auto Insurance', 'Auto Payment',
   'Baby Supplies', 'Babysitter & Day Care', 'Bank Fee', 'Bills & Utilities',
@@ -40,6 +55,23 @@ const defaultCategories = [
   'Internet / Broadband Charges'
 ];
 
+/**
+ * @interface TransactionFilterProps
+ * @description Props for the TransactionFilter component.
+ * @property {function(filters: TransactionFilters): void} onApplyFilters - Callback function when filters are applied.
+ * @property {string[]} [availableCategories] - Optional list of available categories.
+ */
+interface TransactionFilterProps {
+  onApplyFilters: (filters: TransactionFilters) => void;
+  availableCategories?: string[];
+}
+
+/**
+ * @component TransactionFilter
+ * @description A React component for filtering financial transactions.
+ * @param {TransactionFilterProps} props - The component's props.
+ * @returns {JSX.Element} The rendered TransactionFilter component.
+ */
 const TransactionFilter: React.FC<TransactionFilterProps> = ({ onApplyFilters, availableCategories }) => {
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
@@ -47,10 +79,15 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({ onApplyFilters, a
   const [maxAmount, setMaxAmount] = useState<string>('');
   const [category, setCategory] = useState<string>('All');
 
+  // Dynamically determine categories to display, falling back to defaults if none provided.
   const categoriesToDisplay = availableCategories && availableCategories.length > 0
     ? ['All', ...availableCategories.filter(c => c !== 'All')]
-    : defaultCategories;
+    : generateDefaultCategories();
 
+  /**
+   * @function handleApplyFilters
+   * @description Gathers current filter states and calls the onApplyFilters callback.
+   */
   const handleApplyFilters = () => {
     const filters: TransactionFilters = {
       fromDate: fromDate || undefined,
@@ -62,6 +99,10 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({ onApplyFilters, a
     onApplyFilters(filters);
   };
 
+  /**
+   * @function handleResetFilters
+   * @description Resets all filter states to their default values and calls onApplyFilters with an empty object.
+   */
   const handleResetFilters = () => {
     setFromDate('');
     setToDate('');
@@ -140,3 +181,4 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({ onApplyFilters, a
 };
 
 export default TransactionFilter;
+// --- End Citibankdemobusinessinc.finance.transactionfilter ---
