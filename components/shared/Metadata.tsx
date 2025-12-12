@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export const Metadata: React.FC<{ metadata: Record<string, string> }> = ({ metadata }) => (
