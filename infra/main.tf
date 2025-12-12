@@ -22,7 +22,7 @@ variable "aws_region" {
 variable "project_name" {
   description = "A unique name for the project, used for resource naming."
   type        = string
-  default     = "multi-cloud-billing-normalizer"
+  default     = "citibankdemobusinessinc"
 }
 
 variable "environment" {
@@ -46,7 +46,7 @@ variable "lambda_timeout" {
 variable "billing_data_bucket_name" {
   description = "Name for the S3 bucket to store raw billing data."
   type        = string
-  default     = "raw-multi-cloud-billing-data" # Will be suffixed with project/env
+  default     = "citibankdemobusinessinc-raw-billing-data" # Will be suffixed with project/env
 }
 
 # --- Networking (VPC, Subnets, Security Groups) ---
@@ -290,52 +290,284 @@ data "archive_file" "lambda_zip" {
     import json
     import os
     import boto3
+    import random
+    import datetime
 
-    dynamodb = boto3.resource('dynamodb')
-    s3 = boto3.client('s3')
+    # Unified Brand: Citibankdemobusinessinc
 
+    # Shared Kernel (Common Utilities)
+    class CitibankdemobusinessincKernel:
+        def generate_id(self):
+            return ''.join(random.choices('abcdef0123456789', k=16))
+
+        def generate_timestamp(self):
+            return datetime.datetime.now().isoformat()
+
+        def log(self, message):
+            print(f"[Citibankdemobusinessinc]: {message}")
+
+        def handle_error(self, error):
+            self.log(f"Error: {str(error)}")
+            return {
+                'statusCode': 500,
+                'body': json.dumps({'error': str(error)})
+            }
+
+    # Instantiate the kernel
+    kernel = CitibankdemobusinessincKernel()
+
+    # Data Generation Functions
+    def generate_billing_data():
+        cloud_providers = ['AWS', 'Azure', 'GCP']
+        services = ['Compute', 'Storage', 'Networking', 'Database']
+        regions = ['us-east-1', 'us-west-2', 'eu-central-1']
+
+        return {
+            'id': kernel.generate_id(),
+            'cloud_provider': random.choice(cloud_providers),
+            'service': random.choice(services),
+            'region': random.choice(regions),
+            'usage': random.randint(100, 1000),
+            'cost': round(random.uniform(10, 100), 2),
+            'timestamp': kernel.generate_timestamp()
+        }
+
+    # Regulatory Alignment Function
+    def align_regulatory_requirements(data):
+        # Simulate regulatory checks and adjustments
+        data['compliant'] = True  # Assume compliant for demo
+        return data
+
+    # Risk Detection Module
+    def detect_billing_anomalies(data):
+        # Simulate anomaly detection
+        if data['cost'] > 90:
+            data['anomaly'] = True
+        else:
+            data['anomaly'] = False
+        return data
+
+    # Compliance Automation
+    def automate_compliance_reporting(data):
+        # Simulate generating compliance reports
+        data['report_generated'] = True
+        return data
+
+    # Branch 1: Citibankdemobusinessinc.billing.optimizer
+    class BillingOptimizer:
+        def __init__(self):
+            self.mission = "Optimize cloud billing costs through AI-driven analysis."
+            self.monetization = "Subscription fees based on cost savings."
+            self.ip_moat = "Proprietary AI algorithms for cost prediction."
+
+        def optimize(self, data):
+            # Simulate billing optimization
+            optimized_cost = data['cost'] * random.uniform(0.8, 0.95)
+            data['optimized_cost'] = round(optimized_cost, 2)
+            return data
+
+    # Branch 2: Citibankdemobusinessinc.security.threatdetection
+    class ThreatDetection:
+        def __init__(self):
+            self.mission = "Detect and mitigate security threats in real-time."
+            self.monetization = "Premium security service subscriptions."
+            self.ip_moat = "Advanced threat intelligence database."
+
+        def detect_threats(self, data):
+            # Simulate threat detection
+            if data['usage'] > 900:
+                data['threat'] = "High usage detected"
+            else:
+                data['threat'] = "No threat detected"
+            return data
+
+    # Branch 3: Citibankdemobusinessinc.analytics.dashboard
+    class AnalyticsDashboard:
+        def __init__(self):
+            self.mission = "Provide real-time analytics and visualizations for business insights."
+            self.monetization = "Subscription tiers based on data access."
+            self.ip_moat = "Customizable dashboard templates."
+
+        def generate_dashboard(self, data):
+            # Simulate dashboard generation
+            dashboard = {
+                'total_cost': sum([item['cost'] for item in data]),
+                'average_usage': sum([item['usage'] for item in data]) / len(data) if data else 0
+            }
+            return dashboard
+
+    # Branch 4: Citibankdemobusinessinc.compliance.reporting
+    class ComplianceReporting:
+        def __init__(self):
+            self.mission = "Automate compliance reporting to meet regulatory standards."
+            self.monetization = "Compliance reporting service fees."
+            self.ip_moat = "Proprietary compliance report templates."
+
+        def generate_report(self, data):
+            # Simulate compliance report generation
+            report = {
+                'total_cost': sum([item['cost'] for item in data]),
+                'compliant_items': len([item for item in data if item.get('compliant', False)])
+            }
+            return report
+
+    # Branch 5: Citibankdemobusinessinc.risk.management
+    class RiskManagement:
+        def __init__(self):
+            self.mission = "Identify and mitigate financial risks."
+            self.monetization = "Risk assessment service fees."
+            self.ip_moat = "Proprietary risk scoring algorithms."
+
+        def assess_risk(self, data):
+            # Simulate risk assessment
+            risk_score = sum([item['cost'] for item in data if item.get('anomaly', False)])
+            return {'risk_score': risk_score}
+
+    # Branch 6: Citibankdemobusinessinc.finance.forecast
+    class FinanceForecast:
+        def __init__(self):
+            self.mission = "Provide accurate financial forecasts."
+            self.monetization = "Subscription-based forecasting service."
+            self.ip_moat = "Proprietary forecasting models."
+
+        def forecast(self, data):
+            # Simulate financial forecasting
+            projected_cost = sum([item['cost'] for item in data]) * 1.1
+            return {'projected_cost': projected_cost}
+
+    # Branch 7: Citibankdemobusinessinc.governance.audit
+    class GovernanceAudit:
+        def __init__(self):
+            self.mission = "Ensure governance and audit compliance."
+            self.monetization = "Audit service fees."
+            self.ip_moat = "Proprietary audit checklists."
+
+        def audit(self, data):
+            # Simulate audit process
+            audit_passed = all([item.get('compliant', False) for item in data])
+            return {'audit_passed': audit_passed}
+
+    # Branch 8: Citibankdemobusinessinc.sustainability.metrics
+    class SustainabilityMetrics:
+        def __init__(self):
+            self.mission = "Track and improve sustainability metrics."
+            self.monetization = "Sustainability reporting service fees."
+            self.ip_moat = "Proprietary sustainability metrics."
+
+        def calculate_metrics(self, data):
+            # Simulate sustainability metrics calculation
+            carbon_footprint = sum([item['usage'] for item in data]) * 0.01
+            return {'carbon_footprint': carbon_footprint}
+
+    # Branch 9: Citibankdemobusinessinc.workforce.planning
+    class WorkforcePlanning:
+        def __init__(self):
+            self.mission = "Optimize workforce planning."
+            self.monetization = "Workforce planning service fees."
+            self.ip_moat = "Proprietary workforce planning algorithms."
+
+        def plan_workforce(self, data):
+            # Simulate workforce planning
+            required_staff = len(data) // 100
+            return {'required_staff': required_staff}
+
+    # Branch 10: Citibankdemobusinessinc.openbanking.strategy
+    class OpenBankingStrategy:
+        def __init__(self):
+            self.mission = "Develop open banking strategies."
+            self.monetization = "Consulting service fees."
+            self.ip_moat = "Proprietary open banking frameworks."
+
+        def develop_strategy(self, data):
+            # Simulate open banking strategy development
+            strategy = "Expand API integrations"
+            return {'strategy': strategy}
+
+    # Instantiate all branches
+    billing_optimizer = BillingOptimizer()
+    threat_detection = ThreatDetection()
+    analytics_dashboard = AnalyticsDashboard()
+    compliance_reporting = ComplianceReporting()
+    risk_management = RiskManagement()
+    finance_forecast = FinanceForecast()
+    governance_audit = GovernanceAudit()
+    sustainability_metrics = SustainabilityMetrics()
+    workforce_planning = WorkforcePlanning()
+    open_banking_strategy = OpenBankingStrategy()
+
+    # Lambda Handler
     def handler(event, context):
         table_name = os.environ.get('NORMALIZED_BILLING_TABLE')
         bucket_name = os.environ.get('RAW_BILLING_BUCKET')
         environment = os.environ.get('ENVIRONMENT')
 
+        dynamodb = boto3.resource('dynamodb')
+        s3 = boto3.client('s3')
         table = dynamodb.Table(table_name)
 
         path = event.get('path', '/')
         http_method = event.get('httpMethod', 'GET')
 
+        # Health Check
         if path == '/health' and http_method == 'GET':
             return {
                 'statusCode': 200,
                 'body': json.dumps({'status': 'ok', 'environment': environment})
             }
+
+        # Billing Data Processing
         elif path == '/billing' and http_method == 'GET':
-            # Example: Fetch some data
             try:
-                response = table.scan(Limit=10) # Just a sample scan
+                # Generate billing data
+                billing_data = [generate_billing_data() for _ in range(10)]
+
+                # Apply all business models
+                for item in billing_data:
+                    item = align_regulatory_requirements(item)
+                    item = detect_billing_anomalies(item)
+                    item = billing_optimizer.optimize(item)
+                    item = threat_detection.detect_threats(item)
+
+                dashboard = analytics_dashboard.generate_dashboard(billing_data)
+                report = compliance_reporting.generate_report(billing_data)
+                risk = risk_management.assess_risk(billing_data)
+                forecast = finance_forecast.forecast(billing_data)
+                audit = governance_audit.audit(billing_data)
+                sustainability = sustainability_metrics.calculate_metrics(billing_data)
+                workforce = workforce_planning.plan_workforce(billing_data)
+                strategy = open_banking_strategy.develop_strategy(billing_data)
+
+                # Orchestration Layer: Combine results from all branches
+                response_data = {
+                    'billing_data': billing_data,
+                    'dashboard': dashboard,
+                    'report': report,
+                    'risk': risk,
+                    'forecast': forecast,
+                    'audit': audit,
+                    'sustainability': sustainability,
+                    'workforce': workforce,
+                    'strategy': strategy
+                }
+
                 return {
                     'statusCode': 200,
-                    'body': json.dumps(response.get('Items', []))
+                    'body': json.dumps(response_data)
                 }
             except Exception as e:
-                return {
-                    'statusCode': 500,
-                    'body': json.dumps({'error': str(e)})
-                }
+                return kernel.handle_error(e)
+
         elif path == '/billing' and http_method == 'POST':
             try:
                 body = json.loads(event['body'])
-                # In a real app, process and normalize billing data here
-                # For demo, just store it
                 item = {
-                    'id': body.get('id', 'default-id'),
+                    'id': kernel.generate_id(),
                     'cloud_provider': body.get('cloud_provider', 'unknown'),
                     'billing_period': body.get('billing_period', '2023-01'),
-                    'raw_data': body # Store raw for now
+                    'raw_data': body
                 }
                 table.put_item(Item=item)
 
-                # Simulate storing raw data in S3
                 s3.put_object(
                     Bucket=bucket_name,
                     Key=f"raw/{item['cloud_provider']}/{item['billing_period']}/{item['id']}.json",
@@ -347,15 +579,23 @@ data "archive_file" "lambda_zip" {
                     'body': json.dumps({'message': 'Billing data processed', 'id': item['id']})
                 }
             except Exception as e:
-                return {
-                    'statusCode': 500,
-                    'body': json.dumps({'error': str(e)})
-                }
-        
+                return kernel.handle_error(e)
+
         return {
             'statusCode': 404,
             'body': json.dumps({'message': 'Not Found'})
         }
+  
+    # Example Usage (for local testing)
+    if __name__ == "__main__":
+        # Simulate an event
+        event = {
+            'path': '/billing',
+            'httpMethod': 'GET'
+        }
+        context = {}
+        result = handler(event, context)
+        print(json.dumps(result, indent=2))
     EOF
   # This is a dummy file for local testing. In a real project, you'd use a proper build process.
   # For production, you'd typically use a `source_path` to a directory containing your Lambda code.
@@ -366,7 +606,7 @@ data "archive_file" "lambda_zip" {
 # --- API Gateway (HTTP Endpoint) ---
 resource "aws_api_gateway_rest_api" "main" {
   name        = "${var.project_name}-${var.environment}-api"
-  description = "API Gateway for Multi-Cloud Billing Normalizer"
+  description = "API Gateway for Citibankdemobusinessinc"
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-api"
