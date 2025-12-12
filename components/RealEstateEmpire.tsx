@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 
 // --- Core Domain Models (Diminished for Minimalist Operation) ---
@@ -202,7 +201,7 @@ const ExecutiveMetricCard: React.FC<{ title: string; value: string; secondaryVal
       {secondaryValue && (
         <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', fontSize: '14px' }}>
           <span style={{ color: trendColor, marginRight: '5px' }}>
-            {trend === 'up' ? '▲' : trend === 'down' ? '▼' : '—'}
+            {trend === 'up' ? 'â–²' : trend === 'down' ? 'â–¼' : 'â€”'}
           </span>
           <span style={{ color: trendColor }}>{secondaryValue}</span>
         </div>
@@ -435,7 +434,7 @@ export const RealEstateEmpire: React.FC = () => {
                     {header.label}
                     {header.key === sortKey && (
                       <span style={{ marginLeft: '5px', fontSize: '0.8em' }}>
-                        {sortDirection === 'asc' ? '▲' : '▼'}
+                        {sortDirection === 'asc' ? 'â–²' : 'â–¼'}
                       </span>
                     )}
                   </th>
