@@ -1,296 +1,93 @@
-import React, { useState, useEffect } from 'react';
-import {
-  PlaidIdentityGetRequest,
-  IdentityGetResponse,
-  IdentityMatchRequest,
-  IdentityMatchResponse,
-  PlaidError,
-  Account,
-  Identity,
-  IdentityMatch,
-} from 'plaid';
-import { usePlaid } from './PlaidContext';
+import React from 'react';
 
-const PlaidIdentityView: React.FC = () => {
-  const { plaidClient } = usePlaid();
-  const [identityData, setIdentityData] = useState<IdentityGetResponse | null>(null);
-  const [identityMatchData, setIdentityMatchData] = useState<IdentityMatchResponse | null>(null);
-  const [error, setError] = useState<PlaidError | null>(null);
-  const [loadingIdentity, setLoadingIdentity] = useState<boolean>(false);
-  const [loadingMatch, setLoadingMatch] = useState<boolean>(false);
-
-  const [matchFormData, setMatchFormData] = useState<{
-    name: string;
-    email: string;
-    address: string;
-    city: string;
-    region: string;
-    postalCode: string;
-    country: string;
-  }>({
-    name: '',
-    email: '',
-    address: '',
-    city: '',
-    region: '',
-    postalCode: '',
-    country: '',
-  });
-
-  const accessToken = localStorage.getItem('plaidAccessToken'); // Assuming access token is stored
-
-  useEffect(() => {
-    const fetchIdentityData = async () => {
-      if (!accessToken) {
-        setError({
-          error_type: 'INVALID_INPUT',
-          error_code: 'ACCESS_TOKEN_INVALID',
-          error_message: 'Access token not found.',
-          display_message: 'Please link your account first.',
-          status: 400,
-          request_id: '',
-        });
-        return;
-      }
-
-      setLoadingIdentity(true);
-      setError(null);
-      try {
-        const request: PlaidIdentityGetRequest = {
-          access_token: accessToken,
-        };
-        const response = await plaidClient.identityGet(request);
-        setIdentityData(response.data);
-      } catch (err: any) {
-        setError(err.response?.data || { error_message: 'An unknown error occurred.' });
-      } finally {
-        setLoadingIdentity(false);
-      }
-    };
-
-    fetchIdentityData();
-  }, [accessToken, plaidClient]);
-
-  const handleMatchFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setMatchFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleIdentityMatchSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!accessToken) {
-      setError({
-        error_type: 'INVALID_INPUT',
-        error_code: 'ACCESS_TOKEN_INVALID',
-        error_message: 'Access token not found.',
-        display_message: 'Please link your account first.',
-        status: 400,
-        request_id: '',
-      });
-      return;
-    }
-
-    setLoadingMatch(true);
-    setError(null);
-    setIdentityMatchData(null);
-    try {
-      const request: IdentityMatchRequest = {
-        access_token: accessToken,
-        user: {
-          name: matchFormData.name,
-          email: matchFormData.email,
-          address: {
-            street: matchFormData.address,
-            city: matchFormData.city,
-            region: matchFormData.region,
-            postal_code: matchFormData.postalCode,
-            country: matchFormData.country,
-          },
-        },
-      };
-      const response = await plaidClient.identityMatch(request);
-      setIdentityMatchData(response.data);
-    } catch (err: any) {
-      setError(err.response?.data || { error_message: 'An unknown error occurred.' });
-    } finally {
-      setLoadingMatch(false);
-    }
-  };
-
+const TheCodeThatKnowsYou: React.FC = () => {
   return (
-    <div>
-      <h2>Identity Information</h2>
-      {loadingIdentity && <p>Loading identity data...</p>}
-      {error && <p style={{ color: 'red' }}>Error: {error.error_message}</p>}
-      {identityData && (
-        <div>
-          {identityData.accounts.map((account: Account) => (
-            <div key={account.account_id}>
-              <h3>{account.name} ({account.official_name || 'N/A'})</h3>
-              <p>Account ID: {account.account_id}</p>
-              <p>Type: {account.type} / Subtype: {account.subtype}</p>
-              {account.owners && account.owners.length > 0 && (
-                <div>
-                  <h4>Owners:</h4>
-                  {account.owners.map((owner, ownerIndex) => (
-                    <div key={ownerIndex}>
-                      {owner.names && owner.names.length > 0 && (
-                        <p>Name: {owner.names.join(', ')}</p>
-                      )}
-                      {owner.emails && owner.emails.length > 0 && (
-                        <p>
-                          Emails:{' '}
-                          {owner.emails
-                            .map((email) => email.data)
-                            .join(', ')}
-                        </p>
-                      )}
-                      {owner.addresses && owner.addresses.length > 0 && (
-                        <div>
-                          <h5>Addresses:</h5>
-                          {owner.addresses.map((address, addrIndex) => (
-                            <p key={addrIndex}>
-                              {address.data.street},{' '}
-                              {address.data.city},{' '}
-                              {address.data.region} {address.data.postal_code},{' '}
-                              {address.data.country}
-                            </p>
-                          ))}
-                        </div>
-                      )}
-                      {owner.phone_numbers && owner.phone_numbers.length > 0 && (
-                        <p>
-                          Phone Numbers:{' '}
-                          {owner.phone_numbers
-                            .map((phone) => phone.data)
-                            .join(', ')}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+    <article style={{ fontFamily: 'Georgia, serif', lineHeight: 1.6, color: '#333', maxWidth: '700px', margin: '0 auto', padding: '2rem' }}>
+      <header>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', lineHeight: '1.2' }}>
+          Beyond the Password: 4 Surprising Truths About Digital Identity Hidden in a Few Lines of Code
+        </h1>
+        <p style={{ fontStyle: 'italic', color: '#666' }}>
+          How modern apps verify you're really you is less about secrets and more about data, scores, and confidence.
+        </p>
+      </header>
 
-      <hr />
+      <main>
+        <p style={{ marginTop: '2rem' }}>
+          Ever signed up for a new fintech app and wondered how it magically knows your name, address, and even your email without you typing it all in? Or how it confirms your identity with unnerving accuracy? It’s not magic. It’s a sophisticated dance of data exchange happening behind the scenes, orchestrated by code.
+        </p>
+        <p>
+          We got a peek at a component that uses Plaid, a popular service connecting apps to banks, to do just this. And buried within its logic are some fascinating, counter-intuitive truths about what "identity" really means in the digital age. It’s not what you think.
+        </p>
 
-      <h2>Identity Match Tool</h2>
-      <form onSubmit={handleIdentityMatchSubmit}>
-        <div>
-          <label htmlFor="name">Full Name:</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={matchFormData.name}
-            onChange={handleMatchFormChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={matchFormData.email}
-            onChange={handleMatchFormChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="address">Street Address:</label>
-          <input
-            type="text"
-            id="address"
-            name="address"
-            value={matchFormData.address}
-            onChange={handleMatchFormChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="city">City:</label>
-          <input
-            type="text"
-            id="city"
-            name="city"
-            value={matchFormData.city}
-            onChange={handleMatchFormChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="region">State/Region:</label>
-          <input
-            type="text"
-            id="region"
-            name="region"
-            value={matchFormData.region}
-            onChange={handleMatchFormChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="postalCode">Postal Code:</label>
-          <input
-            type="text"
-            id="postalCode"
-            name="postalCode"
-            value={matchFormData.postalCode}
-            onChange={handleMatchFormChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="country">Country (e.g., US):</label>
-          <input
-            type="text"
-            id="country"
-            name="country"
-            value={matchFormData.country}
-            onChange={handleMatchFormChange}
-            required
-          />
-        </div>
-        <button type="submit" disabled={loadingMatch}>
-          {loadingMatch ? 'Matching...' : 'Match Identity'}
-        </button>
-      </form>
+        <section>
+          <h2 style={{ fontSize: '1.8rem', marginTop: '3rem', marginBottom: '1rem' }}>
+            1. Your Identity Isn't One Thing—It's a Mosaic
+          </h2>
+          <p>
+            We tend to think of our identity as a single, solid concept: our name. But in the digital world, that's not how systems see you. The code reveals that your identity is actually a collection of data points scattered across your financial accounts.
+          </p>
+          <p>
+            When the system requests your identity, it doesn't just get a name. It gets a list of all the owners associated with an account, and for each owner, it pulls every name, email address, physical address, and phone number on file. One bank account could have your full legal name, while another has a nickname. You might have an old college email address on one and a work address on another. The system gathers it all, creating a rich, complex mosaic of you.
+          </p>
+        </section>
 
-      {loadingMatch && <p>Performing identity match...</p>}
-      {error && <p style={{ color: 'red' }}>Error: {error.error_message}</p>}
-      {identityMatchData && (
-        <div>
-          <h3>Identity Match Results:</h3>
-          {identityMatchData.accounts.map((match: IdentityMatch, index) => (
-            <div key={match.account_id || index}>
-              <h4>Account: {identityData?.accounts.find(acc => acc.account_id === match.account_id)?.name || 'Unknown Account'}</h4>
-              {match.legal_name && (
-                <p>
-                  Legal Name Match Score:{' '}
-                  {match.legal_name.score} (Nickname Match:{' '}
-                  {match.legal_name.is_nickname_match ? 'Yes' : 'No'}, Name Match:{' '}
-                  {match.legal_name.is_first_name_or_last_name_match ? 'Yes' : 'No'})
-                </p>
-              )}
-              {match.phone_number && <p>Phone Number Match Score: {match.phone_number.score}</p>}
-              {match.email_address && <p>Email Address Match Score: {match.email_address.score}</p>}
-              {match.address && <p>Address Match Score: {match.address.score} (Postal Code Match: {match.address.is_postal_code_match ? 'Yes' : 'No'})</p>}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+        <section>
+          <h2 style={{ fontSize: '1.8rem', marginTop: '3rem', marginBottom: '1rem' }}>
+            2. Verification Is a Game of Scores, Not a Simple "Yes" or "No"
+          </h2>
+          <p>
+            Here’s the most surprising part. When you try to prove who you are by entering your name and address, the system doesn't just check for a perfect, character-for-character match. That would be too brittle; a single typo would cause it to fail. Instead, it plays a game of statistics.
+          </p>
+          <p>
+            The code doesn't ask, "Is this the right person?" It asks, "How confident are we that this is the right person?" It generates a score for each piece of information you provide.
+          </p>
+          <blockquote style={{ borderLeft: '4px solid #ccc', paddingLeft: '1rem', margin: '2rem 0', fontStyle: 'italic', color: '#555' }}>
+            "The system returns a `legal_name.score` from 0 to 100, an `email_address.score`, and an `address.score`. It's not about a binary pass/fail; it's about building a cumulative case for your identity based on the strength of multiple data points."
+          </blockquote>
+          <p>
+            This approach is far more resilient and reflects how identity works in the real world. A perfect match is rare, but a high-confidence match across multiple vectors (name, phone, address) is a very strong signal.
+          </p>
+        </section>
+
+        <section>
+          <h2 style={{ fontSize: '1.8rem', marginTop: '3rem', marginBottom: '1rem' }}>
+            3. The Two-Step Process: First Fetch, Then Match
+          </h2>
+          <p>
+            The logic is elegantly split into two distinct phases. This isn't just a coding choice; it's a fundamental security and design pattern.
+          </p>
+          <p>
+            <strong>Step 1: `identityGet`</strong> — The system first establishes a "ground truth." It securely connects to your bank using a pre-authorized token and fetches the raw identity data (that mosaic we talked about). This data is considered authoritative because it comes directly from a trusted financial institution.
+          </p>
+          <p>
+            <strong>Step 2: `identityMatch`</strong> — Only after fetching the ground truth does it perform the match. It takes the information you just typed into a form and compares it against the authoritative data it just retrieved. This separation ensures that the user-provided data is always checked against a reliable source, preventing spoofing and reducing fraud.
+          </p>
+        </section>
+
+        <section>
+          <h2 style={{ fontSize: '1.8rem', marginTop: '3rem', marginBottom: '1rem' }}>
+            4. A Good User Experience is Non-Negotiable for Sensitive Operations
+          </h2>
+          <p>
+            You might think code dealing with sensitive data is all about backend logic, but the user interface is paramount. The code is peppered with state management hooks like `loadingIdentity`, `loadingMatch`, and `error`.
+          </p>
+          <p>
+            This isn't just for looks. When you're asking a user to trust you with their financial data, clear communication is everything. The interface must instantly tell the user: "I'm working on it..." (`loadingIdentity`), "Something went wrong, and here's why..." (`error`), or "Here are the results" (`identityMatchData`). This constant feedback loop builds trust and prevents the user from feeling lost or anxious during a critical, high-stakes process. Without it, the entire system, no matter how secure, would feel broken.
+          </p>
+        </section>
+      </main>
+
+      <footer style={{ marginTop: '3rem', borderTop: '1px solid #eee', paddingTop: '1.5rem' }}>
+        <p>
+          Looking at this code, we see that digital identity is less about a single secret password and more about a verifiable, multi-faceted data profile. It's a system of confidence scores and trusted sources, designed to be both flexible and secure.
+        </p>
+        <p>
+          It leaves us with a powerful question to ponder: As our data becomes more interconnected, how do we strike the right balance between seamless verification and personal privacy?
+        </p>
+      </footer>
+    </article>
   );
 };
 
-export default PlaidIdentityView;
+export default TheCodeThatKnowsYou;
