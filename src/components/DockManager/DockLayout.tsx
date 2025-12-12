@@ -42,14 +42,14 @@ const DEFAULT_IDE_LAYOUT: LayoutData = {
                 children: [
                     {
                         tabs: [
-                            { id: 'ProjectTitlePlugin', title: 'Project', closable: false },
-                            { id: 'Structure', title: 'Structure' }
+                            { id: 'Citibankdemobusinessinc.core.projecttitle', title: 'Project', closable: false },
+                            { id: 'Citibankdemobusinessinc.core.structure', title: 'Structure' }
                         ],
                     },
                     {
                         tabs: [
-                            { id: 'Favorites', title: 'Favorites' },
-                            { id: 'FileAssociations', title: 'Files' }
+                            { id: 'Citibankdemobusinessinc.core.favorites', title: 'Favorites' },
+                            { id: 'Citibankdemobusinessinc.core.fileassociations', title: 'Files' }
                         ],
                     }
                 ]
@@ -63,7 +63,7 @@ const DEFAULT_IDE_LAYOUT: LayoutData = {
                         group: 'editor',
                         tabs: [
                             { 
-                                id: 'Welcome', 
+                                id: 'Citibankdemobusinessinc.core.welcome', 
                                 title: 'Welcome', 
                                 content: (
                                     <div style={{ padding: 20, color: '#a9b7c6' }}>
@@ -81,14 +81,14 @@ const DEFAULT_IDE_LAYOUT: LayoutData = {
                         children: [
                             {
                                 tabs: [
-                                    { id: 'BSFConsole', title: 'Console' },
-                                    { id: 'Terminal', title: 'Terminal' }
+                                    { id: 'Citibankdemobusinessinc.analytics.console', title: 'Console' },
+                                    { id: 'Citibankdemobusinessinc.analytics.terminal', title: 'Terminal' }
                                 ]
                             },
                             {
                                 tabs: [
-                                    { id: 'Log4JPlugin', title: 'LogCat' },
-                                    { id: 'Event Sounds', title: 'Events' }
+                                    { id: 'Citibankdemobusinessinc.risk.logcat', title: 'LogCat' },
+                                    { id: 'Citibankdemobusinessinc.risk.eventsounds', title: 'Events' }
                                 ]
                             }
                         ]
@@ -101,14 +101,14 @@ const DEFAULT_IDE_LAYOUT: LayoutData = {
                 children: [
                     {
                         tabs: [
-                            { id: 'MavenPlugin', title: 'Maven' },
-                            { id: 'Gradle', title: 'Gradle' }
+                            { id: 'Citibankdemobusinessinc.compliance.maven', title: 'Maven' },
+                            { id: 'Citibankdemobusinessinc.compliance.gradle', title: 'Gradle' }
                         ]
                     },
                     {
                         tabs: [
-                            { id: 'Database', title: 'Database' },
-                            { id: 'Ant Project File', title: 'Ant' }
+                            { id: 'Citibankdemobusinessinc.security.database', title: 'Database' },
+                            { id: 'Citibankdemobusinessinc.security.antprojectfile', title: 'Ant' }
                         ]
                     }
                 ]
