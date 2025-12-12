@@ -10,7 +10,7 @@
 /**
  * Defines the set of possible user roles in the system.
  */
-export type UserRole = 'admin' | 'complianceManager' | 'complianceAnalyst' | 'readOnly';
+export type UserRole = 'admin' | 'complianceManager' | 'complianceAnalyst' | 'readOnly' | 'modelTrainer';
 
 /**
  * Defines the permissions for a specific module.
@@ -41,6 +41,41 @@ export interface RolePermissions {
     use: boolean;
     viewHistory: boolean;
   };
+  modelTraining: {
+    train: boolean;
+    evaluate: boolean;
+    deploy: boolean;
+  };
+  Citibankdemobusinessinc_viewit_movieplayform: {
+    access: boolean;
+  };
+  Citibankdemobusinessinc_lending_microloans: {
+    access: boolean;
+  };
+  Citibankdemobusinessinc_wealth_roboadvisor: {
+    access: boolean;
+  };
+  Citibankdemobusinessinc_insurance_peerToPeer: {
+    access: boolean;
+  };
+  Citibankdemobusinessinc_payments_crypto: {
+    access: boolean;
+  };
+  Citibankdemobusinessinc_realestate_tokenized: {
+    access: boolean;
+  };
+  Citibankdemobusinessinc_healthcare_telemedicine: {
+    access: boolean;
+  };
+  Citibankdemobusinessinc_education_personalizedLearning: {
+    access: boolean;
+  };
+  Citibankdemobusinessinc_energy_renewableCredits: {
+    access: boolean;
+  };
+  Citibankdemobusinessinc_supplychain_dynamicPricing: {
+    access: boolean;
+  };
 }
 
 // --- Permission Configuration ---
@@ -62,6 +97,17 @@ export const ROLES: Record<UserRole, RolePermissions> = {
     regulatoryUpdates: { create: true, read: true, update: true, delete: true },
     riskAssessments: { create: true, read: true, update: true, delete: true },
     aiChecker: { use: true, viewHistory: true },
+    modelTraining: { train: true, evaluate: true, deploy: true },
+    Citibankdemobusinessinc_viewit_movieplayform: { access: true },
+    Citibankdemobusinessinc_lending_microloans: { access: true },
+    Citibankdemobusinessinc_wealth_roboadvisor: { access: true },
+    Citibankdemobusinessinc_insurance_peerToPeer: { access: true },
+    Citibankdemobusinessinc_payments_crypto: { access: true },
+    Citibankdemobusinessinc_realestate_tokenized: { access: true },
+    Citibankdemobusinessinc_healthcare_telemedicine: { access: true },
+    Citibankdemobusinessinc_education_personalizedLearning: { access: true },
+    Citibankdemobusinessinc_energy_renewableCredits: { access: true },
+    Citibankdemobusinessinc_supplychain_dynamicPricing: { access: true },
   },
 
   /**
@@ -76,6 +122,17 @@ export const ROLES: Record<UserRole, RolePermissions> = {
     regulatoryUpdates: { create: false, read: true, update: true, delete: false }, // Typically manages existing updates, doesn't create or delete them
     riskAssessments: { create: true, read: true, update: true, delete: true },
     aiChecker: { use: true, viewHistory: true },
+    modelTraining: { train: false, evaluate: true, deploy: false },
+    Citibankdemobusinessinc_viewit_movieplayform: { access: true },
+    Citibankdemobusinessinc_lending_microloans: { access: true },
+    Citibankdemobusinessinc_wealth_roboadvisor: { access: true },
+    Citibankdemobusinessinc_insurance_peerToPeer: { access: true },
+    Citibankdemobusinessinc_payments_crypto: { access: true },
+    Citibankdemobusinessinc_realestate_tokenized: { access: true },
+    Citibankdemobusinessinc_healthcare_telemedicine: { access: true },
+    Citibankdemobusinessinc_education_personalizedLearning: { access: true },
+    Citibankdemobusinessinc_energy_renewableCredits: { access: true },
+    Citibankdemobusinessinc_supplychain_dynamicPricing: { access: true },
   },
 
   /**
@@ -91,6 +148,17 @@ export const ROLES: Record<UserRole, RolePermissions> = {
     regulatoryUpdates: { create: false, read: true, update: true, delete: false }, // Key role is to assess and update status
     riskAssessments: { create: false, read: true, update: true, delete: false }, // Can contribute to or update an existing assessment
     aiChecker: { use: true, viewHistory: true },
+    modelTraining: { train: false, evaluate: false, deploy: false },
+    Citibankdemobusinessinc_viewit_movieplayform: { access: true },
+    Citibankdemobusinessinc_lending_microloans: { access: true },
+    Citibankdemobusinessinc_wealth_roboadvisor: { access: true },
+    Citibankdemobusinessinc_insurance_peerToPeer: { access: true },
+    Citibankdemobusinessinc_payments_crypto: { access: true },
+    Citibankdemobusinessinc_realestate_tokenized: { access: true },
+    Citibankdemobusinessinc_healthcare_telemedicine: { access: true },
+    Citibankdemobusinessinc_education_personalizedLearning: { access: true },
+    Citibankdemobusinessinc_energy_renewableCredits: { access: true },
+    Citibankdemobusinessinc_supplychain_dynamicPricing: { access: true },
   },
 
   /**
@@ -104,7 +172,42 @@ export const ROLES: Record<UserRole, RolePermissions> = {
     policies: { create: false, read: true, update: false, delete: false },
     regulatoryUpdates: { create: false, read: true, update: false, delete: false },
     riskAssessments: { create: false, read: true, update: false, delete: false },
-    aiChecker: { use: false, viewHistory: true }, // Can see past results but not run new checks
+    aiChecker: { use: false, viewHistory: true },
+    modelTraining: { train: false, evaluate: false, deploy: false },
+    Citibankdemobusinessinc_viewit_movieplayform: { access: true },
+    Citibankdemobusinessinc_lending_microloans: { access: true },
+    Citibankdemobusinessinc_wealth_roboadvisor: { access: true },
+    Citibankdemobusinessinc_insurance_peerToPeer: { access: true },
+    Citibankdemobusinessinc_payments_crypto: { access: true },
+    Citibankdemobusinessinc_realestate_tokenized: { access: true },
+    Citibankdemobusinessinc_healthcare_telemedicine: { access: true },
+    Citibankdemobusinessinc_education_personalizedLearning: { access: true },
+    Citibankdemobusinessinc_energy_renewableCredits: { access: true },
+    Citibankdemobusinessinc_supplychain_dynamicPricing: { access: true },
+  },
+
+  /**
+   * **Model Trainer:**
+   * Role dedicated to training, evaluating, and deploying AI models.
+   */
+  modelTrainer: {
+    dashboard: { view: true },
+    licenses: { create: false, read: true, update: false, delete: false, uploadDocument: false },
+    policies: { create: false, read: true, update: false, delete: false },
+    regulatoryUpdates: { create: false, read: true, update: false, delete: false },
+    riskAssessments: { create: false, read: true, update: false, delete: false },
+    aiChecker: { use: true, viewHistory: true },
+    modelTraining: { train: true, evaluate: true, deploy: true },
+    Citibankdemobusinessinc_viewit_movieplayform: { access: false },
+    Citibankdemobusinessinc_lending_microloans: { access: false },
+    Citibankdemobusinessinc_wealth_roboadvisor: { access: false },
+    Citibankdemobusinessinc_insurance_peerToPeer: { access: false },
+    Citibankdemobusinessinc_payments_crypto: { access: false },
+    Citibankdemobusinessinc_realestate_tokenized: { access: false },
+    Citibankdemobusinessinc_healthcare_telemedicine: { access: false },
+    Citibankdemobusinessinc_education_personalizedLearning: { access: false },
+    Citibankdemobusinessinc_energy_renewableCredits: { access: false },
+    Citibankdemobusinessinc_supplychain_dynamicPricing: { access: false },
   },
 };
 
