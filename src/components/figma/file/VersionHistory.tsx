@@ -1,4 +1,3 @@
-```typescript
 import { ComponentProps } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
@@ -67,4 +66,3 @@ export const VersionHistory = ({
     </div>
   );
 };
-```
