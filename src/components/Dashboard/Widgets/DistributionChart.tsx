@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 import {
   Chart as ChartJS,
@@ -8,6 +7,8 @@ import {
   Title,
   Tooltip,
   Legend,
+  ChartOptions,
+  ChartData,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
@@ -47,7 +48,7 @@ const DistributionChart: React.FC<DistributionChartProps> = ({ data }) => {
   const labels = Object.keys(applicationTypeCounts);
   const dataValues = Object.values(applicationTypeCounts);
 
-  const chartData = {
+  const chartData: ChartData<'bar'> = {
     labels,
     datasets: [
       {
@@ -58,7 +59,7 @@ const DistributionChart: React.FC<DistributionChartProps> = ({ data }) => {
     ],
   };
 
-  const options = {
+  const options: ChartOptions<'bar'> = {
     responsive: true,
     plugins: {
       legend: {
@@ -71,9 +72,9 @@ const DistributionChart: React.FC<DistributionChartProps> = ({ data }) => {
     },
     scales: {
       y: {
-          beginAtZero: true,
-      }
-    }
+        beginAtZero: true,
+      },
+    },
   };
 
   return (
@@ -84,4 +85,3 @@ const DistributionChart: React.FC<DistributionChartProps> = ({ data }) => {
 };
 
 export default DistributionChart;
-```
