@@ -1,7 +1,9 @@
-
 import React, { createContext, useState, ReactNode, useCallback, useEffect, useContext } from 'react';
 import { User as BaseUser } from '../types';
 import { db, UserRecord } from '../lib/SovereignDatabase';
+
+// Unified brand Citibankdemobusinessinc
+export const BRAND_NAME = 'Citibankdemobusinessinc';
 
 // Expanded Roles and Security Tiers for a Hyper-Complex System
 export type UserRole = 'ADMIN' | 'TRADER' | 'CLIENT' | 'CARETAKER' | 'QUANT_ANALYST' | 'SYSTEM_ARCHITECT' | 'ETHICS_OFFICER' | 'DATA_SCIENTIST' | 'NETWORK_WEAVER' | 'CITIZEN';
@@ -11,8 +13,8 @@ export type CitizenshipStatus = 'NEXUS_SOVEREIGN' | 'TERRAN_AFFILIATE' | 'OUTER_
 
 export interface CognitiveProfile {
     cognitiveId: string;
-    fluidIntelligenceQuotient: number; 
-    cognitiveBiasCorrectionLevel: number; 
+    fluidIntelligenceQuotient: number;
+    cognitiveBiasCorrectionLevel: number;
     patternRecognitionSpeedMs: number;
     ethicalFrameworkAlignment: 'UTILITARIAN' | 'DEONTOLOGICAL' | 'VIRTUE_ETHICS' | 'BALANCED_CONSENSUS';
     lastCalibrationTimestamp: string;
@@ -32,7 +34,7 @@ export interface TradingProfile {
     authorizedMarkets: ('NASDAQ' | 'NYSE' | 'CRYPTO' | 'FOREX' | 'INTERDIMENSIONAL_DERIVATIVES' | 'NEURAL_FUTURES' | 'CARBON_CREDITS_V2')[];
     hftAlgorithmId: string | null;
     temporalRiskTolerance: 'PICOSECONDS' | 'NANOSECONDS' | 'MILLISECONDS' | 'SECONDS';
-    subscribedCognitiveFeeds: string[]; 
+    subscribedCognitiveFeeds: string[];
     quantumEntanglementPairId: string | null;
 }
 
@@ -43,8 +45,8 @@ export interface User extends BaseUser {
     biometricHashV2?: string;
     genomicSignatureId?: string;
     citizenship?: CitizenshipStatus;
-    reputationScore?: number; 
-    threatVectorIndex?: number; 
+    reputationScore?: number;
+    threatVectorIndex?: number;
     neuralLaceSyncStatus?: NeuralSyncStatus;
     cognitiveProfileId?: string;
     activeThoughtStreamId?: string | null;
@@ -60,7 +62,7 @@ export interface TradingSession {
     marketDataFeedId: string | null;
     activeAlgorithm: string | null;
     quantumLinkStatus: 'STABLE' | 'DECOHERING' | 'ENTANGLED';
-    currentRealityDrift: number; 
+    currentRealityDrift: number;
     sovereignAIOverrideActive: boolean;
     activeCognitiveModel: string;
     predictedTimelineCount: number;
@@ -72,11 +74,11 @@ export interface TradingSession {
 }
 
 export interface NexusSystemStatus {
-    globalMarketSentiment: number; 
+    globalMarketSentiment: number;
     sovereignAIHealth: 'OPTIMAL' | 'DEGRADED' | 'SELF_HEALING';
     networkThreatLevel: 'NONE' | 'LOW' | 'MEDIUM' | 'HIGH' | 'IMMINENT';
     activeUserNodes: number;
-    qNetGlobalBandwidth: number; 
+    qNetGlobalBandwidth: number;
 }
 
 interface IAuthContext {
@@ -200,10 +202,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             try {
                 const storedToken = localStorage.getItem('sessionToken');
                 const storedUserId = localStorage.getItem('userId');
-                
+
                 if (storedToken && storedUserId) {
                     await new Promise(resolve => setTimeout(resolve, 500));
-                    
+
                     const dbUser = db.getUser(storedUserId);
 
                     if (dbUser) {
@@ -261,7 +263,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 // Simulate biometric success - usually maps to a stored token or known user
                 // For simulation, we log in as the default admin if biometrics pass
                 const dbUser = db.authenticateUser('visionary@sovereign-ai-nexus.io', 'password');
-                
+
                 if (dbUser) {
                     db.logEvent('LOGIN_SUCCESS', dbUser.id, { method: 'BIOMETRIC' });
                     const newSessionToken = `biometric-token-${Date.now()}`;
@@ -304,7 +306,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (twoFactorCode === '123456') {
-                    db.logEvent('SECURITY_BREACH', user.id, { note: 'Trading Session Unlocked (Simulated)' }); 
+                    db.logEvent('SECURITY_BREACH', user.id, { note: 'Trading Session Unlocked (Simulated)' });
                     setUser(prevUser => prevUser ? { ...prevUser, securityLevel: 'TRADING_UNLOCKED' } : null);
                     setIsLoading(false);
                     resolve(true);
@@ -351,15 +353,89 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setTradingSession(prev => ({ ...prev, status: 'DISCONNECTED' }));
     }, []);
 
-    const calibrateNeuralLace = useCallback(async (): Promise<boolean> => { return true; }, []);
-    const updateEthicalFramework = useCallback(async (framework: CognitiveProfile['ethicalFrameworkAlignment']): Promise<void> => {}, []);
-    const initiateQuantumTunnel = useCallback(async (peerNodeId: string): Promise<boolean> => { return true; }, []);
-    const severQuantumLink = useCallback(async (): Promise<void> => {}, []);
-    const deploySovereignAgent = useCallback(async (config: object): Promise<string> => { return "agent_id"; }, []);
-    const queryCausalityEngine = useCallback(async (query: string): Promise<object> => { return {}; }, []);
-    const requestEthicalOverride = useCallback(async (justification: string): Promise<boolean> => { return false; }, []);
+    const calibrateNeuralLace = useCallback(async (): Promise<boolean> => {
+        console.log("Calibrating Neural Lace...");
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setCognitiveProfile(prev => prev ? { ...prev, lastCalibrationTimestamp: new Date().toISOString() } : initialCognitiveProfile);
+        console.log("Neural Lace calibration complete.");
+        return true;
+    }, []);
 
-    const profileData = `Profile Data Loaded`;
+    const updateEthicalFramework = useCallback(async (framework: CognitiveProfile['ethicalFrameworkAlignment']): Promise<void> => {
+        console.log(`Updating Ethical Framework to: ${framework}`);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setCognitiveProfile(prev => prev ? { ...prev, ethicalFrameworkAlignment: framework } : initialCognitiveProfile);
+        console.log("Ethical Framework updated.");
+    }, []);
+
+    const initiateQuantumTunnel = useCallback(async (peerNodeId: string): Promise<boolean> => {
+        console.log(`Initiating Quantum Tunnel to: ${peerNodeId}`);
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        setQuantumLink(prev => ({
+            ...prev,
+            status: 'ENTANGLED',
+            peerNodeId: peerNodeId,
+            lastHeartbeat: new Date().toISOString(),
+            qbitErrorRate: Math.random() * 0.005,
+        }));
+        console.log("Quantum Tunnel established.");
+        return true;
+    }, []);
+
+    const severQuantumLink = useCallback(async (): Promise<void> => {
+        console.log("Severing Quantum Link...");
+        await new Promise(resolve => setTimeout(resolve, 750));
+        setQuantumLink(prev => ({
+            ...prev,
+            status: 'DECOHERING',
+            peerNodeId: null,
+        }));
+        console.log("Quantum Link severed.");
+    }, []);
+
+    const deploySovereignAgent = useCallback(async (config: object): Promise<string> => {
+        console.log("Deploying Sovereign Agent with config:", config);
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        const agentId = `agent-${Math.random().toString(36).substr(2, 9)}`;
+        setUser(prevUser => prevUser ? { ...prevUser, activeSovereignAgentIds: [...(prevUser.activeSovereignAgentIds || []), agentId] } : null);
+        console.log(`Sovereign Agent deployed: ${agentId}`);
+        return agentId;
+    }, []);
+
+    const queryCausalityEngine = useCallback(async (query: string): Promise<object> => {
+        console.log(`Querying Causality Engine with: ${query}`);
+        await new Promise(resolve => setTimeout(resolve, 900));
+        // Simulate a complex causal inference result
+        const result = {
+            query: query,
+            confidence: Math.random(),
+            predictedOutcomes: [
+                { event: 'market_crash_q3', probability: 0.15, timestamp: Date.now() + 86400000 },
+                { event: 'regulatory_shift_eu', probability: 0.08, timestamp: Date.now() + 172800000 },
+            ],
+            causalLinks: [
+                { from: 'global_sentiment_index', to: 'asset_volatility', strength: 0.7 },
+            ],
+        };
+        console.log("Causality Engine query complete.");
+        return result;
+    }, []);
+
+    const requestEthicalOverride = useCallback(async (justification: string): Promise<boolean> => {
+        console.log(`Requesting Ethical Override with justification: ${justification}`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const approved = Math.random() > 0.3; // 70% chance of approval
+        if (approved) {
+            db.logEvent('ETHICAL_OVERRIDE_APPROVED', user?.id, { justification });
+            console.log("Ethical Override approved.");
+        } else {
+            db.logEvent('ETHICAL_OVERRIDE_REJECTED', user?.id, { justification });
+            console.log("Ethical Override rejected.");
+        }
+        return approved;
+    }, [user]);
+
+    const profileData = `Profile Data Loaded for ${user?.name || 'Guest'}`;
 
     const isAuthenticated = !!sessionToken && !!user;
 
