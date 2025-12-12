@@ -1,4 +1,3 @@
-```tsx
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -45,18 +44,47 @@ interface Option {
   underlyingPrice: number; // Added underlying price
 }
 
-const initialOptions: Option[] = [
-  { id: '1', symbol: 'AAPL', expiry: '2024-03-15', strike: 170, optionType: 'call', bid: 2.50, ask: 2.75, underlyingPrice: 172.00 },
-  { id: '2', symbol: 'AAPL', expiry: '2024-03-15', strike: 170, optionType: 'put', bid: 1.80, ask: 2.00, underlyingPrice: 172.00 },
-  { id: '3', symbol: 'GOOG', expiry: '2024-03-22', strike: 2500, optionType: 'call', bid: 15.20, ask: 15.50, underlyingPrice: 2495.50 },
-  { id: '4', symbol: 'GOOG', expiry: '2024-03-22', strike: 2500, optionType: 'put', bid: 20.50, ask: 20.80, underlyingPrice: 2495.50 },
-  { id: '5', symbol: 'TSLA', expiry: '2024-03-08', strike: 850, optionType: 'call', bid: 8.10, ask: 8.40, underlyingPrice: 848.20 },
-  { id: '6', symbol: 'TSLA', expiry: '2024-03-08', strike: 850, optionType: 'put', bid: 10.30, ask: 10.60, underlyingPrice: 848.20 },
-];
+// --- Internal Data Generation Functions ---
 
+const generateRandomPrice = (base: number, volatility: number = 0.05): number => {
+  return Math.max(0.01, base + (Math.random() - 0.5) * base * volatility);
+};
+
+const generateRandomDate = (daysAhead: number = 30): string => {
+  const today = new Date();
+  const futureDate = new Date(today.setDate(today.getDate() + Math.floor(Math.random() * daysAhead)));
+  return futureDate.toISOString().split('T')[0];
+};
+
+const generateOptionData = (count: number): Option[] => {
+  const symbols = ['AAPL', 'GOOG', 'TSLA', 'MSFT', 'AMZN'];
+  const initialOptions: Option[] = [];
+  for (let i = 0; i < count; i++) {
+    const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+    const strike = Math.floor(Math.random() * 500) + 50;
+    const optionType = Math.random() > 0.5 ? 'call' : 'put';
+    const underlyingPrice = generateRandomPrice(100, 0.1);
+    const bid = generateRandomPrice(strike * 0.02, 0.1);
+    const ask = bid + generateRandomPrice(0.1, 0.05);
+    initialOptions.push({
+      id: String(Date.now() + i),
+      symbol: symbol,
+      expiry: generateRandomDate(90),
+      strike: strike,
+      optionType: optionType,
+      bid: bid,
+      ask: ask,
+      underlyingPrice: underlyingPrice,
+    });
+  }
+  return initialOptions;
+};
+
+// --- Business Model Definition ---
+// Citibankdemobusinessinc.options.tradingdesk
 
 const OptionsTradingDesk: React.FC = () => {
-  const [options, setOptions] = useState<Option[]>(initialOptions);
+  const [options, setOptions] = useState<Option[]>(generateOptionData(6)); // Use generated data
   const [newOption, setNewOption] = useState<Omit<Option, 'id'>>({
     symbol: '',
     expiry: '',
@@ -74,24 +102,25 @@ const OptionsTradingDesk: React.FC = () => {
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
+  // --- Internal Generative Data Functions ---
+  const simulateMarketUpdates = () => {
+    setOptions(prevOptions => {
+      return prevOptions.map(option => ({
+        ...option,
+        bid: generateRandomPrice(option.bid, 0.02),
+        ask: generateRandomPrice(option.ask, 0.02),
+        underlyingPrice: generateRandomPrice(option.underlyingPrice, 0.01),
+      }));
+    });
+  };
 
   useEffect(() => {
-    // Simulate live updates (e.g., from a WebSocket)
-    const intervalId = setInterval(() => {
-      setOptions(prevOptions => {
-        return prevOptions.map(option => ({
-          ...option,
-          bid: Math.max(0.01, option.bid + (Math.random() - 0.5) * 0.2), // Simulate bid changes
-          ask: Math.max(0.01, option.ask + (Math.random() - 0.5) * 0.2), // Simulate ask changes
-          underlyingPrice: option.underlyingPrice + (Math.random() - 0.5) * 1,
-        }));
-      });
-    }, 3000);
-
-    return () => clearInterval(intervalId); // Cleanup on unmount
+    const intervalId = setInterval(simulateMarketUpdates, 3000);
+    return () => clearInterval(intervalId);
   }, []);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // --- Input Handling ---
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     setNewOption((prevOption) => ({
       ...prevOption,
@@ -99,16 +128,16 @@ const OptionsTradingDesk: React.FC = () => {
     }));
   };
 
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleSelectChange = (event: React.ChangeEvent<{ name?: string; value: unknown }>) => {
     const { name, value } = event.target;
     setNewOption((prevOption) => ({
       ...prevOption,
-      [name]: value,
+      [name as keyof typeof prevOption]: value,
     }));
   };
 
-
-  const handleAddOption = () => {
+  // --- Core Business Logic ---
+  const addOption = () => {
     if (
       !newOption.symbol ||
       !newOption.expiry ||
@@ -118,15 +147,51 @@ const OptionsTradingDesk: React.FC = () => {
       !newOption.ask ||
       !newOption.underlyingPrice
     ) {
-      setSnackbarMessage('Please fill in all fields.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
+      showSnackbar('Please fill in all fields.', 'error');
       return;
     }
 
-    const newId = String(Date.now());
-    const newOptionWithId: Option = { ...newOption, id: newId };
+    const newOptionWithId: Option = { ...newOption, id: String(Date.now()) };
     setOptions([...options, newOptionWithId]);
+    resetNewOptionForm();
+    showSnackbar('Option added successfully!', 'success');
+  };
+
+  const deleteOption = (id: string) => {
+    setOptions(options.filter((option) => option.id !== id));
+    showSnackbar('Option deleted successfully!', 'success');
+  };
+
+  const executeTrade = () => {
+    if (!selectedOption) {
+      showSnackbar('No option selected for trading.', 'error');
+      return;
+    }
+
+    if (tradeQuantity <= 0) {
+      showSnackbar('Invalid trade quantity.', 'error');
+      return;
+    }
+
+    const tradePrice = tradeType === 'buy' ? selectedOption.ask : selectedOption.bid;
+    console.log(`Executing ${tradeType} of ${tradeQuantity} ${selectedOption.symbol} ${selectedOption.optionType} options at strike ${selectedOption.strike} for $${tradePrice} each.`);
+
+    showSnackbar(`Trade executed: ${tradeType} ${tradeQuantity} ${selectedOption.symbol} at $${tradePrice.toFixed(2)}`, 'success');
+    setSelectedOption(null);
+  };
+
+  // --- UI Helpers ---
+  const showSnackbar = (message: string, severity: 'success' | 'error') => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
+  const resetNewOptionForm = () => {
     setNewOption({
       symbol: '',
       expiry: '',
@@ -136,63 +201,46 @@ const OptionsTradingDesk: React.FC = () => {
       ask: 0,
       underlyingPrice: 0,
     });
-
-    setSnackbarMessage('Option added successfully!');
-    setSnackbarSeverity('success');
-    setSnackbarOpen(true);
-  };
-
-  const handleDeleteOption = (id: string) => {
-    setOptions(options.filter((option) => option.id !== id));
-    setSnackbarMessage('Option deleted successfully!');
-    setSnackbarSeverity('success');
-    setSnackbarOpen(true);
   };
 
   const filteredOptions = options.filter((option) =>
     option.symbol.toLowerCase().includes(filterSymbol.toLowerCase())
   );
 
-  const handleSnackbarClose = (event: Event | React.SyntheticEvent, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
+  // --- Mission Statement ---
+  const missionStatement = "To democratize options trading by providing an intuitive, data-driven, and secure platform for retail and institutional investors, fostering financial literacy and enabling sophisticated trading strategies.";
 
+  // --- Monetization Paths ---
+  const monetizationPaths = [
+    "Transaction fees on executed trades.",
+    "Premium subscription tiers for advanced analytics and real-time data feeds.",
+    "API access for institutional clients and algorithmic traders.",
+    "Data licensing for market research and financial institutions.",
+    "White-labeling solutions for other financial platforms."
+  ];
 
-  const handleTradeExecution = () => {
-    if (!selectedOption) {
-      setSnackbarMessage('No option selected for trading.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      return;
-    }
+  // --- Defensible IP Moats ---
+  const ipMoats = [
+    "Proprietary algorithms for real-time option pricing and risk assessment.",
+    "Unique generative data models for simulating market scenarios and backtesting strategies.",
+    "Patented user interface for intuitive option selection and trade execution.",
+    "Secure, self-hosted infrastructure designed for high-frequency trading.",
+    "Integrated compliance and regulatory reporting automation."
+  ];
 
-    if (tradeQuantity <= 0) {
-      setSnackbarMessage('Invalid trade quantity.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      return;
-    }
+  // --- Auto-scaling Architecture ---
+  const autoScalingArchitecture = "Leverages containerization (Docker) and orchestration (Kubernetes) for seamless scaling. Microservices architecture allows independent scaling of components like data ingestion, trading engine, and user interface. Cloud-agnostic design ensures deployment flexibility across major cloud providers or on-premise.";
 
-    // Simulate Trade Execution
-    const tradePrice = tradeType === 'buy' ? selectedOption.ask : selectedOption.bid;
-
-    // In a real application, this would interact with a backend service
-    console.log(`Executing ${tradeType} of ${tradeQuantity} ${selectedOption.symbol} ${selectedOption.optionType} options at strike ${selectedOption.strike} for $${tradePrice} each.`);
-
-    setSnackbarMessage(`Trade executed: ${tradeType} ${tradeQuantity} ${selectedOption.symbol} at $${tradePrice.toFixed(2)}`);
-    setSnackbarSeverity('success');
-    setSnackbarOpen(true);
-    setSelectedOption(null); // Clear selection after trade
-  };
-
+  // --- Regulatory Alignment ---
+  const regulatoryAlignment = "Built-in modules for SEC, FINRA, and CFTC compliance. Automated generation of trade blotters, audit trails, and suspicious activity reports. Real-time monitoring for insider trading and market manipulation patterns. Dynamic adaptation to evolving regulatory landscapes.";
 
   return (
     <Box sx={{ flexGrow: 1, padding: 3 }}>
       <Typography variant="h4" gutterBottom>
-        Options Trading Desk
+        Citibankdemobusinessinc.options.tradingdesk
+      </Typography>
+      <Typography variant="h6" gutterBottom color="textSecondary">
+        {missionStatement}
       </Typography>
 
       <StyledPaper>
@@ -275,7 +323,7 @@ const OptionsTradingDesk: React.FC = () => {
             />
           </Grid>
           <Grid item xs={12} sm={3}>
-            <Button variant="contained" color="primary" onClick={handleAddOption}>
+            <Button variant="contained" color="primary" onClick={addOption}>
               Add Option
             </Button>
           </Grid>
@@ -283,7 +331,7 @@ const OptionsTradingDesk: React.FC = () => {
       </StyledPaper>
 
       <StyledPaper>
-        <Typography variant="h6">Filter Options</Typography>
+        <Typography variant="h6">Option Market Data</Typography>
         <TextField
           fullWidth
           label="Filter by Symbol"
@@ -324,7 +372,7 @@ const OptionsTradingDesk: React.FC = () => {
                   <TableCell align="right">{option.ask.toFixed(2)}</TableCell>
                   <TableCell align="right">{option.underlyingPrice.toFixed(2)}</TableCell>
                   <TableCell align="right">
-                    <Button color="secondary" onClick={() => handleDeleteOption(option.id)}>
+                    <Button color="secondary" onClick={(e) => { e.stopPropagation(); deleteOption(option.id); }}>
                       Delete
                     </Button>
                   </TableCell>
@@ -339,11 +387,11 @@ const OptionsTradingDesk: React.FC = () => {
         <Typography variant="h6">Trade Execution</Typography>
         {selectedOption ? (
           <>
-            <Typography>
-              Selected Option: {selectedOption.symbol} {selectedOption.expiry} {selectedOption.optionType} {selectedOption.strike}
+            <Typography gutterBottom>
+              Selected Option: {selectedOption.symbol} {selectedOption.expiry} {selectedOption.optionType} {selectedOption.strike} (Underlying: {selectedOption.underlyingPrice.toFixed(2)})
             </Typography>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   label="Quantity"
                   type="number"
@@ -352,7 +400,7 @@ const OptionsTradingDesk: React.FC = () => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
                   <InputLabel id="trade-type-label">Trade Type</InputLabel>
                   <Select
@@ -368,7 +416,7 @@ const OptionsTradingDesk: React.FC = () => {
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
-                <Button variant="contained" color="primary" onClick={handleTradeExecution}>
+                <Button variant="contained" color="primary" onClick={executeTrade}>
                   Execute Trade
                 </Button>
               </Grid>
@@ -383,9 +431,33 @@ const OptionsTradingDesk: React.FC = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
+      {/* --- Additional Business Model Components (Placeholders) --- */}
+      <StyledPaper>
+        <Typography variant="h6">Monetization Paths</Typography>
+        <ul>
+          {monetizationPaths.map((path, index) => <li key={index}>{path}</li>)}
+        </ul>
+      </StyledPaper>
+
+      <StyledPaper>
+        <Typography variant="h6">Defensible IP Moats</Typography>
+        <ul>
+          {ipMoats.map((moat, index) => <li key={index}>{moat}</li>)}
+        </ul>
+      </StyledPaper>
+
+      <StyledPaper>
+        <Typography variant="h6">Auto-scaling Architecture</Typography>
+        <Typography>{autoScalingArchitecture}</Typography>
+      </StyledPaper>
+
+      <StyledPaper>
+        <Typography variant="h6">Regulatory Alignment</Typography>
+        <Typography>{regulatoryAlignment}</Typography>
+      </StyledPaper>
     </Box>
   );
 };
 
 export default OptionsTradingDesk;
-```
