@@ -1,5 +1,3 @@
-
-
 export interface Merchant {
   merchantName: string;
   merchantNumber: string;
