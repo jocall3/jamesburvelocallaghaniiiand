@@ -7,6 +7,8 @@ import Card from './Card';
  * This component outlines the core strategic direction for the platform,
  * focusing on its foundational principles and long-term goals. It represents
  * a current understanding of the project's aspirations, subject to iterative refinement.
+ *
+ * This component is part of the Citibankdemobusinessinc.orchestration.vision namespace.
  */
 const TheVisionView: React.FC = () => {
     // Constants defining the core guiding principles
@@ -14,22 +16,22 @@ const TheVisionView: React.FC = () => {
         {
             title: "Architectural Harmony",
             description: "Achieving a unified, supportive codebase where all modules communicate to ensure stability, reliability, and perfect compliance with established regulations.",
-            icon: "🏛️"
+            icon: "ðŸ ›ï¸ "
         },
         {
             title: "Cognitive Assistance",
             description: "The system operates as a helpful guide, offering gentle suggestions from the 'Civic Mind AI' core to ensure users make responsible and community-oriented decisions.",
-            icon: "🤝"
+            icon: "ðŸ¤ "
         },
         {
             title: "Ethical Data Stewardship",
             description: "Implementing transparent, verifiable record-keeping to ensure all data is handled with the utmost respect for privacy and regulatory requirements.",
-            icon: "📜"
+            icon: "ðŸ“œ"
         },
         {
             title: "Universal Support Layer (USL)",
             description: "Every user interaction is designed to be inclusive, supportive, and educational, helping citizens navigate the financial landscape with confidence.",
-            icon: "🌱"
+            icon: "ðŸŒ±"
         }
     ];
 
