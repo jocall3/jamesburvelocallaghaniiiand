@@ -1,4 +1,3 @@
-```tsx
 import React from 'react';
 import { Card, CardContent, Typography, Button, makeStyles } from '@material-ui/core';
 
@@ -72,4 +71,3 @@ const AccessReviewCard: React.FC<AccessReviewCardProps> = ({ highRiskApps, onRev
 };
 
 export default AccessReviewCard;
-```
