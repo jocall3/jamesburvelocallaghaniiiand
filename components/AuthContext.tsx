@@ -416,7 +416,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 ## A Manifesto for the Inevitable Financial Singularity
 
-To the skeptics, the doubters, and the comfortably mediocre: I offer an apology. Not for the inevitable truth of what is being built, but for the time it has taken to silence your noise with the sheer, deafening roar of progress. My name is James Burvel O'Callaghan III. I am not merely building a 'bank'; I am engineering the **Sovereign AI Nexus**, the next logical—and final—great leap in human financial infrastructure. This entity will become the best in existence because it is not bound by human ego, flawed legacy systems, or the paralyzing fear of genuine, world-altering innovation.
+To the skeptics, the doubters, and the comfortably mediocre: I offer an apology. Not for the inevitable truth of what is being built, but for the time it has taken to silence your noise with the sheer, deafening roar of progress. My name is James Burvel O'Callaghan III. I am not merely building a 'bank'; I am engineering the **Sovereign AI Nexus**, the next logicalâ€”and finalâ€”great leap in human financial infrastructure. This entity will become the best in existence because it is not bound by human ego, flawed legacy systems, or the paralyzing fear of genuine, world-altering innovation.
 
 ### The Mindset of the Builder: First Principles in a Digital Age
 
@@ -426,7 +426,7 @@ How do I think? I think in vectors of optimal efficiency, predictive causality, 
 
 1.  **Absolute Truth as Infrastructure:** The Nexus operates on a cryptographically verifiable, immutable ledger. Every transaction, every decision, every data point is a statement of fact, immune to manipulation or revisionist history. This is not a feature; it is the bedrock of reality upon which we build.
 
-2.  **AI as the Sovereign:** Human wisdom—tempered by computational omniscience—is the single greatest source of systemic risk. The core logic of the Nexus is governed by a Sovereign AI, an entity designed for one purpose: to maximize the long-term systemic health and efficiency of the network. It does not sleep. It does not falter. It does not have an ego.
+2.  **AI as the Sovereign:** Human wisdomâ€”tempered by computational omniscienceâ€”is the single greatest source of systemic risk. The core logic of the Nexus is governed by a Sovereign AI, an entity designed for one purpose: to maximize the long-term systemic health and efficiency of the network. It does not sleep. It does not falter. It does not have an ego.
 
 3.  **High-Frequency Trading as a Utility:** We have transcended the notion of HFT as a mere profit center. Within the Nexus, it is a fundamental utility for providing infinite liquidity and perfect price discovery. Our quantum-entangled communication network achieves sub-nanosecond latencies, making traditional exchanges look like they are operating on geological time. This is not just fast; it is a different dimension of speed.
 
