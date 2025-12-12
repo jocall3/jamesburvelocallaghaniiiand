@@ -1,4 +1,3 @@
-
 export interface ReportingReportRun {
     id: string;
     status: string;
