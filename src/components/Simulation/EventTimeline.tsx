@@ -1,4 +1,3 @@
-```tsx
 import React from 'react';
 
 interface Event {
@@ -112,4 +111,3 @@ const EventTimeline: React.FC<EventTimelineProps> = ({ events }) => {
 };
 
 export default EventTimeline;
-```
