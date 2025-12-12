@@ -1,4 +1,3 @@
-```typescript
 import {
   Column,
   ColumnFormat,
@@ -195,4 +194,3 @@ export function ApplicationTable({
     </DataGrid>
   );
 }
-```
