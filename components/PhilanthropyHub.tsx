@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { DollarSign, Zap, Target, BarChart2, TrendingUp, Briefcase, Cpu, Layers, Plus, X, ArrowRight, Bot, ChevronsRight, FileText, Filter, Settings, ShieldCheck, Heart } from 'lucide-react';
 
