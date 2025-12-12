@@ -1,0 +1,53 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+
+# Common labels added to all resources
+commonLabels:
+  app.kubernetes.io/name: my-app
+  app.kubernetes.io/version: "1.0.0"
+
+# Namespace to deploy resources into
+namespace: my-namespace
+
+# Patches to modify resources
+patches:
+  # Example patch to add a resource quota
+  # - target:
+  #     kind: Namespace
+  #     name: my-namespace
+  #   patch: |-
+  #     apiVersion: v1
+  #     kind: Namespace
+  #     metadata:
+  #       name: my-namespace
+  #       annotations:
+  #         quota.openshift.io/cluster-resource-quota-general: "true"
+
+# Components for reusable configurations
+components:
+  # - ../../components/monitoring # Example component
+
+# Bases for common configurations
+bases:
+  # - ../../base/common # Example base
+
+# Images to be updated
+images:
+  # - name: my-image
+  #   newName: my-new-image
+  #   newTag: latest
+
+# ConfigMaps and Secrets
+configMapGenerator:
+  # - name: my-configmap
+  #   literals:
+  #     - key1=value1
+  #     - key2=value2
+secretGenerator:
+  # - name: my-secret
+  #   literals:
+  #     - key1=secretvalue1
+  #     - key2=secretvalue2
