@@ -1,5 +1,71 @@
 import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
 
+// --- Citibankdemobusinessinc Shared Kernel ---
+// This kernel provides common utilities and types used across all Citibankdemobusinessinc applications.
+namespace CitibankdemobusinessincKernel {
+  // Utility function to generate a random string of a specified length.
+  export const generateRandomString = (length: number): string => {
+    const array = new Uint32Array(length / 2);
+    window.crypto.getRandomValues(array);
+    return Array.from(array, dec => ('0' + dec.toString(16)).substr(-2)).join('');
+  };
+
+  // Asynchronous SHA-256 hashing function.
+  export const sha256 = async (plain: string): Promise<ArrayBuffer> => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(plain);
+    return window.crypto.subtle.digest('SHA-256', data);
+  };
+
+  // Base64 URL encoding function.
+  export const base64urlencode = (input: ArrayBuffer): string => {
+    return btoa(String.fromCharCode(...new Uint8Array(input)))
+      .replace(/=/g, '')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_');
+  };
+
+  // Generates a PKCE code challenge from a code verifier.
+  export const generateCodeChallenge = async (codeVerifier: string): Promise<string> => {
+    const hashed = await sha256(codeVerifier);
+    return base64urlencode(hashed);
+  };
+
+  // Type definition for a basic configuration object.
+  export interface Config {
+    clientId: string;
+    redirectUri: string;
+    scope: string;
+    tokenExchangeEndpoint?: string;
+  }
+
+  // Function to simulate network delay (useful for testing).
+  export const simulateNetworkDelay = (ms: number): Promise<void> => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  };
+
+  // Error handling utility.
+  export const handleGenericError = (error: any, componentName: string) => {
+    console.error(`Error in ${componentName}:`, error);
+    return `An error occurred in ${componentName}. Please check the console for details.`;
+  };
+
+  // Function to generate a unique identifier.
+  export const generateUniqueId = (): string => {
+    return `citibankdemobusinessinc_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+  };
+
+  // Function to generate a timestamp.
+  export const generateTimestamp = (): string => {
+    return new Date().toISOString();
+  };
+
+  // Function to generate a random number within a range.
+  export const generateRandomNumber = (min: number, max: number): number => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  };
+}
+
 // --- BankOfAmericaAuthContext ---
 // Provides authentication status and functions to child components.
 interface BankOfAmericaAuthContextType {
@@ -25,33 +91,6 @@ export const useBankOfAmericaAuth = () => {
     throw new Error('useBankOfAmericaAuth must be used within a BankOfAmericaAuthGateProvider');
   }
   return context;
-};
-
-// --- PKCE (Proof Key for Code Exchange) Helpers ---
-// Essential for securing OAuth flows in public clients (like SPAs).
-// These functions generate a cryptographically random code verifier and its challenge.
-const generateRandomString = (length: number) => {
-  const array = new Uint32Array(length / 2);
-  window.crypto.getRandomValues(array);
-  return Array.from(array, dec => ('0' + dec.toString(16)).substr(-2)).join('');
-};
-
-const sha256 = async (plain: string) => {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(plain);
-  return window.crypto.subtle.digest('SHA-256', data);
-};
-
-const base64urlencode = (input: ArrayBuffer) => {
-  return btoa(String.fromCharCode(...new Uint8Array(input)))
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_');
-};
-
-const generateCodeChallenge = async (codeVerifier: string) => {
-  const hashed = await sha256(codeVerifier);
-  return base64urlencode(hashed);
 };
 
 // --- Constants for Local Storage Keys ---
@@ -114,9 +153,9 @@ export const BankOfAmericaAuthGate: React.FC<BankOfAmericaAuthGateProps> = ({
     setError(null);
 
     try {
-      const codeVerifier = generateRandomString(128); // PKCE code verifier
-      const codeChallenge = await generateCodeChallenge(codeVerifier);
-      const state = generateRandomString(32); // CSRF protection
+      const codeVerifier = CitibankdemobusinessincKernel.generateRandomString(128); // PKCE code verifier
+      const codeChallenge = await CitibankdemobusinessincKernel.generateCodeChallenge(codeVerifier);
+      const state = CitibankdemobusinessincKernel.generateRandomString(32); // CSRF protection
 
       localStorage.setItem(LOCAL_STORAGE_CODE_VERIFIER_KEY, codeVerifier);
       localStorage.setItem(LOCAL_STORAGE_STATE_KEY, state);
@@ -191,7 +230,7 @@ export const BankOfAmericaAuthGate: React.FC<BankOfAmericaAuthGateProps> = ({
         // a client_secret is involved. PKCE helps for public clients, but a backend
         // is still the most robust approach.
         console.warn('No tokenExchangeEndpoint provided. Simulating token exchange. This is INSECURE for production.');
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+        await CitibankdemobusinessincKernel.simulateNetworkDelay(1000); // Simulate network delay
         tokenResponse = { access_token: `simulated_boa_token_${Date.now()}`, expires_in: 3600 };
       }
 
@@ -372,3 +411,422 @@ export const BankOfAmericaAuthGate: React.FC<BankOfAmericaAuthGateProps> = ({
     </BankOfAmericaAuthContext.Provider>
   );
 };
+
+// --- Citibankdemobusinessinc.insights.financialadvisor ---
+// Business Model 1: AI-Powered Financial Advisor
+namespace Citibankdemobusinessinc {
+  export namespace insights {
+    export namespace financialadvisor {
+      // Mission Statement: To democratize access to personalized financial advice through AI-driven insights, empowering users to make informed decisions and achieve their financial goals.
+      // Monetization Path: Subscription-based access to premium features, personalized financial plans, and advanced analytics.
+      // IP Moat: Proprietary AI algorithms trained on vast datasets of financial data, providing unique and actionable insights.
+
+      // Interface for Financial Advisor Configuration
+      interface FinancialAdvisorConfig extends CitibankdemobusinessincKernel.Config {
+        riskToleranceLevels: number;
+        investmentOptions: string[];
+      }
+
+      // Default Configuration
+      const defaultConfig: FinancialAdvisorConfig = {
+        clientId: CitibankdemobusinessincKernel.generateUniqueId(),
+        redirectUri: 'https://citibankdemobusinessinc.com/financialadvisor/callback',
+        scope: 'financial_data',
+        tokenExchangeEndpoint: '/api/financialadvisor/token',
+        riskToleranceLevels: 5,
+        investmentOptions: ['Stocks', 'Bonds', 'Real Estate', 'Crypto']
+      };
+
+      // Function to generate a risk profile
+      const generateRiskProfile = (): number => {
+        return CitibankdemobusinessincKernel.generateRandomNumber(1, defaultConfig.riskToleranceLevels);
+      };
+
+      // Function to generate investment portfolio
+      const generateInvestmentPortfolio = (riskProfile: number): string[] => {
+        const portfolio: string[] = [];
+        for (let i = 0; i < riskProfile; i++) {
+          portfolio.push(defaultConfig.investmentOptions[CitibankdemobusinessincKernel.generateRandomNumber(0, defaultConfig.investmentOptions.length - 1)]);
+        }
+        return portfolio;
+      };
+
+      // Main Financial Advisor Application
+      export const FinancialAdvisorApp = () => {
+        const [riskProfile, setRiskProfile] = useState<number>(generateRiskProfile());
+        const [portfolio, setPortfolio] = useState<string[]>(generateInvestmentPortfolio(riskProfile));
+
+        const updateProfile = () => {
+          const newRiskProfile = generateRiskProfile();
+          setRiskProfile(newRiskProfile);
+          setPortfolio(generateInvestmentPortfolio(newRiskProfile));
+        };
+
+        return (
+          <div>
+            <h1>AI-Powered Financial Advisor</h1>
+            <p>Risk Profile: {riskProfile}</p>
+            <p>Recommended Portfolio: {portfolio.join(', ')}</p>
+            <button onClick={updateProfile}>Update Profile</button>
+          </div>
+        );
+      };
+    }
+  }
+}
+
+// --- Citibankdemobusinessinc.lending.microloans ---
+// Business Model 2: AI-Driven Microloan Platform
+namespace Citibankdemobusinessinc {
+  export namespace lending {
+    export namespace microloans {
+      // Mission Statement: To provide accessible and affordable microloans to underserved communities, leveraging AI to assess creditworthiness and streamline the lending process.
+      // Monetization Path: Interest on loans, fees for late payments, and partnerships with local businesses.
+      // IP Moat: Proprietary AI algorithms for credit scoring and risk assessment, enabling faster and more accurate loan approvals.
+
+      // Interface for Microloan Configuration
+      interface MicroloanConfig extends CitibankdemobusinessincKernel.Config {
+        loanAmountRange: [number, number];
+        interestRateRange: [number, number];
+      }
+
+      // Default Configuration
+      const defaultConfig: MicroloanConfig = {
+        clientId: CitibankdemobusinessincKernel.generateUniqueId(),
+        redirectUri: 'https://citibankdemobusinessinc.com/microloans/callback',
+        scope: 'loan_data',
+        tokenExchangeEndpoint: '/api/microloans/token',
+        loanAmountRange: [100, 1000],
+        interestRateRange: [5, 15]
+      };
+
+      // Function to generate a loan amount
+      const generateLoanAmount = (): number => {
+        return CitibankdemobusinessincKernel.generateRandomNumber(defaultConfig.loanAmountRange[0], defaultConfig.loanAmountRange[1]);
+      };
+
+      // Function to generate an interest rate
+      const generateInterestRate = (): number => {
+        return CitibankdemobusinessincKernel.generateRandomNumber(defaultConfig.interestRateRange[0], defaultConfig.interestRateRange[1]) / 100;
+      };
+
+      // Main Microloan Application
+      export const MicroloanApp = () => {
+        const [loanAmount, setLoanAmount] = useState<number>(generateLoanAmount());
+        const [interestRate, setInterestRate] = useState<number>(generateInterestRate());
+
+        const applyForLoan = () => {
+          setLoanAmount(generateLoanAmount());
+          setInterestRate(generateInterestRate());
+        };
+
+        return (
+          <div>
+            <h1>AI-Driven Microloan Platform</h1>
+            <p>Loan Amount: ${loanAmount}</p>
+            <p>Interest Rate: {interestRate * 100}%</p>
+            <button onClick={applyForLoan}>Apply for Loan</button>
+          </div>
+        );
+      };
+    }
+  }
+}
+
+// --- Citibankdemobusinessinc.payments.smartpay ---
+// Business Model 3: AI-Enhanced Payment Processing
+namespace Citibankdemobusinessinc {
+  export namespace payments {
+    export namespace smartpay {
+      // Mission Statement: To revolutionize payment processing with AI-driven fraud detection and personalized payment experiences, ensuring secure and seamless transactions for businesses and consumers.
+      // Monetization Path: Transaction fees, premium fraud protection services, and data analytics insights for merchants.
+      // IP Moat: Proprietary AI algorithms for fraud detection and risk assessment, providing superior security and personalized payment options.
+
+      // Interface for SmartPay Configuration
+      interface SmartPayConfig extends CitibankdemobusinessincKernel.Config {
+        transactionFeeRate: number;
+        fraudDetectionThreshold: number;
+      }
+
+      // Default Configuration
+      const defaultConfig: SmartPayConfig = {
+        clientId: CitibankdemobusinessincKernel.generateUniqueId(),
+        redirectUri: 'https://citibankdemobusinessinc.com/smartpay/callback',
+        scope: 'payment_data',
+        tokenExchangeEndpoint: '/api/smartpay/token',
+        transactionFeeRate: 0.02,
+        fraudDetectionThreshold: 0.9
+      };
+
+      // Function to generate a transaction amount
+      const generateTransactionAmount = (): number => {
+        return CitibankdemobusinessincKernel.generateRandomNumber(10, 1000);
+      };
+
+      // Function to simulate fraud detection
+      const simulateFraudDetection = (): boolean => {
+        return Math.random() > defaultConfig.fraudDetectionThreshold;
+      };
+
+      // Main SmartPay Application
+      export const SmartPayApp = () => {
+        const [transactionAmount, setTransactionAmount] = useState<number>(generateTransactionAmount());
+        const [isFraudulent, setIsFraudulent] = useState<boolean>(simulateFraudDetection());
+
+        const processPayment = () => {
+          setTransactionAmount(generateTransactionAmount());
+          setIsFraudulent(simulateFraudDetection());
+        };
+
+        return (
+          <div>
+            <h1>AI-Enhanced Payment Processing</h1>
+            <p>Transaction Amount: ${transactionAmount}</p>
+            <p>Fraudulent: {isFraudulent ? 'Yes' : 'No'}</p>
+            <button onClick={processPayment}>Process Payment</button>
+          </div>
+        );
+      };
+    }
+  }
+}
+
+// --- Citibankdemobusinessinc.wealth.roboadvisor ---
+// Business Model 4: AI-Powered Robo-Advisor for Wealth Management
+namespace Citibankdemobusinessinc {
+  export namespace wealth {
+    export namespace roboadvisor {
+      // Mission Statement: To provide personalized wealth management services through AI-driven robo-advisory, enabling users to optimize their investments and achieve long-term financial security.
+      // Monetization Path: Management fees based on assets under management, subscription fees for premium features, and commissions on investment products.
+      // IP Moat: Proprietary AI algorithms for portfolio optimization and risk management, providing superior investment performance and personalized advice.
+
+      // Interface for RoboAdvisor Configuration
+      interface RoboAdvisorConfig extends CitibankdemobusinessincKernel.Config {
+        managementFeeRate: number;
+        riskToleranceLevels: number;
+      }
+
+      // Default Configuration
+      const defaultConfig: RoboAdvisorConfig = {
+        clientId: CitibankdemobusinessincKernel.generateUniqueId(),
+        redirectUri: 'https://citibankdemobusinessinc.com/roboadvisor/callback',
+        scope: 'wealth_data',
+        tokenExchangeEndpoint: '/api/roboadvisor/token',
+        managementFeeRate: 0.01,
+        riskToleranceLevels: 5
+      };
+
+      // Function to generate an investment amount
+      const generateInvestmentAmount = (): number => {
+        return CitibankdemobusinessincKernel.generateRandomNumber(1000, 100000);
+      };
+
+      // Function to generate a risk profile
+      const generateRiskProfile = (): number => {
+        return CitibankdemobusinessincKernel.generateRandomNumber(1, defaultConfig.riskToleranceLevels);
+      };
+
+      // Main RoboAdvisor Application
+      export const RoboAdvisorApp = () => {
+        const [investmentAmount, setInvestmentAmount] = useState<number>(generateInvestmentAmount());
+        const [riskProfile, setRiskProfile] = useState<number>(generateRiskProfile());
+
+        const updateInvestment = () => {
+          setInvestmentAmount(generateInvestmentAmount());
+          setRiskProfile(generateRiskProfile());
+        };
+
+        return (
+          <div>
+            <h1>AI-Powered Robo-Advisor</h1>
+            <p>Investment Amount: ${investmentAmount}</p>
+            <p>Risk Profile: {riskProfile}</p>
+            <button onClick={updateInvestment}>Update Investment</button>
+          </div>
+        );
+      };
+    }
+  }
+}
+
+// --- Citibankdemobusinessinc.insurance.smartprotect ---
+// Business Model 5: AI-Driven Insurance Platform
+namespace Citibankdemobusinessinc {
+  export namespace insurance {
+    export namespace smartprotect {
+      // Mission Statement: To provide personalized insurance solutions through AI-driven risk assessment and claims processing, ensuring comprehensive coverage and seamless customer experiences.
+      // Monetization Path: Premiums on insurance policies, fees for value-added services, and partnerships with healthcare providers.
+      // IP Moat: Proprietary AI algorithms for risk assessment and claims processing, providing superior underwriting and personalized coverage options.
+
+      // Interface for SmartProtect Configuration
+      interface SmartProtectConfig extends CitibankdemobusinessincKernel.Config {
+        premiumRate: number;
+        coverageAmount: number;
+      }
+
+      // Default Configuration
+      const defaultConfig: SmartProtectConfig = {
+        clientId: CitibankdemobusinessincKernel.generateUniqueId(),
+        redirectUri: 'https://citibankdemobusinessinc.com/smartprotect/callback',
+        scope: 'insurance_data',
+        tokenExchangeEndpoint: '/api/smartprotect/token',
+        premiumRate: 0.05,
+        coverageAmount: 100000
+      };
+
+      // Function to generate a policy holder age
+      const generatePolicyHolderAge = (): number => {
+        return CitibankdemobusinessincKernel.generateRandomNumber(18, 75);
+      };
+
+      // Function to calculate premium
+      const calculatePremium = (age: number): number => {
+        return defaultConfig.premiumRate * defaultConfig.coverageAmount * (age / 100);
+      };
+
+      // Main SmartProtect Application
+      export const SmartProtectApp = () => {
+        const [policyHolderAge, setPolicyHolderAge] = useState<number>(generatePolicyHolderAge());
+        const [premium, setPremium] = useState<number>(calculatePremium(policyHolderAge));
+
+        const updatePolicy = () => {
+          const newAge = generatePolicyHolderAge();
+          setPolicyHolderAge(newAge);
+          setPremium(calculatePremium(newAge));
+        };
+
+        return (
+          <div>
+            <h1>AI-Driven Insurance Platform</h1>
+            <p>Policy Holder Age: {policyHolderAge}</p>
+            <p>Premium: ${premium}</p>
+            <button onClick={updatePolicy}>Update Policy</button>
+          </div>
+        );
+      };
+    }
+  }
+}
+
+// --- Citibankdemobusinessinc.realestate.propertyinsights ---
+// Business Model 6: AI-Powered Real Estate Investment Platform
+namespace Citibankdemobusinessinc {
+  export namespace realestate {
+    export namespace propertyinsights {
+      // Mission Statement: To empower real estate investors with AI-driven property insights and investment recommendations, maximizing returns and minimizing risks.
+      // Monetization Path: Subscription fees for premium data and analytics, commissions on property transactions, and management fees for property management services.
+      // IP Moat: Proprietary AI algorithms for property valuation and market analysis, providing superior investment recommendations and personalized advice.
+
+      // Interface for PropertyInsights Configuration
+      interface PropertyInsightsConfig extends CitibankdemobusinessincKernel.Config {
+        propertyValuationRange: [number, number];
+        marketAnalysisScoreRange: [number, number];
+      }
+
+      // Default Configuration
+      const defaultConfig: PropertyInsightsConfig = {
+        clientId: CitibankdemobusinessincKernel.generateUniqueId(),
+        redirectUri: 'https://citibankdemobusinessinc.com/propertyinsights/callback',
+        scope: 'realestate_data',
+        tokenExchangeEndpoint: '/api/propertyinsights/token',
+        propertyValuationRange: [100000, 1000000],
+        marketAnalysisScoreRange: [1, 100]
+      };
+
+      // Function to generate a property valuation
+      const generatePropertyValuation = (): number => {
+        return CitibankdemobusinessincKernel.generateRandomNumber(defaultConfig.propertyValuationRange[0], defaultConfig.propertyValuationRange[1]);
+      };
+
+      // Function to generate a market analysis score
+      const generateMarketAnalysisScore = (): number => {
+        return CitibankdemobusinessincKernel.generateRandomNumber(defaultConfig.marketAnalysisScoreRange[0], defaultConfig.marketAnalysisScoreRange[1]);
+      };
+
+      // Main PropertyInsights Application
+      export const PropertyInsightsApp = () => {
+        const [propertyValuation, setPropertyValuation] = useState<number>(generatePropertyValuation());
+        const [marketAnalysisScore, setMarketAnalysisScore] = useState<number>(generateMarketAnalysisScore());
+
+        const updateProperty = () => {
+          setPropertyValuation(generatePropertyValuation());
+          setMarketAnalysisScore(generateMarketAnalysisScore());
+        };
+
+        return (
+          <div>
+            <h1>AI-Powered Real Estate Investment Platform</h1>
+            <p>Property Valuation: ${propertyValuation}</p>
+            <p>Market Analysis Score: {marketAnalysisScore}</p>
+            <button onClick={updateProperty}>Update Property</button>
+          </div>
+        );
+      };
+    }
+  }
+}
+
+// --- Citibankdemobusinessinc.healthcare.medicalbilling ---
+// Business Model 7: AI-Driven Medical Billing and Coding
+namespace Citibankdemobusinessinc {
+  export namespace healthcare {
+    export namespace medicalbilling {
+      // Mission Statement: To streamline medical billing and coding processes with AI-driven automation, reducing errors and maximizing revenue for healthcare providers.
+      // Monetization Path: Fees for billing and coding services, subscription fees for premium features, and partnerships with healthcare providers.
+      // IP Moat: Proprietary AI algorithms for medical coding and billing, providing superior accuracy and efficiency.
+
+      // Interface for MedicalBilling Configuration
+      interface MedicalBillingConfig extends CitibankdemobusinessincKernel.Config {
+        billingAmountRange: [number, number];
+        codingAccuracyRate: number;
+      }
+
+      // Default Configuration
+      const defaultConfig: MedicalBillingConfig = {
+        clientId: CitibankdemobusinessincKernel.generateUniqueId(),
+        redirectUri: 'https://citibankdemobusinessinc.com/medicalbilling/callback',
+        scope: 'healthcare_data',
+        tokenExchangeEndpoint: '/api/medicalbilling/token',
+        billingAmountRange: [100, 10000],
+        codingAccuracyRate: 0.95
+      };
+
+      // Function to generate a billing amount
+      const generateBillingAmount = (): number => {
+        return CitibankdemobusinessincKernel.generateRandomNumber(defaultConfig.billingAmountRange[0], defaultConfig.billingAmountRange[1]);
+      };
+
+      // Function to simulate coding accuracy
+      const simulateCodingAccuracy = (): boolean => {
+        return Math.random() < defaultConfig.codingAccuracyRate;
+      };
+
+      // Main MedicalBilling Application
+      export const MedicalBillingApp = () => {
+        const [billingAmount, setBillingAmount] = useState<number>(generateBillingAmount());
+        const [isCodingAccurate, setIsCodingAccurate] = useState<boolean>(simulateCodingAccuracy());
+
+        const updateBilling = () => {
+          setBillingAmount(generateBillingAmount());
+          setIsCodingAccurate(simulateCodingAccuracy());
+        };
+
+        return (
+          <div>
+            <h1>AI-Driven Medical Billing and Coding</h1>
+            <p>Billing Amount: ${billingAmount}</p>
+            <p>Coding Accurate: {isCodingAccurate ? 'Yes' : 'No'}</p>
+            <button onClick={updateBilling}>Update Billing</button>
+          </div>
+        );
+      };
+    }
+  }
+}
+
+// --- Citibankdemobusinessinc.education.personalizedlearning ---
+// Business Model 8: AI-Powered Personalized Learning Platform
+namespace Citibankdemobusinessinc {
+  export namespace education {
+    export namespace personalizedlearning {
+      // Mission Statement:
