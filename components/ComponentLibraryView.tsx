@@ -3,106 +3,62 @@ import { Cpu, Shield, Activity, CheckCircle, AlertTriangle } from 'lucide-react'
 
 const ComponentLibraryView: React.FC = () => {
     return (
-        <div className="p-6 space-y-8 text-white">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">
-                    Component Library
-                </h1>
-                <p className="text-gray-400 mt-2">
-                    A collection of reusable UI components used throughout the AI Banking University platform.
+        <div className="blog-container p-6 max-w-4xl mx-auto text-gray-200 font-sans leading-relaxed">
+            <h1 className="text-4xl font-extrabold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">
+                Beyond the Pixels: 3 Surprising Lessons from an AI Banking UI
+            </h1>
+
+            <p className="mb-6 text-lg text-center text-gray-400">
+                Ever wonder what truly goes into crafting an intuitive and powerful user interface, especially in a domain as critical as AI banking? We often see the polished final product, but the design decisions beneath the surface tell a fascinating story. Today, we're diving into the core of a modern UI component library for an "AI Banking University" platform to uncover some impactful, perhaps even counter-intuitive, takeaways that elevate a good design to a great one.
+            </p>
+
+            <section className="mb-8">
+                <h2 className="text-2xl font-bold text-cyan-400 mb-4">
+                    1. Dark Mode Isn't Just a Trend; It's a Strategic Brand Statement
+                </h2>
+                <p className="mb-4">
+                    While many platforms default to a light theme, this AI Banking University UI boldly embraces a dark mode first approach. Notice the immediate `text-white` and deep `bg-gray-800/50` backgrounds. This isn't merely an aesthetic choice; it's a deliberate statement that communicates sophistication, modernity, and often, a focus on data-intensive applications where reduced eye strain is a welcome bonus.
+                </p>
+                <p className="mb-4">
+                    Against this elegant dark canvas, the brand's vibrant `cyan-400` and `purple-500` gradients truly pop, creating a distinctive visual identity that feels both cutting-edge and trustworthy. It's a powerful example of how a foundational design decision can amplify brand messaging and set a premium tone from the first glance.
+                </p>
+                <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-300 my-4">
+                    "In the digital realm, your aesthetic is your first handshake. A dark theme, when executed well, whispers 'premium' and 'precision'."
+                </blockquote>
+            </section>
+
+            <section className="mb-8">
+                <h2 className="text-2xl font-bold text-cyan-400 mb-4">
+                    2. Designing for Intent: Guiding Users with Purpose-Built Components
+                </h2>
+                <p className="mb-4">
+                    It's easy to create a generic button or a simple card. What truly stands out here is the intentionality behind each component's design. Buttons aren't just styled differently; they're semantically named: "Primary Action," "Secondary Action," "Neutral Action," "Outline Action." This isn't just developer convenience; it guides users and developers alike on the hierarchy and expected impact of each interaction, streamlining decision-making.
+                </p>
+                <p className="mb-4">
+                    The same principle applies to cards. We don't just have "a card"; we have a "Feature Card," a "Stat Card" (with its green `Activity` icon and financial data), and a striking "Alert Card" (featuring a `Shield` icon and a red theme). Each is meticulously crafted to convey a specific type of information and urgency, transforming simple containers into powerful communication tools. This level of detail ensures clarity, especially in a high-stakes environment like banking.
+                </p>
+            </section>
+
+            <section className="mb-8">
+                <h2 className="text-2xl font-bold text-cyan-400 mb-4">
+                    3. The Subtle Art of Feedback: Micro-Interactions That Matter
+                </h2>
+                <p className="mb-4">
+                    Often overlooked, the small details make a huge difference in user experience. This component library is rich with subtle micro-interactions that provide crucial feedback. Notice the `hover:bg-cyan-500` on buttons, the `transition-all` for smooth state changes, and the `focus:border-cyan-500` on form elements. These aren't just decorative; they confirm user actions, indicate interactivity, and make the interface feel responsive and alive.
+                </p>
+                <p className="mb-4">
+                    Even effects like `shadow-lg` and `backdrop-blur-sm` on cards add depth and a premium feel, enhancing the perceived quality and polish of the application. These seemingly minor touches collectively elevate the user's journey from merely functional to genuinely delightful, fostering trust and engagement.
+                </p>
+            </section>
+
+            <div className="text-center mt-10 pt-6 border-t border-gray-700">
+                <p className="text-lg mb-4">
+                    From strategic color choices to purpose-driven components and the magic of micro-interactions, this AI Banking University UI offers a masterclass in thoughtful design. It reminds us that every pixel, every transition, and every semantic choice contributes to a larger narrative of user experience and brand identity.
+                </p>
+                <p className="text-xl font-semibold text-purple-400">
+                    What hidden design gems have you discovered in the code you work with?
                 </p>
             </div>
-
-            {/* Buttons Section */}
-            <section className="space-y-4">
-                <h2 className="text-xl font-semibold text-cyan-400 border-b border-gray-700 pb-2">Buttons</h2>
-                <div className="flex flex-wrap gap-4">
-                    <button className="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-full transition-all shadow-lg shadow-cyan-500/50">
-                        Primary Action
-                    </button>
-                    <button className="px-6 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-full transition-all shadow-lg shadow-purple-500/50">
-                        Secondary Action
-                    </button>
-                    <button className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-full transition-all">
-                        Neutral Action
-                    </button>
-                    <button className="px-6 py-2 border border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 font-bold rounded-full transition-all">
-                        Outline Action
-                    </button>
-                </div>
-            </section>
-
-            {/* Cards Section */}
-            <section className="space-y-4">
-                <h2 className="text-xl font-semibold text-cyan-400 border-b border-gray-700 pb-2">Cards</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700 hover:border-cyan-400/50 transition-all">
-                        <div className="mb-4 p-3 bg-gray-900 rounded-full w-fit">
-                            <Cpu className="w-6 h-6 text-cyan-400" />
-                        </div>
-                        <h3 className="text-lg font-semibold mb-2">Feature Card</h3>
-                        <p className="text-gray-400 text-sm">Standard card component used for features or dashboard widgets.</p>
-                    </div>
-                    
-                    <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl border border-gray-700 shadow-lg">
-                        <div className="flex justify-between items-start mb-4">
-                            <h3 className="text-lg font-semibold">Stat Card</h3>
-                            <Activity className="w-5 h-5 text-green-400" />
-                        </div>
-                        <div className="text-3xl font-bold text-white mb-1">$1,234.56</div>
-                        <div className="text-green-400 text-sm flex items-center">
-                            +12.5% <span className="text-gray-500 ml-1">vs last month</span>
-                        </div>
-                    </div>
-
-                    <div className="bg-red-900/20 p-6 rounded-xl border border-red-500/30">
-                        <div className="flex items-center gap-3 mb-2">
-                            <Shield className="w-5 h-5 text-red-400" />
-                            <h3 className="text-lg font-semibold text-red-200">Alert Card</h3>
-                        </div>
-                        <p className="text-red-300/80 text-sm">Used for critical warnings or security alerts within the system.</p>
-                    </div>
-                </div>
-            </section>
-
-            {/* Form Elements */}
-            <section className="space-y-4">
-                <h2 className="text-xl font-semibold text-cyan-400 border-b border-gray-700 pb-2">Form Elements</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
-                    <div className="space-y-2">
-                        <label className="text-sm text-gray-400">Input Field</label>
-                        <input 
-                            type="text" 
-                            placeholder="Enter value..." 
-                            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-sm text-gray-400">Select Menu</label>
-                        <select className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500 transition-colors">
-                            <option>Option 1</option>
-                            <option>Option 2</option>
-                            <option>Option 3</option>
-                        </select>
-                    </div>
-                </div>
-            </section>
-
-            {/* Status Indicators */}
-            <section className="space-y-4">
-                <h2 className="text-xl font-semibold text-cyan-400 border-b border-gray-700 pb-2">Status Indicators</h2>
-                <div className="flex flex-wrap gap-4">
-                    <span className="flex items-center gap-2 px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-sm border border-green-500/30">
-                        <CheckCircle className="w-4 h-4" /> Active
-                    </span>
-                    <span className="flex items-center gap-2 px-3 py-1 bg-yellow-900/30 text-yellow-400 rounded-full text-sm border border-yellow-500/30">
-                        <AlertTriangle className="w-4 h-4" /> Pending
-                    </span>
-                    <span className="flex items-center gap-2 px-3 py-1 bg-red-900/30 text-red-400 rounded-full text-sm border border-red-500/30">
-                        <Shield className="w-4 h-4" /> Blocked
-                    </span>
-                </div>
-            </section>
         </div>
     );
 };
