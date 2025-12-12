@@ -1,4 +1,3 @@
-```typescript
 import React, { useState, useContext } from 'react';
 import { Select } from 'antd';
 import { ChainContext } from '../../context/ChainContext';
@@ -22,4 +21,3 @@ const ChainSelector: React.FC = () => {
 };
 
 export default ChainSelector;
-```
