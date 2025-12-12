@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 import { EdgeProps } from 'reactflow';
 
@@ -31,4 +30,3 @@ const IdentityEdge = ({ id, source, target, data, style, markerEnd }: EdgeProps)
 };
 
 export default IdentityEdge;
-```
