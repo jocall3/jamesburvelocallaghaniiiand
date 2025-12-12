@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Card from './Card';
 import { MOCK_ANOMALIES } from '../data/mockData';
