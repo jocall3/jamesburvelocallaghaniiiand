@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export const DetailItem: React.FC<{ title: string; value: React.ReactNode; isMono?: boolean }> = ({ title, value, isMono }) => (
