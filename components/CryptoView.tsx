@@ -243,7 +243,7 @@ const CryptoView: React.FC = () => {
                             <div className="flex-1 space-y-2">
                                 <label className="text-xs text-gray-400 uppercase font-bold tracking-wider">CVC / CVV</label>
                                 <div className="bg-gray-800 p-4 rounded-lg border border-gray-600">
-                                    <span className="text-white font-mono">•••</span>
+                                    <span className="text-white font-mono">â€¢â€¢â€¢</span>
                                 </div>
                             </div>
                         </div>
@@ -274,7 +274,7 @@ const CryptoView: React.FC = () => {
                 <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-4">
                         <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                            <span className="text-white font-bold text-xl">Ξ</span>
+                            <span className="text-white font-bold text-xl">Îž</span>
                         </div>
                         <div>
                             <h1 className="text-xl font-bold text-white tracking-wide">NEXUS <span className="text-cyan-400">OS</span></h1>
@@ -338,7 +338,7 @@ const CryptoView: React.FC = () => {
                                     <div className="mt-2">
                                         <h3 className="text-3xl font-bold text-white">${portfolioAnalytics.totalValue.toLocaleString()}</h3>
                                         <div className="flex items-center mt-2 text-green-400 text-sm font-bold">
-                                            <span>▲ 4.2%</span>
+                                            <span>â–² 4.2%</span>
                                             <span className="text-gray-500 ml-2 font-normal">vs last 24h</span>
                                         </div>
                                     </div>
@@ -461,7 +461,7 @@ const CryptoView: React.FC = () => {
                                     ) : (
                                         <div className="text-center py-8">
                                             <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                                                <span className="text-2xl">💳</span>
+                                                <span className="text-2xl">ðŸ’³</span>
                                             </div>
                                             <p className="text-gray-400 mb-6 text-sm">Generate a cryptographically secure virtual card for global payments.</p>
                                             <button 
@@ -492,19 +492,19 @@ const CryptoView: React.FC = () => {
                                     </button>
                                     <button className="flex flex-col items-center justify-center p-4 bg-gray-800 hover:bg-gray-700 rounded-xl border border-gray-700 transition-all group">
                                         <div className="w-10 h-10 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center mb-2 group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                                            <span className="text-xl font-bold">⇄</span>
+                                            <span className="text-xl font-bold">â‡„</span>
                                         </div>
                                         <span className="text-sm font-medium text-gray-300">Swap</span>
                                     </button>
                                     <button className="flex flex-col items-center justify-center p-4 bg-gray-800 hover:bg-gray-700 rounded-xl border border-gray-700 transition-all group">
                                         <div className="w-10 h-10 rounded-full bg-purple-500/10 text-purple-500 flex items-center justify-center mb-2 group-hover:bg-purple-500 group-hover:text-white transition-colors">
-                                            <span className="text-xl font-bold">⚗</span>
+                                            <span className="text-xl font-bold">âš—</span>
                                         </div>
                                         <span className="text-sm font-medium text-gray-300">Stake</span>
                                     </button>
                                     <button className="flex flex-col items-center justify-center p-4 bg-gray-800 hover:bg-gray-700 rounded-xl border border-gray-700 transition-all group">
                                         <div className="w-10 h-10 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center mb-2 group-hover:bg-orange-500 group-hover:text-white transition-colors">
-                                            <span className="text-xl font-bold">⚡</span>
+                                            <span className="text-xl font-bold">âš¡</span>
                                         </div>
                                         <span className="text-sm font-medium text-gray-300">Bridge</span>
                                     </button>
@@ -625,7 +625,7 @@ const CryptoView: React.FC = () => {
                         ) : (
                             <div className="flex flex-col items-center justify-center py-20 bg-gray-800/30 rounded-3xl border border-dashed border-gray-700">
                                 <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mb-4">
-                                    <span className="text-3xl opacity-50">🖼️</span>
+                                    <span className="text-3xl opacity-50">ðŸ–¼ï¸ </span>
                                 </div>
                                 <h3 className="text-xl font-bold text-white">No Assets Detected</h3>
                                 <p className="text-gray-500 mt-2">Connect a wallet containing NFTs to view AI valuations.</p>
@@ -646,12 +646,12 @@ const CryptoView: React.FC = () => {
                                             <div className="w-6 h-6 rounded-full bg-gray-700"></div>
                                             <span className="text-white font-bold">Ethereum Mainnet</span>
                                         </div>
-                                        <span className="text-gray-400">▼</span>
+                                        <span className="text-gray-400">â–¼</span>
                                     </div>
                                 </div>
                                 <div className="flex justify-center -my-3 relative z-10">
                                     <div className="bg-gray-800 p-2 rounded-full border border-gray-600">
-                                        <span className="text-white">↓</span>
+                                        <span className="text-white">â†“</span>
                                     </div>
                                 </div>
                                 <div className="bg-gray-900 p-4 rounded-xl border border-gray-700">
@@ -661,7 +661,7 @@ const CryptoView: React.FC = () => {
                                             <div className="w-6 h-6 rounded-full bg-purple-600"></div>
                                             <span className="text-white font-bold">Polygon PoS</span>
                                         </div>
-                                        <span className="text-gray-400">▼</span>
+                                        <span className="text-gray-400">â–¼</span>
                                     </div>
                                 </div>
                                 <button className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded-xl transition-colors">
