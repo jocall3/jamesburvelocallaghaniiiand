@@ -1,5 +1,7 @@
-```typescript
 import React, { useState, useEffect, useMemo } from 'react';
+
+// --- Unified Brand ---
+const BRAND = 'Citibankdemobusinessinc';
 
 // --- Type Definitions ---
 type InsightType = 'ANOMALY' | 'PREDICTION' | 'RECOMMENDATION';
@@ -31,44 +33,70 @@ const RecommendationIcon: React.FC = () => (
   </svg>
 );
 
-// --- Mock Data Generation ---
+// --- Generative Data Functions ---
 
-const MOCK_MESSAGES: Record<InsightType, string[]> = {
-  ANOMALY: [
-    "Unusual login attempt detected from new device for account ending in 7899.",
-    "High-risk transaction of $5,230.14 flagged for manual review on account ...93f6.",
-    "Multiple failed password attempts on customer profile ...5f9. Account locked.",
-    "Potential credential stuffing attack detected. Monitoring initiated.",
-    "Anomalous API usage pattern from client_id 'partner-fintech-app'. Rate limit temporarily tightened.",
-  ],
-  PREDICTION: [
-    "Predicting high credit card reward redemption volume in the next 72 hours.",
-    "Customer ...d5f9 likely to churn. Proactive retention offer recommended.",
-    "Forecast indicates a 15% increase in 'Shop with Points' linkage requests this quarter.",
-    "High probability of successful cross-sell for 'Citi Savings Account' to user ...3ee0.",
-    "AI model predicts seasonal spending surge in travel-related categories starting next week.",
-  ],
-  RECOMMENDATION: [
-    "Recommend offering Citi Rewards+℠ Card to customer ...d5f9 based on spending habits.",
-    "Activate real-time fraud alerts for account ...7899 due to recent travel patterns.",
-    "System suggests consolidating multiple small savings accounts for customer ...93f6 to maximize interest.",
-    "Automated system health check recommended for the '/oauth2/token' endpoint due to rising latency.",
-    "Engage customer ...3ee0 with a targeted marketing campaign for investment products.",
-  ],
+const generateRandomNumber = (min: number, max: number): number => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+
+const generateRandomString = (length: number): string => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+};
+
+const generateRandomDate = (start: Date, end: Date): string => {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toLocaleTimeString('en-US');
+};
+
+// --- Insight Message Generators ---
+
+const generateAnomalyMessage = (): string => {
+  const accountId = generateRandomString(8);
+  const amount = generateRandomNumber(1000, 10000);
+  return `[${BRAND}.risk.fraud] Unusual transaction of $${amount} detected on account ...${accountId}.`;
+};
+
+const generatePredictionMessage = (): string => {
+  const customerId = generateRandomString(6);
+  const percentage = generateRandomNumber(5, 20);
+  return `[${BRAND}.analytics.churn] Predicting ${percentage}% churn risk for customer ...${customerId}.`;
+};
+
+const generateRecommendationMessage = (): string => {
+  const productId = generateRandomString(4);
+  const customerId = generateRandomString(7);
+  return `[${BRAND}.marketing.upsell] Recommending product ${productId} to customer ...${customerId} based on AI analysis.`;
+};
+
+// --- Insight Generation ---
 
 let insightIdCounter = 0;
 const generateRandomInsight = (): Insight => {
   const types: InsightType[] = ['ANOMALY', 'PREDICTION', 'RECOMMENDATION'];
   const randomType = types[Math.floor(Math.random() * types.length)];
-  const messagesForType = MOCK_MESSAGES[randomType];
-  const randomMessage = messagesForType[Math.floor(Math.random() * messagesForType.length)];
+
+  let message: string;
+  switch (randomType) {
+    case 'ANOMALY':
+      message = generateAnomalyMessage();
+      break;
+    case 'PREDICTION':
+      message = generatePredictionMessage();
+      break;
+    case 'RECOMMENDATION':
+      message = generateRecommendationMessage();
+      break;
+  }
 
   return {
     id: insightIdCounter++,
     type: randomType,
-    timestamp: new Date().toLocaleTimeString('en-US'),
-    message: randomMessage,
+    timestamp: generateRandomDate(new Date(2024, 0, 1), new Date()),
+    message: message,
   };
 };
 
@@ -181,4 +209,3 @@ const InsightStream: React.FC = () => {
 };
 
 export default InsightStream;
-```
