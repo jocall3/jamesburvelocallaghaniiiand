@@ -1,4 +1,3 @@
-
 // Mock implementation without 'plaid' package dependency
 
 export enum Products {
