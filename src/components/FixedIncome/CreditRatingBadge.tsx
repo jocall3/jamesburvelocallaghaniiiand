@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 import styled from 'styled-components';
 
@@ -48,4 +47,3 @@ const CreditRatingBadge: React.FC<CreditRatingBadgeProps> = ({ rating }) => {
 };
 
 export default CreditRatingBadge;
-```
