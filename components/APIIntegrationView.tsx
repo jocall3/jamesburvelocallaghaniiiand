@@ -785,7 +785,7 @@ const BusinessIntelligenceDashboard: React.FC<{ geminiApiKey: string | null }> =
                             </ResponsiveContainer>
                         </div>
                         <div className="bg-gray-900 rounded-lg p-4 border border-gray-700 space-y-3">
-                            <h4 className="text-lg font-semibold text-white">AI Operational Insights</h4>
+                            <h4 className="text-lg font-semibold text-white}>AI Operational Insights</h4>
                             <p className="text-gray-400 text-sm">
                                 AI identifies a 25% potential for further automation in customer support workflows, leading to significant cost savings and improved response times.
                             </p>
