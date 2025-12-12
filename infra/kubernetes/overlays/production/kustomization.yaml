@@ -1,0 +1,108 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+  - ../../base
+
+patchesStrategicMerge:
+  - patch-deployment.yaml
+  - patch-service.yaml
+
+# Add resources specific to production
+resources:
+  - ingress.yaml
+
+# Configure image pull secrets for production
+# imagePullSecrets:
+#   - name: regcred
+
+# Namespace configuration
+namespace: production
+
+# Add labels to all resources
+commonLabels:
+  environment: production
+
+# Configure resource limits and requests
+# patches:
+#   - target:
+#       kind: Deployment
+#       name: my-app
+#     patch: |-
+#       spec:
+#         template:
+#           spec:
+#             containers:
+#               - name: my-app
+#                 resources:
+#                   requests:
+#                     cpu: 100m
+#                     memory: 256Mi
+#                   limits:
+#                     cpu: 500m
+#                     memory: 512Mi
+
+# Configure replicas
+replicas:
+  - name: my-app
+    count: 3
+
+# Configure ingress host
+# patches:
+#   - target:
+#       kind: Ingress
+#       name: my-app-ingress
+#     patch: |-
+#       spec:
+#         rules:
+#           - host: my-app.example.com
+#             http:
+#               paths:
+#                 - path: /
+#                   pathType: Prefix
+#                   backend:
+#                     service:
+#                       name: my-app-service
+#                       port:
+#                         number: 80
+
+# Add annotations
+commonAnnotations:
+  example.com/deployed-by: kustomize
+
+# Patches JSON 6902
+# patchesJson6902:
+#   - target:
+#       group: apps
+#       version: v1
+#       kind: Deployment
+#       name: my-app
+#     patch:
+#     - op: replace
+#       path: /spec/replicas
+#       value: 5
+
+# ConfigMap generator
+configMapGenerator:
+  - name: my-app-config
+    literals:
+      - APP_ENVIRONMENT=production
+      - FEATURE_FLAG=enabled
+
+# Secret generator
+secretGenerator:
+  - name: my-app-secret
+    literals:
+      - DB_PASSWORD=prod_secret_password
+
+# Images
+images:
+  - name: my-app
+    newName: your-registry/my-app
+    newTag: v1.0.0
+
+# Add a prefix to resource names
+namePrefix: prod-
+
+# Add a suffix to resource names
+nameSuffix: -prod
