@@ -1,4 +1,3 @@
-```typescript
 import React, { useState, useEffect } from 'react';
 import { Token } from '../../types';
 import { useWallet } from './WalletContext';
@@ -53,4 +52,3 @@ const TokenList: React.FC<TokenListProps> = ({ onTokenSelect, selectedTokenAddre
 };
 
 export default TokenList;
-```
