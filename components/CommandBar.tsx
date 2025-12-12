@@ -116,7 +116,7 @@ const CommandBar: React.FC<CommandBarProps> = ({
         <p className="mt-2 text-center text-xs text-gray-500">
           You can also press{' '}
           <kbd className="rounded-md border border-gray-600 bg-gray-700 px-2 py-1 text-xs font-semibold text-gray-400">
-            ⌘ K
+            âŒ˜ K
           </kbd>{' '}
           to focus.
         </p>
