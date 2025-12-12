@@ -1,4 +1,3 @@
-```tsx
 import React, { useState, useEffect } from 'react';
 
 const ZeitgeistEngineView: React.FC = () => {
@@ -33,4 +32,3 @@ const ZeitgeistEngineView: React.FC = () => {
 };
 
 export default ZeitgeistEngineView;
-```
