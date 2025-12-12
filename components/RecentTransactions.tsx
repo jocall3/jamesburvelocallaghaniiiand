@@ -40,7 +40,7 @@ const CarbonFootprintBadge: React.FC<{ footprint: number }> = ({ footprint }) =>
                  <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                  <path d="M10 3.5a1.5 1.5 0 011.5 1.5v.92l5.06 4.69a1.5 1.5 0 01-.18 2.4l-3.38 1.95a1.5 1.5 0 01-1.5-.26L10 12.43l-1.5 2.25a1.5 1.5 0 01-1.5.26l-3.38-1.95a1.5 1.5 0 01-.18-2.4l5.06-4.69V5A1.5 1.5 0 0110 3.5z" />
             </svg>
-            <span className="font-mono">{footprint.toFixed(1)} kg CO₂</span>
+            <span className="font-mono">{footprint.toFixed(1)} kg COâ‚‚</span>
         </div>
     );
 };
