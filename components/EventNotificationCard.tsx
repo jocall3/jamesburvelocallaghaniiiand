@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Box, Typography, Card, CardContent, Divider } from '@mui/material';
 import { ExternalCorporateActionEventType1Code } from './iso20022';
