@@ -365,7 +365,7 @@ const AuditLog: React.FC = () => {
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Resource</label>
-                                    <div className="text-white text-sm">{selectedEntry.resourceType} <span className="text-gray-500 mx-1">•</span> <span className="font-mono text-gray-400">{selectedEntry.resourceId}</span></div>
+                                    <div className="text-white text-sm">{selectedEntry.resourceType} <span className="text-gray-500 mx-1">â¢</span> <span className="font-mono text-gray-400">{selectedEntry.resourceId}</span></div>
                                 </div>
                             </div>
 
