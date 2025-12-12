@@ -1,8 +1,3 @@
-
-
-
-
-
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 // --- Types & Interfaces ---
@@ -427,7 +422,7 @@ export default function CommoditiesExchange() {
                 ${selectedPrice.toFixed(2)}
               </div>
               <div style={{ color: isUp ? '#10b981' : '#ef4444' }}>
-                {isUp ? '▲' : '▼'} {Math.abs(selectedPrice - previousPrice).toFixed(2)} ({percentChange.toFixed(2)}%)
+                {isUp ? 'â–²' : 'â–¼'} {Math.abs(selectedPrice - previousPrice).toFixed(2)} ({percentChange.toFixed(2)}%)
               </div>
             </div>
           </div>
