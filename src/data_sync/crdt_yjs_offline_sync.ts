@@ -1,4 +1,3 @@
-```typescript
 import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 import { IndexeddbPersistence } from 'y-indexeddb';
@@ -71,4 +70,3 @@ export class YjsOfflineSync {
     console.log(`[YjsOfflineSync] Current state of ${this.roomName}:`, JSON.stringify(Y.encodeStateAsUpdate(this.doc).length));
   }
 }
-```
