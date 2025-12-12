@@ -1,4 +1,3 @@
-```python
 import math
 from scipy.stats import norm
 
@@ -127,4 +126,3 @@ class OptionsCalculator:
         return option_values[0]
       except (ValueError, OverflowError):
           return None
-```
