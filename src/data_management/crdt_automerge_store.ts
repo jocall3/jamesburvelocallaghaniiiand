@@ -1,4 +1,3 @@
-```typescript
 import * as Automerge from '@automerge/automerge';
 import { ChangeFn } from '@automerge/automerge';
 import { DocHandle, Repo } from "@automerge/automerge-repo"
@@ -71,4 +70,3 @@ export class AutomergeCRDTStore<T extends Record<string, any>> implements CRDTSt
   //   console.log(`Syncing with peer: ${peerId}`);
   // }
 }
-```
