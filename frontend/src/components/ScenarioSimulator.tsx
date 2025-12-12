@@ -1,4 +1,3 @@
-```typescript
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Slider, Grid, Paper } from '@mui/material';
 import { Portfolio } from '../utils/types';
@@ -74,4 +73,3 @@ const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({ portfolio }) => {
 };
 
 export default ScenarioSimulator;
-```
