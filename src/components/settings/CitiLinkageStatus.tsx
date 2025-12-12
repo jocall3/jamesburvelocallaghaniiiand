@@ -1,5 +1,50 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
+// Unified Brand Name
+const BRAND_NAME = "Citibankdemobusinessinc";
+
+// Shared Kernel: Utility Functions
+const generateRandomString = (length: number): string => {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
+const generateRandomNumber = (min: number, max: number): number => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+const generateFutureDate = (seconds: number): Date => {
+  const now = new Date();
+  now.setSeconds(now.getSeconds() + seconds);
+  return now;
+};
+
+const formatDate = (date: Date | null): string => {
+  if (!date) return 'N/A';
+  return date.toLocaleString();
+};
+
+// Shared Kernel: Data Generation
+const generateAccessToken = (): string => `access_token_${generateRandomString(20)}`;
+const generateRefreshToken = (): string => `refresh_token_${generateRandomString(20)}`;
+
+// Shared Kernel: Error Handling
+const handleGenericError = (error: any, component: string) => {
+  console.error(`[${BRAND_NAME} - ${component}] Error:`, error);
+  return `An unexpected error occurred in ${component}. Please try again.`;
+};
+
+// Shared Kernel: Local Storage Keys
+const ACCESS_TOKEN_STORAGE_KEY = `${BRAND_NAME}_access_token`;
+const ACCESS_TOKEN_EXPIRY_STORAGE_KEY = `${BRAND_NAME}_access_token_expiry`;
+const REFRESH_TOKEN_STORAGE_KEY = `${BRAND_NAME}_refresh_token`;
+const REFRESH_TOKEN_EXPIRY_STORAGE_KEY = `${BRAND_NAME}_refresh_token_expiry`;
+
 // Define types for the token response based on OpenAPI schema
 interface AccessTokenResponse {
   token_type: string;
@@ -10,19 +55,6 @@ interface AccessTokenResponse {
   refresh_token_expires_in: number; // seconds
 }
 
-// Helper to calculate expiry date
-const getExpiryDate = (expiresInSeconds: number): Date => {
-  const now = new Date();
-  now.setSeconds(now.getSeconds() + expiresInSeconds);
-  return now;
-};
-
-// Helper to format date
-const formatDate = (date: Date | null): string => {
-  if (!date) return 'N/A';
-  return date.toLocaleString();
-};
-
 // Mock API client (in a real app, this would be a separate service/module)
 const mockApiClient = {
   // Simulate fetching a new access token
@@ -31,13 +63,13 @@ const mockApiClient = {
       setTimeout(() => {
         resolve({
           token_type: 'Bearer',
-          access_token: `mock_access_token_${Math.random().toString(36).substring(7)}`,
-          expires_in: 600, // 10 minutes
+          access_token: generateAccessToken(),
+          expires_in: generateRandomNumber(600, 1200), // Random expiry between 10-20 minutes
           scope: 'accounts_details customers_profiles',
-          refresh_token: `mock_refresh_token_${Math.random().toString(36).substring(7)}`,
-          refresh_token_expires_in: 2592000, // 30 days
+          refresh_token: generateRefreshToken(),
+          refresh_token_expires_in: generateRandomNumber(2592000, 5184000), // Random expiry between 30-60 days
         });
-      }, 1000); // Simulate network delay
+      }, generateRandomNumber(500, 1500)); // Simulate network delay
     });
   },
 
@@ -51,13 +83,13 @@ const mockApiClient = {
         }
         resolve({
           token_type: 'Bearer',
-          access_token: `refreshed_access_token_${Math.random().toString(36).substring(7)}`,
-          expires_in: 600,
+          access_token: generateAccessToken(),
+          expires_in: generateRandomNumber(600, 1200),
           scope: 'accounts_details customers_profiles',
-          refresh_token: `new_refresh_token_${Math.random().toString(36).substring(7)}`, // Often a new refresh token is issued too
-          refresh_token_expires_in: 2592000,
+          refresh_token: generateRefreshToken(), // Often a new refresh token is issued too
+          refresh_token_expires_in: generateRandomNumber(2592000, 5184000),
         });
-      }, 1000);
+      }, generateRandomNumber(500, 1500));
     });
   },
 
@@ -67,16 +99,12 @@ const mockApiClient = {
       setTimeout(() => {
         console.log(`Mock: Revoking ${tokenTypeHint} - ${token}`);
         resolve({ status: 'success' });
-      }, 500);
+      }, generateRandomNumber(250, 750));
     });
   },
 };
 
-const ACCESS_TOKEN_STORAGE_KEY = 'citi_access_token';
-const ACCESS_TOKEN_EXPIRY_STORAGE_KEY = 'citi_access_token_expiry';
-const REFRESH_TOKEN_STORAGE_KEY = 'citi_refresh_token';
-const REFRESH_TOKEN_EXPIRY_STORAGE_KEY = 'citi_refresh_token_expiry';
-
+// Citibankdemobusinessinc.core.CitiLinkageStatus
 const CitiLinkageStatus: React.FC = () => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [accessTokenExpiry, setAccessTokenExpiry] = useState<Date | null>(null);
@@ -128,9 +156,9 @@ const CitiLinkageStatus: React.FC = () => {
 
   const updateTokens = useCallback((response: AccessTokenResponse) => {
     setAccessToken(response.access_token);
-    setAccessTokenExpiry(getExpiryDate(response.expires_in));
+    setAccessTokenExpiry(generateFutureDate(response.expires_in));
     setRefreshToken(response.refresh_token);
-    setRefreshTokenExpiry(getExpiryDate(response.refresh_token_expires_in));
+    setRefreshTokenExpiry(generateFutureDate(response.refresh_token_expires_in));
     setError(null); // Clear any previous errors on successful token update
   }, []);
 
@@ -141,7 +169,8 @@ const CitiLinkageStatus: React.FC = () => {
       const response = await mockApiClient.getAccessToken();
       updateTokens(response);
     } catch (err) {
-      setError(`Failed to connect: ${(err as Error).message}`);
+      const errorMessage = handleGenericError(err, 'CitiLinkageStatus - Connect');
+      setError(`Failed to connect: ${errorMessage}`);
       // Clear tokens on connection failure
       setAccessToken(null);
       setAccessTokenExpiry(null);
@@ -163,7 +192,8 @@ const CitiLinkageStatus: React.FC = () => {
       const response = await mockApiClient.refreshAccessToken(refreshToken);
       updateTokens(response);
     } catch (err) {
-      setError(`Failed to refresh token: ${(err as Error).message}. You may need to reconnect.`);
+      const errorMessage = handleGenericError(err, 'CitiLinkageStatus - Refresh');
+      setError(`Failed to refresh token: ${errorMessage}. You may need to reconnect.`);
       // If refresh fails, clear all tokens, forcing a full re-connect
       setAccessToken(null);
       setAccessTokenExpiry(null);
@@ -190,7 +220,8 @@ const CitiLinkageStatus: React.FC = () => {
       setRefreshToken(null);
       setRefreshTokenExpiry(null);
     } catch (err) {
-      setError(`Failed to revoke tokens: ${(err as Error).message}`);
+      const errorMessage = handleGenericError(err, 'CitiLinkageStatus - Revoke');
+      setError(`Failed to revoke tokens: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
