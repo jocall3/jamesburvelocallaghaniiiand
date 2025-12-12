@@ -145,7 +145,7 @@ export const AccountDetails: React.FC<AccountDetailsProps> = ({ account, isLoadi
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">{account.nickname}</h1>
-            <p className="text-sm text-gray-500">{account.accountType} •••• {account.accountNumberMasked}</p>
+            <p className="text-sm text-gray-500">{account.accountType} â¢â¢â¢â¢ {account.accountNumberMasked}</p>
           </div>
           <button className="p-2 text-gray-500 hover:bg-gray-200 rounded-full transition-colors">
             <MoreHorizontal size={20} />
@@ -194,7 +194,7 @@ export const AccountDetails: React.FC<AccountDetailsProps> = ({ account, isLoadi
             </>
           )}
           <dt className="text-gray-500">Account Number</dt>
-          <dd className="text-gray-900 font-mono">•••• {account.accountNumberMasked}</dd>
+          <dd className="text-gray-900 font-mono">â¢â¢â¢â¢ {account.accountNumberMasked}</dd>
           {account.interestRate !== undefined && (
             <>
               <dt className="text-gray-500">Interest Rate (APY)</dt>
