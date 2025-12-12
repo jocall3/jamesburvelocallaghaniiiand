@@ -1,4 +1,3 @@
-```typescript
 import * as tf from '@tensorflow/tfjs';
 
 export class TensorFlowGraphRunner {
@@ -60,4 +59,3 @@ export class TensorFlowGraphRunner {
   }
 
 }
-```
