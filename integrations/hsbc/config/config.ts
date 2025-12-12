@@ -34,7 +34,7 @@ export interface HsbcConfig {
     clientId: string;
     /** The Client Secret for your application, provided by HSBC. */
     clientSecret: string;
-    /** The URI to which HSBC will redirect the user after authentication. */
+    /** The URI to which HSBC will redirect the user for authorization. */
     redirectUri: string;
     /** The OAuth 2.0 scopes your application is requesting. */
     scopes: string[];
