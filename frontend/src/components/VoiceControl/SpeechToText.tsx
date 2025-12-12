@@ -1,4 +1,3 @@
-```typescript
 import React, { useState, useEffect, useCallback } from 'react';
 import { Subject } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
@@ -97,4 +96,3 @@ const SpeechToText: React.FC<SpeechToTextProps> = ({ onTranscript, onError }) =>
 };
 
 export default SpeechToText;
-```
