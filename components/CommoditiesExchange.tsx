@@ -422,7 +422,7 @@ export default function CommoditiesExchange() {
                 ${selectedPrice.toFixed(2)}
               </div>
               <div style={{ color: isUp ? '#10b981' : '#ef4444' }}>
-                {isUp ? 'â–²' : 'â–¼'} {Math.abs(selectedPrice - previousPrice).toFixed(2)} ({percentChange.toFixed(2)}%)
+                {isUp ? 'Ã¢â€“Â²' : 'Ã¢â€“Â¼'} {Math.abs(selectedPrice - previousPrice).toFixed(2)} ({percentChange.toFixed(2)}%)
               </div>
             </div>
           </div>
