@@ -1,4 +1,3 @@
-```typescript
 import { IAdapter } from "../interfaces/IAdapter";
 import { FinancialData } from "../types/FinancialData";
 import { WellsFargoConfig } from "../types/WellsFargoConfig";
@@ -92,4 +91,3 @@ export class WellsFargoAdapter implements IAdapter {
         return transformedData;
     }
 }
-```
