@@ -1,6 +1,3 @@
-
-
-
 import React, { useState } from 'react';
 import Form from '@rjsf/core';
 import validator from '@rjsf/validator-ajv8';
@@ -261,7 +258,7 @@ const schema: ExtendedJSONSchema7 = {
               "SMPG"
             ] as ExternalAcceptedReason1Code[],
             "enumNames": [
-              "ADEA - Received after the servicer’s deadline. Processed on best effort basis",
+              "ADEA - Received after the servicerâ€™s deadline. Processed on best effort basis",
               "NSTP - Instruction was not straight through processing and had to be processed manually",
               "SMPG - Instruction is accepted but does not comply with the market practice rule"
             ]
@@ -360,9 +357,9 @@ const schema: ExtendedJSONSchema7 = {
               "CNBR - China Bond Repurchase Master Agreement",
               "CSDA - CSD bilateral agreement",
               "DEMA - German Master Agreement",
-              "DERD - Deutscher Rahmenvertrag für Wertpapierdarlehen",
-              "DERP - Deutscher Rahmenvertrag für Wertpapierpensionsgeschäfte",
-              "DERV - Deutscher Rahmenvertrag für Finanztermingeschäfte (DRV)",
+              "DERD - Deutscher Rahmenvertrag fÃ¼r Wertpapierdarlehen",
+              "DERP - Deutscher Rahmenvertrag fÃ¼r WertpapierpensionsgeschÃ¤fte",
+              "DERV - Deutscher Rahmenvertrag fÃ¼r FinanztermingeschÃ¤fte (DRV)",
               "EFMA - EFET Master Agreement",
               "ESRA - Contrato Marco de compraventa y Reporto de valores",
               "EUMA - European Master Agreement",
