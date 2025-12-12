@@ -25,48 +25,119 @@ interface ServiceGroup {
     services: ApiService[];
 }
 
-// --- Mock Data ---
+// --- Data Generation Functions ---
 
-const MOCK_SERVICES: ServiceGroup[] = [
-    {
-        groupName: 'Core Banking & Transactions',
-        icon: ChipIcon,
-        services: [
-            { name: 'Transaction Processing API', health: ServiceHealth.Operational, lastChecked: 'Just now', description: 'Handles all real-time ledger entries and transfers.' },
-            { name: 'Account Balances API', health: ServiceHealth.Operational, lastChecked: 'Just now', description: 'Provides up-to-date account balance information.' },
-            { name: 'Payment Gateway (Stripe/Marqeta)', health: ServiceHealth.DegradedPerformance, lastChecked: '1 minute ago', description: 'Slight increase in latency (P95) for payment orders due to high volume.' },
-            { name: 'Webhooks & Events', health: ServiceHealth.Operational, lastChecked: 'Just now', description: 'Real-time event notification system is healthy.' },
-        ],
-    },
-    {
-        groupName: 'AI & Computational Services',
-        icon: BoltIcon,
-        services: [
-            { name: 'Quantum Oracle (Simulation)', health: ServiceHealth.Operational, lastChecked: 'Just now', description: 'Predictive modeling engine is running at full capacity.' },
-            { name: 'AI Advisor (Conversational)', health: ServiceHealth.Operational, lastChecked: '2 minutes ago', description: 'AI chat endpoints are responsive.' },
-            { name: 'Quantum Weaver (Incubation)', health: ServiceHealth.Maintenance, lastChecked: '1 hour ago', description: 'Scheduled update to the model infrastructure (Expected completion: 12:00 UTC).' },
-            { name: 'Ad Studio (Video Generation)', health: ServiceHealth.Operational, lastChecked: 'Just now', description: 'Generative AI endpoints are stable.' },
-        ],
-    },
-    {
-        groupName: 'Corporate Finance & Compliance',
-        icon: LockClosedIcon,
-        services: [
-            { name: 'Corporate Cards API', health: ServiceHealth.Operational, lastChecked: 'Just now', description: 'Manages virtual and physical corporate card controls.' },
-            { name: 'Anomaly Detection System', health: ServiceHealth.PartialOutage, lastChecked: '5 minutes ago', description: 'Sporadic failures in real-time fraud scoring service.' },
-            { name: 'Invoicing & Counterparties', health: ServiceHealth.Operational, lastChecked: 'Just now', description: 'Business finance document management is stable.' },
-        ],
-    },
-    {
-        groupName: 'Platform & Developer Experience',
-        icon: CloudIcon,
-        services: [
-            { name: 'Authentication & Identity', health: ServiceHealth.Operational, lastChecked: 'Just now', description: 'User login and token validation services are fully functional.' },
-            { name: 'API Gateway Management', health: ServiceHealth.Operational, lastChecked: 'Just now', description: 'Traffic routing and rate limiting are healthy.' },
-            { name: 'Documentation Hosting', health: ServiceHealth.Operational, lastChecked: 'Just now', description: 'Developer documentation site is available.' },
-        ],
-    },
-];
+const generateRandomHealth = (): ServiceHealth => {
+    const healthOptions = Object.values(ServiceHealth);
+    const randomIndex = Math.floor(Math.random() * healthOptions.length);
+    return healthOptions[randomIndex];
+};
+
+const generateRandomPastTime = (): string => {
+    const minutesAgo = Math.floor(Math.random() * 60);
+    return `${minutesAgo} minute${minutesAgo === 1 ? '' : 's'} ago`;
+};
+
+const generateRandomDescription = (): string => {
+    const descriptions = [
+        'Handles real-time data processing.',
+        'Provides up-to-date information.',
+        'Experiencing slight latency.',
+        'Real-time event notification system.',
+        'Predictive modeling engine running.',
+        'AI chat endpoints are responsive.',
+        'Scheduled update in progress.',
+        'Generative AI endpoints are stable.',
+        'Manages virtual card controls.',
+        'Sporadic failures detected.',
+        'Business finance document management.',
+        'User login and token validation.',
+        'Traffic routing and rate limiting.',
+        'Developer documentation available.',
+    ];
+    const randomIndex = Math.floor(Math.random() * descriptions.length);
+    return descriptions[randomIndex];
+};
+
+// --- Citibankdemobusinessinc Data Generation ---
+
+namespace Citibankdemobusinessinc {
+
+    const generateServiceName = (category: string): string => {
+        const serviceNames = [
+            `Automated ${category} System`,
+            `${category} Intelligence API`,
+            `Real-Time ${category} Monitor`,
+            `Dynamic ${category} Platform`,
+            `Adaptive ${category} Engine`,
+        ];
+        const randomIndex = Math.floor(Math.random() * serviceNames.length);
+        return serviceNames[randomIndex];
+    };
+
+    const createServiceGroup = (groupName: string, icon: React.FC<React.SVGProps<SVGSVGElement>>, serviceCount: number): ServiceGroup => {
+        const services: ApiService[] = Array.from({ length: serviceCount }, (_, i) => ({
+            name: generateServiceName(groupName.split(' ')[0]),
+            health: generateRandomHealth(),
+            lastChecked: generateRandomPastTime(),
+            description: generateRandomDescription(),
+        }));
+        return { groupName, icon, services };
+    };
+
+    export namespace viewit {
+        export const movieplayform = (): ServiceGroup => createServiceGroup('Movie Streaming Services', CloudIcon, 3);
+    }
+
+    export namespace innovatech {
+        export const aiadsolutions = (): ServiceGroup => createServiceGroup('AI-Driven Solutions', BoltIcon, 4);
+    }
+
+    export namespace securenet {
+        export const cyberdefensesuite = (): ServiceGroup => createServiceGroup('Cybersecurity Defenses', LockClosedIcon, 3);
+    }
+
+    export namespace fintechglobal {
+        export const paymentprocessing = (): ServiceGroup => createServiceGroup('Global Payment Processing', ChipIcon, 4);
+    }
+
+    export namespace healthwise {
+        export const telehealthplatform = (): ServiceGroup => createServiceGroup('Telehealth Services', CloudIcon, 3);
+    }
+
+    export namespace edutech {
+        export const onlinelearning = (): ServiceGroup => createServiceGroup('Online Learning Platforms', CloudIcon, 3);
+    }
+
+    export namespace greeneconomy {
+        export const energygrids = (): ServiceGroup => createServiceGroup('Smart Energy Grids', BoltIcon, 4);
+    }
+
+    export namespace smartcitysolutions {
+        export const iotplatform = (): ServiceGroup => createServiceGroup('IoT Platform Services', CloudIcon, 3);
+    }
+
+    export namespace spaceexploration {
+        export const satellitecommunications = (): ServiceGroup => createServiceGroup('Satellite Communications', CloudIcon, 3);
+    }
+
+    export namespace advancedmanufacturing {
+        export const roboticsautomation = (): ServiceGroup => createServiceGroup('Robotics Automation', BoltIcon, 4);
+    }
+
+    export const getAllServiceGroups = (): ServiceGroup[] => [
+        viewit.movieplayform(),
+        innovatech.aiadsolutions(),
+        securenet.cyberdefensesuite(),
+        fintechglobal.paymentprocessing(),
+        healthwise.telehealthplatform(),
+        edutech.onlinelearning(),
+        greeneconomy.energygrids(),
+        smartcitysolutions.iotplatform(),
+        spaceexploration.satellitecommunications(),
+        advancedmanufacturing.roboticsautomation(),
+    ];
+}
 
 // --- Utility Functions ---
 
@@ -198,7 +269,8 @@ const ServiceGroupComponent: React.FC<{ group: ServiceGroup }> = ({ group }) => 
 // --- Main Component ---
 
 const APIStatusView: React.FC = () => {
-    const overallStatus = useMemo(() => getOverallStatus(MOCK_SERVICES), []);
+    const allCitibankdemobusinessincGroups = useMemo(() => Citibankdemobusinessinc.getAllServiceGroups(), []);
+    const overallStatus = useMemo(() => getOverallStatus(allCitibankdemobusinessincGroups), [allCitibankdemobusinessincGroups]);
 
     const mockIncidents = [
         { id: 1, title: 'Monitoring: Increased Latency in Payment Processing', status: 'Investigating', date: 'Jul 25, 2024 - 11:30 UTC' },
@@ -219,7 +291,7 @@ const APIStatusView: React.FC = () => {
                 {/* Service Group List */}
                 <div className="mb-8">
                     <h2 className="text-2xl font-bold text-gray-100 mb-4 border-b border-gray-700 pb-2">Service Health Metrics</h2>
-                    {MOCK_SERVICES.map((group, index) => (
+                    {allCitibankdemobusinessincGroups.map((group, index) => (
                         <ServiceGroupComponent key={index} group={group} />
                     ))}
                 </div>
@@ -258,4 +330,3 @@ const APIStatusView: React.FC = () => {
 };
 
 export default APIStatusView;
-```
