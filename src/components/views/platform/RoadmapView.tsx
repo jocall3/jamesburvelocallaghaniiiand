@@ -6,6 +6,420 @@ import Chip from '../../ui/Chip';
 import { ArrowRightIcon, CalendarIcon, CodeBracketIcon, CogIcon, LightBulbIcon, RocketLaunchIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid';
 import useFeatureFlag from '../../../hooks/useFeatureFlag';
+import { LockClosedIcon } from '@heroicons/react/24/solid';
+
+// Namespace Declaration
+namespace Citibankdemobusinessinc {
+
+    // Shared Kernel - Core Utilities and Types
+    export namespace Kernel {
+        export type ID = string;
+
+        export enum Status {
+            Planned = "Planned",
+            InProgress = "In Progress",
+            Launched = "Launched",
+            OnHold = "On Hold",
+        }
+
+        export function generateID(): ID {
+            return Math.random().toString(36).substring(2, 15);
+        }
+
+        export function generateRandomNumber(min: number, max: number): number {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        export function generateRandomDate(start: Date, end: Date): Date {
+            return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+        }
+
+        export function generateRandomStatus(): Status {
+            const statuses = Object.values(Status);
+            return statuses[Math.floor(Math.random() * statuses.length)];
+        }
+
+        export function generateRandomText(length: number): string {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+    }
+
+    // --- Business Model 1: Citibankdemobusinessinc.openbanking.marketplace ---
+    export namespace openbanking {
+        export namespace marketplace {
+            // Mission: To create a decentralized marketplace for financial APIs, fostering innovation and competition.
+            // Monetization: Transaction fees, premium API access, and data analytics services.
+            // IP Moat: Proprietary API discovery algorithm and reputation system.
+
+            interface APIListing {
+                id: Kernel.ID;
+                name: string;
+                description: string;
+                provider: string;
+                category: string;
+                pricing: string;
+                status: Kernel.Status;
+            }
+
+            function generateAPIListing(): APIListing {
+                return {
+                    id: Kernel.generateID(),
+                    name: `API ${Kernel.generateRandomText(5)}`,
+                    description: Kernel.generateRandomText(50),
+                    provider: `Provider ${Kernel.generateRandomText(5)}`,
+                    category: `Category ${Kernel.generateRandomText(5)}`,
+                    pricing: `$${Kernel.generateRandomNumber(1, 100)}/call`,
+                    status: Kernel.generateRandomStatus(),
+                };
+            }
+
+            export function runMarketplace(): APIListing[] {
+                const listings: APIListing[] = [];
+                for (let i = 0; i < 10; i++) {
+                    listings.push(generateAPIListing());
+                }
+                return listings;
+            }
+        }
+    }
+
+    // --- Business Model 2: Citibankdemobusinessinc.data.analytics ---
+    export namespace data {
+        export namespace analytics {
+            // Mission: To provide advanced data analytics services to financial institutions, enabling better decision-making.
+            // Monetization: Subscription fees, custom analytics reports, and consulting services.
+            // IP Moat: Proprietary machine learning algorithms for financial data analysis.
+
+            interface FinancialData {
+                id: Kernel.ID;
+                date: Date;
+                transactionType: string;
+                amount: number;
+                location: string;
+            }
+
+            function generateFinancialData(): FinancialData {
+                return {
+                    id: Kernel.generateID(),
+                    date: Kernel.generateRandomDate(new Date(2023, 0, 1), new Date()),
+                    transactionType: `Type ${Kernel.generateRandomText(5)}`,
+                    amount: Kernel.generateRandomNumber(10, 1000),
+                    location: `Location ${Kernel.generateRandomText(5)}`,
+                };
+            }
+
+            export function runAnalytics(): FinancialData[] {
+                const data: FinancialData[] = [];
+                for (let i = 0; i < 10; i++) {
+                    data.push(generateFinancialData());
+                }
+                return data;
+            }
+        }
+    }
+
+    // --- Business Model 3: Citibankdemobusinessinc.identity.verification ---
+    export namespace identity {
+        export namespace verification {
+            // Mission: To provide secure and reliable identity verification services for financial transactions.
+            // Monetization: Per-verification fees, subscription plans for high-volume users.
+            // IP Moat: Advanced biometric authentication and fraud detection algorithms.
+
+            interface IdentityRecord {
+                id: Kernel.ID;
+                name: string;
+                address: string;
+                dob: Date;
+                verificationStatus: string;
+            }
+
+            function generateIdentityRecord(): IdentityRecord {
+                return {
+                    id: Kernel.generateID(),
+                    name: `Name ${Kernel.generateRandomText(5)}`,
+                    address: `Address ${Kernel.generateRandomText(10)}`,
+                    dob: Kernel.generateRandomDate(new Date(1970, 0, 1), new Date(2000, 0, 1)),
+                    verificationStatus: Kernel.generateRandomStatus().toString(),
+                };
+            }
+
+            export function runVerification(): IdentityRecord[] {
+                const records: IdentityRecord[] = [];
+                for (let i = 0; i < 10; i++) {
+                    records.push(generateIdentityRecord());
+                }
+                return records;
+            }
+        }
+    }
+
+    // --- Business Model 4: Citibankdemobusinessinc.lending.platform ---
+    export namespace lending {
+        export namespace platform {
+            // Mission: To create a peer-to-peer lending platform connecting borrowers and lenders.
+            // Monetization: Loan origination fees, interest rate spreads, and late payment fees.
+            // IP Moat: Proprietary credit scoring algorithm and risk management system.
+
+            interface LoanApplication {
+                id: Kernel.ID;
+                borrowerName: string;
+                loanAmount: number;
+                interestRate: number;
+                loanTerm: number;
+                status: Kernel.Status;
+            }
+
+            function generateLoanApplication(): LoanApplication {
+                return {
+                    id: Kernel.generateID(),
+                    borrowerName: `Borrower ${Kernel.generateRandomText(5)}`,
+                    loanAmount: Kernel.generateRandomNumber(1000, 10000),
+                    interestRate: Kernel.generateRandomNumber(5, 15) / 100,
+                    loanTerm: Kernel.generateRandomNumber(12, 60),
+                    status: Kernel.generateRandomStatus(),
+                };
+            }
+
+            export function runLending(): LoanApplication[] {
+                const applications: LoanApplication[] = [];
+                for (let i = 0; i < 10; i++) {
+                    applications.push(generateLoanApplication());
+                }
+                return applications;
+            }
+        }
+    }
+
+    // --- Business Model 5: Citibankdemobusinessinc.payment.gateway ---
+    export namespace payment {
+        export namespace gateway {
+            // Mission: To provide a secure and reliable payment gateway for online transactions.
+            // Monetization: Transaction fees, subscription plans for merchants.
+            // IP Moat: Advanced fraud detection and security protocols.
+
+            interface TransactionRecord {
+                id: Kernel.ID;
+                amount: number;
+                timestamp: Date;
+                status: Kernel.Status;
+                merchant: string;
+            }
+
+            function generateTransactionRecord(): TransactionRecord {
+                return {
+                    id: Kernel.generateID(),
+                    amount: Kernel.generateRandomNumber(1, 500),
+                    timestamp: Kernel.generateRandomDate(new Date(2023, 0, 1), new Date()),
+                    status: Kernel.generateRandomStatus(),
+                    merchant: `Merchant ${Kernel.generateRandomText(5)}`,
+                };
+            }
+
+            export function runGateway(): TransactionRecord[] {
+                const transactions: TransactionRecord[] = [];
+                for (let i = 0; i < 10; i++) {
+                    transactions.push(generateTransactionRecord());
+                }
+                return transactions;
+            }
+        }
+    }
+
+    // --- Business Model 6: Citibankdemobusinessinc.wealth.management ---
+    export namespace wealth {
+        export namespace management {
+            // Mission: To provide personalized wealth management services to high-net-worth individuals.
+            // Monetization: Management fees, performance-based fees.
+            // IP Moat: Proprietary investment algorithms and financial planning tools.
+
+            interface Portfolio {
+                id: Kernel.ID;
+                clientName: string;
+                assets: string[];
+                value: number;
+                riskScore: number;
+            }
+
+            function generatePortfolio(): Portfolio {
+                return {
+                    id: Kernel.generateID(),
+                    clientName: `Client ${Kernel.generateRandomText(5)}`,
+                    assets: [`Asset ${Kernel.generateRandomText(3)}`, `Asset ${Kernel.generateRandomText(3)}`],
+                    value: Kernel.generateRandomNumber(100000, 1000000),
+                    riskScore: Kernel.generateRandomNumber(1, 10),
+                };
+            }
+
+            export function runManagement(): Portfolio[] {
+                const portfolios: Portfolio[] = [];
+                for (let i = 0; i < 10; i++) {
+                    portfolios.push(generatePortfolio());
+                }
+                return portfolios;
+            }
+        }
+    }
+
+    // --- Business Model 7: Citibankdemobusinessinc.insurance.platform ---
+    export namespace insurance {
+        export namespace platform {
+            // Mission: To provide a platform for comparing and purchasing insurance products.
+            // Monetization: Commissions, advertising revenue.
+            // IP Moat: Proprietary insurance recommendation engine.
+
+            interface InsurancePolicy {
+                id: Kernel.ID;
+                policyHolder: string;
+                type: string;
+                coverageAmount: number;
+                premium: number;
+            }
+
+            function generateInsurancePolicy(): InsurancePolicy {
+                return {
+                    id: Kernel.generateID(),
+                    policyHolder: `Holder ${Kernel.generateRandomText(5)}`,
+                    type: `Type ${Kernel.generateRandomText(5)}`,
+                    coverageAmount: Kernel.generateRandomNumber(50000, 500000),
+                    premium: Kernel.generateRandomNumber(100, 1000),
+                };
+            }
+
+            export function runInsurance(): InsurancePolicy[] {
+                const policies: InsurancePolicy[] = [];
+                for (let i = 0; i < 10; i++) {
+                    policies.push(generateInsurancePolicy());
+                }
+                return policies;
+            }
+        }
+    }
+
+    // --- Business Model 8: Citibankdemobusinessinc.realestate.investment ---
+    export namespace realestate {
+        export namespace investment {
+            // Mission: To provide a platform for investing in real estate.
+            // Monetization: Management fees, transaction fees.
+            // IP Moat: Proprietary real estate valuation algorithm.
+
+            interface Property {
+                id: Kernel.ID;
+                address: string;
+                value: number;
+                rentalYield: number;
+                occupancyRate: number;
+            }
+
+            function generateProperty(): Property {
+                return {
+                    id: Kernel.generateID(),
+                    address: `Address ${Kernel.generateRandomText(10)}`,
+                    value: Kernel.generateRandomNumber(200000, 2000000),
+                    rentalYield: Kernel.generateRandomNumber(3, 10) / 100,
+                    occupancyRate: Kernel.generateRandomNumber(70, 100) / 100,
+                };
+            }
+
+            export function runRealEstate(): Property[] {
+                const properties: Property[] = [];
+                for (let i = 0; i < 10; i++) {
+                    properties.push(generateProperty());
+                }
+                return properties;
+            }
+        }
+    }
+
+    // --- Business Model 9: Citibankdemobusinessinc.healthcare.finance ---
+    export namespace healthcare {
+        export namespace finance {
+            // Mission: To provide financial solutions for healthcare providers and patients.
+            // Monetization: Loan interest, service fees.
+            // IP Moat: Proprietary healthcare-specific credit scoring algorithm.
+
+            interface MedicalBill {
+                id: Kernel.ID;
+                patientName: string;
+                amount: number;
+                dueDate: Date;
+                status: Kernel.Status;
+            }
+
+            function generateMedicalBill(): MedicalBill {
+                return {
+                    id: Kernel.generateID(),
+                    patientName: `Patient ${Kernel.generateRandomText(5)}`,
+                    amount: Kernel.generateRandomNumber(50, 5000),
+                    dueDate: Kernel.generateRandomDate(new Date(), new Date(2024, 11, 31)),
+                    status: Kernel.generateRandomStatus(),
+                };
+            }
+
+            export function runHealthcareFinance(): MedicalBill[] {
+                const bills: MedicalBill[] = [];
+                for (let i = 0; i < 10; i++) {
+                    bills.push(generateMedicalBill());
+                }
+                return bills;
+            }
+        }
+    }
+
+    // --- Business Model 10: Citibankdemobusinessinc.education.finance ---
+    export namespace education {
+        export namespace finance {
+            // Mission: To provide financial solutions for students and educational institutions.
+            // Monetization: Loan interest, service fees.
+            // IP Moat: Proprietary education-specific credit scoring algorithm.
+
+            interface StudentLoan {
+                id: Kernel.ID;
+                studentName: string;
+                loanAmount: number;
+                interestRate: number;
+                term: number;
+            }
+
+            function generateStudentLoan(): StudentLoan {
+                return {
+                    id: Kernel.generateID(),
+                    studentName: `Student ${Kernel.generateRandomText(5)}`,
+                    loanAmount: Kernel.generateRandomNumber(1000, 50000),
+                    interestRate: Kernel.generateRandomNumber(3, 12) / 100,
+                    term: Kernel.generateRandomNumber(1, 10),
+                };
+            }
+
+            export function runEducationFinance(): StudentLoan[] {
+                const loans: StudentLoan[] = [];
+                for (let i = 0; i < 10; i++) {
+                    loans.push(generateStudentLoan());
+                }
+                return loans;
+            }
+        }
+    }
+
+    // --- Orchestration Layer ---
+    export function orchestrate(): void {
+        console.log("Citibankdemobusinessinc Orchestration Layer");
+        console.log("Running Open Banking Marketplace:", openbanking.marketplace.runMarketplace());
+        console.log("Running Data Analytics:", data.analytics.runAnalytics());
+        console.log("Running Identity Verification:", identity.verification.runVerification());
+        console.log("Running Lending Platform:", lending.platform.runLending());
+        console.log("Running Payment Gateway:", payment.gateway.runGateway());
+        console.log("Running Wealth Management:", wealth.management.runManagement());
+        console.log("Running Insurance Platform:", insurance.platform.runInsurance());
+        console.log("Running Real Estate Investment:", realestate.investment.runRealEstate());
+        console.log("Running Healthcare Finance:", healthcare.finance.runHealthcareFinance());
+        console.log("Running Education Finance:", education.finance.runEducationFinance());
+    }
+}
 
 // Mock Data Structure for the Roadmap - This would ideally come from the GraphQL API (e.g., /roadmap)
 const initialRoadmap: RoadmapItem[] = [
@@ -331,23 +745,4 @@ const RoadmapView: React.FC = () => {
                         <div className="w-1/5 flex space-x-2 text-xs">
                             {data.launched > 0 && <Chip label={`${data.launched} Done`} className="bg-green-500/20 text-green-400 border-green-500" />}
                             {data.inProgress > 0 && <Chip label={`${data.inProgress} In Progress`} className="bg-cyan-500/20 text-cyan-400 border-cyan-500" />}
-                            {data.planned > 0 && <Chip label={`${data.planned} Planned`} className="bg-gray-500/20 text-gray-400 border-gray-500" />}
-                        </div>
-                        <div className="w-3/5 flex flex-wrap gap-2">
-                            {data.items.slice(0, 3).map(item => (
-                                <span key={item.id} className="text-xs text-gray-300 bg-gray-700/30 px-2 py-0.5 rounded-md truncate max-w-[200px]">{item.title}</span>
-                            ))}
-                            {data.items.length > 3 && (
-                                <span className="text-xs text-gray-500">+{data.items.length - 3} more...</span>
-                            )}
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-        </div>
-    );
-};
-
-export default RoadmapView;
-```
+                            {data.planned > 0 && <Chip label={`${data.planned} Planned`} className="bg-gray-500/20 text-gray-400 border-gray-500"
