@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
@@ -64,4 +63,3 @@ const AuctionResultsCard: React.FC<AuctionResultsCardProps> = ({ auctionResults 
 };
 
 export default AuctionResultsCard;
-```
