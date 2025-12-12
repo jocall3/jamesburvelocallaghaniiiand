@@ -105,7 +105,7 @@ const LoadingSkeleton: React.FC = () => (
 
 const ErrorDisplay: React.FC<{ message: string }> = ({ message }) => (
   <div style={styles.stateContainer}>
-    <p style={styles.stateText}>⚠️ {message}</p>
+    <p style={styles.stateText}>â ï¸ {message}</p>
   </div>
 );
 
