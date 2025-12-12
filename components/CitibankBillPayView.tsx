@@ -61,7 +61,7 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error }) => {
 
 // --- Main Component ---
 
-const CitibankBillPayView: React.FC = () => {
+const CitibankdemobusinessincBillPayView: React.FC = () => {
   const { api, accessToken, uuid, generateNewUuid } = useMoneyMovement();
 
   // --- State Management ---
@@ -462,7 +462,7 @@ const CitibankBillPayView: React.FC = () => {
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Citi Bill Payment
+        Citibankdemobusinessinc Bill Payment
       </Typography>
       <Divider sx={{ mb: 3 }} />
 
@@ -481,4 +481,4 @@ const CitibankBillPayView: React.FC = () => {
   );
 };
 
-export default CitibankBillPayView;
+export default CitibankdemobusinessincBillPayView;
