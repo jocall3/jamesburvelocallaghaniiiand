@@ -1,4 +1,3 @@
-```typescript
 // src/core_infra/crdt_automerge_wasm.ts
 // WASM-compiled Automerge for offline-first collaborative editing.
 
@@ -68,4 +67,3 @@ export class AutomergeWasm {
       return Automerge.view(this.doc);
   }
 }
-```
