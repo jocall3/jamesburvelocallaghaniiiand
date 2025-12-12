@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 
 // Type definitions based on the OpenAPI specification
