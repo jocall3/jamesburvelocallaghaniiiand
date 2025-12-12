@@ -1,14 +1,12 @@
-
-
 import React, { useState } from 'react';
 import Card from './Card';
 import { Building, Lock, CheckCircle, AlertTriangle } from 'lucide-react';
 
-interface CitiAuthGateProps {
+interface CitibankdemobusinessincAuthGateProps {
     children: React.ReactNode;
 }
 
-const CitiAuthGate: React.FC<CitiAuthGateProps> = ({ children }) => {
+const CitibankdemobusinessincAuthGate: React.FC<CitibankdemobusinessincAuthGateProps> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [clientId, setClientId] = useState('');
     const [clientSecret, setClientSecret] = useState('');
@@ -36,14 +34,14 @@ const CitiAuthGate: React.FC<CitiAuthGateProps> = ({ children }) => {
 
     return (
         <div className="flex items-center justify-center h-full min-h-[500px] p-6">
-            <Card title="Citi Connect Core Authorization" className="w-full max-w-md border-blue-500/50">
+            <Card title="Citibankdemobusinessinc Connect Core Authorization" className="w-full max-w-md border-blue-500/50">
                 <div className="flex flex-col items-center mb-6">
                     <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
                         <Building className="w-8 h-8 text-blue-600" />
                     </div>
                     <h2 className="text-xl font-bold text-white">Secure Gateway</h2>
                     <p className="text-sm text-gray-400 text-center mt-2">
-                        Enter your Citi Developer Portal credentials to access the simulation environment.
+                        Enter your Citibankdemobusinessinc Developer Portal credentials to access the simulation environment.
                     </p>
                 </div>
 
@@ -97,4 +95,4 @@ const CitiAuthGate: React.FC<CitiAuthGateProps> = ({ children }) => {
     );
 };
 
-export default CitiAuthGate;
+export default CitibankdemobusinessincAuthGate;
