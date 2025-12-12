@@ -258,7 +258,7 @@ export class HsbcApiClient {
     const query = new URLSearchParams();
     if (options.from) query.set('from', options.from);
     if (options.to) query.set('to', options.to);
-    if (options.limit) query.set('limit', options.limit.toString());
+    if (options.limit) query.set('limit.toString()', options.limit.toString());
 
     const queryString = query.toString();
     const endpoint = `/accounts/${accountId}/transactions${queryString ? `?${queryString}` : ''}`;
