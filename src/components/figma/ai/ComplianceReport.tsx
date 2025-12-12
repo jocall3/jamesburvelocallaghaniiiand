@@ -1,4 +1,3 @@
-```tsx
 import React from 'react';
 import { Box, Typography, Table, TableHead, TableBody, TableRow, TableCell, TableContainer, Paper } from '@mui/material';
 
@@ -79,4 +78,3 @@ const ComplianceReport: React.FC<ComplianceReportProps> = ({ issues }) => {
 };
 
 export default ComplianceReport;
-```
