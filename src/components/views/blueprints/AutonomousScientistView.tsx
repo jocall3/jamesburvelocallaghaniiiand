@@ -1,4 +1,3 @@
-```tsx
 // src/components/views/blueprints/AutonomousScientistView.tsx
 import React, { useState } from 'react';
 
@@ -72,4 +71,3 @@ const AutonomousScientistView: React.FC = () => {
 };
 
 export default AutonomousScientistView;
-```
