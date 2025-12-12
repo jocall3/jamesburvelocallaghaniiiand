@@ -1,4 +1,3 @@
-```tsx
 import React from 'react';
 import { Chart, Geom, Tooltip, Axis, View } from 'bizcharts';
 import { RiskIntensityData } from '@/types'; // Assuming RiskIntensityData is defined in your types
@@ -56,4 +55,3 @@ const RiskHeatmap: React.FC<RiskHeatmapProps> = ({ data }) => {
 };
 
 export default RiskHeatmap;
-```
