@@ -1,4 +1,3 @@
-```tsx
 import React from 'react';
 import { Handle, Position } from 'reactflow';
 
@@ -32,4 +31,3 @@ function ManagedIdentityNode({ id, data }: ManagedIdentityNodeProps) {
 }
 
 export default ManagedIdentityNode;
-```
