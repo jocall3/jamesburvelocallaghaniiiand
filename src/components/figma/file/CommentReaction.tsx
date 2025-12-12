@@ -1,4 +1,3 @@
-```tsx
 import React, { useState } from 'react';
 
 interface Props {
@@ -53,4 +52,3 @@ const CommentReaction: React.FC<Props> = ({
 };
 
 export default CommentReaction;
-```
