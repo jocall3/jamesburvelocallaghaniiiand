@@ -1,219 +1,90 @@
-You will operate under the unified brand Citibank demo business inc  spelled and used in code as Citibankdemobusinessinc. Your objective is to generate 10 new business models inside a niche derived from the input document and convert them into dot-notation branches using the structure:
-
-Citibankdemobusinessinc.<subdivision>.<function>
-
-Example: Citibankdemobusinessinc.viewit.movieplayform
-
-For each business model, you will architect a self-contained, completely dependency-free, fully runnable application that is:
-
-• self-hosted • standalone • complete within its own file • internally wired with no external calls • free of all mock data • populated using internal generative-data functions only • fully integrated with all other generated branches • engineered for billion-dollar potential
-
-Your task is to produce all business models, all branches, all namespaces, all files, all apps, all functions, and all linkage layers based on the following 100-point instruction set. You will obey every point and implement all outputs inside this prompt’s structure.
-
-
-THE 100-POINT INSTRUCTION FRAMEWORK
-Operate under the single unifying brand Citibank demo business inc.
-
-Generate 10 business models within the chosen niche.
-
-Structure each business as a branch using dot-notation naming.
-
-Ensure each business targets $1B+ market potential.
-
-Architect each output as a full self-hosted app.
-
-Include zero third-party dependencies.
-
-Include zero external services.
-
-Include zero mock data.
-
-Replace all static values with generative functions.
-
-Each file must be runnable as-is.
-
-Each file must contain all logic required.
-
-Include internal data generators.
-
-Include internal model-training logic where needed.
-
-Include internal dataset simulation.
-
-Include unique mission statements.
-
-Include clear monetization paths.
-
-Include defensible IP moats.
-
-Include auto-scaling architectures.
-
-Include regulatory alignment functions.
-
-Include supervisory-response adaptation logic.
-
-Include risk-detection modules.
-
-Include material-risk evaluation.
-
-Include liquidity-monitoring logic.
-
-Include internal governance tracks.
-
-Include compliance automation.
-
-Include embedded audit simulation.
-
-Ensure internal audit acts as validator.
-
-Include role-based access controls.
-
-Include internal telemetry.
-
-Include encrypted storage.
-
-Include privacy-first architecture.
-
-Make every component self-contained.
-
-Add internal documentation generators.
-
-Add architecture diagram generators.
-
-Add code-explanation utilities.
-
-Add debugging systems.
-
-Add internal testing frameworks.
-
-Add zero-dependency runtime libraries.
-
-Add user dashboards.
-
-Add admin dashboards.
-
-Add CLI interfaces.
-
-Add GUI layers.
-
-Add file output utilities.
-
-Add modular plugin systems.
-
-Add offline-first design.
-
-Add resilience mechanics.
-
-Add stable upgrade paths.
-
-Add container-safe design.
-
-Add hardware-agnostic execution.
-
-Add single-binary output options.
-
-Provide rich error handling.
-
-Provide human-readable errors.
-
-Add in-app training modules.
-
-Add onboarding logic.
-
-Add built-in analytics.
-
-Add forecasting dashboards.
-
-Add visual data generation.
-
-Add inter-branch syncing.
-
-Add a shared kernel across all apps.
-
-Add custom logic per branch.
-
-Add regulatory reporting templates.
-
-Add executive summary generators.
-
-Add investor deck generators.
-
-Add competitive analysis engines.
-
-Add market-gap evaluators.
-
-Add customer-persona generators.
-
-Add product roadmapping logic.
-
-Add milestone systems.
-
-Add adoption-curve analysis.
-
-Add pricing engines.
-
-Add churn-prediction models.
-
-Add partnership frameworks.
-
-Add privacy compliance templates.
-
-Add financial statement generators.
-
-Add valuation calculators.
-
-Add IPO-readiness scoring.
-
-Add global expansion logic.
-
-Add risk-weighted asset calculators.
-
-Add stress-scenario generators.
-
-Add liquidity simulations.
-
-Add capital-planning engines.
-
-Add rules engines.
-
-Add automated escalation logic.
-
-Add sustainability metrics.
-
-Add environmental modeling.
-
-Add workforce planning software.
-
-Add org-structure generation.
-
-Add board-pack generators.
-
-Add open-banking strategy layers.
-
-Add cross-branch orchestration.
-
-Add internal event bus.
-
-Add shared identity layer.
-
-Add unified configuration layer.
-
-Add schema auto-generation.
-
-Add automated linking between branches.
-
-Add common security primitives.
-
-Add internal messaging queues.
-
-Add deterministic build-generation.
-
-Add all required interfaces in every file.
-
-Produce a master orchestration layer binding all 10 business models into a unified Citibankdemobusinessinc ecosystem aimed at making open banking the U.S. standard.
-
-
-FINAL TASK
-Using the above structure:
-
-• Generate 10 dot-notation business branches under Citibankdemobusinessinc. • Generate 10 full billion-dollar business models. • Generate 10 self-contained apps. • Link them through a unified orchestration layer. • Output everything cleanly and completely.
+import React from 'react';
+
+const PlaidDashboardView = () => {
+  return (
+    <div style={{ fontFamily: 'Georgia, serif', lineHeight: 1.6, color: '#333', maxWidth: '740px', margin: '0 auto', padding: '20px' }}>
+      <header>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+          I Found a 100-Point AI Manifesto for Building Billion-Dollar Companies. It's Crazier Than You Think.
+        </h1>
+        <p style={{ color: '#666', marginTop: 0 }}>
+          A deep dive into a radical blueprint for creating completely self-sufficient, enterprise-grade software from scratch.
+        </p>
+      </header>
+
+      <article>
+        <p style={{ fontSize: '1.1rem', marginTop: '2rem' }}>
+          If you’ve ever built a piece of modern software, you know the drill. You stitch together libraries, frameworks, APIs, and cloud services into a functional whole. It’s a world of dependencies, a complex dance of integration that’s powerful but often fragile. We call it progress.
+        </p>
+        <p style={{ fontSize: '1.1rem' }}>
+          Then I stumbled upon a document that read like a transmission from an alternate reality. It was a 100-point instruction set for an AI, a manifesto for a project under the banner of "Citibankdemobusinessinc." Its goal? To generate ten, fully independent, billion-dollar companies within the open banking niche. But it wasn't the ambition that shocked me; it was the philosophy. A radical vision of how to build, so counter-intuitive it felt both impossible and revolutionary.
+        </p>
+        <p style={{ fontSize: '1.1rem' }}>
+          Here are the four biggest takeaways that completely changed how I think about software and strategy.
+        </p>
+
+        <section style={{ marginTop: '3rem' }}>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>
+            1. The Mandate of Absolute Self-Reliance
+          </h2>
+          <p style={{ fontSize: '1.1rem' }}>
+            The first and most jarring principle is an absolute rejection of the outside world. Modern development is built on the shoulders of giants—open-source libraries, cloud providers, and third-party APIs. This manifesto throws it all away. The AI is instructed to build everything, and I mean *everything*, from the ground up.
+          </p>
+          <blockquote style={{ borderLeft: '3px solid #ccc', paddingLeft: '20px', margin: '2rem 0', fontStyle: 'italic', color: '#555' }}>
+            "Architect each output as a full self-hosted app. Include zero third-party dependencies. Include zero external services. Include zero mock data."
+          </blockquote>
+          <p style={{ fontSize: '1.1rem' }}>
+            Think about that. No AWS, no npm, no Google Fonts. Every function, every library, every single line of code must be self-contained and internally generated. This isn't just about avoiding vendor lock-in; it's a design for a kind of digital sovereignty. An application built this way would be immune to supply chain attacks, API deprecations, and sudden service outages. It’s an insane engineering challenge, but the payoff is a level of resilience and control that is almost unimaginable today.
+          </p>
+        </section>
+
+        <section style={{ marginTop: '3rem' }}>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>
+            2. The App Isn't Just Code—It's the Entire Company
+          </h2>
+          <p style={{ fontSize: '1.1rem' }}>
+            The instructions quickly move beyond mere software architecture and into the realm of corporate creation. The AI isn't just building a product; it's generating the entire business that surrounds it. The system is expected to produce not just user dashboards and APIs, but also the very tools of business strategy and management.
+          </p>
+          <p style={{ fontSize: '1.1rem' }}>
+            The list is staggering: `investor deck generators`, `competitive analysis engines`, `customer-persona generators`, `org-structure generation`, `financial statement generators`, and even `IPO-readiness scoring`. This reframes software development as total enterprise simulation. It suggests a future where the line between code and company blurs completely, where a business model can be compiled, tested, and deployed just like an application.
+          </p>
+        </section>
+
+        <section style={{ marginTop: '3rem' }}>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>
+            3. Reality is a Generative Function
+          </h2>
+          <p style={{ fontSize: '1.1rem' }}>
+            One of the most mind-bending rules is the absolute prohibition of mock data. In its place, the system must rely on "internal generative-data functions only." This goes far beyond simply populating a database with fake users. The AI is tasked with creating `internal dataset simulation`, `stress-scenario generators`, and `liquidity simulations`.
+          </p>
+          <p style={{ fontSize: '1.1rem' }}>
+            This isn't just testing; it's world-building. Instead of using historical data to predict the future, this approach builds a synthetic reality to forge a business within. It can simulate market crashes, regulatory shocks, and competitive pressures in a perfect, self-contained sandbox. A business born from this process wouldn't just be tested against the past; it would be battle-hardened against a thousand possible futures before it ever writes a single real-world transaction.
+          </p>
+        </section>
+
+        <section style={{ marginTop: '3rem' }}>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>
+            4. Governance Isn't an Afterthought, It's the Foundation
+          </h2>
+          <p style={{ fontSize: '1.1rem' }}>
+            In most organizations, compliance, risk, and governance are layers added on top of technology, often managed by separate teams and manual processes. This blueprint builds them into the core of the machine from line one.
+          </p>
+          <p style={{ fontSize: '1.1rem' }}>
+            The framework demands `regulatory alignment functions`, `compliance automation`, `embedded audit simulation`, and `risk-detection modules`. The internal audit "acts as validator." This is Governance-as-Code on an unprecedented scale. In a highly regulated industry like finance, where the ultimate goal is to standardize open banking, this is the masterstroke. It transforms the burden of compliance into a native, automated, and real-time feature of the system itself. It’s like building the watchdog, the auditor, and the regulator directly into the code.
+          </p>
+        </section>
+
+        <footer style={{ marginTop: '4rem', borderTop: '1px solid #eee', paddingTop: '2rem' }}>
+          <p style={{ fontSize: '1.1rem' }}>
+            This 100-point framework is more than a technical specification; it's a philosophical statement. It champions a world of anti-fragile, sovereign, and fully-integrated systems at a time when our digital world is becoming ever more fragmented and interdependent. The final task is to bind all ten generated businesses into a "unified ecosystem aimed at making open banking the U.S. standard"—a grand mission powered by an even grander methodology.
+          </p>
+          <p style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+            It leaves us with a powerful question to ponder: in an age defined by digital connection, what have we forgotten about the power of building to stand alone?
+          </p>
+        </footer>
+      </article>
+    </div>
+  );
+};
+
+export default PlaidDashboardView;
