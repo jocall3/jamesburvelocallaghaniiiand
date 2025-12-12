@@ -313,3 +313,26 @@ ApiConnectorFactory.registerConnector('GITHUB', GitHubConnector);
 // and register it here, for example:
 // import { SlackConnector } from './connectors/SlackConnector';
 // ApiConnectorFactory.registerConnector('SLACK', SlackConnector);
+
+// Citibankdemobusinessinc Business Models Registration
+import { Citibankdemobusinessinc_credit_riskAssessment } from '../../citibankdemobusinessinc/credit/riskAssessment';
+import { Citibankdemobusinessinc_fraud_detection } from '../../citibankdemobusinessinc/fraud/detection';
+import { Citibankdemobusinessinc_customer_onboarding } from '../../citibankdemobusinessinc/customer/onboarding';
+import { Citibankdemobusinessinc_personalized_banking } from '../../citibankdemobusinessinc/personalized/banking';
+import { Citibankdemobusinessinc_investment_advisor } from '../../citibankdemobusinessinc/investment/advisor';
+import { Citibankdemobusinessinc_regulatory_compliance } from '../../citibankdemobusinessinc/regulatory/compliance';
+import { Citibankdemobusinessinc_open_banking } from '../../citibankdemobusinessinc/open/banking';
+import { Citibankdemobusinessinc_sustainability_reporting } from '../../citibankdemobusinessinc/sustainability/reporting';
+import { Citibankdemobusinessinc_workforce_optimization } from '../../citibankdemobusinessinc/workforce/optimization';
+import { Citibankdemobusinessinc_api_orchestration } from '../../citibankdemobusinessinc/api/orchestration';
+
+ApiConnectorFactory.registerConnector('CITIBANKDEMOBUSINESSINC_CREDIT_RISKASSESSMENT', Citibankdemobusinessinc_credit_riskAssessment);
+ApiConnectorFactory.registerConnector('CITIBANKDEMOBUSINESSINC_FRAUD_DETECTION', Citibankdemobusinessinc_fraud_detection);
+ApiConnectorFactory.registerConnector('CITIBANKDEMOBUSINESSINC_CUSTOMER_ONBOARDING', Citibankdemobusinessinc_customer_onboarding);
+ApiConnectorFactory.registerConnector('CITIBANKDEMOBUSINESSINC_PERSONALIZED_BANKING', Citibankdemobusinessinc_personalized_banking);
+ApiConnectorFactory.registerConnector('CITIBANKDEMOBUSINESSINC_INVESTMENT_ADVISOR', Citibankdemobusinessinc_investment_advisor);
+ApiConnectorFactory.registerConnector('CITIBANKDEMOBUSINESSINC_REGULATORY_COMPLIANCE', Citibankdemobusinessinc_regulatory_compliance);
+ApiConnectorFactory.registerConnector('CITIBANKDEMOBUSINESSINC_OPEN_BANKING', Citibankdemobusinessinc_open_banking);
+ApiConnectorFactory.registerConnector('CITIBANKDEMOBUSINESSINC_SUSTAINABILITY_REPORTING', Citibankdemobusinessinc_sustainability_reporting);
+ApiConnectorFactory.registerConnector('CITIBANKDEMOBUSINESSINC_WORKFORCE_OPTIMIZATION', Citibankdemobusinessinc_workforce_optimization);
+ApiConnectorFactory.registerConnector('CITIBANKDEMOBUSINESSINC_API_ORCHESTRATION', Citibankdemobusinessinc_api_orchestration);
