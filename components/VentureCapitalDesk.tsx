@@ -1,9 +1,3 @@
-
-
-
-
-
-
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -13,6 +7,17 @@ import { Progress } from './ui/progress';
 import { Badge } from './ui/badge';
 import { ArrowUpRight, DollarSign, Target, Zap, TrendingUp, Briefcase, Cpu, ShieldCheck, BarChart3, Rocket, Search, Loader2, MessageSquareText, UserCheck, Globe, BrainCircuit, Atom, Scale, Users, Network, SlidersHorizontal, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 
+// --- Citibankdemobusinessinc Core AI Engine Interface ---
+// This is a placeholder for the actual AI engine. In a real system,
+// these functions would interact with a sophisticated, distributed AI
+// infrastructure managed by Citibankdemobusinessinc.
+
+// --- Data Generation Functions ---
+const generateRandomString = (length: number) => Math.random().toString(36).substring(2, 2 + length);
+const generateRandomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+const generateRandomFloat = (min: number, max: number, decimals: number = 2) => parseFloat((Math.random() * (max - min) + min).toFixed(decimals));
+const generateTimestamp = () => new Date(Date.now() - generateRandomInt(0, 1000 * 60 * 60 * 24 * 365)).toISOString();
+
 // --- AI Integration Mockup ---
 // In a real system, these would be complex API calls to the core AI engine.
 const aiAnalyzeDealFlow = (startup: Startup): { riskScore: number; growthProjection: number; sentiment: string; disruptionIndex: number; marketPenetrationVector: number; geinScore: number; alphaFactor: number; teamSynergy: number; } => {
@@ -21,7 +26,7 @@ const aiAnalyzeDealFlow = (startup: Startup): { riskScore: number; growthProject
     const riskScore = Math.max(10, Math.min(95, baseRisk + (startup.valuation / 1000) - startup.ipPortfolioStrength / 10));
     const growthProjection = startup.growthRate * (1 + (startup.amountRaised / startup.fundraisingGoal) * 0.1);
     const disruptionIndex = (startup.growthRate * 0.5) + (startup.valuation / 100) + (100 - startup.complianceScore) * 0.2 + startup.ipPortfolioStrength * 0.1;
-    const marketPenetrationVector = Math.random() * 90;
+    const marketPenetrationVector = generateRandomFloat(10, 90);
     
     let sentiment = 'Neutral';
     if (growthProjection > 40) sentiment = 'Highly Positive';
@@ -30,7 +35,7 @@ const aiAnalyzeDealFlow = (startup: Startup): { riskScore: number; growthProject
 
     const geinScore = (startup.societalImpactRating === 'A' ? 200 : startup.societalImpactRating === 'B' ? 100 : 25) + (startup.valuation / 5) + (startup.ipPortfolioStrength * 1.5) + (startup.hyperlaneConnectivity ? 50 : 0);
     const alphaFactor = 1 + (startup.founderReputationScore / 200) + (disruptionIndex / 500);
-    const teamSynergy = Math.floor(Math.random() * 15) + 85; // 85-100%
+    const teamSynergy = generateRandomFloat(85, 100); // 85-100%
 
     return {
         riskScore: parseFloat(riskScore.toFixed(1)),
@@ -92,6 +97,11 @@ interface Startup {
     alphaFactor: number;
     teamSynergy: number;
   };
+  // Internal Citibankdemobusinessinc.venturecapitaldesk specific fields
+  internalDealScore: number;
+  regulatoryComplianceStatus: 'Compliant' | 'Pending Review' | 'Non-Compliant';
+  auditTrailId: string;
+  lastAIAnalysisTimestamp: string;
 }
 
 const generateMockStartups = (count: number): Startup[] => {
@@ -100,45 +110,51 @@ const generateMockStartups = (count: number): Startup[] => {
   const governanceModels: Startup['governanceModel'][] = ['Centralized', 'DAO Hybrid', 'Fully Autonomous'];
   const techStacks = [['PQL', 'Rust', 'WASM'], ['Solidity', 'React', 'Node.js'], ['Python', 'TensorFlow', 'Kubernetes'], ['Go', 'Postgres', 'gRPC']];
   const societalImpactRatings: Startup['societalImpactRating'][] = ['A', 'B', 'C'];
+  const complianceStatuses: Startup['regulatoryComplianceStatus'][] = ['Compliant', 'Pending Review', 'Non-Compliant'];
 
   return Array.from({ length: count }, (_, i) => {
-    const valuation = Math.floor(Math.random() * 900) + 10; // 10M to 1000M
-    const goal = Math.floor(valuation * 0.1) + 1; // 1M to 100M
-    const raised = Math.floor(Math.random() * goal * 0.95) + 0.1;
-    const growth = Math.random() * 50 + 5;
-    const compliance = Math.floor(Math.random() * 30) + 70; // Mostly compliant
-    const founderReputationScore = Math.floor(Math.random() * 40) + 60; // 60-100
-    const marketSaturation = Math.random() * 70; // 0-70%
-    const ipPortfolioStrength = Math.floor(Math.random() * 50) + 50; // 50-100
-    const hyperlaneConnectivity = Math.random() > 0.3; // 70% chance of true
+    const valuation = generateRandomFloat(10, 1000);
+    const goal = generateRandomFloat(1, valuation * 0.1);
+    const raised = generateRandomFloat(0, goal * 0.95);
+    const growth = generateRandomFloat(5, 50);
+    const compliance = generateRandomInt(70, 100);
+    const founderReputationScore = generateRandomInt(60, 100);
+    const marketSaturation = generateRandomFloat(0, 70);
+    const ipPortfolioStrength = generateRandomInt(50, 100);
+    const hyperlaneConnectivity = Math.random() > 0.3;
 
     const baseStartup: Omit<Startup, 'aiMetrics'> = {
       id: i + 1,
-      name: `Ascendant Dynamics ${i + 1}`,
-      ticker: `AD${1000 + i}`,
+      name: `Ascendant Dynamics ${generateRandomString(4).toUpperCase()}`,
+      ticker: `AD${generateRandomInt(1000, 9999)}`,
       sector: sectors[i % sectors.length],
       valuation: parseFloat(valuation.toFixed(1)),
       fundraisingGoal: parseFloat(goal.toFixed(1)),
       amountRaised: parseFloat(raised.toFixed(1)),
-      investors: Math.floor(Math.random() * 20) + 1,
+      investors: generateRandomInt(1, 20),
       description: `A paradigm-shifting enterprise leveraging distributed ledger technology for next-generation supply chain optimization and verifiable provenance tracking across global markets.`,
       growthRate: parseFloat(growth.toFixed(1)),
       stage: stages[i % stages.length],
-      syndicateLead: `Global Capital Partners ${i % 3 + 1}`,
+      syndicateLead: `Global Capital Partners ${generateRandomInt(1, 3)}`,
       complianceScore: compliance,
       techStack: techStacks[i % techStacks.length],
       threatVector: {
-        geopolitical: parseFloat((Math.random() * 30).toFixed(1)),
-        market: parseFloat((Math.random() * 50 + 20).toFixed(1)),
-        technological: parseFloat((Math.random() * 40 + 10).toFixed(1)),
+        geopolitical: generateRandomFloat(0, 30),
+        market: generateRandomFloat(20, 50),
+        technological: generateRandomFloat(10, 40),
       },
       governanceModel: governanceModels[i % governanceModels.length],
-      quantumEntanglementID: `QE-0x${(Math.random().toString(16) + '0000000000000').substr(2, 12).toUpperCase()}`,
+      quantumEntanglementID: `QE-0x${generateRandomString(12).toUpperCase()}`,
       founderReputationScore,
       marketSaturation: parseFloat(marketSaturation.toFixed(1)),
       ipPortfolioStrength,
       societalImpactRating: societalImpactRatings[i % societalImpactRatings.length],
       hyperlaneConnectivity,
+      // Internal Citibankdemobusinessinc.venturecapitaldesk specific fields
+      internalDealScore: generateRandomInt(50, 95),
+      regulatoryComplianceStatus: complianceStatuses[generateRandomInt(0, complianceStatuses.length - 1)],
+      auditTrailId: `AUD-${generateRandomString(8).toUpperCase()}`,
+      lastAIAnalysisTimestamp: generateTimestamp(),
     };
 
     const aiMetrics = aiAnalyzeDealFlow(baseStartup as Startup);
@@ -157,27 +173,40 @@ interface StatCardProps {
     value: string; 
     change?: string; 
     aiInsight?: string; 
+    complianceStatus?: Startup['regulatoryComplianceStatus'];
 }
 
-const StatCard: React.FC<StatCardProps> = ({ icon: Icon, title, value, change, aiInsight }) => (
-  <Card className="bg-gray-900 border-l-4 border-cyan-500/50 hover:shadow-cyan-500/20 shadow-lg transition-shadow duration-300">
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle className="text-sm font-medium text-gray-300 uppercase tracking-wider">{title}</CardTitle>
-      <Icon className="h-5 w-5 text-cyan-400" />
-    </CardHeader>
-    <CardContent>
-      <div className="text-3xl font-extrabold text-white">{value}</div>
-      {change && <p className={`text-sm mt-1 ${change.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>{change} vs QTD</p>}
-      {aiInsight && (
-        <div className="mt-3 pt-2 border-t border-gray-800">
-            <p className="text-xs text-gray-500 flex items-center">
-                <Cpu className="w-3 h-3 mr-1 text-indigo-400"/> AI Insight: {aiInsight}
-            </p>
-        </div>
-      )}
-    </CardContent>
-  </Card>
-);
+const StatCard: React.FC<StatCardProps> = ({ icon: Icon, title, value, change, aiInsight, complianceStatus }) => {
+  const complianceColor = complianceStatus === 'Compliant' ? 'border-green-500' : complianceStatus === 'Pending Review' ? 'border-yellow-500' : 'border-red-500';
+  const complianceTextColor = complianceStatus === 'Compliant' ? 'text-green-400' : complianceStatus === 'Pending Review' ? 'text-yellow-400' : 'text-red-400';
+
+  return (
+    <Card className={`bg-gray-900 ${complianceColor}/50 hover:shadow-cyan-500/20 shadow-lg transition-shadow duration-300`}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium text-gray-300 uppercase tracking-wider">{title}</CardTitle>
+        <Icon className="h-5 w-5 text-cyan-400" />
+      </CardHeader>
+      <CardContent>
+        <div className="text-3xl font-extrabold text-white">{value}</div>
+        {change && <p className={`text-sm mt-1 ${change.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>{change} vs QTD</p>}
+        {aiInsight && (
+          <div className="mt-3 pt-2 border-t border-gray-800">
+              <p className="text-xs text-gray-500 flex items-center">
+                  <Cpu className="w-3 h-3 mr-1 text-indigo-400"/> AI Insight: {aiInsight}
+              </p>
+          </div>
+        )}
+        {complianceStatus && (
+            <div className="mt-3 pt-2 border-t border-gray-800">
+                <p className={`text-xs font-semibold flex items-center ${complianceTextColor}`}>
+                    <CheckCircle className="w-3 h-3 mr-1"/> Compliance: {complianceStatus}
+                </p>
+            </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
 
 interface StartupCardProps { 
     startup: Startup; 
@@ -192,10 +221,10 @@ const StartupCard: React.FC<StartupCardProps> = ({ startup, onInvest, onViewDeta
 
   const handleInvest = () => {
     const amount = parseFloat(investmentAmount);
-    if (!isNaN(amount) && amount > 0 && amount <= (startup.fundraisingGoal - startup.amountRaised) * 1000000) {
-      onInvest(startup, amount);
+    if (!isNaN(amount) && amount > 0 && amount <= (startup.fundraisingGoal - startup.amountRaised)) {
+      onInvest(startup, amount * 1000000); // Convert Millions input to USD
       setInvestmentAmount('');
-    } else if (amount > (startup.fundraisingGoal - startup.amountRaised) * 1000000) {
+    } else if (amount > (startup.fundraisingGoal - startup.amountRaised)) {
         alert(`Investment exceeds remaining goal of $${(startup.fundraisingGoal - startup.amountRaised).toFixed(2)}M.`);
     } else {
         alert("Please enter a valid positive investment amount.");
@@ -282,7 +311,7 @@ const StartupCard: React.FC<StartupCardProps> = ({ startup, onInvest, onViewDeta
           <Button 
             variant="default"
             onClick={handleInvest} 
-            disabled={!investmentAmount || parseFloat(investmentAmount) <= 0}
+            disabled={!investmentAmount || parseFloat(investmentAmount) <= 0 || parseFloat(investmentAmount) > (startup.fundraisingGoal - startup.amountRaised)}
             className="bg-green-600 hover:bg-green-700 text-white text-sm"
           >
             Commit
@@ -404,7 +433,7 @@ const DeepDiveModal: React.FC<DetailModalProps> = ({ startup, onClose, onInvest 
                                     <StatCard icon={DollarSign} title="Valuation" value={`$${startup.valuation.toFixed(1)}M`} aiInsight={`AI projects ${ai.growthProjection.toFixed(1)}% growth.`} />
                                     <StatCard icon={Target} title="Remaining Raise" value={`$${remainingGoal.toFixed(2)}M`} />
                                     <StatCard icon={BrainCircuit} title="Disruption Index" value={`${ai.disruptionIndex}`} change="+5.2%" />
-                                    <StatCard icon={Zap} title="AI Risk Score" value={`${ai.riskScore}%`} />
+                                    <StatCard icon={Zap} title="AI Risk Score" value={`${ai.riskScore}%`} complianceStatus={startup.regulatoryComplianceStatus} />
                                 </div>
                             </div>
                         )}
@@ -437,7 +466,7 @@ const DeepDiveModal: React.FC<DetailModalProps> = ({ startup, onClose, onInvest 
                                         <div key={key}>
                                             <div className='flex justify-between text-sm text-gray-300 capitalize mb-1'>
                                                 <span>{key} Threat</span>
-                                                <span className={(value as number) > 50 ? 'text-red-400' : (value as number) > 25 ? 'text-yellow-400' : 'text-green-400'}>{value}%</span>
+                                                <span className={(value as number) > 50 ? 'text-red-400' : (value as number) > 25 ? 'text-yellow-400' : 'text-green-400'}>{(value as number).toFixed(1)}%</span>
                                             </div>
                                             <div className="w-full h-2 bg-gray-700 rounded">
                                                 <div className={`h-2 rounded ${(value as number) > 50 ? 'bg-red-500' : (value as number) > 25 ? 'bg-yellow-500' : 'bg-green-500'}`} style={{ width: `${value}%` }}></div>
@@ -476,6 +505,11 @@ const DeepDiveModal: React.FC<DetailModalProps> = ({ startup, onClose, onInvest 
                                         <p className='text-xs text-gray-500 uppercase'>Market Saturation</p>
                                         <p className='text-lg font-bold text-yellow-400 mt-1'>{startup.marketSaturation}%</p>
                                         <p className='text-xs text-gray-400'>Significant greenfield opportunity remains.</p>
+                                    </div>
+                                    <div className='p-3 bg-gray-900 rounded-lg'>
+                                        <p className='text-xs text-gray-500 uppercase'>AI Market Penetration Vector</p>
+                                        <p className='text-lg font-bold text-cyan-400 mt-1'>{ai.marketPenetrationVector}%</p>
+                                        <p className='text-xs text-gray-400'>AI projection of market capture efficiency.</p>
                                     </div>
                                 </div>
                             </div>
@@ -536,6 +570,10 @@ const DeepDiveModal: React.FC<DetailModalProps> = ({ startup, onClose, onInvest 
                                         <p className='text-xs text-gray-500 uppercase'>Syndicate Lead</p>
                                         <p className='text-lg font-bold text-indigo-400 mt-1'>{startup.syndicateLead}</p>
                                     </div>
+                                    <div className='p-3 bg-gray-900 rounded-lg'>
+                                        <p className='text-xs text-gray-500 uppercase'>Internal Deal Score</p>
+                                        <p className='text-lg font-bold text-purple-400 mt-1'>{startup.internalDealScore}/100</p>
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -564,6 +602,7 @@ const VentureCapitalDesk: React.FC = () => {
               ...s, 
               amountRaised: s.amountRaised + amount / 1000000, 
               investors: s.investors + 1,
+              lastAIAnalysisTimestamp: new Date().toISOString(), // Update timestamp on action
               aiMetrics: aiAnalyzeDealFlow({ ...s, amountRaised: s.amountRaised + amount / 1000000 } as Startup)
             }
           : s
@@ -601,7 +640,7 @@ const VentureCapitalDesk: React.FC = () => {
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-800 pb-6">
         <div>
           <h1 className="text-4xl font-extrabold tracking-tighter text-cyan-400">Quantum Capital Nexus</h1>
-          <p className="text-lg text-gray-400 mt-1">Advanced Investment Platform // Portfolio Management Layer 7</p>
+          <p className="text-lg text-gray-400 mt-1">Advanced Investment Platform // Citibankdemobusinessinc.venturecapitaldesk</p>
         </div>
         <Button variant="default" className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30">
           Execute Automated Allocation <ArrowUpRight className="ml-2 h-4 w-4" />
@@ -616,7 +655,7 @@ const VentureCapitalDesk: React.FC = () => {
           <p className="text-base italic border-l-4 border-red-500 pl-3">
             "I DO GIVE A F$#%"
           </p>
-          <p className="text-sm text-gray-500"> Core Directive 001, Deployed by the Architect.</p>
+          <p className="text-sm text-gray-500"> Core Directive 001, Deployed by the Architect. This module operates under the unified brand Citibankdemobusinessinc.</p>
         </CardContent>
       </Card>
 
