@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
 
@@ -125,4 +124,3 @@ const ApplicationRow: React.FC<ApplicationRowProps> = ({ app }) => {
 };
 
 export default ApplicationRow;
-```
