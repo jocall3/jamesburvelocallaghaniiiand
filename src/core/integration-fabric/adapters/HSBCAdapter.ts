@@ -1,4 +1,5 @@
-```typescript
+// src/core/integration-fabric/adapters/HSBCAdapter.ts
+
 import { IIntegrationAdapter } from "../IIntegrationAdapter";
 import { FinancialData } from "../../models/FinancialData";
 
@@ -56,4 +57,3 @@ export class HSBCAdapter implements IIntegrationAdapter {
     }));
   }
 }
-```
