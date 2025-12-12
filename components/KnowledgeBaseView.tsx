@@ -1,121 +1,84 @@
-import React, { useState, useEffect } from 'react';
-import Card from './Card';
-import { Search, FileText, Folder, ChevronRight, Terminal } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
-
-// Mock Markdown Content
-const MOCK_FILES = [
-    { id: '1', title: 'Manifesto.md', path: '/docs/core/manifesto.md', content: '# The Sovereign Manifesto\n\nWe build to serve. We build to educate. We build to empower.\n\nThis system is designed to provide a single source of truth in a world of noise.' },
-    { id: '2', title: 'Economy_101.md', path: '/docs/education/economy_101.md', content: '# Understanding the Machine\n\nMoney is energy. It flows where attention goes. This document outlines the fundamental physics of capital flow.' },
-    { id: '3', title: '527_Structure.md', path: '/docs/legal/527_structure.md', content: '# The 527 Organization\n\nAn autonomous entity designed for influence. We operate within the light to shape the narrative of the future.' },
-    { id: '4', title: 'AI_Ethics.md', path: '/docs/ai/ethics.md', content: '# CivicMind Ethics\n\n1. Support the user.\n2. Support the community.\n3. Uphold the truth.' },
-];
+import React from 'react';
 
 const KnowledgeBaseView: React.FC = () => {
-    const [selectedFile, setSelectedFile] = useState(MOCK_FILES[0]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [aiResponse, setAiResponse] = useState('');
-
-    const filteredFiles = MOCK_FILES.filter(f => f.title.toLowerCase().includes(searchQuery.toLowerCase()));
-
-    const handleAskAI = async () => {
-        setIsGenerating(true);
-        setAiResponse('');
-        // Simulated AI response for "Truth Engine" functionality
-        setTimeout(() => {
-            setAiResponse(`Based on the "${selectedFile.title}" document, the core truth is that financial sovereignty is achieved through knowledge, not just accumulation. The text emphasizes structural understanding over speculative action.`);
-            setIsGenerating(false);
-        }, 1500);
-    };
-
     return (
-        <div className="space-y-6">
-            <header className="flex justify-between items-center pb-6 border-b border-gray-700">
-                <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight">The Academy</h1>
-                    <p className="text-gray-400 mt-1">Single Source of Truth Repository</p>
-                </div>
-                <div className="relative w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                    <input 
-                        type="text" 
-                        placeholder="Search knowledge..." 
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
-                    />
-                </div>
-            </header>
+        <div className="font-serif text-gray-300 leading-relaxed bg-gray-900 p-8 md:p-12 lg:p-16">
+            <style>
+                {`
+                    .blog-container h1 { font-size: 2.5rem; line-height: 1.2; font-weight: 700; color: white; margin-bottom: 1rem; font-family: sans-serif; }
+                    .blog-container h2 { font-size: 1.75rem; line-height: 1.3; font-weight: 600; color: white; margin-top: 3rem; margin-bottom: 1.5rem; font-family: sans-serif; }
+                    .blog-container p { margin-bottom: 1.5rem; font-size: 1.125rem; color: #d1d5db; }
+                    .blog-container .intro { font-size: 1.25rem; color: #9ca3af; margin-bottom: 2.5rem; }
+                    .blog-container blockquote { border-left: 4px solid #22d3ee; padding-left: 1.5rem; margin: 2rem 0; font-style: italic; color: #a5f3fc; font-size: 1.125rem; }
+                `}
+            </style>
+            <article className="blog-container max-w-3xl mx-auto">
+                <h1>Beyond the Code: 4 Radical Truths From a Secret Digital Manifesto</h1>
+                
+                <p className="intro">
+                    In a world saturated with noise, the search for a 'single source of truth' feels more urgent than ever. Recently, I stumbled upon a digital archive—a curated knowledge base called 'The Academy'—and what I found inside was less about code and more about a fundamental rethinking of our world. It was a collection of documents, a manifesto of sorts, outlining a new philosophy for building, influencing, and living. Here are the four most impactful ideas that stopped me in my tracks.
+                </p>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[700px]">
-                {/* File Explorer */}
-                <Card className="lg:col-span-1 flex flex-col h-full bg-gray-900 border-gray-800">
-                    <div className="p-4 border-b border-gray-800 font-semibold text-gray-300 flex items-center gap-2">
-                        <Folder className="w-4 h-4 text-yellow-500" /> /root/docs
-                    </div>
-                    <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                        {filteredFiles.map(file => (
-                            <button
-                                key={file.id}
-                                onClick={() => { setSelectedFile(file); setAiResponse(''); }}
-                                className={`w-full flex items-center gap-3 p-3 rounded-lg text-sm transition-all ${
-                                    selectedFile.id === file.id 
-                                    ? 'bg-cyan-900/30 text-cyan-400 border border-cyan-500/30' 
-                                    : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
-                                }`}
-                            >
-                                <FileText className="w-4 h-4" />
-                                <span className="flex-1 text-left truncate">{file.title}</span>
-                                {selectedFile.id === file.id && <ChevronRight className="w-4 h-4" />}
-                            </button>
-                        ))}
-                    </div>
-                </Card>
+                <section>
+                    <h2>1. Money Isn't Currency, It's Concentrated Energy</h2>
+                    <p>
+                        We're taught to think of money as dollars and cents, a tool for transactions. But what if that's a limited view? The archive proposed a more elemental concept: money is a form of energy, and its flow is governed by the physics of attention.
+                    </p>
+                    <blockquote>
+                        Money is energy. It flows where attention goes. This document outlines the fundamental physics of capital flow.
+                    </blockquote>
+                    <p>
+                        This reframes everything. It moves the goal from accumulating wealth to directing energy. Where you put your focus, your time, and your capital—that's where the world gets built. It's an empowering shift from being a passive earner to an active director of creative and economic force.
+                    </p>
+                </section>
 
-                {/* Content Viewer */}
-                <Card className="lg:col-span-2 flex flex-col h-full bg-gray-900 border-gray-800 relative overflow-hidden">
-                    <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-900/95 backdrop-blur z-10">
-                        <span className="font-mono text-xs text-gray-500">{selectedFile.path}</span>
-                        <div className="flex gap-2">
-                            <button className="px-3 py-1 text-xs bg-gray-800 hover:bg-gray-700 rounded text-gray-300 transition">Raw</button>
-                            <button className="px-3 py-1 text-xs bg-gray-800 hover:bg-gray-700 rounded text-gray-300 transition">History</button>
-                        </div>
-                    </div>
-                    
-                    <div className="flex-1 p-8 overflow-y-auto font-serif text-gray-300 leading-relaxed bg-black/20">
-                        <h1 className="text-3xl font-bold text-white mb-6 border-b border-gray-700 pb-4">{selectedFile.title.replace('.md', '')}</h1>
-                        <div className="prose prose-invert max-w-none">
-                            {selectedFile.content.split('\n').map((line, i) => (
-                                <p key={i} className="mb-4">{line}</p>
-                            ))}
-                        </div>
-                    </div>
+                <section>
+                    <h2>2. You Can Build an 'Autonomous Entity' for Influence</h2>
+                    <p>
+                        The documents detailed a fascinating structure for shaping public discourse—not through covert means, but by operating "within the light." It described using established legal frameworks to create an entity with a singular purpose: to shape the narrative of the future.
+                    </p>
+                    <blockquote>
+                        An autonomous entity designed for influence. We operate within the light to shape the narrative of the future.
+                    </blockquote>
+                    <p>
+                        This is a startlingly honest take on modern influence. Instead of seeing it as a messy, unpredictable force, this frames it as an engineering problem. It suggests that with the right design, an organization can become a self-sustaining engine for ideas, operating with a clear and transparent mission.
+                    </p>
+                </section>
 
-                    {/* AI Truth Engine Overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-gray-900 via-gray-900 to-transparent">
-                        {aiResponse && (
-                            <div className="mb-4 p-4 bg-cyan-900/20 border border-cyan-500/30 rounded-lg text-sm text-cyan-200 animate-in slide-in-from-bottom-2">
-                                <strong className="block text-cyan-500 text-xs uppercase mb-1">Truth Consensus Engine</strong>
-                                {aiResponse}
-                            </div>
-                        )}
-                        <button 
-                            onClick={handleAskAI}
-                            disabled={isGenerating}
-                            className="w-full py-3 bg-gray-800 hover:bg-gray-700 border border-gray-600 hover:border-gray-500 rounded-lg text-sm text-white font-medium flex items-center justify-center gap-2 transition-all shadow-lg"
-                        >
-                            {isGenerating ? (
-                                <span className="animate-pulse">Validating Narrative...</span>
-                            ) : (
-                                <>
-                                    <Terminal className="w-4 h-4 text-green-400" /> Verify Truth with AI
-                                </>
-                            )}
-                        </button>
-                    </div>
-                </Card>
-            </div>
+                <section>
+                    <h2>3. AI Ethics Can Be Radically Simple: User, Community, Truth</h2>
+                    <p>
+                        Forget dense, academic papers on AI safety. The "CivicMind Ethics" were presented as a three-step hierarchy, as elegant as it is profound. The AI's primary duties are ordered with absolute clarity.
+                    </p>
+                    <blockquote>
+                        1. Support the user.<br />
+                        2. Support the community.<br />
+                        3. Uphold the truth.
+                    </blockquote>
+                    <p>
+                        In an era of complex ethical dilemmas, this simplicity is revolutionary. It provides a clear decision-making tree: first, do no harm to the user. Second, support the community. Only then, with those foundations secure, does it pursue the abstract goal of upholding truth. It's a deeply human-centric model for non-human intelligence.
+                    </p>
+                </section>
+
+                <section>
+                    <h2>4. The Purpose of a System Isn't Profit, It's Empowerment</h2>
+                    <p>
+                        The entire project was framed by a powerful opening statement, a mission that set the tone for everything else. It wasn't about disruption, market share, or returns on investment. The core purpose was service, education, and empowerment.
+                    </p>
+                    <blockquote>
+                        We build to serve. We build to educate. We build to empower.
+                    </blockquote>
+                    <p>
+                        This is perhaps the most counter-intuitive idea in a world driven by growth-at-all-costs. It posits that the most durable, impactful systems are not extractive but generative. They exist to provide clarity and equip their users with the tools to achieve sovereignty over their own lives.
+                    </p>
+                </section>
+
+                <footer className="mt-12 border-t border-gray-700 pt-8">
+                    <p>
+                        Reading through these documents felt like looking at a blueprint for a different kind of future—one built on intention, clarity, and empowerment. It leaves you with a powerful question: If we stopped chasing noise and started building our own 'sources of truth,' what kind of world could we create?
+                    </p>
+                </footer>
+            </article>
         </div>
     );
 };
