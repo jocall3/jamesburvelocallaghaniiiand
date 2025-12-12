@@ -1,4 +1,3 @@
-```typescript
 export type ContentSource = {
   type: string;
   url: string;
@@ -12,4 +11,3 @@ export type ContentSource = {
   tags?: string[];
   customFields?: { [key: string]: string };
 };
-```
