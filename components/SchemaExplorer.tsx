@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, CSSProperties } from 'react';
 
 // Type definitions for the ISO 20022 Schema
