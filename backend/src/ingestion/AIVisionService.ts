@@ -1,4 +1,3 @@
-```typescript
 import { CosmosClient } from "@azure/cosmos";
 import { QueueServiceClient } from "@azure/storage-queue";
 import { v4 as uuidv4 } from "uuid";
@@ -95,4 +94,3 @@ export class AIVisionService {
         return extractionResult;
     }
 }
-```
