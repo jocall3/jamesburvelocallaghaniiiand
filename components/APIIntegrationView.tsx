@@ -1,4 +1,3 @@
-
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { DataContext } from '../context/DataContext';
 import { APIStatus } from '../types';
