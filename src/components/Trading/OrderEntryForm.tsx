@@ -1,4 +1,3 @@
-```tsx
 import React, { useState } from 'react';
 import {
   TextField,
@@ -94,4 +93,3 @@ const OrderEntryForm: React.FC<OrderEntryFormProps> = ({ onSubmit }) => {
 };
 
 export default OrderEntryForm;
-```
