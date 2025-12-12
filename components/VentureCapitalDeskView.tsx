@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Button, Tabs, Tab } from 'react-bootstrap';
 import { DealFlow } from './DealFlow';
