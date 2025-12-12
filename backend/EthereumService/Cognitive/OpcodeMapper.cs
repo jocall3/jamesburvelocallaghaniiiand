@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
-namespace Nethereum.Cognitive
+namespace Citibankdemobusinessinc.EthereumService.Cognitive
 {
     public static class OpcodeMapper
     {
