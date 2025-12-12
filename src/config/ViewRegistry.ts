@@ -131,6 +131,78 @@ const viewList: Readonly<ViewRegistration[]> = [
     component: lazy(() => import('../apps/Calendar/CalendarApp')),
     icon: Calendar,
   },
+
+  // --- Citibankdemobusinessinc Applications ---
+  {
+    id: 'Citibankdemobusinessinc.creditrisk.modelvalidation',
+    name: 'Credit Risk Model Validation',
+    type: 'app',
+    component: lazy(() => import('../apps/Citibankdemobusinessinc/CreditRiskModelValidationApp')),
+    icon: FileText,
+  },
+  {
+    id: 'Citibankdemobusinessinc.marketrisk.realtimeanalytics',
+    name: 'Market Risk Real-time Analytics',
+    type: 'app',
+    component: lazy(() => import('../apps/Citibankdemobusinessinc/MarketRiskAnalyticsApp')),
+    icon: TerminalSquare,
+  },
+  {
+    id: 'Citibankdemobusinessinc.fraud.detectionai',
+    name: 'Fraud Detection AI',
+    type: 'app',
+    component: lazy(() => import('../apps/Citibankdemobusinessinc/FraudDetectionApp')),
+    icon: Globe,
+  },
+  {
+    id: 'Citibankdemobusinessinc.compliance.regulatoryreporting',
+    name: 'Regulatory Reporting Automation',
+    type: 'app',
+    component: lazy(() => import('../apps/Citibankdemobusinessinc/RegulatoryReportingApp')),
+    icon: BookUser,
+  },
+  {
+    id: 'Citibankdemobusinessinc.liquidity.stressTesting',
+    name: 'Liquidity Stress Testing',
+    type: 'app',
+    component: lazy(() => import('../apps/Citibankdemobusinessinc/LiquidityStressTestingApp')),
+    icon: Calendar,
+  },
+  {
+    id: 'Citibankdemobusinessinc.cybersecurity.threatintel',
+    name: 'Cybersecurity Threat Intelligence',
+    type: 'app',
+    component: lazy(() => import('../apps/Citibankdemobusinessinc/ThreatIntelligenceApp')),
+    icon: Globe,
+  },
+  {
+    id: 'Citibankdemobusinessinc.wealth.personalizedadvice',
+    name: 'Personalized Wealth Advice',
+    type: 'app',
+    component: lazy(() => import('../apps/Citibankdemobusinessinc/WealthAdviceApp')),
+    icon: BookUser,
+  },
+  {
+    id: 'Citibankdemobusinessinc.investment.portfoliomanagement',
+    name: 'AI Portfolio Management',
+    type: 'app',
+    component: lazy(() => import('../apps/Citibankdemobusinessinc/PortfolioManagementApp')),
+    icon: Calendar,
+  },
+  {
+    id: 'Citibankdemobusinessinc.retail.customeroffers',
+    name: 'Personalized Customer Offers',
+    type: 'app',
+    component: lazy(() => import('../apps/Citibankdemobusinessinc/CustomerOffersApp')),
+    icon: Globe,
+  },
+  {
+    id: 'Citibankdemobusinessinc.operations.processautomation',
+    name: 'Operations Process Automation',
+    type: 'app',
+    component: lazy(() => import('../apps/Citibankdemobusinessinc/ProcessAutomationApp')),
+    icon: BookUser,
+  },
 ];
 
 /**
