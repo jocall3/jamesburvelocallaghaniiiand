@@ -1,3 +1,4 @@
+---
 -- CreateTable
 CREATE TABLE "EvmTrace" (
     "id" SERIAL NOT NULL,
@@ -48,3 +49,4 @@ CREATE TABLE "GoogleSearchFact" (
 
 -- AddForeignKey
 ALTER TABLE "GoogleSearchFact" ADD CONSTRAINT "GoogleSearchFact_narrativeHistoryId_fkey" FOREIGN KEY ("narrativeHistoryId") REFERENCES "NarrativeHistory"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+---
