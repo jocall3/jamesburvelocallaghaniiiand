@@ -11,111 +11,67 @@ interface Integration {
   description: string;
   logo: React.ReactNode;
   status: IntegrationStatus;
-  category: 'Storage' | 'Code' | 'Communication' | 'Payments' | 'Automation' | 'Data';
+  category: 'Storage' | 'Code' | 'Communication' | 'Payments' | 'Automation' | 'Data' | 'Open Banking';
 }
 
-// --- MOCK DATA ---
-// In a real application, this data would be fetched from an API.
-// The component is designed to handle 100+ integrations.
-const mockIntegrations: Integration[] = [
-  {
-    id: 'google-drive',
-    name: 'Google Drive',
-    description: 'Store and access files from your Google Drive account.',
-    logo: <img src="/logos/google-drive.svg" alt="Google Drive" className="w-12 h-12" />,
-    status: 'connected',
-    category: 'Storage',
-  },
-  {
-    id: 'github',
-    name: 'GitHub',
-    description: 'Connect repositories, manage issues, and trigger workflows.',
-    logo: <img src="/logos/github.svg" alt="GitHub" className="w-12 h-12" />,
-    status: 'connected',
-    category: 'Code',
-  },
-  {
-    id: 'slack',
-    name: 'Slack',
-    description: 'Send notifications and messages to your Slack channels.',
-    logo: <img src="/logos/slack.svg" alt="Slack" className="w-12 h-12" />,
-    status: 'not_connected',
-    category: 'Communication',
-  },
-  {
-    id: 'stripe',
-    name: 'Stripe',
-    description: 'Process payments and manage subscriptions.',
-    logo: <img src="/logos/stripe.svg" alt="Stripe" className="w-12 h-12" />,
-    status: 'not_connected',
-    category: 'Payments',
-  },
-  {
-    id: 'jira',
-    name: 'Jira',
-    description: 'Sync issues, projects, and sprints with your Jira instance.',
-    logo: <img src="/logos/jira.svg" alt="Jira" className="w-12 h-12" />,
-    status: 'not_connected',
-    category: 'Code',
-  },
-  {
-    id: 'aws-s3',
-    name: 'AWS S3',
-    description: 'Use S3 buckets for scalable object storage.',
-    logo: <img src="/logos/aws-s3.svg" alt="AWS S3" className="w-12 h-12" />,
-    status: 'not_connected',
-    category: 'Storage',
-  },
-  {
-    id: 'openai',
-    name: 'OpenAI',
-    description: 'Integrate powerful AI models like GPT-4 into your workflows.',
-    logo: <img src="/logos/openai.svg" alt="OpenAI" className="w-12 h-12" />,
-    status: 'connected',
-    category: 'Automation',
-  },
-  {
-    id: 'sendgrid',
-    name: 'SendGrid',
-    description: 'Reliable email delivery, scaling, and analytics.',
-    logo: <img src="/logos/sendgrid.svg" alt="SendGrid" className="w-12 h-12" />,
-    status: 'not_connected',
-    category: 'Communication',
-  },
-  {
-    id: 'postgresql',
-    name: 'PostgreSQL',
-    description: 'Connect to your PostgreSQL database for direct data access.',
-    logo: <Database className="w-12 h-12 text-blue-600" />,
-    status: 'not_connected',
-    category: 'Data',
-  },
-  {
-    id: 'zapier',
-    name: 'Zapier',
-    description: 'Connect your apps and automate workflows with Zapier.',
-    logo: <img src="/logos/zapier.svg" alt="Zapier" className="w-12 h-12" />,
-    status: 'coming_soon',
-    category: 'Automation',
-  },
-  {
-    id: 'gitlab',
-    name: 'GitLab',
-    description: 'Connect GitLab repositories, CI/CD pipelines, and more.',
-    logo: <img src="/logos/gitlab.svg" alt="GitLab" className="w-12 h-12" />,
-    status: 'coming_soon',
-    category: 'Code',
-  },
-  {
-    id: 'hubspot',
-    name: 'HubSpot',
-    description: 'Sync contacts, deals, and marketing data from HubSpot.',
-    logo: <img src="/logos/hubspot.svg" alt="HubSpot" className="w-12 h-12" />,
-    status: 'not_connected',
-    category: 'Data',
-  },
-];
+// --- UTILITY FUNCTIONS ---
 
+// Generates a random string ID
+const generateId = (): string => Math.random().toString(36).substring(2, 15);
+
+// Generates a random integer within a range
+const getRandomInt = (min: number, max: number): number => {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+// Generates a random status
+const generateStatus = (): IntegrationStatus => {
+  const statuses: IntegrationStatus[] = ['connected', 'not_connected', 'coming_soon'];
+  return statuses[getRandomInt(0, statuses.length - 1)];
+};
+
+// Generates a random category
+const generateCategory = (): Integration['category'] => {
+  const categories: Integration['category'][] = ['Storage', 'Code', 'Communication', 'Payments', 'Automation', 'Data', 'Open Banking'];
+  return categories[getRandomInt(0, categories.length - 1)];
+};
+
+// Generates a random description
+const generateDescription = (): string => {
+  const descriptions = [
+    'Seamlessly integrate with our platform.',
+    'Enhance your workflow with our powerful tools.',
+    'Connect and automate your daily tasks.',
+    'Unlock new possibilities with our open banking solutions.',
+    'Securely store and access your data.',
+    'Collaborate and communicate effectively.',
+    'Process payments with ease.',
+    'Automate your business processes.',
+    'Gain insights from your data.',
+    'Develop and deploy code efficiently.',
+  ];
+  return descriptions[getRandomInt(0, descriptions.length - 1)];
+};
+
+// --- INTEGRATION GENERATOR ---
+
+const generateIntegration = (index: number): Integration => {
+  const name = `Integration ${index + 1}`;
+  return {
+    id: generateId(),
+    name: name,
+    description: generateDescription(),
+    logo: <Bot className="w-12 h-12 text-gray-600" />,
+    status: generateStatus(),
+    category: generateCategory(),
+  };
+};
+
+// --- MOCK DATA ---
+// Generates 50 integrations using the generative functions
+const mockIntegrations: Integration[] = Array.from({ length: 50 }, (_, i) => generateIntegration(i));
 
 // --- SUB-COMPONENTS ---
 
