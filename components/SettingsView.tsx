@@ -1,4 +1,3 @@
-
 import React, { useState, useContext } from 'react';
 import Card from './Card';
 import { User, Shield, Lock, Mail, Link as LinkIcon, Database, Server, Wifi, Terminal } from 'lucide-react';
