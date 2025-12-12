@@ -1,4 +1,3 @@
-```tsx
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -510,4 +509,3 @@ const AssetExportRuleForm: React.FC<AssetExportRuleFormProps> = ({
 };
 
 export default AssetExportRuleForm;
-```
