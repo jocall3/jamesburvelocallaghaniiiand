@@ -1,4 +1,3 @@
-```typescript
 import {
   Candle,
   Strategy,
@@ -310,4 +309,3 @@ export class BacktestingEngine {
     return Math.sqrt(variance);
   }
 }
-```
