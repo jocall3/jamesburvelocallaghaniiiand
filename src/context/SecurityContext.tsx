@@ -1,4 +1,3 @@
-```typescript
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 // Define the shape of the security context
@@ -69,4 +68,3 @@ export const useSecurity = (): SecurityContextType => {
   }
   return context;
 };
-```
