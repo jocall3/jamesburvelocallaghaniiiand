@@ -190,7 +190,7 @@ const LandingPage: React.FC<{ onLoginClick?: () => void }> = ({ onLoginClick }) 
                         <h2 className="text-4xl font-bold text-white">This is a Simulation</h2>
                         <div className="prose prose-invert prose-lg mx-auto text-gray-300">
                             <p>
-                                You are viewing a <strong>Demo Environment</strong>. The data you see—balances, transactions, and market movements—is simulated for educational purposes.
+                                You are viewing a <strong>Demo Environment</strong>. The data you seeâ€”balances, transactions, and market movementsâ€”is simulated for educational purposes.
                             </p>
                             <p>
                                 This platform is designed as a <strong>Living Textbook</strong>. It demonstrates how modern financial applications are architected, how they handle state, and how they integrate with AI.
@@ -328,7 +328,7 @@ const LandingPage: React.FC<{ onLoginClick?: () => void }> = ({ onLoginClick }) 
                         <span className="font-bold text-gray-400">Mind's Eye Orchestration</span>
                     </div>
                     <div className="text-xs text-gray-600 font-mono">
-                        COPYRIGHT © 2025 MIND'S EYE ORCHESTRATION.
+                        COPYRIGHT Â© 2025 MIND'S EYE ORCHESTRATION.
                     </div>
                 </div>
             </footer>
