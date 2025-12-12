@@ -1,4 +1,3 @@
-```typescript
 // src/ai/cfo/strategies/DebtConsolidationStrategy.ts
 
 // --- Model Definitions (based on OpenAPI specs) ---
@@ -257,4 +256,3 @@ function formatCurrency(amount: number): string {
     currency: 'USD',
   }).format(amount);
 }
-```
