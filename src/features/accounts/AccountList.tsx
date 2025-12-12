@@ -187,7 +187,7 @@ const AccountList: React.FC = () => {
                         onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
                         className="p-1 bg-gray-700 rounded hover:bg-gray-600"
                     >
-                        {sortOrder === 'asc' ? '↑' : '↓'}
+                        {sortOrder === 'asc' ? 'â' : 'â'}
                     </button>
                 </div>
             </div>
