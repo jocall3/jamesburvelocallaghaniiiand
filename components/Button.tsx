@@ -51,7 +51,7 @@ const buttonVariants = {
     hftSell:
       "bg-red-500 text-white font-mono tracking-wider hover:bg-red-400 active:bg-red-600 transform active:scale-95 transition-all duration-75",
 
-    // GEIN 1–35 (complete)
+    // GEIN 1â€“35 (complete)
     'gein-1': 'bg-red-500 text-white hover:bg-red-600',
     'gein-2': 'bg-orange-500 text-white hover:bg-orange-600',
     'gein-3': 'bg-yellow-500 text-white hover:bg-yellow-600',
