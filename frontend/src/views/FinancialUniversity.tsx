@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 
 const FinancialUniversity = () => {
@@ -37,4 +36,3 @@ const FinancialUniversity = () => {
 };
 
 export default FinancialUniversity;
-```
