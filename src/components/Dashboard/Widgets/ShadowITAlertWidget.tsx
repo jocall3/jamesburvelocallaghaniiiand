@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 import { Card, CardHeader, CardContent, Typography, makeStyles } from '@material-ui/core';
 
@@ -57,4 +56,3 @@ const ShadowITAlertWidget: React.FC<ShadowITAlertWidgetProps> = ({ shadowITDetec
 };
 
 export default ShadowITAlertWidget;
-```
