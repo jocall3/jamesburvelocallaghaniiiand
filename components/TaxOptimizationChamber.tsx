@@ -188,7 +188,7 @@ const HFT_Simulator: React.FC<{ isRunning: boolean }> = ({ isRunning }) => {
             <div className="p-3 rounded-lg border border-dashed border-teal-500/50 bg-black/30">
                 <div className="flex justify-between items-center mb-2 pb-2 border-b border-teal-700">
                     <span className={`text-lg font-bold ${isRunning ? 'text-green-400 animate-pulse' : 'text-red-400'}`}>
-                        {isRunning ? 'â—  MONITORING' : 'â–  OFFLINE'}
+                        {isRunning ? 'Ã¢â  MONITORING' : 'Ã¢âÂ  OFFLINE'}
                     </span>
                     <div className="text-right">
                         <p className="text-xs text-gray-400">Total Taxable Events</p>
