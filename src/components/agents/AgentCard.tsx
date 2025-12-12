@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 import { motion } from 'framer-motion';
 
@@ -141,4 +140,3 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent, onAction }) => {
 };
 
 export default AgentCard;
-```
