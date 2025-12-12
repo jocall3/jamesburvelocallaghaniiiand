@@ -1,4 +1,3 @@
-```typescript
 import React, { useState } from 'react';
 import {
   TextField,
@@ -159,4 +158,3 @@ const TradeExecutionTerminal: React.FC<TradeExecutionTerminalProps> = ({
 };
 
 export default TradeExecutionTerminal;
-```
