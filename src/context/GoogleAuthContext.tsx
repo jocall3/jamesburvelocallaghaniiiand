@@ -144,6 +144,7 @@ export const GoogleAuthProvider: React.FC<GoogleAuthProviderProps> = ({ children
     if (tokenClient) {
       // Request access token with popup
       // prompt: '' ensures it doesn't force re-consent if already granted, 
+      // but 'consent' might be needed for refresh tokens if already granted, 
       // but 'consent' might be needed for refresh tokens if we were doing server-side flow.
       // For implicit flow client-side, standard request is fine.
       tokenClient.requestAccessToken();
