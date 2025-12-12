@@ -34,11 +34,19 @@ interface AgentDeploymentResult {
   deploymentId?: string;
 }
 
-// Mock data for available options
+// Mock data for available options - In a real system, these would be dynamically fetched.
+// For this self-contained example, they are hardcoded.
 const AVAILABLE_AGENT_TYPES = [
   { id: 'financial_analyst', name: 'Financial Analyst Agent' },
   { id: 'logistics_optimizer', name: 'Logistics Optimizer Agent' },
   { id: 'customer_support_bot', name: 'Customer Support Bot' },
+  { id: 'risk_assessor', name: 'Risk Assessment Agent' },
+  { id: 'compliance_officer', name: 'Compliance Officer Agent' },
+  { id: 'market_predictor', name: 'Market Prediction Agent' },
+  { id: 'fraud_detector', name: 'Fraud Detection Agent' },
+  { id: 'portfolio_manager', name: 'Portfolio Management Agent' },
+  { id: 'regulatory_reporter', name: 'Regulatory Reporting Agent' },
+  { id: 'economic_forecaster', name: 'Economic Forecasting Agent' },
 ];
 
 const AVAILABLE_REGIONS = [
@@ -47,27 +55,37 @@ const AVAILABLE_REGIONS = [
   'asia-northeast1',
   'sovereign-eu-a', // Example sovereign region
   'sovereign-apac-b', // Example sovereign region
+  'us-east1',
+  'us-west2',
+  'asia-southeast1',
 ];
 
 const AVAILABLE_MODEL_VERSIONS = [
   'v2.1.0-sovereign',
   'v2.0.5-stability',
   'latest-beta',
+  'v1.9.2-enterprise',
+  'v2.2.0-rc1',
+  'v2.1.5-secure',
 ];
 
 const AVAILABLE_COMPUTE_PROFILES = [
   'standard-highcpu',
   'high-memory-xl',
   'gpu-accelerated-small',
+  'compute-optimized-medium',
+  'memory-optimized-large',
+  'gpu-accelerated-xl',
 ];
 
 const AgentDeploymentForm: React.FC = () => {
+  // Initialize with default values, ensuring they exist
   const initialConfig: AgentConfig = useMemo(() => ({
     agentName: '',
-    agentType: AVAILABLE_AGENT_TYPES[0]?.id || '',
-    region: AVAILABLE_REGIONS[0] || '',
-    modelVersion: AVAILABLE_MODEL_VERSIONS[0] || '',
-    computeProfile: AVAILABLE_COMPUTE_PROFILES[0] || '',
+    agentType: AVAILABLE_AGENT_TYPES[0]?.id || 'financial_analyst',
+    region: AVAILABLE_REGIONS[0] || 'us-central1',
+    modelVersion: AVAILABLE_MODEL_VERSIONS[0] || 'v2.1.0-sovereign',
+    computeProfile: AVAILABLE_COMPUTE_PROFILES[0] || 'standard-highcpu',
     resourceLimits: {
       cpu: 4,
       memoryGb: 16,
@@ -80,6 +98,8 @@ const AgentDeploymentForm: React.FC = () => {
   const [deploymentStatus, setDeploymentStatus] = useState<AgentDeploymentResult | null>(null);
   const [isDeploying, setIsDeploying] = useState(false);
 
+  // --- Event Handlers ---
+
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setConfig(prev => ({
@@ -90,7 +110,11 @@ const AgentDeploymentForm: React.FC = () => {
 
   const handleResourceChange = useCallback((key: keyof AgentConfig['resourceLimits'], value: string) => {
     const numValue = parseInt(value, 10);
-    if (!isNaN(numValue) && numValue >= 0) {
+    // Allow 0 for GPU count, but require positive for CPU/Memory
+    const isValid = (key === 'gpuCount' && !isNaN(numValue) && numValue >= 0) ||
+                    ((key === 'cpu' || key === 'memoryGb') && !isNaN(numValue) && numValue > 0);
+
+    if (isValid) {
       setConfig(prev => ({
         ...prev,
         resourceLimits: {
@@ -98,14 +122,24 @@ const AgentDeploymentForm: React.FC = () => {
           [key]: numValue,
         },
       }));
-    } else if (value === '') {
-        setConfig(prev => ({
-            ...prev,
-            resourceLimits: {
-                ...prev.resourceLimits,
-                [key]: 0, // Allow temporary empty state for typing
-            },
-          }));
+    } else if (value === '' && key === 'gpuCount') {
+      // Allow empty for GPU count to reset to 0
+      setConfig(prev => ({
+        ...prev,
+        resourceLimits: {
+          ...prev.resourceLimits,
+          [key]: 0,
+        },
+      }));
+    } else if (value === '' && (key === 'cpu' || key === 'memoryGb')) {
+      // Do not allow empty for required fields, but clear if user backspaces
+      setConfig(prev => ({
+        ...prev,
+        resourceLimits: {
+          ...prev.resourceLimits,
+          [key]: 0, // Temporarily set to 0, validation will catch it
+        },
+      }));
     }
   }, []);
 
@@ -116,6 +150,8 @@ const AgentDeploymentForm: React.FC = () => {
     }));
   }, []);
 
+  // --- Validation ---
+
   const validateConfig = useMemo(() => {
     return (
       config.agentName.trim().length > 0 &&
@@ -124,13 +160,20 @@ const AgentDeploymentForm: React.FC = () => {
       config.modelVersion.length > 0 &&
       config.computeProfile.length > 0 &&
       config.resourceLimits.cpu > 0 &&
-      config.resourceLimits.memoryGb > 0
+      config.resourceLimits.memoryGb > 0 &&
+      config.deploymentStrategy.length > 0
     );
   }, [config]);
 
-  // Mock deployment function - replace with actual API call
+  // --- Deployment Logic ---
+
+  // Mock deployment function - In a real system, this would interact with a backend API.
+  // For this self-contained example, it simulates a network request and response.
   const deployAgent = async () => {
-    if (!validateConfig) return;
+    if (!validateConfig) {
+      setDeploymentStatus({ success: false, message: "Please fill in all required fields correctly." });
+      return;
+    }
 
     setIsDeploying(true);
     setDeploymentStatus(null);
@@ -145,22 +188,34 @@ const AgentDeploymentForm: React.FC = () => {
       // POST /v1/agents:deploy
       // where the body is 'config'
 
-      // Mock success condition
-      const success = Math.random() > 0.1; // 90% success rate mock
+      // Simulate success/failure based on a random chance or specific conditions
+      const success = Math.random() > 0.15; // 85% success rate mock
 
       if (success) {
+        const deploymentId = `dep-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         setDeploymentStatus({
           success: true,
-          message: `Agent '${config.agentName}' deployment initiated successfully in ${config.region}. Monitoring ID: dep-xyz-${Date.now()}`,
-          deploymentId: `dep-xyz-${Date.now()}`,
+          message: `Agent '${config.agentName}' deployment initiated successfully in ${config.region}. Monitoring ID: ${deploymentId}`,
+          deploymentId: deploymentId,
         });
+        // Reset form after successful deployment initiation
+        setConfig(initialConfig);
       } else {
+        const errorMessages = [
+          "Deployment failed due to insufficient resource allocation in the target region.",
+          "Internal service error during agent provisioning.",
+          "Configuration validation failed at the deployment endpoint.",
+          "Network instability detected in the sovereign environment.",
+          "Agent type not compatible with selected model version.",
+        ];
+        const errorMessage = errorMessages[Math.floor(Math.random() * errorMessages.length)];
         setDeploymentStatus({
           success: false,
-          message: "Deployment failed due to internal constraint violation in the target sovereign environment.",
+          message: `Deployment failed: ${errorMessage}`,
         });
       }
     } catch (error) {
+      console.error("Deployment error:", error);
       setDeploymentStatus({
         success: false,
         message: `An unexpected error occurred during deployment: ${error instanceof Error ? error.message : 'Unknown Error'}`,
@@ -174,19 +229,23 @@ const AgentDeploymentForm: React.FC = () => {
     e.preventDefault();
     if (validateConfig) {
       deployAgent();
+    } else {
+      setDeploymentStatus({ success: false, message: "Please review the form for errors and missing required fields." });
     }
   };
+
+  // --- Rendering ---
 
   const renderStatusAlert = () => {
     if (!deploymentStatus) return null;
 
     const severity = deploymentStatus.success ? 'success' : 'error';
     return (
-      <Alert severity={severity} sx={{ mt: 2 }}>
+      <Alert severity={severity} sx={{ mt: 2, mb: 2 }}>
         {deploymentStatus.message}
         {deploymentStatus.deploymentId && (
-          <Typography variant="body2" sx={{ mt: 1 }}>
-            ID: {deploymentStatus.deploymentId}
+          <Typography variant="body2" sx={{ mt: 1, color: 'inherit' }}>
+            Deployment ID: {deploymentStatus.deploymentId}
           </Typography>
         )}
       </Alert>
@@ -194,29 +253,34 @@ const AgentDeploymentForm: React.FC = () => {
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 4, maxWidth: 900, mx: 'auto', mt: 4 }}>
-      <Typography variant="h5" gutterBottom component="div" sx={{ mb: 3, fontWeight: 'bold', color: '#1976d2' }}>
-        Sovereign AI Agent Deployment Configuration
+    <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 }, maxWidth: 900, mx: 'auto', mt: 4, mb: 4 }}>
+      <Typography variant="h5" gutterBottom component="div" sx={{ mb: 3, fontWeight: 'bold', color: '#0070d2' }}>
+        Citibankdemobusinessinc.deploy.agent
       </Typography>
-      <Box component="form" onSubmit={handleSubmit} noValidate sx={{ '& .MuiTextField-root': { mb: 2 } }}>
+      <Typography variant="subtitle1" gutterBottom sx={{ mb: 3, color: '#555' }}>
+        Configure and deploy your sovereign AI agent for enhanced financial operations.
+      </Typography>
+
+      <Box component="form" onSubmit={handleSubmit} noValidate sx={{ '& .MuiTextField-root, & .MuiFormControl-root': { mb: 2 } }}>
         <Grid container spacing={3}>
-          {/* Section 1: Core Identification */}
+          {/* Section 1: Core Identification & Targeting */}
           <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom sx={{ borderBottom: '1px solid #eee', pb: 1 }}>
-              Agent Identity & Target
+            <Typography variant="h6" gutterBottom sx={{ borderBottom: '1px solid #e0e0e0', pb: 1, color: '#0070d2' }}>
+              Agent Identity & Deployment Target
             </Typography>
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               required
               fullWidth
-              label="Agent Name (Unique Identifier)"
+              label="Agent Name"
               name="agentName"
               value={config.agentName}
               onChange={handleChange}
               error={!config.agentName.trim()}
-              helperText={!config.agentName.trim() ? "Agent name is required" : "A unique name for this deployment instance."}
+              helperText={!config.agentName.trim() ? "Agent name is required" : "A unique, human-readable name for this agent instance."}
               disabled={isDeploying}
+              variant="outlined"
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -228,6 +292,7 @@ const AgentDeploymentForm: React.FC = () => {
                 value={config.agentType}
                 label="Agent Type"
                 onChange={(e) => handleSelectChange('agentType', e.target.value)}
+                variant="outlined"
               >
                 {AVAILABLE_AGENT_TYPES.map((type) => (
                   <MenuItem key={type.id} value={type.id}>
@@ -247,6 +312,7 @@ const AgentDeploymentForm: React.FC = () => {
                 value={config.region}
                 label="Deployment Sovereign Region"
                 onChange={(e) => handleSelectChange('region', e.target.value)}
+                variant="outlined"
               >
                 {AVAILABLE_REGIONS.map((region) => (
                   <MenuItem key={region} value={region}>
@@ -266,6 +332,7 @@ const AgentDeploymentForm: React.FC = () => {
                 value={config.modelVersion}
                 label="AI Model Version"
                 onChange={(e) => handleSelectChange('modelVersion', e.target.value)}
+                variant="outlined"
               >
                 {AVAILABLE_MODEL_VERSIONS.map((version) => (
                   <MenuItem key={version} value={version}>
@@ -276,10 +343,10 @@ const AgentDeploymentForm: React.FC = () => {
             </FormControl>
           </Grid>
 
-          {/* Section 2: Compute and Resources */}
+          {/* Section 2: Compute Profile & Resource Allocation */}
           <Grid item xs={12} sx={{ pt: 3 }}>
-            <Typography variant="h6" gutterBottom sx={{ borderBottom: '1px solid #eee', pb: 1 }}>
-              Compute Profile & Limits
+            <Typography variant="h6" gutterBottom sx={{ borderBottom: '1px solid #e0e0e0', pb: 1, color: '#0070d2' }}>
+              Compute Profile & Resource Allocation
             </Typography>
           </Grid>
 
@@ -292,6 +359,7 @@ const AgentDeploymentForm: React.FC = () => {
                 value={config.computeProfile}
                 label="Compute Profile Template"
                 onChange={(e) => handleSelectChange('computeProfile', e.target.value)}
+                variant="outlined"
               >
                 {AVAILABLE_COMPUTE_PROFILES.map((profile) => (
                   <MenuItem key={profile} value={profile}>
@@ -311,6 +379,7 @@ const AgentDeploymentForm: React.FC = () => {
                 value={config.deploymentStrategy}
                 label="Deployment Strategy"
                 onChange={(e) => handleSelectChange('deploymentStrategy', e.target.value)}
+                variant="outlined"
               >
                 <MenuItem value="standard">Standard Rolling Update</MenuItem>
                 <MenuItem value="canary">Canary Release</MenuItem>
@@ -330,6 +399,8 @@ const AgentDeploymentForm: React.FC = () => {
               InputProps={{ inputProps: { min: 1 } }}
               required
               disabled={isDeploying}
+              variant="outlined"
+              helperText="Minimum 1 core"
             />
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -343,18 +414,22 @@ const AgentDeploymentForm: React.FC = () => {
               InputProps={{ inputProps: { min: 1 } }}
               required
               disabled={isDeploying}
+              variant="outlined"
+              helperText="Minimum 1 GB"
             />
           </Grid>
           <Grid item xs={12} sm={4}>
             <TextField
               fullWidth
-              label="GPU Count (0 or more)"
+              label="GPU Count"
               type="number"
               name="gpuCount"
               value={config.resourceLimits.gpuCount}
               onChange={(e) => handleResourceChange('gpuCount', e.target.value)}
               InputProps={{ inputProps: { min: 0 } }}
               disabled={isDeploying}
+              variant="outlined"
+              helperText="0 or more GPUs"
             />
           </Grid>
 
@@ -367,9 +442,11 @@ const AgentDeploymentForm: React.FC = () => {
             type="submit"
             variant="contained"
             size="large"
+            color="primary"
             disabled={!validateConfig || isDeploying}
+            sx={{ px: 4, py: 1.5 }}
           >
-            {isDeploying ? 'Deploying...' : 'Deploy Sovereign Agent'}
+            {isDeploying ? 'Deploying...' : 'Initiate Sovereign Agent Deployment'}
           </Button>
         </Box>
       </Box>
