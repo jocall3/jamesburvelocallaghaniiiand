@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 
 const inspectorStyles = {
@@ -140,7 +139,7 @@ const JsonObject = ({ data, level, isLast }: { data: object, level: number, isLa
 
   const collapsedView = (
     <span style={inspectorStyles.collapsed} onClick={toggleExpand}>
-      <span style={inspectorStyles.collapser}>{'{...}'}</span>
+      <span style={inspectorStyles.collapser}>{' { ... } '}</span>
       {!isLast && ','}
     </span>
   );
@@ -180,7 +179,8 @@ const JsonArray = ({ data, level, isLast }: { data: any[], level: number, isLast
 
   const collapsedView = (
     <span style={inspectorStyles.collapsed} onClick={toggleExpand}>
-      <span style={inspectorStyles.collapser}>{'[...]'}{` (${data.length} items)`}</span>
+      <span style={inspectorStyles.collapser}>{' [...] '}</span>
+      {` (${data.length} items)`}
       {!isLast && ','}
     </span>
   );
@@ -210,7 +210,7 @@ type UniversalObjectInspectorProps = {
 };
 
 const UniversalObjectInspector = ({ data }: UniversalObjectInspectorProps) => {
-  if (data === undefined) {
+  if (data === undefined || data === null) {
     return null;
   }
   
