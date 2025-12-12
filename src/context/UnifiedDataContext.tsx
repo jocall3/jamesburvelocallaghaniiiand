@@ -99,6 +99,14 @@ interface UnifiedState {
     entityId: string;
     ssoUrl: string;
   };
+
+  // Citibankdemobusinessinc Branches
+  Citibankdemobusinessinc?: {
+    viewit?: {
+      movieplayform?: any;
+    };
+    // Add other branches here as needed
+  };
 }
 
 // --- Initial State ---
@@ -129,7 +137,8 @@ const initialState: UnifiedState = {
   idpConfig: {
     entityId: "https://accounts.google.com/o/saml2?idpid=C01esbeng",
     ssoUrl: "https://accounts.google.com/o/saml2/idp?idpid=C01esbeng"
-  }
+  },
+  Citibankdemobusinessinc: {}, // Initialize the Citibankdemobusinessinc branch
 };
 
 // --- Actions ---
@@ -147,7 +156,9 @@ type Action =
   | { type: 'PRODUCTS_FETCH_FAIL'; payload: string }
   | { type: 'REWARD_LINK_START' }
   | { type: 'REWARD_LINK_SUCCESS'; payload: RewardLinkage }
-  | { type: 'REWARD_LINK_FAIL'; payload: string };
+  | { type: 'REWARD_LINK_FAIL'; payload: string }
+  // Add actions for Citibankdemobusinessinc branches here
+  | { type: 'CITIBANKDEMOBUSINESSINC_VIEWIT_MOVIEPLAYFORM_UPDATE'; payload: any };
 
 // --- Reducer ---
 
@@ -219,6 +230,19 @@ function unifiedReducer(state: UnifiedState, action: Action): UnifiedState {
       return {
         ...state,
         rewards: { ...state.rewards, loading: false, error: action.payload },
+      };
+
+    // Citibankdemobusinessinc Branch Reducers
+    case 'CITIBANKDEMOBUSINESSINC_VIEWIT_MOVIEPLAYFORM_UPDATE':
+      return {
+        ...state,
+        Citibankdemobusinessinc: {
+          ...state.Citibankdemobusinessinc,
+          viewit: {
+            ...state.Citibankdemobusinessinc?.viewit,
+            movieplayform: action.payload,
+          },
+        },
       };
 
     default:
