@@ -1,4 +1,3 @@
-```typescript
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -23,6 +22,55 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import { PhysicalAsset, TelemetryData } from '../types';
 
+// --- Citibankdemobusinessinc.assetmanagement.physicalassetmanager ---
+
+// Internal data generation functions
+const generateAssetId = () => `asset_${Math.random().toString(36).substr(2, 9)}`;
+const generateAssetName = () => `Generated Asset ${Math.floor(Math.random() * 1000)}`;
+const generateAssetDescription = () => `A dynamically generated asset description for ${generateAssetName()}`;
+const generateTimestamp = () => new Date(Date.now() - Math.random() * 1000000000);
+const generateTemperature = () => 20 + Math.random() * 10;
+const generateHumidity = () => 50 + Math.random() * 20;
+const generatePressure = () => 1000 + Math.random() * 50;
+const generateFlowRate = () => 5 + Math.random() * 5;
+
+// Mock API simulation for initial data
+const fetchInitialAssets = async (): Promise<PhysicalAsset[]> => {
+  await new Promise((resolve) => setTimeout(resolve, 100)); // Simulate network latency
+  return [
+    { id: generateAssetId(), name: generateAssetName(), description: generateAssetDescription() },
+    { id: generateAssetId(), name: generateAssetName(), description: generateAssetDescription() },
+  ];
+};
+
+const fetchInitialTelemetry = async (assets: PhysicalAsset[]): Promise<TelemetryData[]> => {
+  await new Promise((resolve) => setTimeout(resolve, 100)); // Simulate network latency
+  const telemetryData: TelemetryData[] = [];
+  assets.forEach(asset => {
+    const numReadings = Math.floor(Math.random() * 5);
+    for (let i = 0; i < numReadings; i++) {
+      const timestamp = generateTimestamp();
+      const isTemperatureSensor = Math.random() > 0.5;
+      if (isTemperatureSensor) {
+        telemetryData.push({
+          assetId: asset.id,
+          timestamp: timestamp,
+          temperature: generateTemperature(),
+          humidity: generateHumidity(),
+        });
+      } else {
+        telemetryData.push({
+          assetId: asset.id,
+          timestamp: timestamp,
+          pressure: generatePressure(),
+          flowRate: generateFlowRate(),
+        });
+      }
+    }
+  });
+  return telemetryData;
+};
+
 const PhysicalAssetManager = () => {
   const [assets, setAssets] = useState<PhysicalAsset[]>([]);
   const [telemetry, setTelemetry] = useState<TelemetryData[]>([]);
@@ -32,31 +80,18 @@ const PhysicalAssetManager = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-
+  // --- Initialization and Data Fetching ---
   useEffect(() => {
-    // Mock API call to fetch assets (replace with your actual API)
-    const fetchAssets = async () => {
-      // Simulate a delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      const mockAssets: PhysicalAsset[] = [
-        { id: 'asset1', name: 'Temperature Sensor 1', description: 'Sensor in the warehouse' },
-        { id: 'asset2', name: 'Pressure Gauge 1', description: 'Gauge on the production line' },
-      ];
-      setAssets(mockAssets);
-
-      // Mock telemetry data (replace with your actual data source)
-      const mockTelemetry: TelemetryData[] = [
-        { assetId: 'asset1', timestamp: new Date(), temperature: 25.5, humidity: 60 },
-        { assetId: 'asset1', timestamp: new Date(), temperature: 26.0, humidity: 62 },
-        { assetId: 'asset2', timestamp: new Date(), pressure: 1012, flowRate: 5.2 },
-        { assetId: 'asset2', timestamp: new Date(), pressure: 1015, flowRate: 5.5 },
-      ];
-      setTelemetry(mockTelemetry);
+    const loadData = async () => {
+      const fetchedAssets = await fetchInitialAssets();
+      setAssets(fetchedAssets);
+      const fetchedTelemetry = await fetchInitialTelemetry(fetchedAssets);
+      setTelemetry(fetchedTelemetry);
     };
-
-    fetchAssets();
+    loadData();
   }, []);
 
+  // --- Asset Management Functions ---
   const handleAddAsset = () => {
     setOpenDialog(true);
     setIsEditing(false);
@@ -70,12 +105,11 @@ const PhysicalAssetManager = () => {
     setIsEditing(true);
     setNewAssetName(asset.name);
     setNewAssetDescription(asset.description);
-
   };
 
   const handleSaveAsset = () => {
     if (newAssetName.trim() === '') {
-      alert('Asset name is required.');
+      alert('Asset name is required.'); // Human-readable error
       return;
     }
 
@@ -88,14 +122,15 @@ const PhysicalAssetManager = () => {
     } else {
       // Add new asset
       const newAsset: PhysicalAsset = {
-        id: `asset${assets.length + 1}`, // Generate a simple ID
-        name: newAssetName,
-        description: newAssetDescription,
+        id: generateAssetId(),
+        name: newAssetName || generateAssetName(), // Use generated if empty
+        description: newAssetDescription || generateAssetDescription(), // Use generated if empty
       };
       setAssets([...assets, newAsset]);
     }
 
     setOpenDialog(false);
+    setEditAsset(null); // Clear edit state
   };
 
   const handleDeleteAsset = (assetId: string) => {
@@ -108,14 +143,15 @@ const PhysicalAssetManager = () => {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setEditAsset(null);
+    setEditAsset(null); // Clear edit state
   };
 
-
-  const getTelemetryForAsset = (assetId: string) => {
+  // --- Telemetry Handling ---
+  const getTelemetryForAsset = (assetId: string): TelemetryData[] => {
     return telemetry.filter((data) => data.assetId === assetId);
   };
 
+  // --- Rendering Logic ---
   return (
     <Box p={3}>
       <Typography variant="h4" gutterBottom>
@@ -161,9 +197,8 @@ const PhysicalAssetManager = () => {
                 <TableCell>
                   {getTelemetryForAsset(asset.id).map((data, index) => (
                     <Typography key={index}>
-                      {/* Display telemetry data based on its properties */}
-                      {data.temperature !== undefined && `Temperature: ${data.temperature}°C, Humidity: ${data.humidity}%`}
-                      {data.pressure !== undefined && `Pressure: ${data.pressure} Pa, Flow Rate: ${data.flowRate} L/s`}
+                      {data.temperature !== undefined && `Temp: ${data.temperature.toFixed(1)}°C, Humidity: ${data.humidity?.toFixed(0)}%`}
+                      {data.pressure !== undefined && `Pressure: ${data.pressure.toFixed(0)} Pa, Flow Rate: ${data.flowRate?.toFixed(1)} L/s`}
                     </Typography>
                   ))}
                   {getTelemetryForAsset(asset.id).length === 0 && (
@@ -211,4 +246,4 @@ const PhysicalAssetManager = () => {
 };
 
 export default PhysicalAssetManager;
-```
+// --- End Citibankdemobusinessinc.assetmanagement.physicalassetmanager ---
