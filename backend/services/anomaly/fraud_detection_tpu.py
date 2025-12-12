@@ -204,4 +204,3 @@ if __name__ == "__main__":
     print("\n--- Prediction after Update (using placeholder) ---")
     prediction_3 = fraud_detector.predict(sample_transaction_1) # Using the same data
     print(f"Prediction 3: {prediction_3}")
-```
