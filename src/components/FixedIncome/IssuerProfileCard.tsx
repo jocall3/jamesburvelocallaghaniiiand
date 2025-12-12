@@ -1,4 +1,3 @@
-```tsx
 import React from 'react';
 import { Card, CardContent, Typography, Grid } from '@mui/material';
 
@@ -67,4 +66,3 @@ const IssuerProfileCard: React.FC<IssuerProfileCardProps> = ({
 };
 
 export default IssuerProfileCard;
-```
