@@ -26,55 +26,57 @@ interface Proposal {
 }
 
 // ----------------------------------------------------------------------
-// Mock Data
+// Internal Data Generation Functions
 // ----------------------------------------------------------------------
 
-const MOCK_PROPOSALS: Proposal[] = [
-    {
-        id: 'GP-2024-001',
-        title: 'Protocol Upgrade: Sharding Phase 1',
-        description: 'Implementation of the initial sharding mechanism to improve transaction throughput and reduce gas fees. This upgrade requires a hard fork.',
-        proposer: '0xDev...Core',
-        status: 'Active',
-        createdAt: '2023-10-25',
-        endsAt: '2023-11-05',
-        votes: { for: 1500000, against: 45000, abstain: 10000 },
-        type: 'Protocol Upgrade'
-    },
-    {
-        id: 'GP-2024-002',
-        title: 'Adjust Liquidity Mining Rewards',
-        description: 'Proposal to decrease the base APY for the ETH-USDC pool from 12% to 8% to conserve treasury emissions for long-term sustainability.',
-        proposer: '0xDao...Treasury',
-        status: 'Active',
-        createdAt: '2023-10-28',
-        endsAt: '2023-11-04',
-        votes: { for: 45000, against: 120000, abstain: 5000 },
-        type: 'Parameter Change'
-    },
-    {
-        id: 'GP-2023-045',
-        title: 'Q3 Marketing Budget Allocation',
-        description: 'Allocate 250,000 tokens from the community treasury to fund the Q3 global hackathon and developer outreach program.',
-        proposer: 'Marketing_WG',
-        status: 'Passed',
-        createdAt: '2023-09-15',
-        endsAt: '2023-09-22',
-        votes: { for: 890000, against: 20000, abstain: 0 },
-        type: 'Treasury'
-    },
-    {
-        id: 'GP-2023-044',
-        title: 'Integrate Layer 2 Bridge',
-        description: 'Authorize the deployment of the official bridge contract to Optimism L2.',
-        proposer: 'Bridge_Alliance',
-        status: 'Rejected',
-        createdAt: '2023-09-10',
-        endsAt: '2023-09-17',
-        votes: { for: 300000, against: 600000, abstain: 50000 },
-        type: 'Protocol Upgrade'
+const generateRandomString = (length: number): string => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
-];
+    return result;
+};
+
+const generateDateString = (daysAgo: number): string => {
+    const date = new Date();
+    date.setDate(date.getDate() - daysAgo);
+    return date.toISOString().split('T')[0];
+};
+
+const generateProposal = (idSuffix: number): Proposal => {
+    const statuses: ProposalStatus[] = ['Active', 'Passed', 'Rejected', 'Pending'];
+    const types: ProposalType[] = ['Protocol Upgrade', 'Parameter Change', 'Treasury'];
+    const status = statuses[Math.floor(Math.random() * statuses.length)];
+    const type = types[Math.floor(Math.random() * types.length)];
+
+    const daysSinceCreation = Math.floor(Math.random() * 365);
+    const daysUntilEnd = status === 'Active' ? Math.floor(Math.random() * 10) + 1 : Math.floor(Math.random() * 30) + 10;
+
+    return {
+        id: `GP-${new Date().getFullYear()}-${String(idSuffix).padStart(3, '0')}`,
+        title: `Proposal Title ${generateRandomString(10)}`,
+        description: `This is a detailed description for proposal ${idSuffix}. It outlines the rationale, expected outcomes, and potential impacts. ${generateRandomString(50)}`,
+        proposer: `0x${generateRandomString(10)}...${generateRandomString(4)}`,
+        status: status,
+        createdAt: generateDateString(daysSinceCreation + daysUntilEnd),
+        endsAt: generateDateString(daysUntilEnd),
+        votes: {
+            for: Math.floor(Math.random() * 1000000),
+            against: Math.floor(Math.random() * 500000),
+            abstain: Math.floor(Math.random() * 100000),
+        },
+        type: type,
+    };
+};
+
+const generateProposals = (count: number): Proposal[] => {
+    const proposals: Proposal[] = [];
+    for (let i = 1; i <= count; i++) {
+        proposals.push(generateProposal(i));
+    }
+    return proposals;
+};
 
 // ----------------------------------------------------------------------
 // Components
@@ -99,7 +101,7 @@ const VoteBar = ({ label, count, total, color }: { label: string, count: number,
 };
 
 const GovernancePortalView: React.FC = () => {
-    const [proposals, setProposals] = useState<Proposal[]>(MOCK_PROPOSALS);
+    const [proposals, setProposals] = useState<Proposal[]>(generateProposals(10)); // Use generative data
     const [filter, setFilter] = useState<'Active' | 'History'>('Active');
 
     // Derived state
@@ -112,14 +114,16 @@ const GovernancePortalView: React.FC = () => {
     const totalCount = proposals.length;
 
     const handleVote = (id: string, voteType: 'for' | 'against' | 'abstain') => {
-        // Simulation of voting logic
+        // Simulation of voting logic using internal generative functions
         setProposals(prev => prev.map(p => {
             if (p.id === id) {
+                // Simulate vote weight increase based on random generation
+                const voteIncrease = Math.floor(Math.random() * 5000) + 1000; 
                 return {
                     ...p,
                     votes: {
                         ...p.votes,
-                        [voteType]: p.votes[voteType] + 1000 // Simulating vote weight
+                        [voteType]: p.votes[voteType] + voteIncrease
                     }
                 };
             }
@@ -142,7 +146,7 @@ const GovernancePortalView: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="text-sm text-gray-500">
-                        Voting Power: <span className="font-bold text-gray-900">12,450 VP</span>
+                        Voting Power: <span className="font-bold text-gray-900">{Math.floor(Math.random() * 20000).toLocaleString()} VP</span> {/* Generative Voting Power */}
                     </div>
                     <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
                         Connect Wallet
@@ -192,7 +196,7 @@ const GovernancePortalView: React.FC = () => {
                             <div>
                                 <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Delegation</p>
                                 <p className="text-sm text-gray-600 mt-2">You are currently delegating to:</p>
-                                <p className="font-semibold text-indigo-600">Self (No delegate)</p>
+                                <p className="font-semibold text-indigo-600">Self (No delegate)</p> {/* Placeholder, could be generative */}
                             </div>
                             <button className="text-sm text-indigo-600 font-medium hover:text-indigo-800 underline">
                                 Manage
