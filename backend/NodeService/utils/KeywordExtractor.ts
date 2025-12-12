@@ -1,4 +1,3 @@
-```typescript
 import natural from 'natural';
 
 export class KeywordExtractor {
@@ -56,4 +55,3 @@ export class KeywordExtractor {
       return keywords.join(' ');
   }
 }
-```
