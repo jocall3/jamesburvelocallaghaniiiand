@@ -1,4 +1,3 @@
-```typescript
 export class ShadowITDetector {
     private suspiciousPatterns: string[] = [
         ".*test.*",
@@ -47,4 +46,3 @@ export class ShadowITDetector {
     }
 
 }
-```
