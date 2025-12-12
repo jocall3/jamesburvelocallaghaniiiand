@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, ChangeEvent, FormEvent } from 'react';
 
 // Based on the OpenAPI spec for a Counterparty
