@@ -1,4 +1,3 @@
-```tsx
 import React, { useState } from 'react';
 import { View } from '../../types';
 import { useOnAnomalyDetectedSubscription } from '../../graphql/generated'; // Mock import
@@ -234,4 +233,3 @@ const ComplianceView: React.FC<ComplianceViewProps> = ({ setActiveView }) => {
 };
 
 export default ComplianceView;
-```
