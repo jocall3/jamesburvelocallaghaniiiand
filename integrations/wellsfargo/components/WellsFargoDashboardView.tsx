@@ -25,27 +25,87 @@ interface Notification {
   read: boolean;
 }
 
-// Mock Data - In a real application, this would come from an API
-const mockAccounts: Account[] = [
-  { id: 'chk-123', name: 'My Everyday Checking', type: 'checking', balance: 12345.67, currency: 'USD' },
-  { id: 'sav-456', name: 'My Savings Account', type: 'savings', balance: 54321.09, currency: 'USD' },
-  { id: 'cc-789', name: 'Wells Fargo Platinum Card', type: 'credit_card', balance: -1234.50, currency: 'USD' },
-  { id: 'inv-101', name: 'WellsTrade Brokerage', type: 'investment', balance: 123456.78, currency: 'USD' },
-];
+// Utility function to generate a random number within a range
+const getRandomNumber = (min: number, max: number): number => {
+  return Math.random() * (max - min) + min;
+};
 
-const mockTransactions: Transaction[] = [
-  { id: 't1', date: '2023-10-26', description: 'Starbucks Coffee', amount: -5.75, type: 'debit', accountId: 'chk-123' },
-  { id: 't2', date: '2023-10-25', description: 'Online Transfer from Savings', amount: 200.00, type: 'credit', accountId: 'chk-123' },
-  { id: 't3', date: '2023-10-24', description: 'Amazon.com', amount: -75.20, type: 'debit', accountId: 'cc-789' },
-  { id: 't4', date: '2023-10-24', description: 'Payroll Deposit', amount: 2500.00, type: 'credit', accountId: 'chk-123' },
-  { id: 't5', date: '2023-10-23', description: 'Grocery Store', amount: -120.50, type: 'debit', accountId: 'chk-123' },
-];
+// Utility function to generate a random date within a range
+const getRandomDate = (start: Date, end: Date): string => {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString().split('T')[0];
+};
 
-const mockNotifications: Notification[] = [
-  { id: 'n1', message: 'Your statement for September is ready.', type: 'info', read: false },
-  { id: 'n2', message: 'Upcoming bill payment for Credit Card due Oct 30.', type: 'warning', read: false },
-];
+// Utility function to generate a random transaction type
+const getRandomTransactionType = (): 'debit' | 'credit' => {
+  return Math.random() < 0.5 ? 'debit' : 'credit';
+};
 
+// Utility function to generate a random account type
+const getRandomAccountType = (): 'checking' | 'savings' | 'credit_card' | 'investment' => {
+  const types: ('checking' | 'savings' | 'credit_card' | 'investment')[] = ['checking', 'savings', 'credit_card', 'investment'];
+  return types[Math.floor(Math.random() * types.length)];
+};
+
+// Data Generation Functions
+const generateAccountId = (): string => {
+  const prefixes = ['chk', 'sav', 'cc', 'inv'];
+  const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+  const randomNumber = Math.floor(Math.random() * 1000);
+  return `${randomPrefix}-${randomNumber}`;
+};
+
+const generateAccountName = (): string => {
+  const names = ['Everyday', 'High Yield', 'Platinum', 'Brokerage'];
+  const randomName = names[Math.floor(Math.random() * names.length)];
+  return `My ${randomName} Account`;
+};
+
+const generateTransactionDescription = (): string => {
+  const descriptions = ['Grocery Store', 'Online Payment', 'ATM Withdrawal', 'Salary Deposit', 'Restaurant'];
+  const randomDescription = descriptions[Math.floor(Math.random() * descriptions.length)];
+  return randomDescription;
+};
+
+const generateNotificationMessage = (): string => {
+  const messages = ['Your statement is ready', 'Upcoming bill payment', 'Low balance alert', 'New transaction'];
+  const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+  return randomMessage;
+};
+
+const generateRandomAccount = (): Account => {
+  const accountType = getRandomAccountType();
+  return {
+    id: generateAccountId(),
+    name: generateAccountName(),
+    type: accountType,
+    balance: getRandomNumber(100, 100000),
+    currency: 'USD',
+  };
+};
+
+const generateRandomTransaction = (accountId: string): Transaction => {
+  return {
+    id: `t-${Math.floor(Math.random() * 1000)}`,
+    date: getRandomDate(new Date(2023, 0, 1), new Date()),
+    description: generateTransactionDescription(),
+    amount: getRandomNumber(-200, 500),
+    type: getRandomTransactionType(),
+    accountId: accountId,
+  };
+};
+
+const generateRandomNotification = (): Notification => {
+  const types: ('info' | 'warning' | 'error')[] = ['info', 'warning', 'error'];
+  const randomType = types[Math.floor(Math.random() * types.length)];
+  return {
+    id: `n-${Math.floor(Math.random() * 1000)}`,
+    message: generateNotificationMessage(),
+    type: randomType,
+    read: Math.random() < 0.5,
+  };
+};
+
+// Component
 const WellsFargoDashboardView: React.FC = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -59,13 +119,19 @@ const WellsFargoDashboardView: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        // In a real application, this would be an actual API call to your backend
-        // which then communicates with Wells Fargo's API or a financial aggregator.
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
-        setAccounts(mockAccounts);
-        setTransactions(mockTransactions);
-        setNotifications(mockNotifications);
+        // Generate random data
+        const generatedAccounts: Account[] = Array.from({ length: 4 }, () => generateRandomAccount());
+        const generatedTransactions: Transaction[] = generatedAccounts.flatMap(account =>
+          Array.from({ length: 5 }, () => generateRandomTransaction(account.id))
+        );
+        const generatedNotifications: Notification[] = Array.from({ length: 3 }, () => generateRandomNotification());
+
+        setAccounts(generatedAccounts);
+        setTransactions(generatedTransactions);
+        setNotifications(generatedNotifications);
       } catch (err) {
         console.error("Failed to fetch Wells Fargo data:", err);
         setError("Failed to load Wells Fargo data. Please try again later.");
@@ -86,7 +152,6 @@ const WellsFargoDashboardView: React.FC = () => {
 
   const handleQuickAction = (action: string) => {
     alert(`Performing action: ${action}`);
-    // In a real app, this would navigate to a specific page or open a modal for the action
   };
 
   if (loading) {
@@ -172,7 +237,7 @@ const WellsFargoDashboardView: React.FC = () => {
                 <td style={{ ...styles.tableCell, color: transaction.amount < 0 ? '#dc3545' : '#28a745' }}>
                   {formatCurrency(transaction.amount, 'USD')}
                 </td>
-                <td style={styles.tableCell}>{mockAccounts.find(acc => acc.id === transaction.accountId)?.name || 'N/A'}</td>
+                <td style={styles.tableCell}>{accounts.find(acc => acc.id === transaction.accountId)?.name || 'N/A'}</td>
               </tr>
             ))}
           </tbody>
@@ -183,8 +248,6 @@ const WellsFargoDashboardView: React.FC = () => {
 };
 
 // Basic inline styles for demonstration.
-// In a real project, these would be replaced by a design system (e.g., Tailwind CSS, Material UI, Chakra UI)
-// or CSS Modules for better maintainability and consistency across the application.
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
     fontFamily: "'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
