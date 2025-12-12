@@ -1,4 +1,3 @@
-```tsx
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -145,4 +144,3 @@ const UniversalDataInspector: React.FC<DataInspectorProps> = ({
 };
 
 export default UniversalDataInspector;
-```
