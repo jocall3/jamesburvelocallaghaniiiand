@@ -1,6 +1,3 @@
-
-
-
 // ISO 20022 External Code Sets
 // This file defines the types used for external codes in ISO 20022 messages.
 
