@@ -1,4 +1,3 @@
-```typescript
 import React from 'react';
 import { Box, Typography, Grid } from '@mui/material';
 
@@ -85,4 +84,3 @@ const BondDetailPanel: React.FC<BondDetailPanelProps> = ({
 };
 
 export default BondDetailPanel;
-```
