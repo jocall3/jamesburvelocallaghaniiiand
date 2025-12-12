@@ -12,7 +12,7 @@ const SsiEditorForm: React.FC<{
     onSubmit: (values: any) => void;
     onCancel: () => void;
 }> = ({ initialValues, onSubmit, onCancel }) => {
-    const [form] = Form.useForm(); // ✅ Correct
+    const [form] = Form.useForm();
 
     const [clearingSystemOptions, setClearingSystemOptions] = useState<
         { value: ExternalClearingSystemIdentification1Code; label: string }[]
@@ -23,6 +23,8 @@ const SsiEditorForm: React.FC<{
     >([]);
 
     useEffect(() => {
+        // In a real application, these would be fetched from a configuration or API.
+        // For this self-contained example, we'll use hardcoded values.
         const clearingSystemData = [
             { value: 'USABA', label: 'USABA' },
             { value: 'CHIPS', label: 'CHIPS' },
@@ -54,7 +56,7 @@ const SsiEditorForm: React.FC<{
                     <Form.Item
                         name="clearingSystem"
                         label="Clearing System"
-                        rules={[{ required: true, message: 'Please select!' }]}
+                        rules={[{ required: true, message: 'Please select a clearing system!' }]}
                     >
                         <Select placeholder="Select clearing system">
                             {clearingSystemOptions.map((option) => (
@@ -66,15 +68,15 @@ const SsiEditorForm: React.FC<{
                     </Form.Item>
                 </Col>
                 <Col span={12}>
-                    <Form.Item name="correspondentBank.bic" label="Correspondent Bank BIC">
+                    <Form.Item name={['correspondentBank', 'bic']} label="Correspondent Bank BIC">
                         <Input placeholder="Correspondent Bank BIC" />
                     </Form.Item>
                 </Col>
             </Row>
             <Row gutter={16}>
                 <Col span={12}>
-                    <Form.Item name="account.identificationType" label="Account ID Type">
-                        <Select placeholder="Select type">
+                    <Form.Item name={['account', 'identificationType']} label="Account ID Type">
+                        <Select placeholder="Select account ID type">
                             {accountIdentificationOptions.map((option) => (
                                 <Select.Option key={option.value} value={option.value}>
                                     {option.label}
@@ -84,7 +86,7 @@ const SsiEditorForm: React.FC<{
                     </Form.Item>
                 </Col>
                 <Col span={12}>
-                    <Form.Item name="account.number" label="Account Number">
+                    <Form.Item name={['account', 'number']} label="Account Number">
                         <Input placeholder="Account Number" />
                     </Form.Item>
                 </Col>
