@@ -1,4 +1,3 @@
-```terraform
 # Secret Manager
 
 # Create a Secret Manager secret to store the API key.
@@ -14,7 +13,7 @@ resource "google_secret_manager_secret" "api_key" {
 resource "google_secret_manager_secret_version" "api_key_version" {
   secret = google_secret_manager_secret.api_key.id
   # Replace with the actual API key value. DO NOT hardcode in the repository.
-  secret_data = "YOUR_API_KEY_HERE" 
+  secret_data = "YOUR_API_KEY_HERE"
 }
 
 # Example:  Allow a specific service account to access the secret.
@@ -30,4 +29,3 @@ output "secret_name" {
   value = google_secret_manager_secret.api_key.id
   description = "The name of the Secret Manager secret."
 }
-```
