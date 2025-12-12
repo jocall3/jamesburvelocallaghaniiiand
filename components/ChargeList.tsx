@@ -17,45 +17,44 @@ interface Charge {
   };
 }
 
-const sampleCharge: Charge = {
-  id: 'ch_1Mcd6UJITzLVzkSmp1XIBHoW',
-  object: 'charge',
-  amount: 10000,
-  currency: 'usd',
-  customer: 'cus_NMLsOPQRSsLoG',
-  description: 'My First Test Charge (created for API docs)',
-  created: 1678886400, // A fixed base timestamp
-  status: 'succeeded',
-  paid: true,
-  receipt_url: 'https://rwashburne-manage-mydev.dev.stripe.me/receipts/payment/...',
-  billing_details: {
-    name: 'Jenny Rosen',
-  },
-};
-
-const generateMockCharges = (count: number): Charge[] => {
+const generateCharges = (count: number): Charge[] => {
   const charges: Charge[] = [];
   const statuses: Charge['status'][] = ['succeeded', 'failed', 'pending'];
   const currencies = ['usd', 'eur', 'gbp'];
+  const firstNames = ['Jenny', 'Alex', 'Michael', 'Sarah', 'David', 'Laura', 'Chris', 'Emily'];
+  const lastNames = ['Rosen', 'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller'];
+  const descriptions = [
+    'Monthly Subscription Fee',
+    'One-time Purchase',
+    'Service Charge',
+    'Product Delivery',
+    'Consulting Services',
+    'Citibankdemobusinessinc Platform Access',
+  ];
+  const baseTimestamp = Math.floor(Date.now() / 1000);
 
   for (let i = 0; i < count; i++) {
     const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
     const randomCurrency = currencies[Math.floor(Math.random() * currencies.length)];
     const randomAmount = Math.floor(Math.random() * 50000) + 500; // 5.00 to 500.00
     const randomCustomer = `cus_${Math.random().toString(36).substring(2, 16)}`;
+    const randomFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const randomLastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const randomDescription = descriptions[Math.floor(Math.random() * descriptions.length)];
 
     charges.push({
-      ...sampleCharge,
       id: `ch_${Math.random().toString(36).substring(2, 26)}`,
+      object: 'charge',
       amount: randomAmount,
       currency: randomCurrency,
+      customer: Math.random() > 0.2 ? randomCustomer : null,
+      description: `${randomDescription} #${Math.floor(Math.random() * 10000)}`,
+      created: baseTimestamp - i * 3600 * Math.floor(Math.random() * 24 + 1), // one charge per random day interval
       status: randomStatus,
       paid: randomStatus === 'succeeded',
-      customer: Math.random() > 0.2 ? randomCustomer : null,
-      description: `Charge for order #${Math.floor(Math.random() * 10000)}`,
-      created: sampleCharge.created - i * 3600 * Math.floor(Math.random() * 24 + 1), // one charge per random day interval
+      receipt_url: `https://citibankdemobusinessinc.com/receipts/payment/${Math.random().toString(36).substring(2, 20)}`,
       billing_details: {
-        name: `Customer ${i + 1}`,
+        name: `${randomFirstName} ${randomLastName}`,
       },
     });
   }
@@ -84,7 +83,7 @@ const ChargeList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const allCharges = useMemo(() => generateMockCharges(150), []);
+  const allCharges = useMemo(() => generateCharges(150), []);
 
   const filteredCharges = useMemo(() => {
     return allCharges.filter(charge => {
@@ -128,7 +127,7 @@ const ChargeList: React.FC = () => {
   return (
     <div className="p-4 sm:p-6 lg:p-8 font-sans bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-4">Charges</h1>
+        <h1 className="text-2xl font-semibold text-gray-900 mb-4">Citibankdemobusinessinc Charges</h1>
 
         <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
