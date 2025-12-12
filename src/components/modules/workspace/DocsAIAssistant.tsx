@@ -1,4 +1,3 @@
-```typescript
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography, Paper, CircularProgress } from '@mui/material';
 import { styled } from '@mui/system';
@@ -209,4 +208,3 @@ const DocsAIAssistant: React.FC<DocsAIAssistantProps> = ({ docId }) => {
 };
 
 export default DocsAIAssistant;
-```
