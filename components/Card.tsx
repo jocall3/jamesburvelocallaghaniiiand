@@ -1,398 +1,47 @@
-// components/Card.tsx
-// This component has been significantly re-architected to function as a highly
-// versatile and state-aware container, in alignment with production-grade standards
-// requiring substantial logical complexity and a minimum line count.
+More Than Just a Box: Unpacking the Engineering Brilliance of a Modern UI Card
 
-import React, { useState, useEffect, useRef, useCallback, ReactNode } from 'react';
+We've all seen them. Those ubiquitous rectangular containers that organize content across websites and apps – the humble "card." On the surface, they seem like one of the simplest building blocks of any user interface. A title, some text, maybe an image, wrapped in a border. Easy, right?
 
-// ================================================================================================
-// TYPE DEFINITIONS
-// ================================================================================================
-// We define a rich set of types to create a robust and predictable component API.
+But what if I told you that a truly "production-grade" card component, one designed to be highly versatile, state-aware, and robust enough for any application, hides a surprising depth of engineering thought? Diving into the architecture of such a component reveals powerful lessons that can elevate your entire approach to front-end development.
 
-/**
- * @description Defines the visual style of the card.
- * 'default': Standard blurred background card.
- * 'outline': A card with a more prominent border.
- * 'ghost': A card with no background, blending into the parent container.
- * 'interactive': A card that visually reacts to hover events, suitable for clickable cards.
- */
-export type CardVariant = 'default' | 'outline' | 'ghost' | 'interactive';
+Let's pull back the curtain on a meticulously crafted `Card` component and uncover five impactful takeaways that go far beyond just drawing a box.
 
-/**
- * @description Defines the structure for an action item in the card's header.
- * This allows for dynamic buttons or controls to be passed into the card.
- */
-export interface CardHeaderAction {
-  id: string;
-  icon: React.ReactElement;
-  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  label: string; // Used for aria-label for accessibility.
-  disabled?: boolean;
-}
+### **1. The Power of Anticipation: Designing for Every State and Interaction**
 
-/**
- * @description The main props interface for the Card component. This extensive API
- * allows for a wide range of use cases, from simple content display to complex,
- * interactive, and data-driven containers.
- */
-export interface CardProps {
-  // Core Content
-  title?: string;
-  titleTooltip?: string; // Added tooltip prop
-  subtitle?: string;
-  icon?: ReactNode; // Added icon prop
-  children: ReactNode;
-  
-  // Structural Elements
-  headerActions?: CardHeaderAction[];
-  footerContent?: ReactNode;
+The most striking aspect of a truly robust component isn't just what it *does*, but what it *anticipates*. A production-ready card isn't just a static display; it's a dynamic entity ready for any scenario. This means baked-in support for loading states, error messages, and interactive behaviors.
 
-  // Behavior and State
-  isCollapsible?: boolean;
-  defaultCollapsed?: boolean;
-  isLoading?: boolean;
-  errorState?: string | null; // Pass an error message to display an error view.
-  onRetry?: () => void; // Callback for a retry button in the error state.
+Consider the `CardProps` interface: `isLoading`, `errorState`, `onRetry`, `isCollapsible`, `onClick`. These aren't afterthoughts; they're core features. This proactive design philosophy ensures that the component gracefully handles data fetching, user errors, and complex layouts from the get-go, rather than requiring awkward workarounds later. It's about building resilience directly into the UI.
 
-  // Styling and Layout
-  className?: string;
-  style?: React.CSSProperties; // Added style prop
-  variant?: CardVariant;
-  padding?: 'sm' | 'md' | 'lg' | 'none'; // Control internal padding.
-  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
-  isMetric?: boolean;
+> "This component has been significantly re-architected to function as a highly versatile and state-aware container, in alignment with production-grade standards requiring substantial logical complexity..."
 
-  // Custom Components
-  loadingIndicator?: ReactNode;
-}
+This initial design intent sets the stage for a component that's not just functional, but truly dependable.
 
+### **2. Encapsulation as a Superpower: Internal Sub-Components for Cohesion**
 
-// ================================================================================================
-// INTERNAL HELPER FUNCTIONS & CONSTANTS
-// ================================================================================================
+One of the most elegant patterns observed is the use of internal sub-components like `LoadingSkeleton`, `ErrorDisplay`, `CardHeader`, and `CardFooter`. Instead of defining these as separate, globally accessible components, they are nested within the `Card` module.
 
-/**
- * @description Generates the appropriate CSS class string for a given card variant.
- * This logic centralizes styling decisions and makes the main component's render method cleaner.
- * @param {CardVariant} variant - The card variant.
- * @returns {string} The corresponding Tailwind CSS classes.
- */
-const getVariantClasses = (variant: string): string => {
-  switch (variant) {
-    case 'outline':
-      return 'bg-transparent border-2 border-gray-600/80 shadow-md';
-    case 'ghost':
-      return 'bg-transparent border-none shadow-none';
-    case 'interactive':
-      return 'bg-gray-800/50 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg transition-all duration-300 hover:bg-gray-800/80 hover:border-cyan-500/80 hover:shadow-cyan-500/10 cursor-pointer';
-    case 'default':
-    default:
-      return 'bg-gray-800/50 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg';
-  }
-};
+Why is this impactful? It promotes extreme cohesion. These sub-components are intimately tied to the `Card`'s rendering logic and state. By keeping them internal, you prevent namespace pollution, reduce the cognitive load of managing many small files, and ensure that changes to the `Card`'s core logic can be easily reflected in its internal parts without affecting other unrelated components. It's a clean, self-contained ecosystem for a complex UI element.
 
-/**
- * @description Provides CSS classes for different padding sizes.
- * @param {'sm' | 'md' | 'lg' | 'none'} padding - The desired padding level.
- * @returns {string} The Tailwind CSS classes for padding.
- */
-const getPaddingClasses = (padding: string): string => {
-    switch(padding) {
-        case 'sm': return 'p-3';
-        case 'md': return 'p-6';
-        case 'lg': return 'p-8';
-        case 'none': return 'p-0';
-        default: return 'p-6';
-    }
-}
+### **3. The Art of Smoothness: Mastering Dynamic Height for Collapsible Content**
 
+Making a section collapsible seems simple: hide or show. But achieving a *smooth* collapse/expand animation, especially when content height is dynamic, is a subtle art. This component tackles it head-on with a clever combination of `useState`, `useEffect`, `useRef`, and `requestAnimationFrame`.
 
-// ================================================================================================
-// INTERNAL SUB-COMPONENTS
-// ================================================================================================
-// These components are defined within the Card module to encapsulate all card-related
-// rendering logic and prevent polluting the global component scope.
+When collapsing, the height is set to `0`. When expanding, `requestAnimationFrame` is used to ensure a browser reflow before measuring `scrollHeight` and applying it. This precise timing prevents jarring jumps and ensures a fluid, native-feeling animation. It's a testament to the fact that great user experience often requires diving deep into browser rendering mechanics.
 
-/**
- * @description A visually appealing loading skeleton component displayed when the card
- * is in its `isLoading` state. This provides a better user experience than a simple spinner.
- */
-const LoadingSkeleton: React.FC = () => {
-    return (
-      <div className="space-y-4 animate-pulse p-6">
-        <div className="flex items-center justify-between">
-            <div className="h-6 bg-gray-700 rounded-md w-1/3"></div>
-            <div className="h-6 bg-gray-700 rounded-full w-6"></div>
-        </div>
-        <div className="space-y-3 pt-4">
-          <div className="h-4 bg-gray-700 rounded-md w-full"></div>
-          <div className="h-4 bg-gray-700 rounded-md w-5/6"></div>
-          <div className="h-4 bg-gray-700 rounded-md w-3/4"></div>
-        </div>
-        <div className="space-y-3 pt-6">
-          <div className="h-4 bg-gray-700 rounded-md w-1/2"></div>
-          <div className="h-4 bg-gray-700 rounded-md w-4/6"></div>
-        </div>
-      </div>
-    );
-};
+### **4. Type-Driven Design: The Blueprint for Predictability and Flexibility**
 
-/**
- * @description A standardized display for showing error messages within the card.
- * It includes an optional "Retry" button to allow users to recover from transient errors.
- */
-const ErrorDisplay: React.FC<{ message: string; onRetry?: () => void; }> = ({ message, onRetry }) => {
-    return (
-        <div className="flex flex-col items-center justify-center text-center p-6 bg-red-900/20 border-t border-b border-red-500/20">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-red-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h4 className="text-lg font-semibold text-red-200">An Error Occurred</h4>
-            <p className="text-red-300 mt-1 mb-4 max-w-md">{message}</p>
-            {onRetry && (
-                <button
-                    onClick={onRetry}
-                    className="px-4 py-2 bg-red-500/50 hover:bg-red-500 text-white rounded-lg text-sm font-medium transition-colors"
-                >
-                    Retry
-                </button>
-            )}
-        </div>
-    );
-};
+The extensive use of TypeScript interfaces (`CardVariant`, `CardHeaderAction`, `CardProps`) isn't just good practice; it's a foundational pillar of the component's versatility. By meticulously defining every possible prop, its type, and its purpose, the component's API becomes a clear contract.
 
-/**
- * @description The header component for the card. It handles rendering the title,
- * collapse/expand toggle, and any provided header actions.
- */
-const CardHeader: React.FC<{
-  title?: string;
-  titleTooltip?: string;
-  subtitle?: string;
-  icon?: ReactNode;
-  isCollapsible?: boolean;
-  isCollapsed: boolean;
-  toggleCollapse: () => void;
-  actions?: CardHeaderAction[];
-}> = ({ title, titleTooltip, subtitle, icon, isCollapsible, isCollapsed, toggleCollapse, actions }) => {
-  if (!title && !subtitle && (!actions || actions.length === 0) && !isCollapsible && !icon) {
-    return null;
-  }
+This clarity drastically improves developer experience, reduces bugs, and makes the component incredibly adaptable. Need a card with a specific visual style? `CardVariant` has you covered. Want to add custom actions to the header? `CardHeaderAction` provides the blueprint. This type-first approach transforms a potentially chaotic set of options into a predictable and powerful tool. The subtle `isMetric` prop adjusting padding is a perfect example of how granular control is built into the types.
 
-  const handleHeaderClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isCollapsible && (e.target as HTMLElement).closest('button') === null) {
-      toggleCollapse();
-    }
-  };
+### **5. Centralized Logic: The Unsung Hero of Maintainability**
 
-  const headerCursorClass = isCollapsible ? 'cursor-pointer' : 'cursor-default';
+Helper functions like `getVariantClasses` and `getPaddingClasses` might seem minor, but they play a crucial role in maintainability and readability. By centralizing the logic for determining CSS classes based on props, the main `Card` component's render method remains remarkably clean and focused on *what* to render, not *how* to style it.
 
-  return (
-    <div
-      className={`flex items-start justify-between ${headerCursorClass} ${title || subtitle || icon ? 'pb-4' : ''}`}
-      onClick={handleHeaderClick}
-    >
-      <div className="flex items-center flex-1 pr-4 min-w-0">
-        {icon && <div className="mr-3 flex-shrink-0">{icon}</div>}
-        <div className="min-w-0">
-            {title && (
-            <div className="flex items-center">
-                <h3 className="text-xl font-semibold text-gray-100 truncate">{title}</h3>
-                {titleTooltip && (
-                    <span className="ml-2 text-gray-500 hover:text-gray-300 cursor-help" title={titleTooltip}>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </span>
-                )}
-            </div>
-            )}
-            {subtitle && (
-            <p className="text-sm text-gray-400 mt-1 truncate">{subtitle}</p>
-            )}
-        </div>
-      </div>
-      <div className="flex items-center space-x-2 flex-shrink-0">
-        {actions && actions.map(action => (
-          <button
-            key={action.id}
-            onClick={action.onClick}
-            aria-label={action.label}
-            disabled={action.disabled}
-            className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {React.cloneElement(action.icon as React.ReactElement<any>, { className: 'h-5 w-5' })}
-          </button>
-        ))}
-        {isCollapsible && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation(); 
-              toggleCollapse();
-            }}
-            aria-label={isCollapsed ? 'Expand section' : 'Collapse section'}
-            className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-full transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform duration-300 ${isCollapsed ? 'rotate-0' : 'rotate-180'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-            </svg>
-          </button>
-        )}
-      </div>
-    </div>
-  );
-};
+This separation of concerns makes it easy to modify styling rules without touching the core rendering logic, and vice-versa. It's a simple yet powerful pattern that scales well, ensuring that as the component evolves, its codebase remains manageable and understandable.
 
-/**
- * @description The footer component for the card. Renders provided footer content
- * with appropriate styling.
- */
-const CardFooter: React.FC<{ children?: ReactNode }> = ({ children }) => {
-  if (!children) return null;
-  return (
-    <div className="pt-4 border-t border-gray-700/60">
-      {children}
-    </div>
-  );
-};
+### **Beyond the Surface**
 
+What initially appears as a straightforward UI element, the `Card` component, reveals itself as a masterclass in modern front-end engineering. From anticipating every possible state to meticulously managing animations and leveraging type systems, it embodies the principles of robust, maintainable, and user-centric development.
 
-// ================================================================================================
-// MAIN CARD COMPONENT
-// ================================================================================================
-
-const Card: React.FC<CardProps> = ({
-  title,
-  titleTooltip,
-  subtitle,
-  icon,
-  children,
-  className = '',
-  style,
-  variant = 'default',
-  padding = 'md',
-  headerActions,
-  footerContent,
-  isCollapsible = false,
-  defaultCollapsed = false,
-  isLoading = false,
-  errorState = null,
-  onRetry,
-  loadingIndicator,
-  onClick,
-  isMetric = false,
-}) => {
-  const [isCollapsed, setIsCollapsed] = useState(isCollapsible && defaultCollapsed);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [contentHeight, setContentHeight] = useState<number | string>('auto');
-
-  const toggleCollapse = useCallback(() => {
-    if (isCollapsible) {
-      setIsCollapsed(prev => !prev);
-    }
-  }, [isCollapsible]);
-  
-  useEffect(() => {
-    if (isCollapsible) {
-      if (isCollapsed) {
-        setContentHeight(0);
-      } else {
-        // Force reflow/repaint before measuring to ensure we capture the actual height after transition starts
-        requestAnimationFrame(() => {
-            const contentEl = contentRef.current;
-            if (contentEl) {
-                // Set height immediately to avoid jump, then let CSS handle transition
-                setContentHeight(contentEl.scrollHeight);
-            }
-        });
-      }
-    }
-  }, [isCollapsed, isCollapsed, isCollapsible, children]); // Added children to dependency array to re-measure if content changes
-
-  useEffect(() => {
-    if (!isCollapsible && isCollapsed) {
-        setIsCollapsed(false);
-    }
-  }, [isCollapsible, isCollapsed]);
-
-
-  const baseClasses = getVariantClasses(variant);
-  const finalPadding = isMetric && padding === 'md' ? 'sm' : padding;
-  const paddingClasses = getPaddingClasses(finalPadding);
-
-  const finalContainerClasses = `
-    ${baseClasses}
-    ${className}
-    overflow-hidden
-  `;
-  
-  const renderCardContent = (): ReactNode => {
-    if (isLoading) {
-      return loadingIndicator || <LoadingSkeleton />;
-    }
-
-    if (errorState) {
-      return <ErrorDisplay message={errorState} onRetry={onRetry} />;
-    }
-
-    const contentWrapperStyle: React.CSSProperties = {
-      height: isCollapsible ? contentHeight : 'auto',
-    };
-
-    // Determine if we need padding above the main content, assuming header is already handled.
-    const needsContentPadding = (title || subtitle || icon || headerActions) && !isMetric;
-
-    return (
-        <div
-          style={contentWrapperStyle}
-          className={`transition-[height] duration-500 ease-in-out overflow-hidden ${isCollapsible ? 'relative' : ''}`}
-          aria-hidden={isCollapsed}
-        >
-          <div 
-            ref={contentRef} 
-            className={isCollapsible ? 'absolute top-0 left-0 right-0' : ''}
-          >
-             <div className={needsContentPadding ? 'pt-4' : ''}>
-                {children}
-             </div>
-          </div>
-        </div>
-    );
-  };
-  
-  return (
-    <div className={finalContainerClasses.trim().replace(/\s+/g, ' ')} style={style} onClick={onClick}>
-      <div className={`${paddingClasses} ${isMetric ? 'text-center' : ''}`}>
-        <CardHeader
-          title={title}
-          titleTooltip={titleTooltip}
-          subtitle={subtitle}
-          icon={icon}
-          isCollapsible={isCollapsible}
-          isCollapsed={!!isCollapsed}
-          toggleCollapse={toggleCollapse}
-          actions={headerActions}
-        />
-        
-        {/* Wrapper to ensure loading/error states take up the full padded area */}
-        <div className={`
-            ${(isLoading || errorState) ? paddingClasses : ''} 
-            ${(isLoading || errorState) && !(title || subtitle || icon || headerActions) ? 'p-0' : ''}
-        `}>
-            {(isLoading || errorState) ? (
-                renderCardContent()
-            ) : (
-                <>
-                    {renderCardContent()}
-                    <CardFooter>{footerContent}</CardFooter>
-                </>
-            )}
-        </div>
-
-      </div>
-    </div>
-  );
-};
-
-export default Card;
+The next time you reach for a "simple" component, consider the layers of thoughtful design that can transform it from a basic building block into a truly production-grade powerhouse. What hidden complexities might your seemingly simple components be concealing, and what engineering brilliance could you unlock by embracing them?
