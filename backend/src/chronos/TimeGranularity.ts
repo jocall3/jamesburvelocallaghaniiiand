@@ -1,7 +1,7 @@
 import { Interval, DateTime, Duration, DurationUnit } from 'luxon';
 
 /**
- * Represents the hierarchical structure of time granularities, 
+ * Represents the hierarchical structure of time granularities,
  * defining constants for calculation and display.
  */
 export const TimeGranularity = {
