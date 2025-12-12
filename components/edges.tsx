@@ -1,4 +1,3 @@
-
 import { MarkerType } from 'reactflow';
 
 const defaultEdgeOptions = {
