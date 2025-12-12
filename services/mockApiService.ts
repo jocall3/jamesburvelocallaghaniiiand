@@ -316,7 +316,7 @@ class MockApiService {
           {
             id: 'meta-post-1',
             author: { id: 'user-a', name: 'Alice Wonderland', profilePictureUrl: 'https://i.pravatar.cc/50?img=1' },
-            content: 'Had a wonderful time exploring the new hiking trail today! 🌳 #nature #hiking',
+            content: 'Had a wonderful time exploring the new hiking trail today! ð³ #nature #hiking',
             timestamp: '2023-10-26T11:00:00Z',
             likes: 120,
             comments: 15,
@@ -332,7 +332,7 @@ class MockApiService {
           {
             id: 'meta-post-3',
             author: { id: 'user-c', name: 'Charlie Chaplin', profilePictureUrl: 'https://i.pravatar.cc/50?img=3' },
-            content: 'Enjoying a quiet evening with a good book and a cup of tea. ☕📖 #relax #reading',
+            content: 'Enjoying a quiet evening with a good book and a cup of tea. âð #relax #reading',
             timestamp: '2023-10-25T20:00:00Z',
             likes: 200,
             comments: 25,
@@ -340,7 +340,7 @@ class MockApiService {
           {
             id: 'meta-post-4',
             author: { id: 'user-a', name: 'Alice Wonderland', profilePictureUrl: 'https://i.pravatar.cc/50?img=1' },
-            content: 'Throwback to last summer\'s beach vacation! Can\'t wait for the next one. ☀️🏖️',
+            content: 'Throwback to last summer\'s beach vacation! Can\'t wait for the next one. âï¸ðï¸',
             timestamp: '2023-10-24T09:00:00Z',
             likes: 90,
             comments: 10,
@@ -348,7 +348,7 @@ class MockApiService {
           {
             id: 'meta-post-5',
             author: { id: 'user-d', name: 'Diana Prince', profilePictureUrl: 'https://i.pravatar.cc/50?img=4' },
-            content: 'New recipe alert! Tried making homemade pasta today and it was delicious. 🍝 #cooking #foodie',
+            content: 'New recipe alert! Tried making homemade pasta today and it was delicious. ð #cooking #foodie',
             timestamp: '2023-10-23T18:45:00Z',
             likes: 150,
             comments: 20,
