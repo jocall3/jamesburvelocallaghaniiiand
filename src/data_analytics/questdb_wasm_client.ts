@@ -1,4 +1,3 @@
-```typescript
 // src/data_analytics/questdb_wasm_client.ts
 
 // Placeholder for QuestDB WASM client integration
@@ -156,4 +155,3 @@ class QuestDBClient {
 }
 
 export default QuestDBClient;
-```
