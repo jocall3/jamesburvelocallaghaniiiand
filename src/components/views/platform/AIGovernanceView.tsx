@@ -1,4 +1,3 @@
-```tsx
 import React, { useState } from 'react';
 
 // ================================================================================================
@@ -280,7 +279,7 @@ const AIGovernanceView: React.FC = () => {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-300 leading-tight">{anomaly.description}</p>
-                                <p className="text-xs text-gray-500 mt-1">{anomaly.agentName} • {anomaly.timestamp}</p>
+                                <p className="text-xs text-gray-500 mt-1">{anomaly.agentName} â¢ {anomaly.timestamp}</p>
                             </div>
                         </div>
                     ))}
@@ -295,4 +294,3 @@ const AIGovernanceView: React.FC = () => {
 };
 
 export default AIGovernanceView;
-```
