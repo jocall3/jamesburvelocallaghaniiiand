@@ -1,4 +1,3 @@
-```tsx
 // src/components/simulation/AgentBehaviorConfig.tsx
 import React, { useState, useCallback } from 'react';
 
@@ -80,4 +79,3 @@ const AgentBehaviorConfig: React.FC<AgentBehaviorConfigProps> = ({
 };
 
 export default AgentBehaviorConfig;
-```
