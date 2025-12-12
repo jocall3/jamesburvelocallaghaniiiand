@@ -1,4 +1,3 @@
-```typescript
 import axios, { AxiosResponse } from 'axios';
 
 const BASE_URL = '/api/compliance'; // Assuming a base URL for the API
@@ -67,4 +66,3 @@ export const deleteCompliancePolicy = async (policyId: string): Promise<void> =>
     throw error;
   }
 }
-```
