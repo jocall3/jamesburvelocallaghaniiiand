@@ -1,4 +1,3 @@
-```tsx
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Typography, CircularProgress, Button } from '@mui/material';
 import axios from 'axios';
@@ -78,4 +77,3 @@ const GmailSmartSummary: React.FC<{ emailBody: string }> = ({ emailBody }) => {
 };
 
 export default GmailSmartSummary;
-```
