@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export const Amount: React.FC<{ amount: number; currency: string; className?: string }> = ({ amount, currency, className }) => (
