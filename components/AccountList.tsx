@@ -138,7 +138,7 @@ const AccountList: React.FC<AccountListProps> = ({ accounts, isLoading, error, o
                   </div>
                   <div className="mt-2 flex items-center text-sm text-gray-500">
                     <p className="capitalize">{account.type.replace(/([A-Z])/g, ' $1')}</p>
-                    <span className="mx-2" aria-hidden="true">·</span>
+                    <span className="mx-2" aria-hidden="true">Â·</span>
                     <p>ending in {account.accountNumberDisplay.slice(-4)}</p>
                   </div>
                 </div>
