@@ -21,7 +21,7 @@ function parseNumericValueWithUnit(input: any): { value?: number; unit?: string 
     // Regex to capture a number (integer or float) and an optional string unit following it.
     // Example: "10.5 m" -> value: 10.5, unit: "m"
     // Example: "200" -> value: 200, unit: undefined
-    const match = trimmed.match(/^(\d+(\.\d+)?)\s*([a-zA-Z%²³°\/]+)?$/); // Added common unit chars
+    const match = trimmed.match(/^(\d+(\.\d+)?)\s*([a-zA-Z%Â²Â³Â°\/]+)?$/); // Added common unit chars
 
     if (match) {
         const value = parseFloat(match[1]);
@@ -40,6 +40,14 @@ function parseNumericValueWithUnit(input: any): { value?: number; unit?: string 
 
 /**
  * Interface representing the raw input data, typically parsed from XML features.
+ * Keys are expected to be the 'Name' attribute of the XML Feature elements.
+ */
+interface RawFeatureData {
+    [featureName: string]: any; // Values can be strings, numbers, etc.
+}
+
+/**
+ * Interface for the raw input data, typically parsed from XML features.
  * Keys are expected to be the 'Name' attribute of the XML Feature elements.
  */
 interface RawFeatureData {
@@ -66,9 +74,9 @@ interface PhysicalMaterial {
     weight?: number;
     weightUnit?: string;    // Unit for weight (e.g., "kg", "lbs")
     volume?: number;
-    volumeUnit?: string;    // Unit for volume (e.g., "m³", "liters")
+    volumeUnit?: string;    // Unit for volume (e.g., "mÂ³", "liters")
     density?: number;
-    densityUnit?: string;   // Unit for density (e.g., "kg/m³")
+    densityUnit?: string;   // Unit for density (e.g., "kg/mÂ³")
     dimensions?: PhysicalDimensions;
 }
 
