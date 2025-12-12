@@ -1,47 +1,30 @@
 import React from 'react';
 
 /**
- * Interface representing a Wells Fargo account.
- * This structure should align with the data received from the Wells Fargo integration API.
+ * Interface representing a Citibankdemobusinessinc account.
  */
-export interface WellsFargoAccount {
-  id: string; // Unique identifier for the account
-  name: string; // User-friendly name of the account (e.g., "My Checking Account")
-  type: 'Checking' | 'Savings' | 'Credit Card' | 'Loan' | 'Investment' | string; // Type of account
-  balance: number; // Current balance of the account
-  currency: string; // Currency code (e.g., "USD")
-  accountNumberMasked?: string; // Masked account number (e.g., "****1234")
-  availableBalance?: number; // Optional: Available balance, if different from current balance
-  // Add any other relevant fields from the Wells Fargo API response
+export interface CitibankdemobusinessincAccount {
+  id: string;
+  name: string;
+  type: 'Checking' | 'Savings' | 'Credit Card' | 'Loan' | 'Investment' | string;
+  balance: number;
+  currency: string;
+  accountNumberMasked?: string;
+  availableBalance?: number;
 }
 
 /**
  * Props for the AccountList component.
  */
 interface AccountListProps {
-  /**
-   * An array of Wells Fargo accounts to display.
-   */
-  accounts: WellsFargoAccount[];
-  /**
-   * Optional callback function to be called when an account is clicked.
-   * Provides the selected account as an argument.
-   */
-  onAccountSelect?: (account: WellsFargoAccount) => void;
-  /**
-   * Optional boolean to indicate if the accounts are currently being loaded.
-   * Displays a loading message if true.
-   */
+  accounts: CitibankdemobusinessincAccount[];
+  onAccountSelect?: (account: CitibankdemobusinessincAccount) => void;
   isLoading?: boolean;
-  /**
-   * Optional string to display an error message if account loading fails.
-   */
   error?: string | null;
 }
 
 /**
- * Component displaying a list of Wells Fargo accounts.
- * It handles loading, error, and empty states, and allows for account selection.
+ * Component displaying a list of Citibankdemobusinessinc accounts.
  */
 const AccountList: React.FC<AccountListProps> = ({ accounts, onAccountSelect, isLoading, error }) => {
   if (isLoading) {
@@ -51,7 +34,7 @@ const AccountList: React.FC<AccountListProps> = ({ accounts, onAccountSelect, is
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        Loading Wells Fargo accounts...
+        Loading Citibankdemobusinessinc accounts...
       </div>
     );
   }
@@ -59,7 +42,7 @@ const AccountList: React.FC<AccountListProps> = ({ accounts, onAccountSelect, is
   if (error) {
     return (
       <div className="p-6 text-center text-red-700 bg-red-50 border border-red-200 rounded-lg shadow-md">
-        <p className="font-semibold mb-2">Error loading Wells Fargo accounts:</p>
+        <p className="font-semibold mb-2">Error loading Citibankdemobusinessinc accounts:</p>
         <p>{error}</p>
         <p className="text-sm text-red-500 mt-2">Please try again later or contact support.</p>
       </div>
@@ -69,7 +52,7 @@ const AccountList: React.FC<AccountListProps> = ({ accounts, onAccountSelect, is
   if (!accounts || accounts.length === 0) {
     return (
       <div className="p-6 text-center text-gray-500 bg-white rounded-lg shadow-md">
-        <p className="text-lg font-medium mb-2">No Wells Fargo accounts found.</p>
+        <p className="text-lg font-medium mb-2">No Citibankdemobusinessinc accounts found.</p>
         <p className="text-sm">It looks like there are no accounts linked or available at this time.</p>
       </div>
     );
@@ -77,7 +60,7 @@ const AccountList: React.FC<AccountListProps> = ({ accounts, onAccountSelect, is
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <h2 className="text-2xl font-bold p-5 border-b border-gray-200 text-gray-800">Your Wells Fargo Accounts</h2>
+      <h2 className="text-2xl font-bold p-5 border-b border-gray-200 text-gray-800">Your Citibankdemobusinessinc Accounts</h2>
       <ul className="divide-y divide-gray-100">
         {accounts.map((account) => (
           <li
