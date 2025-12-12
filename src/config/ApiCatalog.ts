@@ -331,3 +331,89 @@ export const getApiDefinition = (id: string): ApiDefinition | undefined => {
 export const getApisByCategory = (category: string): ApiDefinition[] => {
   return ApiCatalog.filter(api => api.category === category);
 };
+
+// ---------------------------------------------------------------------------
+// Citibankdemobusinessinc Business Models (Open Banking Focus)
+// ---------------------------------------------------------------------------
+
+// Namespace: Citibankdemobusinessinc
+
+// 1. Citibankdemobusinessinc.aggregation.smartSpend
+// Mission: To provide users with an intelligent spending analysis and optimization platform by aggregating financial data from multiple sources.
+// Monetization: Premium subscription for advanced analytics and personalized recommendations.
+// IP Moat: Proprietary AI algorithms for spend categorization and prediction.
+// Self-Hosted App: Standalone Node.js application with a built-in database and UI.
+
+// 2. Citibankdemobusinessinc.payments.instantTransfer
+// Mission: To enable instant, secure, and low-cost money transfers between users and businesses.
+// Monetization: Transaction fees on transfers.
+// IP Moat: Patented security protocols for real-time fraud detection.
+// Self-Hosted App: Go-based microservice with a gRPC interface.
+
+// 3. Citibankdemobusinessinc.credit.dynamicLoans
+// Mission: To offer personalized loan products with dynamically adjusted interest rates based on real-time risk assessment.
+// Monetization: Interest on loans.
+// IP Moat: Machine learning models for credit risk scoring.
+// Self-Hosted App: Python-based application with a TensorFlow model server.
+
+// 4. Citibankdemobusinessinc.investments.roboAdvisor
+// Mission: To provide automated investment advice and portfolio management based on individual financial goals.
+// Monetization: Management fees on assets under management.
+// IP Moat: Algorithmic trading strategies and portfolio optimization techniques.
+// Self-Hosted App: Java-based application with a Spring Boot backend.
+
+// 5. Citibankdemobusinessinc.insurance.personalizedPolicies
+// Mission: To offer customized insurance policies with premiums adjusted based on real-time risk factors.
+// Monetization: Insurance premiums.
+// IP Moat: Predictive analytics for risk assessment and fraud prevention.
+// Self-Hosted App: Scala-based application with an Akka actor system.
+
+// 6. Citibankdemobusinessinc.compliance.autoReporting
+// Mission: To automate regulatory reporting for financial institutions, ensuring compliance with minimal manual effort.
+// Monetization: Subscription fees for compliance automation services.
+// IP Moat: Proprietary rule engine for regulatory compliance.
+// Self-Hosted App: Rust-based application with a focus on security and performance.
+
+// 7. Citibankdemobusinessinc.security.biometricAuth
+// Mission: To provide secure biometric authentication solutions for financial transactions.
+// Monetization: Licensing fees for biometric authentication technology.
+// IP Moat: Patented biometric recognition algorithms.
+// Self-Hosted App: C++-based application with hardware-level security features.
+
+// 8. Citibankdemobusinessinc.data.openApiPlatform
+// Mission: To create an open API platform that allows third-party developers to build innovative financial applications.
+// Monetization: API usage fees and premium developer support.
+// IP Moat: Comprehensive API documentation and developer tools.
+// Self-Hosted App: Kotlin-based application with a GraphQL API.
+
+// 9. Citibankdemobusinessinc.education.financialLiteracy
+// Mission: To provide financial literacy education to users, empowering them to make informed financial decisions.
+// Monetization: Premium educational content and personalized coaching.
+// IP Moat: Engaging and interactive learning modules.
+// Self-Hosted App: Dart-based application with a Flutter frontend.
+
+// 10. Citibankdemobusinessinc.community.localCurrency
+// Mission: To create a local currency system that supports local businesses and promotes community engagement.
+// Monetization: Transaction fees within the local currency ecosystem.
+// IP Moat: Blockchain-based platform for secure and transparent transactions.
+// Self-Hosted App: Elixir-based application with a Phoenix web framework.
+
+// ---------------------------------------------------------------------------
+// Master Orchestration Layer (Conceptual)
+// ---------------------------------------------------------------------------
+
+// This section outlines the conceptual orchestration layer that would bind all 10 business models.
+// In a real implementation, this would involve inter-process communication, message queues,
+// and a unified configuration and identity layer.
+
+// Example Orchestration Logic:
+// 1. User logs in via the shared identity layer.
+// 2. SmartSpend aggregates financial data from various sources.
+// 3. DynamicLoans offers personalized loan products based on the aggregated data.
+// 4. RoboAdvisor provides investment advice based on the user's financial goals.
+// 5. PersonalizedPolicies offers customized insurance policies.
+// 6. AutoReporting ensures compliance with regulatory requirements.
+// 7. BiometricAuth secures financial transactions.
+// 8. OpenApiPlatform allows third-party developers to build innovative applications.
+// 9. FinancialLiteracy provides education to users.
+// 10. LocalCurrency supports local businesses and promotes community engagement.
