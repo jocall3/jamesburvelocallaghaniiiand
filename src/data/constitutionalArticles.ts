@@ -1,4 +1,3 @@
-```typescript
 // src/data/constitutionalArticles.ts
 
 export interface ConstitutionalArticle {
@@ -247,4 +246,3 @@ The horizon is limitless. The tools are in your hands. The workshop is yours.
 Now, build.`
     }
 ];
-```
