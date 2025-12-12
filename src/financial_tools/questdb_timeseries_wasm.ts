@@ -1,4 +1,3 @@
-```typescript
 // src/financial_tools/questdb_timeseries_wasm.ts
 // This file will contain the necessary code to interact with a QuestDB instance
 // compiled to WebAssembly for client-side time-series analysis.
@@ -99,4 +98,3 @@ export class QuestDBWasm {
     }
   }
 }
-```
