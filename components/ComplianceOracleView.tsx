@@ -1,59 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   AppBar,
   Toolbar,
   Typography,
   Container,
-  Grid,
-  Card,
-  CardContent,
-  Paper,
   Box,
   ThemeProvider,
   createTheme,
   CssBaseline,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Chip,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  Paper,
 } from '@mui/material';
-
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
-
-import ShieldIcon from '@mui/icons-material/Shield';
-import GppBadIcon from '@mui/icons-material/GppBad';
-import HourglassTopIcon from '@mui/icons-material/HourglassTop';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import SyncProblemIcon from '@mui/icons-material/SyncProblem';
-import AllInboxIcon from '@mui/icons-material/AllInbox';
-import SpeedIcon from '@mui/icons-material/Speed';
-
-// --- Leaflet Imports ---
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
-import L from 'leaflet';
-
-// Fix Leaflet marker icon issue
-const DefaultIcon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png"
-});
-L.Marker.prototype.options.icon = DefaultIcon;
 
 // --- THEME ---
 const darkTheme = createTheme({
@@ -64,129 +20,16 @@ const darkTheme = createTheme({
     text: { primary: '#e0e0e0', secondary: '#b3b3b3' },
   },
   typography: {
-    h4: { fontWeight: 700 },
-    h5: { fontWeight: 600 }
+    h4: { fontWeight: 700, marginBottom: '1rem' },
+    h5: { fontWeight: 600, marginBottom: '0.75rem' },
+    h6: { fontWeight: 600, marginTop: '2rem', marginBottom: '1rem', color: '#76ff03' },
+    body1: { lineHeight: 1.7 },
+    body2: { lineHeight: 1.6, color: '#b3b3b3' },
   }
 });
 
-// --- MOCK DATA ---
-const generateMessageFlowData = () => {
-  const data = [];
-  for (let i = 10; i >= 0; i--) {
-    const time = new Date();
-    time.setMinutes(time.getMinutes() - i);
-    data.push({
-      time: time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      pacs008: Math.random() * 200 + 300,
-      pacs009: Math.random() * 50 + 80,
-      camt053: Math.random() * 100 + 150,
-    });
-  }
-  return data;
-};
-
-const alertReasons = [
-  'AML Threshold Breach',
-  'Sanction List Hit (OFAC)',
-  'Unusual Activity Pattern',
-  'High-Risk Jurisdiction',
-  'Transaction Structuring',
-  'PEP Match',
-];
-
-const alertStatuses = ['Pending Review', 'Investigating', 'Resolved', 'False Positive'];
-
-const generateRiskAlerts = (count: number) => {
-  const alerts = [];
-  for (let i = 0; i < count; i++) {
-    const riskScore = Math.floor(Math.random() * 60 + 40);
-    alerts.push({
-      id: `TX${Math.floor(Math.random() * 900000) + 100000}`,
-      timestamp: new Date(Date.now() - Math.random() * 600000).toISOString(),
-      reason: alertReasons[Math.floor(Math.random() * alertReasons.length)],
-      riskScore,
-      status: alertStatuses[Math.floor(Math.random() * alertStatuses.length)],
-      amount: `${(Math.random() * 500000 + 10000).toFixed(2)} USD`,
-    });
-  }
-  return alerts.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-};
-
-// High-risk transaction routes
-const highRiskTransactions = [
-  { fromCoords: [-98.5795, 39.8283], toCoords: [105.3188, 61.5240] }, // USA -> Russia
-  { fromCoords: [-3.4360, 55.3781], toCoords: [53.6880, 32.4279] },  // UK -> Iran
-  { fromCoords: [104.1954, 35.8617], toCoords: [127.5101, 40.3399] }, // China -> NK
-  { fromCoords: [10.4515, 51.1657], toCoords: [38.9968, 34.8021] }, // Germany -> Syria
-];
-
-// Map markers
-const markers = [
-  { name: "New York", coordinates: [-74.006, 40.7128] },
-  { name: "London", coordinates: [-0.1278, 51.5074] },
-  { name: "Frankfurt", coordinates: [8.6821, 50.1109] },
-  { name: "Singapore", coordinates: [103.8198, 1.3521] },
-  { name: "Moscow", coordinates: [37.6173, 55.7558] },
-  { name: "Tehran", coordinates: [51.3890, 35.6892] },
-];
-
-// --- COMPONENTS ---
-const KpiCard = ({ title, value, icon }: { title: string; value: string; icon: any }) => (
-  <Card sx={{ height: '100%' }}>
-    <CardContent>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-        {icon}
-        <Typography sx={{ ml: 1, color: 'text.secondary', fontWeight: 'bold' }}>
-          {title}
-        </Typography>
-      </Box>
-      <Typography variant="h4">{value}</Typography>
-    </CardContent>
-  </Card>
-);
-
-const getRiskChipColor = (status: string) => ({
-  'Pending Review': 'warning',
-  'Investigating': 'info',
-  'Resolved': 'success',
-  'False Positive': 'default',
-}[status] || 'default');
-
-const getRiskScoreColor = (score: number) =>
-  score > 85 ? '#f44336' : score > 65 ? '#ff9800' : '#ffc107';
-
-
-// --- MAIN VIEW ---
+// --- MAIN VIEW (now a blog post renderer) ---
 export const ComplianceOracleView = () => {
-  const [messageFlowData, setMessageFlowData] = useState(generateMessageFlowData());
-  const [riskAlerts, setRiskAlerts] = useState(generateRiskAlerts(15));
-  const [totalMessages, setTotalMessages] = useState(245890);
-  const [highRiskAlertsToday, setHighRiskAlertsToday] = useState(132);
-  const [timeFilter, setTimeFilter] = useState('24h');
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setMessageFlowData(prev => {
-        const next = {
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          pacs008: Math.random() * 200 + 300,
-          pacs009: Math.random() * 50 + 80,
-          camt053: Math.random() * 100 + 150,
-        };
-        return [...prev.slice(1), next];
-      });
-
-      if (Math.random() > 0.7) {
-        setRiskAlerts(prev => [...generateRiskAlerts(1), ...prev].slice(0, 15));
-        setHighRiskAlertsToday(a => a + 1);
-      }
-
-      setTotalMessages(t => t + Math.floor(Math.random() * 10));
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -194,181 +37,128 @@ export const ComplianceOracleView = () => {
       <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
         <AppBar position="static" color="default" elevation={1}>
           <Toolbar>
-            <ShieldIcon color="primary" sx={{ mr: 2, fontSize: '2rem' }} />
             <Typography variant="h5" sx={{ flexGrow: 1 }}>
-              Compliance Oracle Dashboard
+              The Compliance Oracle Blog
             </Typography>
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <InputLabel>Time Range</InputLabel>
-              <Select
-                value={timeFilter}
-                label="Time Range"
-                onChange={e => setTimeFilter(e.target.value)}
-              >
-                <MenuItem value={'1h'}>Last Hour</MenuItem>
-                <MenuItem value={'6h'}>Last 6 Hours</MenuItem>
-                <MenuItem value={'24h'}>Last 24 Hours</MenuItem>
-              </Select>
-            </FormControl>
           </Toolbar>
         </AppBar>
 
-        <Container maxWidth={false} sx={{ py: 3, flexGrow: 1, overflowY: 'auto' }}>
-          <Grid container spacing={3}>
+        <Container maxWidth="md" sx={{ py: 4, flexGrow: 1, overflowY: 'auto' }}>
+          <Paper sx={{ p: 4, mb: 4 }}>
+            <Typography variant="h4" component="h1" gutterBottom>
+              The Silent Guardians: 4 Surprising Insights from Building a Real-Time Compliance Oracle
+            </Typography>
 
-            {/* KPIs */}
-            <Grid item xs={12} sm={6} md={3}>
-              <KpiCard
-                title="Total Messages (24h)"
-                value={totalMessages.toLocaleString()}
-                icon={<AllInboxIcon color="primary" />}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <KpiCard
-                title="High-Risk Alerts (24h)"
-                value={highRiskAlertsToday.toLocaleString()}
-                icon={<GppBadIcon color="error" />}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <KpiCard title="Avg. Resolution Time" value="45 min" icon={<HourglassTopIcon color="info" />} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <KpiCard title="Sanction Hit Rate" value="0.02%" icon={<SyncProblemIcon color="warning" />} />
-            </Grid>
+            <Typography variant="body1" paragraph>
+              Ever wondered what it takes to keep the financial world safe and compliant in an age of lightning-fast transactions? It's not just about rules and regulations; it's about an intricate dance of data, technology, and constant vigilance. We recently peeked behind the curtain of a "Compliance Oracle Dashboard" – a system designed to be the eyes and ears of regulatory adherence. What we found wasn't just code; it was a masterclass in turning complex, abstract risks into clear, actionable intelligence. Here are the most impactful takeaways from this digital guardian.
+            </Typography>
 
-            {/* Message Flow Chart */}
-            <Grid item xs={12} lg={8}>
-              <Paper sx={{ p: 2, height: '400px' }}>
-                <Typography variant="h6">Real-Time Message Flow</Typography>
-                <ResponsiveContainer width="100%" height="90%">
-                  <LineChart data={messageFlowData}>
-                    <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
-                    <XAxis dataKey="time" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="pacs008" name="pacs.008" stroke="#82ca9d" dot={false} />
-                    <Line type="monotone" dataKey="pacs009" name="pacs.009" stroke="#8884d8" dot={false} />
-                    <Line type="monotone" dataKey="camt053" name="camt.053" stroke="#ffc658" dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </Paper>
-            </Grid>
+            {/* Takeaway 1 */}
+            <Typography variant="h6" component="h2">
+              1. The Illusion of Simplicity: Beneath Every Green Checkmark, a Data Deluge
+            </Typography>
+            <Typography variant="body1" paragraph>
+              When you see a dashboard proudly displaying "Compliant" next to critical regulations like BSA/AML or OFAC, it looks reassuringly simple. But the code reveals a different story: a relentless torrent of data. Thousands, even hundreds of thousands, of messages (like <Box component="code" sx={{ backgroundColor: '#333', p: '2px 4px', borderRadius: '4px' }}>pacs.008</Box>, <Box component="code" sx={{ backgroundColor: '#333', p: '2px 4px', borderRadius: '4px' }}>pacs.009</Box>, <Box component="code" sx={{ backgroundColor: '#333', p: '2px 4px', borderRadius: '4px' }}>camt.053</Box> in financial messaging) flow through the system every hour, each a potential vector for risk. The dashboard's calm exterior belies the intense processing required to sift through this digital ocean.
+            </Typography>
+            <Box component="blockquote" sx={{
+              borderLeft: '4px solid #76ff03',
+              pl: 2,
+              ml: 0,
+              py: 1,
+              fontStyle: 'italic',
+              color: 'text.secondary'
+            }}>
+              <Typography variant="body1">
+                "Compliance isn't just about ticking boxes; it's about understanding the intricate dance of millions of data points, each scrutinized for the slightest anomaly."
+              </Typography>
+            </Box>
+            <Typography variant="body1" paragraph>
+              This constant ingestion and analysis of data is the unsung hero, ensuring that the green checkmark isn't just a facade but a reflection of genuine, real-time adherence. It's a powerful reminder that true compliance is built on a foundation of comprehensive data mastery.
+            </Typography>
 
-            {/* Compliance Status */}
-            <Grid item xs={12} lg={4}>
-              <Paper sx={{ p: 2, height: '400px' }}>
-                <Typography variant="h6">Regulatory Compliance Status</Typography>
-                <Box sx={{ mt: 2 }}>
-                  {[
-                    { name: 'BSA/AML Reporting', status: 'Compliant' },
-                    { name: 'OFAC Sanctions Screening', status: 'Compliant' },
-                    { name: 'MiFID II Transaction Reporting', status: 'Compliant' },
-                    { name: 'GDPR Data Privacy', status: 'Compliant' },
-                    { name: 'FATF Travel Rule', status: 'Monitoring' },
-                  ].map(reg => (
-                    <Box key={reg.name} sx={{ display: 'flex', mb: 2 }}>
-                      {reg.status === 'Compliant'
-                        ? <CheckCircleIcon color="success" />
-                        : <SpeedIcon color="warning" />}
-                      <Typography sx={{ ml: 2, flexGrow: 1 }}>{reg.name}</Typography>
-                      <Chip label={reg.status} color={reg.status === 'Compliant' ? 'success' : 'warning'} />
-                    </Box>
-                  ))}
-                </Box>
-              </Paper>
-            </Grid>
+            {/* Takeaway 2 */}
+            <Typography variant="h6" component="h2">
+              2. From Abstract Risk Scores to Actionable Insights: The Power of Visualization
+            </Typography>
+            <Typography variant="body1" paragraph>
+              Numbers alone can be overwhelming. A transaction with a "risk score of 88" might raise an eyebrow, but what does it <Box component="em" sx={{ fontStyle: 'italic' }}>mean</Box>? This is where the Compliance Oracle truly shines. It transforms abstract metrics into vivid, actionable insights. High-risk transactions aren't just listed; they're color-coded, flagged with clear reasons, and even plotted on a global map. Seeing a red polyline stretch from the USA to Russia, or the UK to Iran, instantly communicates the gravity and geographical spread of potential threats.
+            </Typography>
+            <Typography variant="body1" paragraph>
+              The simple yet effective <Box component="code" sx={{ backgroundColor: '#333', p: '2px 4px', borderRadius: '4px' }}>getRiskScoreColor</Box> function, for instance, is a testament to this principle:
+            </Typography>
+            <Box component="pre" sx={{ backgroundColor: '#222', p: 2, borderRadius: 1, overflowX: 'auto', mb: 2 }}>
+              <Typography component="code" variant="body2" sx={{ color: '#e0e0e0' }}>
+                {`const getRiskScoreColor = (score: number) =>
+  score > 85 ? '#f44336' : score > 65 ? '#ff9800' : '#ffc107';`}
+              </Typography>
+            </Box>
+            <Typography variant="body1" paragraph>
+              This isn't just about aesthetics; it's about cognitive load reduction. By making risk visually intuitive, analysts can prioritize and respond with unprecedented speed.
+            </Typography>
 
-            {/* Alerts Table */}
-            <Grid item xs={12} lg={7}>
-              <Paper sx={{ height: '500px', display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="h6" sx={{ p: 2, pb: 0 }}>Recent High-Risk Alerts</Typography>
-                <TableContainer sx={{ flexGrow: 1 }}>
-                  <Table stickyHeader size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Transaction ID</TableCell>
-                        <TableCell>Timestamp</TableCell>
-                        <TableCell>Reason</TableCell>
-                        <TableCell>Amount</TableCell>
-                        <TableCell align="center">Risk Score</TableCell>
-                        <TableCell>Status</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {riskAlerts.map(alert => (
-                        <TableRow hover key={alert.id}>
-                          <TableCell>{alert.id}</TableCell>
-                          <TableCell>{new Date(alert.timestamp).toLocaleString()}</TableCell>
-                          <TableCell>{alert.reason}</TableCell>
-                          <TableCell>{alert.amount}</TableCell>
-                          <TableCell align="center">
-                            <Chip
-                              label={alert.riskScore}
-                              sx={{
-                                backgroundColor: getRiskScoreColor(alert.riskScore),
-                                color: '#000',
-                                fontWeight: 'bold'
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Chip label={alert.status} color={getRiskChipColor(alert.status)} />
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Paper>
-            </Grid>
+            {/* Takeaway 3 */}
+            <Typography variant="h6" component="h2">
+              3. The Unsung Hero: Mock Data as the Architect of Robust Systems
+            </Typography>
+            <Typography variant="body1" paragraph>
+              In highly regulated environments, real-world data is often sensitive, scarce, or difficult to access for development and testing. The Compliance Oracle's code reveals a sophisticated approach to this challenge: extensive, realistic mock data generation. Functions like <Box component="code" sx={{ backgroundColor: '#333', p: '2px 4px', borderRadius: '4px' }}>generateMessageFlowData</Box> and <Box component="code" sx={{ backgroundColor: '#333', p: '2px 4px', borderRadius: '4px' }}>generateRiskAlerts</Box> aren't just placeholders; they're carefully crafted simulations of real-world scenarios, complete with varying risk scores, reasons, and statuses.
+            </Typography>
+            <Typography variant="body1" paragraph>
+              This isn't merely a development convenience; it's a strategic imperative. It allows developers to:
+              <Box component="ul" sx={{ mt: 1, pl: 2 }}>
+                <Typography component="li" variant="body1">Stress-test the system with diverse data patterns.</Typography>
+                <Typography component="li" variant="body1">Simulate rare but critical events (e.g., sanction list hits).</Typography>
+                <Typography component="li" variant="body1">Demonstrate the system's capabilities without compromising sensitive information.</Typography>
+              </Box>
+            </Typography>
+            <Box component="blockquote" sx={{
+              borderLeft: '4px solid #76ff03',
+              pl: 2,
+              ml: 0,
+              py: 1,
+              fontStyle: 'italic',
+              color: 'text.secondary'
+            }}>
+              <Typography variant="body1">
+                "In the world of high-stakes compliance, realistic mock data isn't a luxury; it's the bedrock of innovation and reliability, allowing us to build and test the future, today."
+              </Typography>
+            </Box>
+            <Typography variant="body1" paragraph>
+              It underscores that building resilient systems often starts with intelligently simulating the world they're meant to protect.
+            </Typography>
 
-            {/* Leaflet Map */}
-            <Grid item xs={12} lg={5}>
-              <Paper sx={{ p: 2, height: '500px' }}>
-                <Typography variant="h6" gutterBottom>Geographical Risk Flow</Typography>
-                <Box sx={{ height: '430px', borderRadius: 2, overflow: 'hidden' }}>
-                  <MapContainer
-                    center={[20, 0]}
-                    zoom={2}
-                    scrollWheelZoom={true}
-                    style={{ height: "100%", width: "100%" }}
-                  >
-                    <TileLayer
-                      attribution='&copy; OpenStreetMap contributors'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
+            {/* Takeaway 4 */}
+            <Typography variant="h6" component="h2">
+              4. The Ever-Vigilant Eye: Real-Time Monitoring as the New Standard
+            </Typography>
+            <Typography variant="body1" paragraph>
+              The <Box component="code" sx={{ backgroundColor: '#333', p: '2px 4px', borderRadius: '4px' }}>useEffect</Box> hook in the Compliance Oracle's core component is a silent powerhouse, constantly updating message flows, generating new risk alerts, and incrementing total message counts every few seconds. This isn't just a static report; it's a living, breathing system that mirrors the dynamic nature of financial transactions.
+            </Typography>
+            <Box component="pre" sx={{ backgroundColor: '#222', p: 2, borderRadius: 1, overflowX: 'auto', mb: 2 }}>
+              <Typography component="code" variant="body2" sx={{ color: '#e0e0e0' }}>
+                {`useEffect(() => {
+  const interval = setInterval(() => {
+    // ... data generation and state updates ...
+  }, 3000); // Updates every 3 seconds
+  return () => clearInterval(interval);
+}, []);`}
+              </Typography>
+            </Box>
+            <Typography variant="body1" paragraph>
+              This continuous refresh highlights a fundamental shift in compliance: from periodic audits to perpetual vigilance. In a world where illicit activities can unfold in moments, a system that updates every three seconds isn't just fast; it's essential. It ensures that potential threats are identified and flagged <Box component="em" sx={{ fontStyle: 'italic' }}>as they happen</Box>, enabling proactive intervention rather than reactive damage control.
+            </Typography>
 
-                    {/* Red Polylines */}
-                    {highRiskTransactions.map((tx, i) => (
-                      <Polyline
-                        key={i}
-                        positions={[
-                          [tx.fromCoords[1], tx.fromCoords[0]],
-                          [tx.toCoords[1], tx.toCoords[0]]
-                        ]}
-                        pathOptions={{ color: '#f44336', weight: 3, opacity: 0.7 }}
-                      />
-                    ))}
-
-                    {/* Markers */}
-                    {markers.map(m => (
-                      <Marker key={m.name} position={[m.coordinates[1], m.coordinates[0]]}>
-                        <Popup>
-                          <strong>{m.name}</strong><br />
-                          Risk Node Active
-                        </Popup>
-                      </Marker>
-                    ))}
-
-                  </MapContainer>
-                </Box>
-              </Paper>
-            </Grid>
-
-          </Grid>
+            {/* Conclusion */}
+            <Typography variant="h5" component="h3" sx={{ mt: 4, mb: 2 }}>
+              Conclusion:
+            </Typography>
+            <Typography variant="body1" paragraph>
+              The Compliance Oracle Dashboard is more than just a collection of charts and tables; it's a testament to how cutting-edge technology can transform the daunting task of regulatory compliance into a manageable, even proactive, endeavor. By embracing real-time data, powerful visualizations, and robust development practices, we can build systems that not only meet regulatory demands but actively safeguard our financial ecosystems.
+            </Typography>
+            <Typography variant="body1" paragraph>
+              As we navigate an increasingly complex global landscape, one question remains: How can we continue to leverage these "silent guardians" to anticipate tomorrow's risks, before they even emerge?
+            </Typography>
+          </Paper>
         </Container>
       </Box>
     </ThemeProvider>
