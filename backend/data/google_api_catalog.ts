@@ -3,8 +3,8 @@ interface ApiEntry {
   title: string;
   // NOTE: In a real project, we would compute or define these links based on the name.
   // For this exercise, we omit the complex governance/documentation link logic.
-  // governanceLink?: string; 
-  // documentationLink?: string; 
+  // governanceLink?: string;
+  // documentationLink?: string;
 }
 
 const GOOGLE_API_CATALOG: ApiEntry[] = [
