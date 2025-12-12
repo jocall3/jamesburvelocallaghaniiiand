@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { reportingReportRunCreate } from '../lib/api/stripeNexus/reporting';
-import { useAuth } from '../context/AuthContext'; // Fixed path
+import { useAuth } from '../context/AuthContext';
 
 interface ReportRunGeneratorProps {
   onReportRunCreated?: (reportRun: any) => void;
@@ -13,9 +12,18 @@ export const ReportRunGenerator: React.FC<ReportRunGeneratorProps> = ({ onReport
 
   const handleCreate = async () => {
       setLoading(true);
-      await reportingReportRunCreate({});
-      setLoading(false);
-      alert("Report run created!");
+      try {
+          const reportRun = await reportingReportRunCreate({});
+          alert("Report run created!");
+          if (onReportRunCreated) {
+              onReportRunCreated(reportRun);
+          }
+      } catch (error) {
+          console.error("Failed to create report run:", error);
+          alert("Failed to create report run. Please try again.");
+      } finally {
+          setLoading(false);
+      }
   };
 
   if (!user) return <div>Please log in.</div>;
