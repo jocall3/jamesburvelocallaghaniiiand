@@ -1,4 +1,3 @@
-```typescript
 import { SovereignRiskFactors } from "../types/SovereignRiskFactors";
 
 export class SovereignRiskModel {
@@ -42,4 +41,3 @@ export class SovereignRiskModel {
     return normalizedSirs;
   }
 }
-```
