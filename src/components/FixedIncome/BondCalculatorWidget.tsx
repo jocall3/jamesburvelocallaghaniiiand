@@ -1,4 +1,3 @@
-```typescript
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Grid, Box } from '@mui/material';
 
@@ -76,4 +75,3 @@ const BondCalculatorWidget: React.FC<BondCalculatorWidgetProps> = () => {
 };
 
 export default BondCalculatorWidget;
-```
