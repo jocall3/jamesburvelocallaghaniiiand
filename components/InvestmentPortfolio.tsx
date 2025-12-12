@@ -220,7 +220,7 @@ const DetrimentalRiskMetrics: React.FC<{ assets: Asset[] }> = ({ assets }) => {
                 <div className="mt-4 text-xs text-gray-400 space-y-1">
                     {riskData.map(d => (
                         <p key={d.name} className="flex justify-between">
-                            <span style={{ color: d.color }}>â–  {d.name} Assets:</span> <span>{d.count}</span>
+                            <span style={{ color: d.color }}>Ã¢â€“Â  {d.name} Assets:</span> <span>{d.count}</span>
                         </p>
                     ))}
                 </div>
