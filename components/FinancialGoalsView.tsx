@@ -1,4 +1,3 @@
-
 // components/FinancialGoalsView.tsx
 import React, { useContext, useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { DataContext } from '../context/DataContext';
@@ -112,7 +111,7 @@ export interface ExtendedFinancialGoal extends FinancialGoal {
 /**
  * Philosophical thought: Utility functions are the unsung heroes of any robust application.
  * They provide pure, predictable operations, distilling complex logic into reusable, testable units.
- * Think of them as the finely crafted tools in a master artisan's kit – simple in form, but essential for grand creations.
+ * Think of them as the finely crafted tools in a master artisan's kit â€“ simple in form, but essential for grand creations.
  *
  * Million Dollar Feature Overview: "The 'Date Whisperer' and 'Future Fortune Teller' Utilities!"
  * (Said in a jester's voice) "Hark, my friends, these humble functions, they may seem small and meek!
@@ -1561,7 +1560,7 @@ export const CreateGoalView: React.FC<{
  * (Jester voice) "Step right up, noble saver, and behold your goal's full glory!
  * No mere overview, but a 'Gallereia' of its complete story!
  * From humble pennies to soaring projections, a truly epic allegory!
- * Contributions, plans, risks, and AI wisdom – all in one inventory!
+ * Contributions, plans, risks, and AI wisdom â€“ all in one inventory!
  * Tweak, adjust, observe, and conquer, your financial victory!"
  */
 export const GoalDetailView: React.FC<{
@@ -1662,7 +1661,7 @@ export const GoalDetailView: React.FC<{
             {activeTab === 'projections' && <ProjectionSimulator goal={goal as ExtendedFinancialGoal} />}
             {activeTab === 'monte-carlo' && <MonteCarloAnalysis goal={goal as ExtendedFinancialGoal} />}
             {activeTab === 'insights' && <AiInsightsAndRecalibration goal={goal as ExtendedFinancialGoal} onGeneratePlan={onGeneratePlan} onRecalibrateGoal={onRecalibrateGoal} loadingGoalId={loadingGoalId} />}
-            {activeTab === 'dependencies' && <GoalDependenciesManager goal={goal as ExtendedFinancialGoal} allGoals={allGoals as ExtendedFinancialGoal[]} onLinkGoal={onLinkGoal} onUnlinkGoal={onUnlinkGoal} />}
+            {activeTab === 'dependencies' && <GoalDependenciesManager goal={goal as ExtendedFinancialGoal} allGoals={allGoals as ExtendedFinancialGoal[]} onLinkGoal={onLinkGoal} onUnlinkGoal={unlinkGoals} />}
 
         </div>
     );
