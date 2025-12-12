@@ -1,4 +1,3 @@
-```tsx
 import React from 'react';
 
 interface ExternalDataStatusProps {
@@ -24,4 +23,3 @@ const ExternalDataStatus: React.FC<ExternalDataStatusProps> = ({ feedName, isCon
 };
 
 export default ExternalDataStatus;
-```
