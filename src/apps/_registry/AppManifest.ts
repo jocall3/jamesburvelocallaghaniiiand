@@ -17,6 +17,9 @@ export enum AppCategory {
   SOCIAL = 'Social',
   DEVELOPER_TOOLS = 'Developer Tools',
   FINANCE = 'Finance',
+  BANKING = 'Banking',
+  FINTECH = 'FinTech',
+  REGTECH = 'RegTech',
   CREATIVITY = 'Creativity',
   SYSTEM = 'System',
   OTHER = 'Other',
@@ -28,6 +31,8 @@ export enum AppCategory {
 export enum AppType {
   /** A standard application with a graphical user interface. */
   WEB_APP = 'web-app',
+  /** A command-line interface application. */
+  CLI_APP = 'cli-app',
   /** A background process or daemon with no primary UI. */
   SERVICE = 'service',
   /** A component that extends the functionality of the host or other apps. */
@@ -161,6 +166,15 @@ export interface AppManifest {
    * @example "https://github.com/my-org/my-app"
    */
   repository?: string;
+
+  /**
+   * An identifier for a suite of applications that this app belongs to.
+   * This helps group related applications from the same publisher or for a
+   * unified ecosystem.
+   * @optional
+   * @example "com.citibankdemobusinessinc.open-banking-suite"
+   */
+  suite?: string;
 
   /**
    * A declaration of the permissions required by the application to function.
