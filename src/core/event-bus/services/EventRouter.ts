@@ -1,4 +1,3 @@
-```typescript
 import { Logger } from "../../services/Logger";
 import { IEventHandler } from "../interfaces/IEventHandler";
 import { Event } from "../types/Event";
@@ -41,4 +40,3 @@ export class EventRouter {
     );
   }
 }
-```
