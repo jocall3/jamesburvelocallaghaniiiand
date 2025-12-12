@@ -403,7 +403,7 @@ const SimulationTable: React.FC<SimulationTableProps> = ({ simulations, onStop }
             )}
           </TableBody>
         </Table>
-      </Table>
+      </TableContainer>
     </PaperStyled>
   );
 };
