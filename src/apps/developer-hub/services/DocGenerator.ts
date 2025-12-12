@@ -1,4 +1,3 @@
-```typescript
 import { OpenAPIV3 } from 'openapi-types';
 import { parse as commentParser } from 'comment-parser';
 import * as fs from 'fs';
@@ -119,4 +118,3 @@ export class DocGenerator {
     }
   }
 }
-```
