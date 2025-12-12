@@ -1,4 +1,3 @@
-```typescript
 import React, { useState, useEffect } from 'react';
 import { Slider, InputNumber, Switch, Typography, Space, Divider, Alert, Button } from 'antd';
 import { Agent } from '../../types/Agent';
@@ -114,4 +113,3 @@ const AgentConfigPanel: React.FC<AgentConfigPanelProps> = ({ agent, onUpdateAgen
 };
 
 export default AgentConfigPanel;
-```
