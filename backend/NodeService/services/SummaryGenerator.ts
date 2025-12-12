@@ -1,4 +1,3 @@
-```typescript
 import { SummarizeClient } from "@azure/ai-text-analytics";
 import { AzureKeyCredential } from "@azure/core-auth";
 
@@ -67,4 +66,3 @@ export class SummaryGenerator {
     return words.slice(0, maxTokens).join(" ") + "...";
   }
 }
-```
