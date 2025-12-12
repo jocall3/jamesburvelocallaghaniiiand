@@ -51,7 +51,7 @@ import {
   FiActivity,
 } from 'react-icons/fi';
 
-// --- Mock Data Interfaces ---
+// --- Data Interfaces ---
 interface ComplianceArea {
   id: string;
   name: string;
@@ -70,7 +70,7 @@ interface ComplianceAlert {
   severity: 'Critical' | 'High' | 'Medium' | 'Low';
   status: 'Open' | 'Resolved' | 'Acknowledged';
   reportedAt: string;
-  area: string; // e.g., 'GDPR', 'Data Privacy'
+  area: string;
   owner: string;
 }
 
@@ -83,157 +83,92 @@ interface RegulatoryDeadline {
   owner: string;
 }
 
-// --- Mock Data ---
-const mockComplianceAreas: ComplianceArea[] = [
-  {
-    id: 'gdpr',
-    name: 'GDPR',
-    status: 'Compliant',
-    lastUpdated: '2023-10-26',
-    owner: 'Legal Team',
-    progress: 100,
-    issuesCount: 0,
-    description: 'General Data Protection Regulation compliance for EU users.',
-  },
-  {
-    id: 'ccpa',
-    name: 'CCPA',
-    status: 'At-Risk',
-    lastUpdated: '2023-10-25',
-    owner: 'Privacy Office',
-    progress: 85,
-    issuesCount: 3,
-    description: 'California Consumer Privacy Act compliance for CA residents.',
-  },
-  {
-    id: 'soc2',
-    name: 'SOC 2 Type II',
-    status: 'In-Progress',
-    lastUpdated: '2023-10-27',
-    owner: 'Security Team',
-    progress: 60,
-    issuesCount: 7,
-    description: 'Service Organization Control 2 Type II audit preparation.',
-  },
-  {
-    id: 'hipaa',
-    name: 'HIPAA',
-    status: 'Compliant',
-    lastUpdated: '2023-10-20',
-    owner: 'Healthcare Ops',
-    progress: 98,
-    issuesCount: 1,
-    description: 'Health Insurance Portability and Accountability Act for health data.',
-  },
-  {
-    id: 'pci-dss',
-    name: 'PCI DSS',
-    status: 'Non-Compliant',
-    lastUpdated: '2023-10-24',
-    owner: 'Finance & Security',
-    progress: 40,
-    issuesCount: 12,
-    description: 'Payment Card Industry Data Security Standard for cardholder data.',
-  },
-];
+// --- Internal Generative-Data Functions ---
+const randomElement = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+const randomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
+const randomDate = (start: Date, end: Date): Date => new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 
-const mockComplianceAlerts: ComplianceAlert[] = [
-  {
-    id: 'alert-001',
-    title: 'Unauthorized Data Access Attempt',
-    description: 'An attempt to access sensitive customer data was detected from an unknown IP.',
-    severity: 'Critical',
-    status: 'Open',
-    reportedAt: '2023-10-27T10:30:00Z',
-    area: 'Data Security',
-    owner: 'Security Team',
-  },
-  {
-    id: 'alert-002',
-    title: 'GDPR Data Subject Request Backlog',
-    description: 'Over 50 data subject access requests are pending beyond the 30-day limit.',
-    severity: 'High',
-    status: 'Open',
-    reportedAt: '2023-10-26T15:00:00Z',
-    area: 'GDPR',
-    owner: 'Privacy Office',
-  },
-  {
-    id: 'alert-003',
-    title: 'Outdated Security Patch on Production Server',
-    description: 'A critical security patch for CVE-2023-XXXX is missing on server "prod-web-01".',
-    severity: 'Medium',
-    status: 'Acknowledged',
-    reportedAt: '2023-10-25T09:00:00Z',
-    area: 'SOC 2',
-    owner: 'DevOps',
-  },
-  {
-    id: 'alert-004',
-    title: 'PCI DSS Requirement 3.4 Non-Compliance',
-    description: 'Cardholder data is not being masked consistently in development environments.',
-    severity: 'High',
-    status: 'Open',
-    reportedAt: '2023-10-24T11:45:00Z',
-    area: 'PCI DSS',
-    owner: 'Security Team',
-  },
-  {
-    id: 'alert-005',
-    title: 'CCPA Opt-Out Link Broken',
-    description: 'The "Do Not Sell My Personal Information" link on the website is returning a 404 error.',
-    severity: 'Critical',
-    status: 'Open',
-    reportedAt: '2023-10-23T14:00:00Z',
-    area: 'CCPA',
-    owner: 'Marketing Team',
-  },
-  {
-    id: 'alert-006',
-    title: 'Minor Data Retention Policy Violation',
-    description: 'Some non-critical logs were retained for 95 days instead of 90 days.',
-    severity: 'Low',
-    status: 'Resolved',
-    reportedAt: '2023-10-22T16:00:00Z',
-    area: 'Data Privacy',
-    owner: 'IT Operations',
-  },
-];
+const generateComplianceAreas = (count: number): ComplianceArea[] => {
+  const names = ['GDPR', 'CCPA', 'SOC 2 Type II', 'HIPAA', 'PCI DSS', 'SOX', 'ISO 27001', 'AML/KYC'];
+  const owners = ['Legal Team', 'Privacy Office', 'Security Team', 'Healthcare Ops', 'Finance & Security', 'Internal Audit'];
+  const statuses: ComplianceArea['status'][] = ['Compliant', 'Non-Compliant', 'At-Risk', 'In-Progress'];
+  const descriptions = {
+    'GDPR': 'General Data Protection Regulation compliance for EU users.',
+    'CCPA': 'California Consumer Privacy Act compliance for CA residents.',
+    'SOC 2 Type II': 'Service Organization Control 2 Type II audit preparation.',
+    'HIPAA': 'Health Insurance Portability and Accountability Act for health data.',
+    'PCI DSS': 'Payment Card Industry Data Security Standard for cardholder data.',
+    'SOX': 'Sarbanes-Oxley Act for financial reporting controls.',
+    'ISO 27001': 'Information security management system standard.',
+    'AML/KYC': 'Anti-Money Laundering and Know Your Customer regulations.',
+  };
 
-const mockRegulatoryDeadlines: RegulatoryDeadline[] = [
-  {
-    id: 'deadline-001',
-    regulation: 'SOC 2 Type II Audit Report',
-    description: 'Submission of annual SOC 2 Type II audit report.',
-    dueDate: '2023-11-15',
-    status: 'Upcoming',
-    owner: 'Security Team',
-  },
-  {
-    id: 'deadline-002',
-    regulation: 'GDPR Data Protection Impact Assessment (DPIA)',
-    description: 'Review and update DPIA for new product feature.',
-    dueDate: '2023-12-01',
-    status: 'Upcoming',
-    owner: 'Legal Team',
-  },
-  {
-    id: 'deadline-003',
-    regulation: 'CCPA Annual Review',
-    description: 'Annual review of CCPA compliance policies and procedures.',
-    dueDate: '2023-10-31',
-    status: 'Upcoming',
-    owner: 'Privacy Office',
-  },
-  {
-    id: 'deadline-004',
-    regulation: 'HIPAA Security Rule Self-Assessment',
-    description: 'Completion of annual HIPAA Security Rule self-assessment.',
-    dueDate: '2023-09-30',
-    status: 'Overdue',
-    owner: 'Healthcare Ops',
-  },
-];
+  return Array.from({ length: count }, (_, i) => {
+    const name = randomElement(names);
+    const status = randomElement(statuses);
+    const progress = status === 'Compliant' ? 100 : (status === 'Non-Compliant' ? randomInt(0, 50) : randomInt(51, 99));
+    const issuesCount = status === 'Compliant' ? 0 : (status === 'Non-Compliant' ? randomInt(5, 20) : randomInt(1, 5));
+    return {
+      id: `${name.toLowerCase().replace(/ /g, '-')}-${i}`,
+      name,
+      status,
+      lastUpdated: randomDate(new Date(2023, 9, 1), new Date()).toISOString().split('T')[0],
+      owner: randomElement(owners),
+      progress,
+      issuesCount,
+      description: descriptions[name] || 'Standard compliance area monitoring.',
+    };
+  });
+};
+
+const generateComplianceAlerts = (count: number): ComplianceAlert[] => {
+  const titles = [
+    'Unauthorized Data Access Attempt', 'GDPR Data Subject Request Backlog', 'Outdated Security Patch',
+    'PCI DSS Requirement Non-Compliance', 'CCPA Opt-Out Link Broken', 'Minor Data Retention Policy Violation',
+    'Suspicious Login Activity', 'Firewall Misconfiguration Detected', 'Missing Audit Logs'
+  ];
+  const severities: ComplianceAlert['severity'][] = ['Critical', 'High', 'Medium', 'Low'];
+  const statuses: ComplianceAlert['status'][] = ['Open', 'Resolved', 'Acknowledged'];
+  const areas = ['Data Security', 'GDPR', 'SOC 2', 'PCI DSS', 'CCPA', 'Data Privacy', 'Infrastructure'];
+  const owners = ['Security Team', 'Privacy Office', 'DevOps', 'Marketing Team', 'IT Operations'];
+
+  return Array.from({ length: count }, (_, i) => ({
+    id: `alert-${String(i).padStart(3, '0')}`,
+    title: randomElement(titles),
+    description: 'A dynamically generated description of the alert, providing context and potential impact.',
+    severity: randomElement(severities),
+    status: randomElement(statuses),
+    reportedAt: randomDate(new Date(2023, 9, 1), new Date()).toISOString(),
+    area: randomElement(areas),
+    owner: randomElement(owners),
+  }));
+};
+
+const generateRegulatoryDeadlines = (count: number): RegulatoryDeadline[] => {
+  const regulations = [
+    'SOC 2 Type II Audit Report', 'GDPR DPIA Review', 'CCPA Annual Review',
+    'HIPAA Security Self-Assessment', 'Quarterly PCI DSS Scan', 'Annual SOX Attestation'
+  ];
+  const statuses: RegulatoryDeadline['status'][] = ['Upcoming', 'Overdue', 'Completed'];
+  const owners = ['Security Team', 'Legal Team', 'Privacy Office', 'Healthcare Ops', 'Internal Audit'];
+
+  return Array.from({ length: count }, (_, i) => {
+    const status = randomElement(statuses);
+    let dueDate;
+    if (status === 'Upcoming') dueDate = randomDate(new Date(), new Date(new Date().getFullYear() + 1, 11, 31));
+    else if (status === 'Overdue') dueDate = randomDate(new Date(2023, 0, 1), new Date());
+    else dueDate = randomDate(new Date(2023, 0, 1), new Date());
+
+    return {
+      id: `deadline-${String(i).padStart(3, '0')}`,
+      regulation: randomElement(regulations),
+      description: 'Dynamically generated description for the regulatory deadline submission or review.',
+      dueDate: dueDate.toISOString().split('T')[0],
+      status,
+      owner: randomElement(owners),
+    };
+  });
+};
 
 // --- Helper Functions ---
 const getStatusColor = (status: ComplianceArea['status'] | ComplianceAlert['status'] | RegulatoryDeadline['status']) => {
@@ -283,9 +218,9 @@ const formatDateTime = (dateString: string) => {
 
 const ComplianceDashboard: React.FC = () => {
   const toast = useToast();
-  const [complianceAreas, setComplianceAreas] = useState<ComplianceArea[]>(mockComplianceAreas);
-  const [complianceAlerts, setComplianceAlerts] = useState<ComplianceAlert[]>(mockComplianceAlerts);
-  const [regulatoryDeadlines, setRegulatoryDeadlines] = useState<RegulatoryDeadline[]>(mockRegulatoryDeadlines);
+  const [complianceAreas, setComplianceAreas] = useState<ComplianceArea[]>(() => generateComplianceAreas(6));
+  const [complianceAlerts, setComplianceAlerts] = useState<ComplianceAlert[]>(() => generateComplianceAlerts(15));
+  const [regulatoryDeadlines, setRegulatoryDeadlines] = useState<RegulatoryDeadline[]>(() => generateRegulatoryDeadlines(5));
   const [loading, setLoading] = useState(false);
 
   const [alertSearchTerm, setAlertSearchTerm] = useState('');
@@ -294,15 +229,15 @@ const ComplianceDashboard: React.FC = () => {
 
   const refreshData = () => {
     setLoading(true);
-    // Simulate API call
+    // Simulate API call with generative data
     setTimeout(() => {
-      setComplianceAreas(mockComplianceAreas);
-      setComplianceAlerts(mockComplianceAlerts);
-      setRegulatoryDeadlines(mockRegulatoryDeadlines);
+      setComplianceAreas(generateComplianceAreas(6));
+      setComplianceAlerts(generateComplianceAlerts(15));
+      setRegulatoryDeadlines(generateRegulatoryDeadlines(5));
       setLoading(false);
       toast({
         title: 'Data Refreshed',
-        description: 'Compliance data has been updated.',
+        description: 'Compliance data has been regenerated.',
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -311,6 +246,7 @@ const ComplianceDashboard: React.FC = () => {
   };
 
   const overallComplianceStatus = useMemo(() => {
+    if (complianceAreas.length === 0) return { status: 'Unknown', color: 'gray' };
     const nonCompliant = complianceAreas.filter(area => area.status === 'Non-Compliant').length;
     const atRisk = complianceAreas.filter(area => area.status === 'At-Risk').length;
     const inProgress = complianceAreas.filter(area => area.status === 'In-Progress').length;
@@ -319,8 +255,8 @@ const ComplianceDashboard: React.FC = () => {
     if (nonCompliant > 0) return { status: 'Non-Compliant', color: 'red' };
     if (atRisk > 0) return { status: 'At-Risk', color: 'orange' };
     if (inProgress > 0) return { status: 'In-Progress', color: 'blue' };
-    if (compliant === complianceAreas.length && compliant > 0) return { status: 'Fully Compliant', color: 'green' };
-    return { status: 'Unknown', color: 'gray' };
+    if (compliant === complianceAreas.length) return { status: 'Fully Compliant', color: 'green' };
+    return { status: 'Partially Compliant', color: 'yellow' };
   }, [complianceAreas]);
 
   const criticalAlertsCount = useMemo(() => {
@@ -364,10 +300,10 @@ const ComplianceDashboard: React.FC = () => {
       <Flex align="center" mb={8}>
         <VStack align="flex-start" spacing={1}>
           <Heading as="h1" size="xl" color="gray.800">
-            Compliance Dashboard
+            Citibankdemobusinessinc Compliance Dashboard
           </Heading>
           <Text fontSize="md" color="gray.600">
-            A central hub for monitoring compliance status, alerts, and regulatory requirements across all integrated apps.
+            Centralized compliance monitoring for the Citibankdemobusinessinc ecosystem.
           </Text>
         </VStack>
         <Spacer />
