@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 
 // --- App-in-App: Sovereign AI Micro-Components ---
@@ -21,6 +20,48 @@ const CogIcon = () => (
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
 );
+
+// --- Data Generation Functions ---
+
+const generateCompanyName = (id: number): string => `Global Entity #${id}`;
+const generateCompanyTicker = (id: number): string => `WRLD${id}`;
+const generateSector = (index: number): 'Tech' | 'Finance' | 'Energy' | 'Industry' | 'Health' | 'Quantum' | 'BioSynth' => ['Tech', 'Finance', 'Energy', 'Industry', 'Health', 'Quantum', 'BioSynth'][index % 7] as any;
+const generateCurrentPrice = (): number => parseFloat((Math.random() * 500 + 50).toFixed(2));
+const generateVolatilityIndex = (): number => parseFloat((Math.random() * 1.5 + 0.2).toFixed(2));
+const generateMarketCap = (): number => parseFloat((Math.random() * 2000 + 10).toFixed(2));
+const generatePERatio = (): number => parseFloat((Math.random() * 40 + 5).toFixed(2));
+const generateDividendYield = (): number => parseFloat((Math.random() * 5).toFixed(2));
+const generateESGRating = (index: number): 'AAA' | 'AA' | 'A' | 'BBB' | 'BB' | 'B' | 'CCC' => ['AAA' , 'AA' , 'A' , 'BBB' , 'BB' , 'B' , 'CCC'][index % 7] as any;
+const generateAnalystConsensus = (index: number): 'Strong Buy' | 'Buy' | 'Hold' | 'Sell' | 'Strong Sell' => ['Strong Buy' , 'Buy' , 'Hold' , 'Sell' , 'Strong Sell'][index % 5] as any;
+const generateNewsSentiment = (): number => parseFloat((Math.random() * 2 - 1).toFixed(2));
+
+const generateCompany = (id: number): Company => ({
+  id: 101 + id,
+  ticker: generateCompanyTicker(id + 1),
+  name: generateCompanyName(id + 1),
+  sector: generateSector(id),
+  currentPrice: generateCurrentPrice(),
+  volatilityIndex: generateVolatilityIndex(),
+  marketCap: generateMarketCap(),
+  peRatio: generatePERatio(),
+  dividendYield: generateDividendYield(),
+  esgRating: generateESGRating(id),
+  analystConsensus: generateAnalystConsensus(id),
+  newsSentiment: generateNewsSentiment(),
+});
+
+const generateHolding = (companyId: number, index: number): Holding => {
+    const purchaseDate = new Date();
+    const daysAgo = Math.floor(Math.random() * 500);
+    purchaseDate.setDate(purchaseDate.getDate() - daysAgo);
+    const costBasis = generateCurrentPrice() * (1 + (Math.random() - 0.5) * 0.2); // Cost basis near current price
+    return {
+        companyId,
+        shares: Math.floor(Math.random() * 200) + 10,
+        costBasis: parseFloat(costBasis.toFixed(2)),
+        purchaseDate: purchaseDate,
+    };
+};
 
 // --- Expanded Data Structures & World Simulation ---
 
@@ -66,30 +107,10 @@ interface HFT_MicroTrade {
 }
 
 // Simulate a vast, interconnected market of 100 entities
-const MOCK_COMPANIES: Company[] = Array.from({ length: 100 }, (_, i) => ({
-  id: 101 + i,
-  ticker: `WRLD${i + 1}`,
-  name: `Global Entity #${i + 1}`,
-  sector: ['Tech', 'Finance', 'Energy', 'Industry', 'Health', 'Quantum', 'BioSynth'][i % 7] as any,
-  currentPrice: parseFloat((Math.random() * 500 + 50).toFixed(2)),
-  volatilityIndex: parseFloat((Math.random() * 1.5 + 0.2).toFixed(2)),
-  marketCap: parseFloat((Math.random() * 2000 + 10).toFixed(2)),
-  peRatio: parseFloat((Math.random() * 40 + 5).toFixed(2)),
-  dividendYield: parseFloat((Math.random() * 5).toFixed(2)),
-  esgRating: ['AAA' , 'AA' , 'A' , 'BBB' , 'BB' , 'B' , 'CCC'][i % 7] as any,
-  analystConsensus: ['Strong Buy' , 'Buy' , 'Hold' , 'Sell' , 'Strong Sell'][i % 5] as any,
-  newsSentiment: parseFloat((Math.random() * 2 - 1).toFixed(2)),
-}));
+const MOCK_COMPANIES: Company[] = Array.from({ length: 100 }, (_, i) => generateCompany(i));
 
 // Simulate a complex, multi-lot user portfolio
-const MOCK_PORTFOLIO: Holding[] = [
-  { companyId: 101, shares: 50, costBasis: 180.00, purchaseDate: new Date('2023-02-15') }, // Long-term loss
-  { companyId: 102, shares: 100, costBasis: 30.00, purchaseDate: new Date('2022-11-20') }, // Long-term gain
-  { companyId: 103, shares: 20, costBasis: 220.10, purchaseDate: new Date() }, // Break even
-  { companyId: 104, shares: 75, costBasis: 110.00, purchaseDate: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000) }, // Short-term loss
-  { companyId: 105, shares: 10, costBasis: 250.00, purchaseDate: new Date(Date.now() - 400 * 24 * 60 * 60 * 1000) }, // Long-term gain
-  { companyId: 108, shares: 200, costBasis: 75.00, purchaseDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000) }, // Short-term gain
-];
+const MOCK_PORTFOLIO: Holding[] = Array.from({ length: 6 }, (_, i) => generateHolding(101 + i, i));
 
 // --- Sovereign AI Logic Core ---
 
@@ -167,7 +188,7 @@ const HFT_Simulator: React.FC<{ isRunning: boolean }> = ({ isRunning }) => {
             <div className="p-3 rounded-lg border border-dashed border-teal-500/50 bg-black/30">
                 <div className="flex justify-between items-center mb-2 pb-2 border-b border-teal-700">
                     <span className={`text-lg font-bold ${isRunning ? 'text-green-400 animate-pulse' : 'text-red-400'}`}>
-                        {isRunning ? '● MONITORING' : '■ OFFLINE'}
+                        {isRunning ? 'â—  MONITORING' : 'â–  OFFLINE'}
                     </span>
                     <div className="text-right">
                         <p className="text-xs text-gray-400">Total Taxable Events</p>
