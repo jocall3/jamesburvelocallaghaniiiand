@@ -38,7 +38,7 @@ const mockAccounts: BankOfAmericaAccount[] = [
   },
   {
     id: 'boa-cc-9012',
-    name: 'Bank of America® Customized Cash Rewards credit card',
+    name: 'Bank of AmericaÂ® Customized Cash Rewards credit card',
     type: 'Credit Card',
     balance: -750.25, // Negative for credit card balance owed
     currency: 'USD',
