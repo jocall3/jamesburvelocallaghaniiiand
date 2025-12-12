@@ -1,4 +1,3 @@
-
 export interface Charge {
     id: string;
     amount: number;
@@ -9,4 +8,3 @@ export interface Charge {
     payment_intent: string;
     description?: string;
 }
-      
