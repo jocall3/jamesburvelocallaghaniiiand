@@ -1,26 +1,92 @@
-
-import React, { useState } from 'react';
-import Card from './Card';
-import { DollarSign, TrendingUp, Globe, Activity, RefreshCw, AlertTriangle, Briefcase } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, Legend } from 'recharts';
+import { Globe, Activity, RefreshCw, AlertTriangle, Briefcase, DollarSign, TrendingUp } from 'lucide-react';
 
-// --- Mock Data ---
-const CASH_POSITIONS = [
-    { currency: 'USD', amount: 12500000, rate: 1.0, trend: 2.5 },
-    { currency: 'EUR', amount: 4500000, rate: 1.08, trend: -0.5 },
-    { currency: 'GBP', amount: 2100000, rate: 1.26, trend: 1.2 },
-    { currency: 'JPY', amount: 150000000, rate: 0.0067, trend: -1.8 },
-];
+// --- Internal Data Generation ---
+const generateRandomNumber = (min: number, max: number): number => Math.random() * (max - min) + min;
+const generateCurrency = (): string => ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD'][Math.floor(Math.random() * 6)];
+const generateTrend = (): number => (Math.random() - 0.5) * 5; // Trend between -2.5% and +2.5%
+const generateAmount = (currency: string): number => {
+    if (currency === 'JPY') return Math.floor(generateRandomNumber(50_000_000, 200_000_000));
+    return Math.floor(generateRandomNumber(1_000_000, 20_000_000));
+};
+const generateExchangeRate = (currency: string): number => {
+    switch (currency) {
+        case 'USD': return 1.0;
+        case 'EUR': return generateRandomNumber(1.05, 1.10);
+        case 'GBP': return generateRandomNumber(1.20, 1.30);
+        case 'JPY': return generateRandomNumber(0.0065, 0.0070);
+        case 'CAD': return generateRandomNumber(0.70, 0.75);
+        case 'AUD': return generateRandomNumber(0.65, 0.70);
+        default: return 1.0;
+    }
+};
 
-const FORECAST_DATA = Array.from({length: 12}, (_, i) => ({
-    month: `Month ${i+1}`,
-    operating: 5000 + Math.random() * 2000,
-    investing: 1000 + Math.random() * 3000,
-    financing: -1000 - Math.random() * 500,
-    net: 0
-})).map(d => ({...d, net: d.operating + d.investing + d.financing}));
+const generateCashPositions = (count: number = 5): Array<{ currency: string; amount: number; rate: number; trend: number }> => {
+    const positions = [];
+    const usedCurrencies = new Set<string>();
+    while (positions.length < count) {
+        const currency = generateCurrency();
+        if (!usedCurrencies.has(currency)) {
+            const rate = generateExchangeRate(currency);
+            positions.push({
+                currency: currency,
+                amount: generateAmount(currency),
+                rate: rate,
+                trend: generateTrend(),
+            });
+            usedCurrencies.add(currency);
+        }
+    }
+    return positions;
+};
 
-// --- Helper Components ---
+const generateForecastData = (months: number = 12): Array<{ month: string; operating: number; investing: number; financing: number; net: number }> => {
+    const data = [];
+    for (let i = 0; i < months; i++) {
+        const operating = generateRandomNumber(4000, 8000);
+        const investing = generateRandomNumber(500, 2500);
+        const financing = generateRandomNumber(-1500, -500);
+        const net = operating + investing + financing;
+        data.push({
+            month: `Month ${i + 1}`,
+            operating: operating,
+            investing: investing,
+            financing: financing,
+            net: net,
+        });
+    }
+    return data;
+};
+
+const generateDebtMaturityData = (): Array<{ year: string; amount: number }> => {
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: 5 }, (_, i) => ({
+        year: (currentYear + i).toString(),
+        amount: generateRandomNumber(200_000, 3_000_000),
+    }));
+};
+
+// --- Internal Model Training & Simulation ---
+const simulateRiskDetection = (): { level: 'low' | 'medium' | 'high'; message: string } => {
+    const riskLevel = generateRandomNumber(0, 1);
+    if (riskLevel < 0.6) return { level: 'low', message: 'All systems nominal.' };
+    if (riskLevel < 0.9) return { level: 'medium', message: 'Minor FX volatility detected.' };
+    return { level: 'high', message: 'Significant liquidity risk identified.' };
+};
+
+const simulateRegulatoryAlignment = (): boolean => generateRandomNumber(0, 1) > 0.1; // 90% chance of alignment
+
+// --- Shared Kernel Components ---
+const Card: React.FC<{ title: string; children: React.ReactNode; className?: string }> = ({ title, children, className }) => (
+    <div className={`bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-cyan-500/50 transition-colors ${className}`}>
+        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <DollarSign className="text-cyan-400" size={20} /> {title}
+        </h3>
+        {children}
+    </div>
+);
+
 const MetricTile: React.FC<{ label: string; value: string; subValue?: string; trend?: 'up' | 'down' }> = ({ label, value, subValue, trend }) => (
     <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700 hover:border-cyan-500/50 transition-colors">
         <p className="text-gray-400 text-xs uppercase tracking-wider mb-1">{label}</p>
@@ -33,62 +99,107 @@ const MetricTile: React.FC<{ label: string; value: string; subValue?: string; tr
     </div>
 );
 
+// --- Treasury View Business Model ---
 const TreasuryView: React.FC = () => {
-    const [activeCurrency, setActiveCurrency] = useState('USD');
+    const [cashPositions, setCashPositions] = useState<Array<{ currency: string; amount: number; rate: number; trend: number }>>([]);
+    const [forecastData, setForecastData] = useState<Array<{ month: string; operating: number; investing: number; financing: number; net: number }>>([]);
+    const [debtMaturityData, setDebtMaturityData] = useState<Array<{ year: string; amount: number }>>([]);
+    const [riskStatus, setRiskStatus] = useState<{ level: 'low' | 'medium' | 'high'; message: string }>({ level: 'low', message: '' });
+    const [regulatoryStatus, setRegulatoryStatus] = useState<boolean>(true);
 
-    const totalGlobalLiquidity = CASH_POSITIONS.reduce((acc, curr) => acc + (curr.amount * curr.rate), 0);
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        // Initial data load
+        setCashPositions(generateCashPositions());
+        setForecastData(generateForecastData());
+        setDebtMaturityData(generateDebtMaturityData());
+        setRiskStatus(simulateRiskDetection());
+        setRegulatoryStatus(simulateRegulatoryAlignment());
+
+        // Simulate real-time updates
+        intervalRef.current = setInterval(() => {
+            setCashPositions(generateCashPositions());
+            setForecastData(generateForecastData());
+            setDebtMaturityData(generateDebtMaturityData());
+            setRiskStatus(simulateRiskDetection());
+            setRegulatoryStatus(simulateRegulatoryAlignment());
+        }, 30000); // Update every 30 seconds
+
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        };
+    }, []);
+
+    const totalGlobalLiquidity = cashPositions.reduce((acc, curr) => acc + (curr.amount * curr.rate), 0);
+    const formattedTotalLiquidity = `$${totalGlobalLiquidity.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+
+    const riskColorClass = riskStatus.level === 'high' ? 'border-red-500' : riskStatus.level === 'medium' ? 'border-yellow-500' : 'border-green-500';
+    const regulatoryColorClass = regulatoryStatus ? 'border-green-500' : 'border-red-500';
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-end">
+        <div className="space-y-6 p-8 bg-gray-900 text-gray-300 min-h-screen font-sans">
+            <div className="flex justify-between items-end border-b border-gray-700 pb-4">
                 <div>
-                    <h2 className="text-3xl font-bold text-white tracking-wider flex items-center gap-3">
-                        <Globe className="text-cyan-400" /> Global Treasury
+                    <h2 className="text-4xl font-bold text-white tracking-wider flex items-center gap-3">
+                        <Globe className="text-cyan-400" size={36} /> Global Treasury Operations
                     </h2>
-                    <p className="text-gray-400 mt-1">Real-time liquidity management and FX exposure.</p>
+                    <p className="text-gray-400 mt-2 text-lg">Real-time liquidity management, FX exposure, and debt profiling.</p>
                 </div>
                 <div className="text-right">
-                    <p className="text-sm text-gray-500 uppercase">Total Global Liquidity (USD Eqv)</p>
-                    <p className="text-4xl font-extrabold text-white text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-500">
-                        ${totalGlobalLiquidity.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    <p className="text-sm text-gray-500 uppercase tracking-wider">Total Global Liquidity (USD Eqv)</p>
+                    <p className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-500">
+                        {formattedTotalLiquidity}
                     </p>
                 </div>
             </div>
 
-            {/* Cash Positions Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {CASH_POSITIONS.map(pos => (
-                    <MetricTile 
+            {/* Key Metrics Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {cashPositions.map(pos => (
+                    <MetricTile
                         key={pos.currency}
                         label={`${pos.currency} Position`}
                         value={pos.amount.toLocaleString(undefined, { style: 'currency', currency: pos.currency })}
-                        subValue={`${pos.trend > 0 ? '+' : ''}${pos.trend}% vs prev day`}
+                        subValue={`${pos.trend > 0 ? '+' : ''}${pos.trend.toFixed(2)}% vs prev day`}
                         trend={pos.trend > 0 ? 'up' : 'down'}
                     />
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Liquidity Forecast */}
                 <Card title="12-Month Liquidity Forecast" className="lg:col-span-2 h-[450px]">
                     <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={FORECAST_DATA} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                        <AreaChart data={forecastData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="colorNet" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.8}/>
                                     <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
                                 </linearGradient>
+                                <linearGradient id="colorOperating" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.7}/>
+                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.2}/>
+                                </linearGradient>
+                                <linearGradient id="colorFinancing" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.7}/>
+                                    <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.2}/>
+                                </linearGradient>
                             </defs>
                             <XAxis dataKey="month" stroke="#6b7280" fontSize={12} />
-                            <YAxis stroke="#6b7280" fontSize={12} tickFormatter={(val) => `$${val/1000}k`} />
+                            <YAxis stroke="#6b7280" fontSize={12} tickFormatter={(val) => `$${(val / 1000).toFixed(0)}k`} />
                             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                            <Tooltip 
-                                contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#fff' }}
-                                formatter={(val: number) => `$${val.toLocaleString()}`}
+                            <Tooltip
+                                contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#fff', borderRadius: '8px' }}
+                                itemStyle={{ color: '#fff' }}
+                                formatter={(val: number) => `$${val.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
                             />
-                            <Legend />
+                            <Legend wrapperStyle={{ color: '#9ca3af' }} />
                             <Area type="monotone" dataKey="net" stroke="#06b6d4" fillOpacity={1} fill="url(#colorNet)" name="Net Cash Flow" />
-                            <Area type="monotone" dataKey="operating" stroke="#10b981" fillOpacity={0} strokeDasharray="5 5" name="Operating" />
+                            <Area type="monotone" dataKey="operating" stroke="#10b981" fillOpacity={0.6} fill="url(#colorOperating)" strokeDasharray="5 5" name="Operating" />
+                            <Area type="monotone" dataKey="financing" stroke="#f43f5e" fillOpacity={0.6} fill="url(#colorFinancing)" strokeDasharray="3 3" name="Financing" />
                         </AreaChart>
                     </ResponsiveContainer>
                 </Card>
@@ -97,54 +208,51 @@ const TreasuryView: React.FC = () => {
                 <div className="flex flex-col gap-6">
                     <Card title="Quick Actions">
                         <div className="space-y-3">
-                            <button className="w-full p-3 bg-indigo-600 hover:bg-indigo-500 rounded text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors">
-                                <RefreshCw size={16} /> Internal Transfer / Sweep
+                            <button className="w-full p-3 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors shadow-lg hover:shadow-xl">
+                                <RefreshCw size={16} /> Initiate Internal Transfer / Sweep
                             </button>
-                            <button className="w-full p-3 bg-gray-700 hover:bg-gray-600 rounded text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors">
-                                <Activity size={16} /> FX Spot Trade
+                            <button className="w-full p-3 bg-cyan-600 hover:bg-cyan-500 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors shadow-lg hover:shadow-xl">
+                                <Activity size={16} /> Execute FX Spot Trade
                             </button>
-                            <button className="w-full p-3 bg-gray-700 hover:bg-gray-600 rounded text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors">
+                            <button className="w-full p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors shadow-lg hover:shadow-xl">
                                 <Briefcase size={16} /> Manage Debt Facility
                             </button>
                         </div>
                     </Card>
 
-                    <Card title="Exposure Alerts" className="flex-grow border-l-4 border-yellow-500">
+                    <Card title="Risk & Compliance Status" className={`flex-grow border-l-4 ${riskColorClass}`}>
                         <div className="space-y-4">
                             <div className="flex items-start gap-3">
-                                <AlertTriangle className="text-yellow-500 shrink-0 mt-1" size={18} />
+                                <AlertTriangle className={`shrink-0 mt-1 ${riskStatus.level === 'high' ? 'text-red-500' : riskStatus.level === 'medium' ? 'text-yellow-500' : 'text-green-500'}`} size={20} />
                                 <div>
-                                    <p className="text-sm font-bold text-white">JPY Exposure High</p>
-                                    <p className="text-xs text-gray-400">Current JPY holdings exceed hedging policy limit by 12%.</p>
+                                    <p className="text-sm font-bold text-white capitalize">{riskStatus.level} Risk Level</p>
+                                    <p className="text-xs text-gray-400">{riskStatus.message}</p>
                                 </div>
                             </div>
-                            <div className="flex items-start gap-3">
-                                <Activity className="text-cyan-500 shrink-0 mt-1" size={18} />
+                            <div className={`flex items-start gap-3 border-t border-gray-700 pt-4 ${regulatoryColorClass}`}>
+                                <TrendingUp className={`shrink-0 mt-1 ${regulatoryStatus ? 'text-green-500' : 'text-red-500'}`} size={20} />
                                 <div>
-                                    <p className="text-sm font-bold text-white">Yield Optimization</p>
-                                    <p className="text-xs text-gray-400">Found 3 overnight sweep opportunities offering +0.4% APY.</p>
+                                    <p className="text-sm font-bold text-white">Regulatory Alignment</p>
+                                    <p className="text-xs text-gray-400">{regulatoryStatus ? 'Fully compliant with current regulations.' : 'Potential compliance gap detected.'}</p>
                                 </div>
                             </div>
                         </div>
                     </Card>
                 </div>
             </div>
-            
-            {/* Debt Profile */}
+
+            {/* Debt Maturity Profile */}
             <Card title="Debt Maturity Profile">
                 <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={[
-                            { year: '2024', amount: 500000 },
-                            { year: '2025', amount: 1200000 },
-                            { year: '2026', amount: 800000 },
-                            { year: '2027', amount: 2500000 },
-                            { year: '2028', amount: 1500000 },
-                        ]}>
+                        <BarChart data={debtMaturityData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#374151" vertical={false} />
-                            <XAxis dataKey="year" stroke="#6b7280" />
-                            <YAxis stroke="#6b7280" tickFormatter={(val) => `$${val/1000000}M`} />
-                            <Tooltip contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151' }} />
+                            <XAxis dataKey="year" stroke="#6b7280" fontSize={12} />
+                            <YAxis stroke="#6b7280" tickFormatter={(val) => `$${(val / 1000000).toFixed(1)}M`} />
+                            <Tooltip
+                                contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#fff', borderRadius: '8px' }}
+                                formatter={(val: number) => `$${val.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+                            />
                             <Bar dataKey="amount" fill="#6366f1" radius={[4, 4, 0, 0]} name="Principal Due" />
                         </BarChart>
                     </ResponsiveContainer>
