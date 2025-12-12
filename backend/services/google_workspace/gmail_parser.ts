@@ -1,4 +1,3 @@
-```typescript
 import { google, gmail_v1 } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 import { Buffer } from 'buffer';
@@ -198,4 +197,3 @@ export class GmailParserService {
     };
   }
 }
-```
