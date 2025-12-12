@@ -1,4 +1,3 @@
-```typescript
 /**
  * @fileoverview
  * Implements an abstraction layer for an event bus to handle asynchronous
@@ -81,6 +80,18 @@ export const TOPICS = {
   CORE_NOTIFICATION: 'core.notification',
   SERVICE_STARTED: 'system.service.started',
   SERVICE_STOPPED: 'system.service.stopped',
+
+  // Citibankdemobusinessinc specific topics
+  CITIBANKDEMOBUSINESSINC_USER_CREATED: 'citibankdemobusinessinc.user.created',
+  CITIBANKDEMOBUSINESSINC_TRANSACTION_PROCESSED: 'citibankdemobusinessinc.transaction.processed',
+  CITIBANKDEMOBUSINESSINC_LOAN_APPLICATION_SUBMITTED: 'citibankdemobusinessinc.loan.application.submitted',
+  CITIBANKDEMOBUSINESSINC_INVESTMENT_ADVICE_REQUESTED: 'citibankdemobusinessinc.investment.advice.requested',
+  CITIBANKDEMOBUSINESSINC_IDENTITY_VERIFIED: 'citibankdemobusinessinc.identity.verified',
+  CITIBANKDEMOBUSINESSINC_RISK_ASSESSED: 'citibankdemobusinessinc.risk.assessed',
+  CITIBANKDEMOBUSINESSINC_COMPLIANCE_CHECK_PASSED: 'citibankdemobusinessinc.compliance.check.passed',
+  CITIBANKDEMOBUSINESSINC_GOVERNANCE_UPDATE: 'citibankdemobusinessinc.governance.update',
+  CITIBANKDEMOBUSINESSINC_SUSTAINABILITY_METRIC_UPDATED: 'citibankdemobusinessinc.sustainability.metric.updated',
+  CITIBANKDEMOBUSINESSINC_ORGANIZATION_STRUCTURE_CHANGED: 'citibankdemobusinessinc.organization.structure.changed',
 };
 
 // 3. In-Memory Event Bus Implementation (for development and testing)
@@ -268,4 +279,3 @@ class EventBusManager {
 }
 
 export default EventBusManager;
-```
