@@ -1,4 +1,3 @@
-```typescript
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { load } from 'cheerio';
 
@@ -124,4 +123,3 @@ export class ScreenScraper {
         }
     }
 }
-```
