@@ -1,218 +1,73 @@
-import React, { memo } from 'react';
-import { Handle, Position } from 'reactflow';
+import React from 'react';
 
-// Generic Node Component
-const GenericNode = ({ data, label }: { data: any, label: string }) => {
+/**
+ * A blog post reflecting on the surprising complexity of modern financial systems,
+ * inspired by the sheer number of components required to visualize its data model.
+ */
+const FinancialSystemComplexityBlog = () => {
   return (
-    <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-gray-200 text-xs">
-      <div className="flex">
-        <div className="ml-2">
-          <div className="text-lg font-bold">{label}</div>
-          <div className="text-gray-500">{data.label}</div>
-        </div>
-      </div>
-      <Handle type="target" position={Position.Top} className="w-16 !bg-teal-500" />
-      <Handle type="source" position={Position.Bottom} className="w-16 !bg-teal-500" />
-    </div>
+    <article style={{ fontFamily: 'sans-serif', lineHeight: 1.6, color: '#333', maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>
+      <header>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>This One Code File Reveals the Secret Complexity of a Single Online Purchase</h1>
+        <p style={{ color: '#666', marginTop: 0 }}>By A World-Class Synthesizer of Ideas</p>
+      </header>
+
+      <main>
+        <p>Ever clicked 'Buy Now' and wondered what happens next? You probably imagine a simple digital handshake: your card details go one way, a confirmation comes back the other. But what if I told you that simple click unleashes a cascade of events within a system so vast and intricate it mirrors the complexity of a small city?</p>
+        <p>I recently stumbled upon a single file of code—a component list for a user interface—that paints a richer picture of modern finance than most textbooks. It's a dizzying list of over 200 distinct concepts, and buried within it are some profound truths about the architecture of our digital economy. Here are the five most surprising things I learned.</p>
+
+        <section>
+          <h2 style={{ fontSize: '1.75rem', borderBottom: '2px solid #eee', paddingBottom: '0.5rem', marginTop: '2.5rem' }}>1. A "Simple" Payment Is a Universe of Interacting Objects</h2>
+          <p>The first thing that hits you when you see this file is the sheer, overwhelming length of the list. We think of a purchase as a single 'Charge', but the code reveals a galaxy of related concepts: <code>Customer</code>, <code>Invoice</code>, <code>Subscription</code>, <code>Payout</code>, <code>Refund</code>, <code>Dispute</code>, <code>BalanceTransaction</code>... the list goes on and on.</p>
+          <p>This isn't just a transaction; it's an ecosystem. Each of these 'nodes' represents a distinct object in the system that might be created or modified during a single purchase, especially for recurring subscriptions or complex marketplace models. It's a powerful visualization of the idea that what feels like a single event to us is, in reality, a carefully choreographed dance between dozens of specialized data objects.</p>
+        </section>
+
+        <section>
+          <h2 style={{ fontSize: '1.75rem', borderBottom: '2px solid #eee', paddingBottom: '0.5rem', marginTop: '2.5rem' }}>2. In Finance, Nothing Is Ever Truly 'Deleted'</h2>
+          <p>One of the most counter-intuitive patterns in the code is the prevalence of objects with a 'Deleted' prefix, like <code>DeletedCustomerNode</code>, <code>DeletedInvoiceNode</code>, and <code>DeletedPlanNode</code>.</p>
+          <p>Why would you need a component for something that's gone? This points to a fundamental rule of financial systems: you can't just erase the past. Deleting a customer doesn't wipe them from existence; it transitions them to a 'deleted' state. This practice, often called a 'soft delete,' is crucial for maintaining an audit trail. You need to preserve historical records for accounting, dispute resolution, and regulatory compliance. The system must account for the absence of something just as rigorously as it accounts for its presence.</p>
+        </section>
+
+        <section>
+          <h2 style={{ fontSize: '1.75rem', borderBottom: '2px solid #eee', paddingBottom: '0.5rem', marginTop: '2.5rem' }}>3. The Secret to Taming Complexity? A Single, Perfect Building Block.</h2>
+          <p>How can any team manage a system with over 200 distinct but related components? The answer lies in a beautifully elegant software design principle: abstraction. The original file contained a single, unassuming component called <code>GenericNode</code>.</p>
+          <p>Every single one of the other 200+ components was just a simple, pre-configured wrapper around this one generic block. The code looked like this:</p>
+          <blockquote style={{ borderLeft: '4px solid #ccc', paddingLeft: '1rem', margin: '1rem 0', fontStyle: 'italic', color: '#555' }}>
+            <pre style={{ backgroundColor: '#f9f9f9', padding: '1rem', borderRadius: '4px', whiteSpace: 'pre-wrap' }}>
+              <code>
+{`// Generic Node Component
+const GenericNode = ({ data, label }) => { /* ... implementation ... */ };
+
+// Specific nodes are just memoized instances of the generic one
+export const AccountNode = memo((props) => <GenericNode {...props} label="Account" />);
+export const ChargeNode = memo((props) => <GenericNode {...props} label="Charge" />);
+export const CustomerNode = memo((props) => <GenericNode {...props} label="Customer" />);`}
+              </code>
+            </pre>
+          </blockquote>
+          <p>This is the "Don't Repeat Yourself" (DRY) principle in its purest form. By creating one reusable, configurable component, the developers can easily create and manage hundreds of variations without duplicating code. It’s a masterclass in building scalable and maintainable systems, proving that the solution to immense complexity is often found in simple, powerful abstractions.</p>
+        </section>
+
+        <section>
+          <h2 style={{ fontSize: '1.75rem', borderBottom: '2px solid #eee', paddingBottom: '0.5rem', marginTop: '2.5rem' }}>4. Modern Payment Platforms Are Full-Fledged Financial Operating Systems</h2>
+          <p>If you scan the list long enough, you'll find names that go far beyond simple online shopping. We see nodes for <code>TreasuryInboundTransfer</code>, <code>CapitalFinancingOffer</code>, <code>IssuingCard</code>, and even <code>ClimateOrder</code>.</p>
+          <p>This reveals the true ambition of modern financial technology. These platforms aren't just for processing payments on a website; they are becoming the financial operating system for businesses. They allow companies to not only accept money but also to manage corporate treasury, access capital loans, issue their own corporate credit cards, and even participate in carbon removal programs. The scope is breathtaking, transforming the very nature of what a 'payment processor' is.</p>
+        </section>
+
+        <section>
+          <h2 style={{ fontSize: '1.75rem', borderBottom: '2px solid #eee', paddingBottom: '0.5rem', marginTop: '2.5rem' }}>5. The Real Genius Is in the "Boring" Stuff: Testing, Fraud, and Compliance</h2>
+          <p>Some of the most interesting components are the ones that sound the most mundane. I'm talking about <code>TestHelpersTestClock</code>, <code>RadarEarlyFraudWarning</code>, <code>TaxIdNode</code>, and <code>SourceMandateNotification</code>.</p>
+          <p>These aren't the glamorous, core features, but they are the bedrock of a trustworthy system. They represent the immense effort that goes into testing every possible scenario, proactively fighting fraud, and navigating the labyrinth of global tax and banking regulations. A mature system isn't defined by its 'happy path' but by its meticulous, robust handling of every conceivable edge case, failure mode, and regulatory hurdle. This is where the real, painstaking work of building a global financial platform happens.</p>
+        </section>
+      </main>
+
+      <footer>
+        <h2 style={{ fontSize: '1.75rem', borderBottom: '2px solid #eee', paddingBottom: '0.5rem', marginTop: '2.5rem' }}>A Final Thought</h2>
+        <p>Looking at this single file is like studying the blueprint for a skyscraper. From the street, you just see the building, but the blueprint reveals the thousands of hidden beams, pipes, and wires that make it stand tall and function safely. This code shows us that the seamless digital experiences we take for granted are built on layers of staggering complexity, elegant design principles, and a relentless focus on the details.</p>
+        <p>It's a powerful reminder that behind every simple click lies a universe of engineering. The next time you buy something online, what hidden systems will you imagine at play?</p>
+      </footer>
+    </article>
   );
 };
 
-// Export a mock component for every node type used in ResourceGraphView
-export const AccountNode = memo((props: any) => <GenericNode {...props} label="Account" />);
-export const AccountLinkNode = memo((props: any) => <GenericNode {...props} label="AccountLink" />);
-export const ApplePayDomainNode = memo((props: any) => <GenericNode {...props} label="ApplePayDomain" />);
-export const ApplicationFeeNode = memo((props: any) => <GenericNode {...props} label="ApplicationFee" />);
-export const AppsSecretNode = memo((props: any) => <GenericNode {...props} label="AppsSecret" />);
-export const BalanceNode = memo((props: any) => <GenericNode {...props} label="Balance" />);
-export const BalanceTransactionNode = memo((props: any) => <GenericNode {...props} label="BalanceTransaction" />);
-export const BankAccountNode = memo((props: any) => <GenericNode {...props} label="BankAccount" />);
-export const BillingPortalConfigurationNode = memo((props: any) => <GenericNode {...props} label="BillingPortalConfig" />);
-export const BillingPortalSessionNode = memo((props: any) => <GenericNode {...props} label="BillingPortalSession" />);
-export const CapabilityNode = memo((props: any) => <GenericNode {...props} label="Capability" />);
-export const CardNode = memo((props: any) => <GenericNode {...props} label="Card" />);
-export const CashBalanceNode = memo((props: any) => <GenericNode {...props} label="CashBalance" />);
-export const ChargeNode = memo((props: any) => <GenericNode {...props} label="Charge" />);
-export const CheckoutSessionNode = memo((props: any) => <GenericNode {...props} label="CheckoutSession" />);
-export const CountrySpecNode = memo((props: any) => <GenericNode {...props} label="CountrySpec" />);
-export const CouponNode = memo((props: any) => <GenericNode {...props} label="Coupon" />);
-export const CreditNoteNode = memo((props: any) => <GenericNode {...props} label="CreditNote" />);
-export const CreditNoteLineItemNode = memo((props: any) => <GenericNode {...props} label="CreditNoteLineItem" />);
-export const CustomerNode = memo((props: any) => <GenericNode {...props} label="Customer" />);
-export const CustomerBalanceTransactionNode = memo((props: any) => <GenericNode {...props} label="CustomerBalanceTxn" />);
-export const CustomerCashBalanceTransactionNode = memo((props: any) => <GenericNode {...props} label="CustomerCashBalanceTxn" />);
-export const DeletedAccountNode = memo((props: any) => <GenericNode {...props} label="DeletedAccount" />);
-export const DeletedApplePayDomainNode = memo((props: any) => <GenericNode {...props} label="DeletedApplePayDomain" />);
-export const DeletedCouponNode = memo((props: any) => <GenericNode {...props} label="DeletedCoupon" />);
-export const DeletedCustomerNode = memo((props: any) => <GenericNode {...props} label="DeletedCustomer" />);
-export const DeletedDiscountNode = memo((props: any) => <GenericNode {...props} label="DeletedDiscount" />);
-export const DeletedExternalAccountNode = memo((props: any) => <GenericNode {...props} label="DeletedExternalAccount" />);
-export const DeletedInvoiceNode = memo((props: any) => <GenericNode {...props} label="DeletedInvoice" />);
-export const DeletedInvoiceitemNode = memo((props: any) => <GenericNode {...props} label="DeletedInvoiceitem" />);
-export const DeletedPaymentSourceNode = memo((props: any) => <GenericNode {...props} label="DeletedPaymentSource" />);
-export const DeletedPersonNode = memo((props: any) => <GenericNode {...props} label="DeletedPerson" />);
-export const DeletedPlanNode = memo((props: any) => <GenericNode {...props} label="DeletedPlan" />);
-export const DeletedProductNode = memo((props: any) => <GenericNode {...props} label="DeletedProduct" />);
-export const DeletedRadarValueListNode = memo((props: any) => <GenericNode {...props} label="DeletedRadarValueList" />);
-export const DeletedRadarValueListItemNode = memo((props: any) => <GenericNode {...props} label="DeletedRadarValueListItem" />);
-export const DeletedSubscriptionItemNode = memo((props: any) => <GenericNode {...props} label="DeletedSubscriptionItem" />);
-export const DeletedTaxIdNode = memo((props: any) => <GenericNode {...props} label="DeletedTaxId" />);
-export const DeletedTerminalConfigurationNode = memo((props: any) => <GenericNode {...props} label="DeletedTerminalConfiguration" />);
-export const DeletedTerminalLocationNode = memo((props: any) => <GenericNode {...props} label="DeletedTerminalLocation" />);
-export const DeletedTerminalReaderNode = memo((props: any) => <GenericNode {...props} label="DeletedTerminalReader" />);
-export const DeletedTestHelpersTestClockNode = memo((props: any) => <GenericNode {...props} label="DeletedTestHelpersTestClock" />);
-export const DeletedWebhookEndpointNode = memo((props: any) => <GenericNode {...props} label="DeletedWebhookEndpoint" />);
-export const DiscountNode = memo((props: any) => <GenericNode {...props} label="Discount" />);
-export const DisputeNode = memo((props: any) => <GenericNode {...props} label="Dispute" />);
-export const EphemeralKeyNode = memo((props: any) => <GenericNode {...props} label="EphemeralKey" />);
-export const EventNode = memo((props: any) => <GenericNode {...props} label="Event" />);
-export const ExchangeRateNode = memo((props: any) => <GenericNode {...props} label="ExchangeRate" />);
-export const ExternalAccountNode = memo((props: any) => <GenericNode {...props} label="ExternalAccount" />);
-export const FeeRefundNode = memo((props: any) => <GenericNode {...props} label="FeeRefund" />);
-export const FileNode = memo((props: any) => <GenericNode {...props} label="File" />);
-export const FileLinkNode = memo((props: any) => <GenericNode {...props} label="FileLink" />);
-export const FinancialConnectionsAccountNode = memo((props: any) => <GenericNode {...props} label="FinancialConnectionsAccount" />);
-export const FinancialConnectionsAccountOwnerNode = memo((props: any) => <GenericNode {...props} label="FinancialConnectionsAccountOwner" />);
-export const FinancialConnectionsSessionNode = memo((props: any) => <GenericNode {...props} label="FinancialConnectionsSession" />);
-export const FundingInstructionsNode = memo((props: any) => <GenericNode {...props} label="FundingInstructions" />);
-export const IdentityVerificationReportNode = memo((props: any) => <GenericNode {...props} label="IdentityVerificationReport" />);
-export const IdentityVerificationSessionNode = memo((props: any) => <GenericNode {...props} label="IdentityVerificationSession" />);
-export const InvoiceNode = memo((props: any) => <GenericNode {...props} label="Invoice" />);
-export const InvoiceitemNode = memo((props: any) => <GenericNode {...props} label="Invoiceitem" />);
-export const IssuingAuthorizationNode = memo((props: any) => <GenericNode {...props} label="IssuingAuthorization" />);
-export const IssuingCardNode = memo((props: any) => <GenericNode {...props} label="IssuingCard" />);
-export const IssuingCardholderNode = memo((props: any) => <GenericNode {...props} label="IssuingCardholder" />);
-export const IssuingDisputeNode = memo((props: any) => <GenericNode {...props} label="IssuingDispute" />);
-export const IssuingSettlementNode = memo((props: any) => <GenericNode {...props} label="IssuingSettlement" />);
-export const IssuingTransactionNode = memo((props: any) => <GenericNode {...props} label="IssuingTransaction" />);
-export const ItemNode = memo((props: any) => <GenericNode {...props} label="Item" />);
-export const LineItemNode = memo((props: any) => <GenericNode {...props} label="LineItem" />);
-export const LoginLinkNode = memo((props: any) => <GenericNode {...props} label="LoginLink" />);
-export const MandateNode = memo((props: any) => <GenericNode {...props} label="Mandate" />);
-export const PaymentIntentNode = memo((props: any) => <GenericNode {...props} label="PaymentIntent" />);
-export const PaymentLinkNode = memo((props: any) => <GenericNode {...props} label="PaymentLink" />);
-export const PaymentMethodNode = memo((props: any) => <GenericNode {...props} label="PaymentMethod" />);
-export const PaymentSourceNode = memo((props: any) => <GenericNode {...props} label="PaymentSource" />);
-export const PayoutNode = memo((props: any) => <GenericNode {...props} label="Payout" />);
-export const PersonNode = memo((props: any) => <GenericNode {...props} label="Person" />);
-export const PlanNode = memo((props: any) => <GenericNode {...props} label="Plan" />);
-export const PriceNode = memo((props: any) => <GenericNode {...props} label="Price" />);
-export const ProductNode = memo((props: any) => <GenericNode {...props} label="Product" />);
-export const PromotionCodeNode = memo((props: any) => <GenericNode {...props} label="PromotionCode" />);
-export const QuoteNode = memo((props: any) => <GenericNode {...props} label="Quote" />);
-export const RadarEarlyFraudWarningNode = memo((props: any) => <GenericNode {...props} label="RadarEarlyFraudWarning" />);
-export const RadarValueListNode = memo((props: any) => <GenericNode {...props} label="RadarValueList" />);
-export const RadarValueListItemNode = memo((props: any) => <GenericNode {...props} label="RadarValueListItem" />);
-export const RefundNode = memo((props: any) => <GenericNode {...props} label="Refund" />);
-export const ReportingReportRunNode = memo((props: any) => <GenericNode {...props} label="ReportingReportRun" />);
-export const ReportingReportTypeNode = memo((props: any) => <GenericNode {...props} label="ReportingReportType" />);
-export const ReviewNode = memo((props: any) => <GenericNode {...props} label="Review" />);
-export const ScheduledQueryRunNode = memo((props: any) => <GenericNode {...props} label="ScheduledQueryRun" />);
-export const SetupAttemptNode = memo((props: any) => <GenericNode {...props} label="SetupAttempt" />);
-export const SetupIntentNode = memo((props: any) => <GenericNode {...props} label="SetupIntent" />);
-export const ShippingRateNode = memo((props: any) => <GenericNode {...props} label="ShippingRate" />);
-export const SourceNode = memo((props: any) => <GenericNode {...props} label="Source" />);
-export const SourceMandateNotificationNode = memo((props: any) => <GenericNode {...props} label="SourceMandateNotification" />);
-export const SourceTransactionNode = memo((props: any) => <GenericNode {...props} label="SourceTransaction" />);
-export const SubscriptionNode = memo((props: any) => <GenericNode {...props} label="Subscription" />);
-export const SubscriptionItemNode = memo((props: any) => <GenericNode {...props} label="SubscriptionItem" />);
-export const SubscriptionScheduleNode = memo((props: any) => <GenericNode {...props} label="SubscriptionSchedule" />);
-export const TaxCodeNode = memo((props: any) => <GenericNode {...props} label="TaxCode" />);
-export const TaxIdNode = memo((props: any) => <GenericNode {...props} label="TaxId" />);
-export const TaxRateNode = memo((props: any) => <GenericNode {...props} label="TaxRate" />);
-export const TerminalConfigurationNode = memo((props: any) => <GenericNode {...props} label="TerminalConfiguration" />);
-export const TerminalConnectionTokenNode = memo((props: any) => <GenericNode {...props} label="TerminalConnectionToken" />);
-export const TerminalLocationNode = memo((props: any) => <GenericNode {...props} label="TerminalLocation" />);
-export const TerminalReaderNode = memo((props: any) => <GenericNode {...props} label="TerminalReader" />);
-export const TestHelpersTestClockNode = memo((props: any) => <GenericNode {...props} label="TestHelpersTestClock" />);
-export const TokenNode = memo((props: any) => <GenericNode {...props} label="Token" />);
-export const TopupNode = memo((props: any) => <GenericNode {...props} label="Topup" />);
-export const TransferNode = memo((props: any) => <GenericNode {...props} label="Transfer" />);
-export const TransferReversalNode = memo((props: any) => <GenericNode {...props} label="TransferReversal" />);
-export const TreasuryCreditReversalNode = memo((props: any) => <GenericNode {...props} label="TreasuryCreditReversal" />);
-export const TreasuryDebitReversalNode = memo((props: any) => <GenericNode {...props} label="TreasuryDebitReversal" />);
-export const TreasuryFinancialAccountNode = memo((props: any) => <GenericNode {...props} label="TreasuryFinancialAccount" />);
-export const TreasuryFinancialAccountFeaturesNode = memo((props: any) => <GenericNode {...props} label="TreasuryFinancialAccountFeatures" />);
-export const TreasuryInboundTransferNode = memo((props: any) => <GenericNode {...props} label="TreasuryInboundTransfer" />);
-export const TreasuryOutboundPaymentNode = memo((props: any) => <GenericNode {...props} label="TreasuryOutboundPayment" />);
-export const TreasuryOutboundTransferNode = memo((props: any) => <GenericNode {...props} label="TreasuryOutboundTransfer" />);
-export const TreasuryReceivedCreditNode = memo((props: any) => <GenericNode {...props} label="TreasuryReceivedCredit" />);
-export const TreasuryReceivedDebitNode = memo((props: any) => <GenericNode {...props} label="TreasuryReceivedDebit" />);
-export const TreasuryTransactionNode = memo((props: any) => <GenericNode {...props} label="TreasuryTransaction" />);
-export const TreasuryTransactionEntryNode = memo((props: any) => <GenericNode {...props} label="TreasuryTransactionEntry" />);
-export const WebhookEndpointNode = memo((props: any) => <GenericNode {...props} label="WebhookEndpoint" />);
-export const AccountNoticeNode = memo((props: any) => <GenericNode {...props} label="AccountNotice" />);
-export const AccountSessionNode = memo((props: any) => <GenericNode {...props} label="AccountSession" />);
-export const ApplicationNode = memo((props: any) => <GenericNode {...props} label="Application" />);
-export const BalanceSettingsNode = memo((props: any) => <GenericNode {...props} label="BalanceSettings" />);
-export const BillingAlertNode = memo((props: any) => <GenericNode {...props} label="BillingAlert" />);
-export const BillingAlertTriggeredNode = memo((props: any) => <GenericNode {...props} label="BillingAlertTriggered" />);
-export const BillingCreditBalanceSummaryNode = memo((props: any) => <GenericNode {...props} label="BillingCreditBalanceSummary" />);
-export const BillingCreditBalanceTransactionNode = memo((props: any) => <GenericNode {...props} label="BillingCreditBalanceTransaction" />);
-export const BillingCreditGrantNode = memo((props: any) => <GenericNode {...props} label="BillingCreditGrant" />);
-export const BillingMeterNode = memo((props: any) => <GenericNode {...props} label="BillingMeter" />);
-export const BillingMeterEventNode = memo((props: any) => <GenericNode {...props} label="BillingMeterEvent" />);
-export const BillingMeterEventAdjustmentNode = memo((props: any) => <GenericNode {...props} label="BillingMeterEventAdjustment" />);
-export const BillingMeterEventSummaryNode = memo((props: any) => <GenericNode {...props} label="BillingMeterEventSummary" />);
-export const CapitalFinancingOfferNode = memo((props: any) => <GenericNode {...props} label="CapitalFinancingOffer" />);
-export const CapitalFinancingSummaryNode = memo((props: any) => <GenericNode {...props} label="CapitalFinancingSummary" />);
-export const CapitalFinancingTransactionNode = memo((props: any) => <GenericNode {...props} label="CapitalFinancingTransaction" />);
-export const ClimateOrderNode = memo((props: any) => <GenericNode {...props} label="ClimateOrder" />);
-export const ClimateProductNode = memo((props: any) => <GenericNode {...props} label="ClimateProduct" />);
-export const ClimateSupplierNode = memo((props: any) => <GenericNode {...props} label="ClimateSupplier" />);
-export const ConfirmationTokenNode = memo((props: any) => <GenericNode {...props} label="ConfirmationToken" />);
-export const CustomerSessionNode = memo((props: any) => <GenericNode {...props} label="CustomerSession" />);
-export const DeletedApplicationNode = memo((props: any) => <GenericNode {...props} label="DeletedApplication" />);
-export const DeletedBankAccountNode = memo((props: any) => <GenericNode {...props} label="DeletedBankAccount" />);
-export const DeletedCardNode = memo((props: any) => <GenericNode {...props} label="DeletedCard" />);
-export const DeletedPriceNode = memo((props: any) => <GenericNode {...props} label="DeletedPrice" />);
-export const DeletedProductFeatureNode = memo((props: any) => <GenericNode {...props} label="DeletedProductFeature" />);
-export const EntitlementsActiveEntitlementNode = memo((props: any) => <GenericNode {...props} label="EntitlementsActiveEntitlement" />);
-export const EntitlementsActiveEntitlementSummaryNode = memo((props: any) => <GenericNode {...props} label="EntitlementsActiveEntitlementSummary" />);
-export const EntitlementsFeatureNode = memo((props: any) => <GenericNode {...props} label="EntitlementsFeature" />);
-export const FinancialConnectionsAccountInferredBalanceNode = memo((props: any) => <GenericNode {...props} label="FinancialConnectionsAccountInferredBalance" />);
-export const FinancialConnectionsAccountOwnershipNode = memo((props: any) => <GenericNode {...props} label="FinancialConnectionsAccountOwnership" />);
-export const FinancialConnectionsInstitutionNode = memo((props: any) => <GenericNode {...props} label="FinancialConnectionsInstitution" />);
-export const FinancialConnectionsTransactionNode = memo((props: any) => <GenericNode {...props} label="FinancialConnectionsTransaction" />);
-export const ForwardingRequestNode = memo((props: any) => <GenericNode {...props} label="ForwardingRequest" />);
-export const FxQuoteNode = memo((props: any) => <GenericNode {...props} label="FxQuote" />);
-export const InvoicePaymentNode = memo((props: any) => <GenericNode {...props} label="InvoicePayment" />);
-export const InvoiceRenderingTemplateNode = memo((props: any) => <GenericNode {...props} label="InvoiceRenderingTemplate" />);
-export const IssuingCreditUnderwritingRecordNode = memo((props: any) => <GenericNode {...props} label="IssuingCreditUnderwritingRecord" />);
-export const IssuingDisputeSettlementDetailNode = memo((props: any) => <GenericNode {...props} label="IssuingDisputeSettlementDetail" />);
-export const IssuingFraudLiabilityDebitNode = memo((props: any) => <GenericNode {...props} label="IssuingFraudLiabilityDebit" />);
-export const IssuingPersonalizationDesignNode = memo((props: any) => <GenericNode {...props} label="IssuingPersonalizationDesign" />);
-export const IssuingPhysicalBundleNode = memo((props: any) => <GenericNode {...props} label="IssuingPhysicalBundle" />);
-export const IssuingTokenNode = memo((props: any) => <GenericNode {...props} label="IssuingToken" />);
-export const MarginNode = memo((props: any) => <GenericNode {...props} label="Margin" />);
-export const OrderNode = memo((props: any) => <GenericNode {...props} label="Order" />);
-export const PaymentAttemptRecordNode = memo((props: any) => <GenericNode {...props} label="PaymentAttemptRecord" />);
-export const PaymentIntentAmountDetailsLineItemNode = memo((props: any) => <GenericNode {...props} label="PaymentIntentAmountDetailsLineItem" />);
-export const PaymentMethodConfigurationNode = memo((props: any) => <GenericNode {...props} label="PaymentMethodConfiguration" />);
-export const PaymentMethodDomainNode = memo((props: any) => <GenericNode {...props} label="PaymentMethodDomain" />);
-export const PaymentRecordNode = memo((props: any) => <GenericNode {...props} label="PaymentRecord" />);
-export const PrivacyRedactionJobNode = memo((props: any) => <GenericNode {...props} label="PrivacyRedactionJob" />);
-export const PrivacyRedactionJobValidationErrorNode = memo((props: any) => <GenericNode {...props} label="PrivacyRedactionJobValidationError" />);
-export const ProductFeatureNode = memo((props: any) => <GenericNode {...props} label="ProductFeature" />);
-export const QuoteLineNode = memo((props: any) => <GenericNode {...props} label="QuoteLine" />);
-export const QuotePreviewInvoiceNode = memo((props: any) => <GenericNode {...props} label="QuotePreviewInvoice" />);
-export const QuotePreviewSubscriptionScheduleNode = memo((props: any) => <GenericNode {...props} label="QuotePreviewSubscriptionSchedule" />);
-export const TaxAssociationNode = memo((props: any) => <GenericNode {...props} label="TaxAssociation" />);
-export const TaxCalculationNode = memo((props: any) => <GenericNode {...props} label="TaxCalculation" />);
-export const TaxCalculationLineItemNode = memo((props: any) => <GenericNode {...props} label="TaxCalculationLineItem" />);
-export const TaxFormNode = memo((props: any) => <GenericNode {...props} label="TaxForm" />);
-export const TaxRegistrationNode = memo((props: any) => <GenericNode {...props} label="TaxRegistration" />);
-export const TaxSettingsNode = memo((props: any) => <GenericNode {...props} label="TaxSettings" />);
-export const TaxTransactionNode = memo((props: any) => <GenericNode {...props} label="TaxTransaction" />);
-export const TaxTransactionLineItemNode = memo((props: any) => <GenericNode {...props} label="TaxTransactionLineItem" />);
-export const TerminalReaderCollectedDataNode = memo((props: any) => <GenericNode {...props} label="TerminalReaderCollectedData" />);
-export const TerminalOnboardingLinkNode = memo((props: any) => <GenericNode {...props} label="TerminalOnboardingLink" />);
-export const BillingAnalyticsMeterUsageNode = memo((props: any) => <GenericNode {...props} label="BillingAnalyticsMeterUsage" />);
-export const BillingAnalyticsMeterUsageRowNode = memo((props: any) => <GenericNode {...props} label="BillingAnalyticsMeterUsageRow" />);
-export const PaymentMethodBalanceNode = memo((props: any) => <GenericNode {...props} label="PaymentMethodBalance" />);
-export const DelegatedCheckoutRequestedSessionNode = memo((props: any) => <GenericNode {...props} label="DelegatedCheckoutRequestedSession" />);
-export const IdentityBlocklistEntryNode = memo((props: any) => <GenericNode {...props} label="IdentityBlocklistEntry" />);
-export const TransitBalanceNode = memo((props: any) => <GenericNode {...props} label="TransitBalance" />);
-export const IssuingProgramNode = memo((props: any) => <GenericNode {...props} label="IssuingProgram" />);
-export const BalanceTransferNode = memo((props: any) => <GenericNode {...props} label="BalanceTransfer" />);
-export const RadarAccountEvaluationNode = memo((props: any) => <GenericNode {...props} label="RadarAccountEvaluation" />);
-export const ProductCatalogTrialOfferNode = memo((props: any) => <GenericNode {...props} label="ProductCatalogTrialOffer" />);
+export default FinancialSystemComplexityBlog;
