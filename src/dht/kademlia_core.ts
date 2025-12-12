@@ -1,4 +1,3 @@
-```typescript
 import { EventEmitter } from 'events';
 import { Contact, RoutingTable } from './routing_table';
 import { ID } from './types';
@@ -246,4 +245,3 @@ export class KademliaCore extends EventEmitter {
       await Promise.all(storePromises);
   }
 }
-```
