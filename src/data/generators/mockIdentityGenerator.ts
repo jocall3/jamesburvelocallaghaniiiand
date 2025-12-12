@@ -81,7 +81,7 @@ export function generateMockIdentities(count: number): Identity[] {
 /**
  * Generates a mock CSV string of identity data.
  * @param count The number of data rows to generate (excluding the header).
- * @returns A CSV formatted string.
+ * @returns a CSV formatted string.
  */
 export function generateMockCsv(count: number): string {
     const identities = generateMockIdentities(count);
