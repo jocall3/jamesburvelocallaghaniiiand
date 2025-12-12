@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, ReactNode, useCallback, useEffect } from 'react';
 import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
 import { v4 as uuidv4 } from 'uuid';
@@ -18,6 +17,12 @@ import {
     MOCK_CORPORATE_TRANSACTIONS, MOCK_SUBSCRIPTIONS
 } from '../data/mockData';
 
+// --- Citibankdemobusinessinc Ecosystem ---
+// This file is part of the Citibankdemobusinessinc ecosystem, a unified platform
+// designed to drive open banking adoption in the US. It provides the central
+// data context for all applications within the ecosystem.
+
+// --- DataContextType Definition ---
 interface DataContextType {
     // --- App State ---
     isLoading: boolean;
@@ -35,10 +40,10 @@ interface DataContextType {
     upcomingBills: any[];
     savingsGoals: any[];
     financialGoals: FinancialGoal[];
-    marketMovers: any[];
+    marketMovers: MarketMover[];
     linkedAccounts: any[];
     notifications: Notification[];
-    subscriptions: Subscription[]; // Added
+    subscriptions: Subscription[];
     
     // --- Corporate & Treasury ---
     paymentOrders: PaymentOrder[];
@@ -47,15 +52,15 @@ interface DataContextType {
     corporateTransactions: CorporateTransaction[];
     
     // --- Crypto & Web3 ---
-    cryptoAssets: any[]; // Added placeholder type
-    walletInfo: any; // Added placeholder
-    virtualCard: any; // Added placeholder
-    nftAssets: any[]; // Added placeholder
-    connectWallet: (provider: any) => void; // Added
-    disconnectWallet: () => void; // Added
-    detectedProviders: any[]; // Added
-    issueCard: () => void; // Added
-    buyCrypto: (amount: number, currency: string) => void; // Added
+    cryptoAssets: any[];
+    walletInfo: any;
+    virtualCard: any;
+    nftAssets: any[];
+    connectWallet: (provider: any) => void;
+    disconnectWallet: () => void;
+    detectedProviders: any[];
+    issueCard: () => void;
+    buyCrypto: (amount: number, currency: string) => void;
 
     // --- Integrations & Config ---
     plaidApiKey: string | null;
@@ -68,9 +73,9 @@ interface DataContextType {
     modernTreasuryOrganizationId: string | null;
     
     // --- Marqeta ---
-    marqetaCardProducts: MarqetaCardProduct[]; // Added
-    fetchMarqetaProducts: () => void; // Added
-    isMarqetaLoading: boolean; // Added
+    marqetaCardProducts: MarqetaCardProduct[];
+    fetchMarqetaProducts: () => void;
+    isMarqetaLoading: boolean;
 
     // --- Database & Infrastructure ---
     dbConfig: DatabaseConfig;
@@ -82,16 +87,16 @@ interface DataContextType {
     launchWebDriver: (taskName: string) => Promise<void>;
 
     // --- Security & Compliance ---
-    showSystemAlert: (message: string, type: string) => void; // Added
-    unlinkAccount: (id: string) => void; // Added
-    securityMetrics: SecurityScoreMetric[]; // Added
-    auditLogs: AuditLogEntry[]; // Added
-    threatAlerts: ThreatAlert[]; // Added
-    dataSharingPolicies: DataSharingPolicy[]; // Added
-    apiKeys: APIKey[]; // Added
-    trustedContacts: TrustedContact[]; // Added
-    securityAwarenessModules: SecurityAwarenessModule[]; // Added
-    transactionRules: TransactionRule[]; // Added
+    showSystemAlert: (message: string, type: string) => void;
+    unlinkAccount: (id: string) => void;
+    securityMetrics: SecurityScoreMetric[];
+    auditLogs: AuditLogEntry[];
+    threatAlerts: ThreatAlert[];
+    dataSharingPolicies: DataSharingPolicy[];
+    apiKeys: APIKey[];
+    trustedContacts: TrustedContact[];
+    securityAwarenessModules: SecurityAwarenessModule[];
+    transactionRules: TransactionRule[];
 
     // --- Actions ---
     addTransaction: (transaction: Transaction) => void;
@@ -117,7 +122,7 @@ interface DataContextType {
     gamification: GamificationState;
     rewardPoints: { balance: number; lastEarned: number; lastRedeemed: number; currency: string };
     creditFactors: any[];
-    apiStatus: any[];
+    apiStatus: APIStatus[];
     
     // --- Legacy / Helpers ---
     handlePlaidSuccess: (publicToken: string, metadata: any) => void;
@@ -148,7 +153,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [marketMovers, setMarketMovers] = useState<MarketMover[]>([]);
     const [linkedAccounts, setLinkedAccounts] = useState<any[]>([]);
     const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [subscriptions, setSubscriptions] = useState<Subscription[]>([]); // Added
+    const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
     
     // --- Corporate State ---
     const [paymentOrders, setPaymentOrders] = useState<PaymentOrder[]>([]);
@@ -213,10 +218,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // --- AI-Powered Mock Data Generation ---
     useEffect(() => {
         const generateInitialData = async () => {
-            // NOTE: Even if API Key is present, we wrap in try/catch and use fallback
-            // data if the AI service fails (e.g. 429 Quota Exceeded).
-            
-            // Fallback function to populate with static data
             const loadFallbackData = () => {
                 console.warn("Using static fallback data for initialization.");
                 setTransactions(MOCK_TRANSACTIONS);
@@ -234,7 +235,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 setApiStatus(MOCK_API_STATUS);
                 setSubscriptions(MOCK_SUBSCRIPTIONS);
                 
-                // Initialize default Financial Goals if not provided
                 if (financialGoals.length === 0) {
                      setFinancialGoals([]);
                 }
@@ -243,7 +243,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             if (!geminiApiKey) {
                 console.log("No Gemini API Key found. Loading fallback data.");
                 loadFallbackData();
-                initializeStaticData(); // Load other static data
+                initializeStaticData();
                 setIsLoading(false);
                 return;
             }
@@ -291,7 +291,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                         invoices: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { id: { type: Type.STRING }, invoiceNumber: { type: Type.STRING }, counterpartyName: { type: Type.STRING }, dueDate: { type: Type.STRING }, amount: { type: Type.NUMBER }, status: { type: Type.STRING } } } },
                         complianceCases: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { id: { type: Type.STRING }, reason: { type: Type.STRING }, entityType: { type: Type.STRING }, entityId: { type: Type.STRING }, status: { type: Type.STRING }, openedDate: { type: Type.STRING } } } },
                         corporateTransactions: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { id: { type: Type.STRING }, cardId: { type: Type.STRING }, holderName: { type: Type.STRING }, merchant: { type: Type.STRING }, amount: { type: Type.NUMBER }, status: { type: Type.STRING }, timestamp: { type: Type.STRING }, date: { type: Type.STRING } } } },
-                        subscriptions: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { id: { type: Type.STRING }, name: { type: Type.STRING }, amount: { type: Type.NUMBER }, nextPayment: { type: Type.STRING }, iconName: { type: Type.STRING } } } }, // Added
+                        subscriptions: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { id: { type: Type.STRING }, name: { type: Type.STRING }, amount: { type: Type.NUMBER }, nextPayment: { type: Type.STRING }, iconName: { type: Type.STRING } } } },
                     }
                 };
 
@@ -308,14 +308,13 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
                 const data = JSON.parse(response.text);
 
-                // Set all states from the AI response
                 setTransactions(data.transactions || []);
                 setAssets(data.assets || []);
                 setBudgets(data.budgets || []);
                 setCreditScore(data.creditScore || { score: 780, change: 5, rating: 'Excellent' });
                 setUpcomingBills(data.upcomingBills || []);
                 setSavingsGoals(data.savingsGoals || []);
-                setFinancialGoals((data.financialGoals || []).map((g: any) => ({...g, plan: null, contributions: [], recurringContributions: [], linkedGoals: []})));
+                setFinancialGoals((data.financialGoals || []).map((g: any) => ({...g, plan: null, contributions: [], recurringContributions: [], linkedGoals: [], status: 'on_track' })));
                 setMarketMovers(data.marketMovers || []);
                 setNotifications(data.notifications || []);
                 setPaymentOrders(data.paymentOrders || []);
@@ -323,13 +322,12 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 setComplianceCases(data.complianceCases || []);
                 setCorporateTransactions(data.corporateTransactions || []);
                 setApiStatus(data.apiStatus || []);
-                setSubscriptions(data.subscriptions || []); // Added
+                setSubscriptions(data.subscriptions || []);
                 
                 initializeStaticData();
 
             } catch (e) {
                 console.error("Failed to generate initial mock data via AI:", e);
-                // Fallback to static data on error (e.g., quota exceeded)
                 loadFallbackData();
                 initializeStaticData();
             } finally {
@@ -338,7 +336,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         };
         
         const initializeStaticData = () => {
-             // Initialize mock security data
              setSecurityMetrics([{ metricName: 'OverallSecurityScore', currentValue: '0.85' }]);
              setAuditLogs([{ id: 'log-1', timestamp: new Date().toISOString(), userId: 'user-1', action: 'LOGIN', targetResource: 'System', success: true }]);
              setThreatAlerts([]);
@@ -348,7 +345,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
              setSecurityAwarenessModules([]);
              setTransactionRules([]);
 
-             // Initialize mock crypto data
              setCryptoAssets([{ ticker: 'BTC', name: 'Bitcoin', value: 45000, amount: 1.5, color: '#F7931A' }]);
              setNftAssets([]);
              setWalletInfo({ balance: 1.5, address: '0x123...abc' });
