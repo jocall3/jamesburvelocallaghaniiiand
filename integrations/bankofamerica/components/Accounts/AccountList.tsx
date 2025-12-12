@@ -116,7 +116,7 @@ const AccountList: React.FC<AccountListProps> = ({
                 <span className="capitalize">
                   {account.type.replace(/_/g, ' ')}
                 </span>{' '}
-                • • • • {account.accountNumberLast4}
+                â¢ â¢ â¢ â¢ {account.accountNumberLast4}
               </p>
             </div>
             <div className="text-right ml-4">
