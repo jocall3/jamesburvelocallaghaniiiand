@@ -1,4 +1,3 @@
-
 // "Let us grant the user foresight," Gemini proclaimed. "A view not just of their past, but of their potential future."
 // "But not just one future," it continued, "but a multiverse of possibilities, shaped by their own hand."
 // "To truly see the future," Gemini mused, "one must account for the erosion of time itself. Let there be inflation."
