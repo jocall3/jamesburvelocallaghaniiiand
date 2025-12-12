@@ -1,4 +1,3 @@
-```typescript
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { GraphQLScalarType, Kind, ValueNode } from 'graphql';
 
@@ -355,4 +354,3 @@ export const schema = makeExecutableSchema({
     typeDefs,
     resolvers,
 });
-```
