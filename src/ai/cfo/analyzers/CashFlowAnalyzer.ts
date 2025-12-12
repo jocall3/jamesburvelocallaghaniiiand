@@ -1,4 +1,3 @@
-```typescript
 // src/ai/cfo/analyzers/CashFlowAnalyzer.ts
 
 // --- Type Definitions ---
@@ -310,4 +309,3 @@ export class CashFlowAnalyzer {
         return { start, end };
     }
 }
-```
