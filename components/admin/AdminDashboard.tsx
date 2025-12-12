@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -33,23 +33,24 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  BarChart,
-  Bar,
 } from 'recharts';
 
-// --- Mock Data (replace with actual API calls in a real application) ---
+// --- Generative Data Functions (as per self-contained app requirement) ---
 
-const mockSystemHealth = {
-  overallStatus: 'Operational',
-  uptime: '99.98%',
-  averageResponseTime: '120ms',
-};
+const generateSystemHealth = () => ({
+  overallStatus: Math.random() > 0.1 ? 'Operational' : 'Degraded',
+  uptime: `${(99.9 + Math.random() * 0.09).toFixed(2)}%`,
+  averageResponseTime: `${Math.floor(80 + Math.random() * 120)}ms`,
+});
 
-const mockUserMetrics = {
-  totalUsers: 125430,
-  newUsersToday: 152,
-  activeUsers24h: 18765,
-  growthLast30d: 12.5,
+const generateUserMetrics = () => {
+    const totalUsers = 100000 + Math.floor(Math.random() * 50000);
+    return {
+        totalUsers,
+        newUsersToday: Math.floor(Math.random() * 200),
+        activeUsers24h: Math.floor(totalUsers * (0.1 + Math.random() * 0.1)),
+        growthLast30d: parseFloat((5 + Math.random() * 15).toFixed(1)),
+    };
 };
 
 type IntegrationStatus = 'Operational' | 'Degraded' | 'Outage';
@@ -62,30 +63,46 @@ interface Integration {
   errorRate: number;
 }
 
-const mockIntegrations: Integration[] = [
-  { id: 'google', name: 'Google', status: 'Operational', apiCalls24h: 120500, errorRate: 0.1 },
-  { id: 'meta', name: 'Meta (Facebook)', status: 'Operational', apiCalls24h: 89700, errorRate: 0.3 },
-  { id: 'microsoft', name: 'Microsoft', status: 'Degraded', apiCalls24h: 45200, errorRate: 5.2 },
-  { id: 'amazon', name: 'Amazon (AWS)', status: 'Operational', apiCalls24h: 250000, errorRate: 0.05 },
-  { id: 'apple', name: 'Apple', status: 'Operational', apiCalls24h: 33100, errorRate: 0.2 },
-  { id: 'x', name: 'X (Twitter)', status: 'Outage', apiCalls24h: 5600, errorRate: 15.8 },
-  { id: 'slack', name: 'Slack', status: 'Operational', apiCalls24h: 67800, errorRate: 0.4 },
+const integrationServices = [
+  { id: 'google', name: 'Google' },
+  { id: 'meta', name: 'Meta (Facebook)' },
+  { id: 'microsoft', name: 'Microsoft' },
+  { id: 'amazon', name: 'Amazon (AWS)' },
+  { id: 'apple', name: 'Apple' },
+  { id: 'x', name: 'X (Twitter)' },
+  { id: 'slack', name: 'Slack' },
 ];
 
-const mockUserGrowthData = [
-  { name: 'Jan', users: 40000 },
-  { name: 'Feb', users: 51000 },
-  { name: 'Mar', users: 65000 },
-  { name: 'Apr', users: 78780 },
-  { name: 'May', users: 95890 },
-  { name: 'Jun', users: 110390 },
-  { name: 'Jul', users: 125430 },
-];
+const generateIntegrations = (): Integration[] => {
+  const statuses: IntegrationStatus[] = ['Operational', 'Degraded', 'Outage'];
+  return integrationServices.map(service => {
+    const rand = Math.random();
+    let status: IntegrationStatus;
+    if (rand < 0.8) status = 'Operational';
+    else if (rand < 0.95) status = 'Degraded';
+    else status = 'Outage';
 
-const mockApiUsageData = mockIntegrations.map(int => ({
-  name: int.name,
-  'API Calls': int.apiCalls24h,
-}));
+    const errorRate = status === 'Operational' ? Math.random() * 0.5 : status === 'Degraded' ? 1 + Math.random() * 5 : 10 + Math.random() * 10;
+
+    return {
+      ...service,
+      status,
+      apiCalls24h: Math.floor(Math.random() * 250000),
+      errorRate: parseFloat(errorRate.toFixed(2)),
+    };
+  });
+};
+
+const generateUserGrowthData = (months = 7) => {
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const data = [];
+  let userCount = 40000;
+  for (let i = 0; i < months; i++) {
+    userCount += Math.floor(userCount * (0.1 + Math.random() * 0.2));
+    data.push({ name: monthNames[i % 12], users: userCount });
+  }
+  return data;
+};
 
 interface ActivityLog {
   id: string;
@@ -94,13 +111,62 @@ interface ActivityLog {
   message: string;
 }
 
-const mockActivityLog: ActivityLog[] = [
-    { id: '1', timestamp: '2 minutes ago', type: 'integration', message: 'X (Twitter) API integration failed.' },
-    { id: '2', timestamp: '15 minutes ago', type: 'user', message: 'New user signed up: user@example.com' },
-    { id: '3', timestamp: '1 hour ago', type: 'system', message: 'Database backup completed successfully.' },
-    { id: '4', timestamp: '2 hours ago', type: 'integration', message: 'Microsoft API showing degraded performance.' },
-    { id: '5', timestamp: '4 hours ago', type: 'user', message: 'User admin@example.com updated system settings.' },
-];
+const generateActivityLog = (count = 5): ActivityLog[] => {
+    const logs: ActivityLog[] = [];
+    const types: ('user' | 'integration' | 'system')[] = ['user', 'integration', 'system'];
+    const userMessages = [
+        'New user signed up: user{N}@example.com',
+        'User admin@example.com updated system settings.',
+        'Password reset requested for user{N}@example.com',
+    ];
+    const integrationMessages = [
+        '{S} API integration failed.',
+        '{S} API showing degraded performance.',
+        'Successfully processed 10,000 records from {S} API.',
+    ];
+    const systemMessages = [
+        'Database backup completed successfully.',
+        'System update to v2.1.0 initiated.',
+        'CPU usage exceeded 90% threshold.',
+    ];
+
+    let time = 2; // start at 2 minutes ago
+    for (let i = 0; i < count; i++) {
+        const type = types[Math.floor(Math.random() * types.length)];
+        let message = '';
+        switch(type) {
+            case 'user':
+                message = userMessages[Math.floor(Math.random() * userMessages.length)].replace('{N}', Math.floor(Math.random() * 1000).toString());
+                break;
+            case 'integration':
+                const service = integrationServices[Math.floor(Math.random() * integrationServices.length)].name;
+                message = integrationMessages[Math.floor(Math.random() * integrationMessages.length)].replace('{S}', service);
+                break;
+            case 'system':
+                message = systemMessages[Math.floor(Math.random() * systemMessages.length)];
+                break;
+        }
+        
+        let timestamp = '';
+        if (time < 60) {
+            timestamp = `${Math.round(time)} minutes ago`;
+        } else {
+            const hours = Math.floor(time / 60);
+            timestamp = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        }
+        
+        logs.push({
+            id: (i + 1).toString(),
+            timestamp,
+            type,
+            message,
+        });
+
+        // Increase time for the next log entry, with some randomness
+        time = time * (1.5 + Math.random() * 2);
+    }
+    return logs;
+};
 
 
 // --- Helper Components ---
@@ -139,18 +205,18 @@ const getStatusBadgeVariant = (status: IntegrationStatus): "default" | "destruct
 // --- Main Dashboard Component ---
 
 export default function AdminDashboard() {
-  // In a real app, you'd use hooks like useQuery from react-query to fetch this data
-  const [systemHealth] = useState(mockSystemHealth);
-  const [userMetrics] = useState(mockUserMetrics);
-  const [integrations] = useState(mockIntegrations);
-  const [userGrowthData] = useState(mockUserGrowthData);
-  const [apiUsageData] = useState(mockApiUsageData);
-  const [activityLog] = useState(mockActivityLog);
+  // Data is generated on component mount to simulate a live, self-contained environment
+  // as per the self-hosted, no-mock-data requirements.
+  const [systemHealth] = useState(() => generateSystemHealth());
+  const [userMetrics] = useState(() => generateUserMetrics());
+  const [integrations] = useState(() => generateIntegrations());
+  const [userGrowthData] = useState(() => generateUserGrowthData());
+  const [activityLog] = useState(() => generateActivityLog());
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Citibankdemobusinessinc Dashboard</h1>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
