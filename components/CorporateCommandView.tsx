@@ -1,5 +1,3 @@
-
-
 import React, { useContext, useState, useEffect } from 'react';
 import { DataContext } from '../context/DataContext';
 import Card from './Card';
@@ -346,7 +344,7 @@ const CorporateCommandView: React.FC<CorporateDashboardProps> = ({ setActiveView
             {subtext && <div className="text-gray-500 text-sm">{subtext}</div>}
             {trend !== undefined && (
                 <div className={`text-sm font-medium mt-3 flex items-center ${trend >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {trend >= 0 ? '↑' : '↓'} {Math.abs(trend)}% <span className="text-gray-600 ml-1">vs last period</span>
+                    {trend >= 0 ? 'â†‘' : 'â†“'} {Math.abs(trend)}% <span className="text-gray-600 ml-1">vs last period</span>
                 </div>
             )}
         </div>
@@ -363,7 +361,7 @@ const CorporateCommandView: React.FC<CorporateDashboardProps> = ({ setActiveView
                     <h1 className="text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
                         NEXUS COMMAND
                     </h1>
-                    <p className="text-gray-400 text-sm mt-1">Enterprise Operating System v4.2.0 • {lastUpdated.toLocaleString()}</p>
+                    <p className="text-gray-400 text-sm mt-1">Enterprise Operating System v4.2.0 â€¢ {lastUpdated.toLocaleString()}</p>
                 </div>
                 <div className="flex space-x-1 mt-4 md:mt-0 bg-gray-900 rounded-lg p-1 border border-gray-800">
                     <TabButton id="Overview" label="EXECUTIVE" />
@@ -516,7 +514,7 @@ const CorporateCommandView: React.FC<CorporateDashboardProps> = ({ setActiveView
                                         <div key={i} className="flex items-center justify-between p-3 bg-gray-800 rounded border border-gray-700">
                                             <div>
                                                 <div className="font-bold text-white">{vendor.vendor}</div>
-                                                <div className="text-xs text-gray-500">{vendor.transactionCount} txns • Risk: {vendor.riskScore}/100</div>
+                                                <div className="text-xs text-gray-500">{vendor.transactionCount} txns â€¢ Risk: {vendor.riskScore}/100</div>
                                             </div>
                                             <div className="text-right">
                                                 <div className="font-mono text-blue-400">{formatCurrency(vendor.totalSpend)}</div>
@@ -618,15 +616,15 @@ const CorporateCommandView: React.FC<CorporateDashboardProps> = ({ setActiveView
                                     <h4 className="font-bold text-white mb-4">AI Recommendation Engine</h4>
                                     <ul className="space-y-4">
                                         <li className="flex items-start space-x-3">
-                                            <span className="text-green-400 text-xl">✓</span>
+                                            <span className="text-green-400 text-xl">âœ“</span>
                                             <span className="text-sm text-gray-300">Optimize vendor contracts to reduce variable OPEX by 12%.</span>
                                         </li>
                                         <li className="flex items-start space-x-3">
-                                            <span className="text-green-400 text-xl">✓</span>
+                                            <span className="text-green-400 text-xl">âœ“</span>
                                             <span className="text-sm text-gray-300">Accelerate receivables collection to improve DSO by 5 days.</span>
                                         </li>
                                         <li className="flex items-start space-x-3">
-                                            <span className="text-yellow-400 text-xl">⚠</span>
+                                            <span className="text-yellow-400 text-xl">âš </span>
                                             <span className="text-sm text-gray-300">Monitor geopolitical risk in supply chain region APAC-1.</span>
                                         </li>
                                     </ul>
