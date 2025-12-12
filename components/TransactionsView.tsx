@@ -1,4 +1,3 @@
-
 // components/TransactionsView.tsx
 // RE-ENACTED & EXPANDED: This component has been resurrected from its deprecated state.
 // It is now the "FlowMatrix," the complete Great Library for all financial events.
@@ -10,6 +9,85 @@ import { DataContext } from '../context/DataContext';
 import Card from './Card';
 import type { Transaction, DetectedSubscription } from '../types';
 import { GoogleGenAI, Type } from "@google/genai";
+
+// ================================================================================================
+// GENERATIVE DATA FUNCTIONS (Internal)
+// ================================================================================================
+
+/**
+ * @description Generates a random string for unique IDs.
+ * @returns {string} A unique identifier.
+ */
+const generateId = (): string => Math.random().toString(36).substring(2, 15);
+
+/**
+ * @description Generates a random date within a specified range.
+ * @param {Date} startDate - The earliest possible date.
+ * @param {Date} endDate - The latest possible date.
+ * @returns {string} A formatted date string (YYYY-MM-DD).
+ */
+const generateDate = (startDate: Date = new Date(2023, 0, 1), endDate: Date = new Date()): string => {
+    const timeDiff = endDate.getTime() - startDate.getTime();
+    const randomTime = startDate.getTime() + Math.random() * timeDiff;
+    const date = new Date(randomTime);
+    return date.toISOString().split('T')[0];
+};
+
+/**
+ * @description Generates a random transaction amount.
+ * @param {number} min - The minimum amount.
+ * @param {number} max - The maximum amount.
+ * @returns {number} A random transaction amount.
+ */
+const generateAmount = (min: number = 10, max: number = 1000): number => {
+    return Math.random() * (max - min) + min;
+};
+
+/**
+ * @description Generates a random transaction description.
+ * @returns {string} A descriptive string for a transaction.
+ */
+const generateDescription = (): string => {
+    const prefixes = ['Payment to', 'Purchase from', 'Transfer to', 'Received from', 'Deposit from', 'Withdrawal from'];
+    const merchants = ['Amazon', 'Starbucks', 'Local Grocer', 'Online Service', 'Utility Company', 'Friend', 'Employer', 'Bank'];
+    const items = ['groceries', 'coffee', 'electronics', 'software subscription', 'rent', 'salary', 'consulting fee'];
+    return `${prefixes[Math.floor(Math.random() * prefixes.length)]} ${merchants[Math.floor(Math.random() * merchants.length)]} for ${items[Math.floor(Math.random() * items.length)]}`;
+};
+
+/**
+ * @description Generates a random transaction category.
+ * @returns {string} A category string.
+ */
+const generateCategory = (): string => {
+    const categories = ['Groceries', 'Dining', 'Utilities', 'Rent/Mortgage', 'Transportation', 'Entertainment', 'Salary', 'Freelance', 'Investments', 'Shopping', 'Health'];
+    return categories[Math.floor(Math.random() * categories.length)];
+};
+
+/**
+ * @description Generates a random transaction type.
+ * @returns {'income' | 'expense'} The type of transaction.
+ */
+const generateTransactionType = (): 'income' | 'expense' => {
+    return Math.random() > 0.6 ? 'income' : 'expense';
+};
+
+/**
+ * @description Generates a simulated transaction object.
+ * @returns {Transaction} A transaction object.
+ */
+const generateTransaction = (): Transaction => {
+    const type = generateTransactionType();
+    const amount = generateAmount(10, 1000);
+    return {
+        id: generateId(),
+        description: generateDescription(),
+        amount: type === 'income' ? amount : -amount,
+        date: generateDate(),
+        category: generateCategory(),
+        type: type,
+        carbonFootprint: Math.random() * 5 // Simulated carbon footprint in kg CO2
+    };
+};
 
 // ================================================================================================
 // MODAL & DETAIL COMPONENTS
@@ -32,11 +110,11 @@ const TransactionDetailModal: React.FC<{ transaction: Transaction | null; onClos
                 </div>
                 <div className="p-6 space-y-3">
                     <div className="flex justify-between text-sm"><span className="text-gray-400">Description:</span> <span className="text-white font-semibold">{transaction.description}</span></div>
-                    <div className="flex justify-between text-sm"><span className="text-gray-400">Amount:</span> <span className={`font-mono font-semibold ${transaction.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>{transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}</span></div>
+                    <div className="flex justify-between text-sm"><span className="text-gray-400">Amount:</span> <span className={`font-mono font-semibold ${transaction.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>{transaction.type === 'income' ? '+' : '-'}${Math.abs(transaction.amount).toFixed(2)}</span></div>
                     <div className="flex justify-between text-sm"><span className="text-gray-400">Date:</span> <span className="text-white">{transaction.date}</span></div>
                     <div className="flex justify-between text-sm"><span className="text-gray-400">Category:</span> <span className="text-white">{transaction.category}</span></div>
                     <div className="flex justify-between text-sm"><span className="text-gray-400">Transaction ID:</span> <span className="text-white font-mono text-xs">{transaction.id}</span></div>
-                    {transaction.carbonFootprint && <div className="flex justify-between text-sm"><span className="text-gray-400">Carbon Footprint:</span> <span className="text-green-300">{transaction.carbonFootprint.toFixed(1)} kg CO₂</span></div>}
+                    {transaction.carbonFootprint !== undefined && <div className="flex justify-between text-sm"><span className="text-gray-400">Carbon Footprint:</span> <span className="text-green-300">{transaction.carbonFootprint.toFixed(1)} kg CO2</span></div>}
                 </div>
             </div>
         </div>
@@ -71,9 +149,16 @@ const AITransactionWidget: React.FC<{
         setError('');
         setResult(null);
         try {
-            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+            // In a real application, API_KEY would be securely managed.
+            // For this self-contained example, we assume it's available in the environment.
+            const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || 'YOUR_FALLBACK_API_KEY'; // Use a placeholder or env var
+            if (!apiKey || apiKey === 'YOUR_FALLBACK_API_KEY') {
+                throw new Error("Gemini API key not configured. Please set NEXT_PUBLIC_GEMINI_API_KEY.");
+            }
+            const ai = new GoogleGenAI({ apiKey: apiKey });
+            
             // Create a concise summary of recent transactions to provide context to the AI.
-            const transactionSummary = transactions.slice(0, 20).map(t => `${t.date} - ${t.description}: $${t.amount.toFixed(2)} (${t.type})`).join('\n');
+            const transactionSummary = transactions.slice(0, 20).map(t => `${t.date} - ${t.description}: $${Math.abs(t.amount).toFixed(2)} (${t.type})`).join('\n');
             const fullPrompt = `${prompt}\n\nHere are the most recent transactions for context:\n${transactionSummary}`;
             
             // Configure the API call based on whether a structured JSON response is expected.
@@ -82,18 +167,20 @@ const AITransactionWidget: React.FC<{
                 config.responseSchema = responseSchema;
             }
 
-            const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
-                contents: fullPrompt,
-                config: config,
+            const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
+            const response = await model.generateContent({
+                contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
+                generationConfig: {
+                    responseMimeType: config.responseMimeType,
+                },
             });
 
-            const textResult = response.text.trim();
+            const textResult = response.response.text().trim();
             setResult(responseSchema ? JSON.parse(textResult) : textResult);
 
-        } catch (err) {
+        } catch (err: any) {
             console.error(`Error generating ${title}:`, err);
-            setError('Plato AI could not generate this insight.');
+            setError(`Plato AI could not generate this insight. Error: ${err.message}`);
         } finally {
             setIsLoading(false);
         }
@@ -154,7 +241,14 @@ const TransactionsView: React.FC = () => {
                 if (sort === 'date') {
                     return new Date(b.date).getTime() - new Date(a.date).getTime();
                 }
-                return b.amount - a.amount;
+                // Sort by absolute amount for consistency, then by type to group income/expense
+                const absA = Math.abs(a.amount);
+                const absB = Math.abs(b.amount);
+                if (absB !== absA) {
+                    return absB - absA;
+                }
+                // If amounts are equal, sort by date (descending)
+                return new Date(b.date).getTime() - new Date(a.date).getTime();
             });
     }, [transactions, filter, sort, searchTerm]);
     
@@ -183,10 +277,10 @@ const TransactionsView: React.FC = () => {
                  <h2 className="text-3xl font-bold text-white tracking-wider">Transaction History (FlowMatrix)</h2>
                  <Card title="Plato's Intelligence Suite" isCollapsible>
                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <AITransactionWidget title="Subscription Hunter" prompt="Analyze these transactions to find potential recurring subscriptions the user might have forgotten about. Look for repeated payments to the same merchant around the same time each month." transactions={transactions} responseSchema={subscriptionSchema}>
+                        <AITransactionWidget title="Subscription Hunter" prompt="Analyze these transactions to find potential recurring subscriptions the user might have forgotten about. Look for repeated payments to the same merchant around the same time each month. Provide the name of the subscription, an estimated monthly amount, and the date of the last known charge." transactions={transactions} responseSchema={subscriptionSchema}>
                            {(result: { subscriptions: DetectedSubscription[] }) => (
                                 <ul className="text-xs text-gray-300 space-y-1 p-2">
-                                    {result.subscriptions.length > 0 ? result.subscriptions.map(sub => <li key={sub.name}>- {sub.name} (~${sub.estimatedAmount.toFixed(2)})</li>) : <li>No potential subscriptions found.</li>}
+                                    {result.subscriptions && result.subscriptions.length > 0 ? result.subscriptions.map(sub => <li key={sub.name}>- {sub.name} (~${sub.estimatedAmount.toFixed(2)})</li>) : <li>No potential subscriptions found.</li>}
                                 </ul>
                            )}
                         </AITransactionWidget>
@@ -227,7 +321,7 @@ const TransactionsView: React.FC = () => {
                                         <td className="px-6 py-4">{tx.category}</td>
                                         <td className="px-6 py-4">{tx.date}</td>
                                         <td className={`px-6 py-4 text-right font-mono ${tx.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
-                                            {tx.type === 'income' ? '+' : '-'}${tx.amount.toFixed(2)}
+                                            {tx.type === 'income' ? '+' : '-'}${Math.abs(tx.amount).toFixed(2)}
                                         </td>
                                     </tr>
                                 ))}
