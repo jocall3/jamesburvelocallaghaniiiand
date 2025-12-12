@@ -1,4 +1,3 @@
-```typescript
 // In a real-world scenario, these types would likely be generated from the OpenAPI
 // specification or defined in a shared library. They are included here for completeness.
 
@@ -193,7 +192,7 @@ export class AutoNegotiator {
    *
    * @param needs A sorted list of accounts that require funds.
    * @param surpluses A sorted list of accounts that can provide funds.
-   * @returns An array of proposed fund transfer actions.
+   * @returns an array of proposed fund transfer actions.
    */
   private generateTransferPlan(needs: AccountNeed[], surpluses: AccountSurplus[]): ProposedTransfer[] {
     const proposedTransfers: ProposedTransfer[] = [];
@@ -246,4 +245,3 @@ export class AutoNegotiator {
     }
   }
 }
-```
