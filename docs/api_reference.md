@@ -23,3 +23,4 @@ Failure to provide a valid API Key will result in a `401 Unauthorized` response.
 Represents a single billing record normalized across AWS, GCP, and Azure.
 
 | Field Name          | Type      | Description
+    ---
