@@ -41,7 +41,7 @@ const VisionSection: React.FC<VisionSectionProps> = ({ title, description, icon,
  */
 const TheVisionView: React.FC = () => {
     const { data, handleSetView } = useContext(DataContext);
-    const [activeTab, setActiveTab] = useState<'narrative' | 'manifesto' | 'roadmap'>('narrative');
+    const [activeTab, setActiveTab] = useState<'narrative' | 'manifesto' | 'roadmap' | 'businessModels'>('narrative');
 
     // Mock Data Simulation for KPIs based on overall system health
     const totalAssets = data.assets.reduce((sum, asset) => sum + asset.value, 0);
@@ -50,6 +50,81 @@ const TheVisionView: React.FC = () => {
 
     const handleNavigate = (view: View) => {
         handleSetView(view);
+    };
+
+    // --- BUSINESS MODEL GENERATION (Citibankdemobusinessinc) ---
+    const generateBusinessModels = () => {
+        const models = [
+            {
+                branch: 'Citibankdemobusinessinc.openbanking.apiplatform',
+                mission: 'To create a unified API platform for seamless open banking integration.',
+                monetization: 'API usage fees, premium feature subscriptions.',
+                description: 'A self-hosted API platform enabling secure data sharing and innovative financial services.',
+            },
+            {
+                branch: 'Citibankdemobusinessinc.openbanking.identityverification',
+                mission: 'To provide secure and reliable identity verification services for open banking.',
+                monetization: 'Verification transaction fees, enterprise licensing.',
+                description: 'A standalone application for verifying user identities in open banking ecosystems.',
+            },
+            {
+                branch: 'Citibankdemobusinessinc.openbanking.fraudprevention',
+                mission: 'To develop advanced fraud prevention solutions for open banking transactions.',
+                monetization: 'Fraud detection service fees, risk assessment reports.',
+                description: 'A complete fraud prevention system integrated with open banking APIs.',
+            },
+            {
+                branch: 'Citibankdemobusinessinc.openbanking.dataanalytics',
+                mission: 'To offer comprehensive data analytics tools for open banking insights.',
+                monetization: 'Data analytics subscriptions, custom report generation.',
+                description: 'A self-contained data analytics app providing actionable insights from open banking data.',
+            },
+            {
+                branch: 'Citibankdemobusinessinc.openbanking.complianceautomation',
+                mission: 'To automate compliance processes for open banking regulations.',
+                monetization: 'Compliance automation software licenses, regulatory update subscriptions.',
+                description: 'A fully runnable compliance automation tool for open banking.',
+            },
+            {
+                branch: 'Citibankdemobusinessinc.openbanking.loanmarketplace',
+                mission: 'To create a transparent and efficient loan marketplace using open banking data.',
+                monetization: 'Transaction fees, premium listing fees.',
+                description: 'A self-hosted loan marketplace connecting borrowers and lenders via open banking.',
+            },
+            {
+                branch: 'Citibankdemobusinessinc.openbanking.investmentplatform',
+                mission: 'To provide personalized investment recommendations through open banking data.',
+                monetization: 'Investment advisory fees, portfolio management subscriptions.',
+                description: 'A standalone investment platform leveraging open banking for personalized advice.',
+            },
+            {
+                branch: 'Citibankdemobusinessinc.openbanking.paymentgateway',
+                mission: 'To offer a secure and efficient payment gateway for open banking transactions.',
+                monetization: 'Transaction fees, premium payment features.',
+                description: 'A complete payment gateway solution integrated with open banking APIs.',
+            },
+            {
+                branch: 'Citibankdemobusinessinc.openbanking.financialplanning',
+                mission: 'To provide automated financial planning tools using open banking data.',
+                monetization: 'Financial planning software licenses, premium advisory services.',
+                description: 'A self-contained financial planning app providing personalized recommendations.',
+            },
+            {
+                branch: 'Citibankdemobusinessinc.openbanking.creditscoring',
+                mission: 'To develop advanced credit scoring models using open banking data.',
+                monetization: 'Credit scoring service fees, risk assessment reports.',
+                description: 'A fully runnable credit scoring system integrated with open banking APIs.',
+            },
+        ];
+
+        return models.map((model, index) => (
+            <div key={index} className="bg-gray-800/50 border-cyan-700/50 shadow-xl p-4 rounded-lg">
+                <h3 className="text-xl font-bold text-white mb-2">{model.branch}</h3>
+                <p className="text-gray-300 text-sm mb-4">{model.mission}</p>
+                <p className="text-gray-400 text-xs">Monetization: {model.monetization}</p>
+                <p className="text-gray-400 text-xs">Description: {model.description}</p>
+            </div>
+        ));
     };
 
     const renderContent = useMemo(() => {
@@ -100,8 +175,8 @@ const TheVisionView: React.FC = () => {
                             <p className="text-gray-300">
                                 The creation of this instrument is not a reaction to the market; it is a proactive attempt to define the market of the future. We move from being managed by finance to mastering the logic that underlies finance itself. The path ahead requires relentless focus, absolute fidelity to the Charter, and the courage to create what has not yet been conceived.
                             </p>
-                            <ActionButton 
-                                label="Review The Charter" 
+                            <ActionButton
+                                label="Review The Charter"
                                 onClick={() => handleNavigate(View.TheCharter)}
                                 className="mt-4 bg-cyan-700 hover:bg-cyan-600"
                             />
@@ -128,8 +203,8 @@ const TheVisionView: React.FC = () => {
                                 **IV. THE ETHICAL IMPERATIVE:** Power without principle is chaos. The Instrument is bound by the ethical constraints inscribed in the Charter. Its highest function is to enforce the Sovereign's declared morality upon the execution of all wealth-generating actions.
                             </p>
                         </div>
-                        <ActionButton 
-                            label="View Governance Status" 
+                        <ActionButton
+                            label="View Governance Status"
                             onClick={() => handleNavigate(View.AIGovernance)}
                             className="mt-4 bg-purple-700 hover:bg-purple-600"
                         />
@@ -165,19 +240,30 @@ const TheVisionView: React.FC = () => {
                             />
                         </div>
                         <div className="mt-10 pt-6 border-t border-gray-700">
-                             <h3 className="text-2xl font-bold text-cyan-400 mb-4">Explore Future Blueprints</h3>
-                             <div className="flex flex-wrap gap-4">
-                                <ActionButton 
-                                    label="Economic Engine" 
+                            <h3 className="text-2xl font-bold text-cyan-400 mb-4">Explore Future Blueprints</h3>
+                            <div className="flex flex-wrap gap-4">
+                                <ActionButton
+                                    label="Economic Engine"
                                     onClick={() => handleNavigate(View.EconomicSynthesisEngine)}
                                     className="bg-yellow-600 hover:bg-yellow-500 text-sm"
                                 />
-                                <ActionButton 
-                                    label="Generative Jurisprudence" 
+                                <ActionButton
+                                    label="Generative Jurisprudence"
                                     onClick={() => handleNavigate(View.GenerativeJurisprudence)}
                                     className="bg-yellow-600 hover:bg-yellow-500 text-sm"
                                 />
-                             </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            case 'businessModels':
+                return (
+                    <div className="space-y-6">
+                        <h2 className="text-3xl font-extrabold text-white border-b border-cyan-600 pb-2">
+                            Citibankdemobusinessinc: Open Banking Business Models
+                        </h2>
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {generateBusinessModels()}
                         </div>
                     </div>
                 );
@@ -229,6 +315,16 @@ const TheVisionView: React.FC = () => {
                     }`}
                 >
                     The Roadmap
+                </button>
+                <button
+                    onClick={() => setActiveTab('businessModels')}
+                    className={`px-6 py-3 text-lg font-medium transition-colors border-b-2 ${
+                        activeTab === 'businessModels'
+                            ? 'border-cyan-500 text-white'
+                            : 'border-transparent text-gray-400 hover:text-white hover:border-gray-500'
+                    }`}
+                >
+                    Business Models
                 </button>
             </div>
 
