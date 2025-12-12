@@ -1,4 +1,3 @@
-```typescript
 import {
     Feature,
     FeatureSet,
@@ -87,4 +86,3 @@ import {
         return findFeatureRecursive(this.featureSet.rootFeature)
     }
   }
-```
