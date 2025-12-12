@@ -30,60 +30,6 @@ interface Pipeline {
     branch: string;
 }
 
-// --- Mock Data ---
-
-const mockPipelines: Pipeline[] = [
-    {
-        id: 'p-core-api',
-        name: 'Core Payment API',
-        description: 'Handles all account transactions and settlement logic.',
-        lastBuildId: 'b-901',
-        status: BuildStatus.RUNNING,
-        lastRun: '2024-07-22T10:30:00Z',
-        durationMs: 650000,
-        branch: 'main',
-        stages: [
-            { name: 'Checkout', durationMs: 120000, status: BuildStatus.SUCCESS, testsPassed: 50, testsTotal: 50 },
-            { name: 'Unit Tests', durationMs: 90000, status: BuildStatus.SUCCESS, testsPassed: 450, testsTotal: 450 },
-            { name: 'Integration Tests', durationMs: 300000, status: BuildStatus.RUNNING, testsPassed: 0, testsTotal: 120 },
-            { name: 'Deploy Canary', durationMs: 100000, status: BuildStatus.QUEUED, testsPassed: 0, testsTotal: 0 },
-            { name: 'Deploy Prod', durationMs: 0, status: BuildStatus.QUEUED, testsPassed: 0, testsTotal: 0 },
-        ],
-    },
-    {
-        id: 'p-frontend-ui',
-        name: 'Sovereign UI/UX',
-        description: 'Build and deployment pipeline for the React front-end application.',
-        lastBuildId: 'b-899',
-        status: BuildStatus.SUCCESS,
-        lastRun: '2024-07-21T18:45:00Z',
-        durationMs: 450000,
-        branch: 'feat/new-sidebar',
-        stages: [
-            { name: 'Linting & Build', durationMs: 150000, status: BuildStatus.SUCCESS, testsPassed: 0, testsTotal: 0 },
-            { name: 'E2E Tests', durationMs: 200000, status: BuildStatus.SUCCESS, testsPassed: 85, testsTotal: 85 },
-            { name: 'Deploy Staging', durationMs: 50000, status: BuildStatus.SUCCESS, testsPassed: 0, testsTotal: 0 },
-            { name: 'Prod Approval', durationMs: 50000, status: BuildStatus.SUCCESS, testsPassed: 0, testsTotal: 0 },
-        ],
-    },
-    {
-        id: 'p-ai-advisor',
-        name: 'AI Model Service',
-        description: 'Retrain, test, and deploy the Quantum AI Advisor model.',
-        lastBuildId: 'b-900',
-        status: BuildStatus.FAILURE,
-        lastRun: '2024-07-22T08:15:00Z',
-        durationMs: 550000,
-        branch: 'main',
-        stages: [
-            { name: 'Data Prep', durationMs: 100000, status: BuildStatus.SUCCESS, testsPassed: 0, testsTotal: 0 },
-            { name: 'Model Training', durationMs: 300000, status: BuildStatus.SUCCESS, testsPassed: 0, testsTotal: 0 },
-            { name: 'Validation Tests', durationMs: 100000, status: BuildStatus.FAILURE, testsPassed: 40, testsTotal: 90 },
-            { name: 'Deploy', durationMs: 0, status: BuildStatus.QUEUED, testsPassed: 0, testsTotal: 0 },
-        ],
-    },
-];
-
 // --- Utility Functions ---
 
 const formatDuration = (ms: number): string => {
@@ -209,7 +155,7 @@ const PipelineFlow: React.FC<{ pipeline: Pipeline }> = ({ pipeline }) => {
 // --- Main Component ---
 
 const CiCdView: React.FC = () => {
-    const [selectedPipeline, setSelectedPipeline] = useState<Pipeline>(mockPipelines[0]);
+    const [selectedPipeline, setSelectedPipeline] = useState<Pipeline>(Citibankdemobusinessinc.orchestration.pipelines[0]);
 
     // Simulated AI Root Cause Analysis for a failed build
     const aiAnalysis = selectedPipeline.status === BuildStatus.FAILURE
@@ -247,7 +193,7 @@ const CiCdView: React.FC = () => {
 
             {/* Pipeline List Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {mockPipelines.map((p) => (
+                {Citibankdemobusinessinc.orchestration.pipelines.map((p) => (
                     <PipelineCard
                         key={p.id}
                         pipeline={p}
@@ -332,5 +278,230 @@ const CiCdView: React.FC = () => {
     );
 };
 
+// --- Citibankdemobusinessinc Ecosystem ---
+
+namespace Citibankdemobusinessinc {
+
+    // --- Shared Kernel ---
+    export namespace kernel {
+        export const brandName = "Citibank demo business inc";
+
+        // Generative Data Functions
+        export function generateId(): string {
+            return Math.random().toString(36).substring(2, 15);
+        }
+
+        export function generateRandomNumber(min: number, max: number): number {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        export function generateRandomDate(start: Date, end: Date): Date {
+            return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+        }
+
+        export function generateRandomStatus<T>(statuses: T[]): T {
+            return statuses[Math.floor(Math.random() * statuses.length)];
+        }
+
+        export function generateRandomDescription(words: number): string {
+            let description = '';
+            const loremIpsum = "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua".split(" ");
+            for (let i = 0; i < words; i++) {
+                description += loremIpsum[Math.floor(Math.random() * loremIpsum.length)] + " ";
+            }
+            return description.trim();
+        }
+    }
+
+    // --- Orchestration Layer ---
+    export namespace orchestration {
+        import generateId = kernel.generateId;
+        import generateRandomNumber = kernel.generateRandomNumber;
+        import generateRandomDate = kernel.generateRandomDate;
+        import generateRandomStatus = kernel.generateRandomStatus;
+        import generateRandomDescription = kernel.generateRandomDescription;
+
+        // Define possible build statuses
+        const buildStatuses: BuildStatus[] = [BuildStatus.SUCCESS, BuildStatus.FAILURE, BuildStatus.RUNNING, BuildStatus.QUEUED];
+
+        // Function to generate a mock stage
+        function generateStage(name: string): Stage {
+            const status = generateRandomStatus(buildStatuses);
+            const durationMs = generateRandomNumber(60000, 600000); // 1min to 10min
+            const testsTotal = generateRandomNumber(50, 500);
+            const testsPassed = status === BuildStatus.SUCCESS || status === BuildStatus.RUNNING ? generateRandomNumber(testsTotal / 2, testsTotal) : generateRandomNumber(0, testsTotal / 2);
+
+            return {
+                name: name,
+                durationMs: durationMs,
+                status: status,
+                testsPassed: testsPassed,
+                testsTotal: testsTotal,
+            };
+        }
+
+        // Function to generate a mock pipeline
+        function generatePipeline(name: string, description: string, branch: string): Pipeline {
+            const status = generateRandomStatus(buildStatuses);
+            const durationMs = generateRandomNumber(300000, 1200000); // 5min to 20min
+            const lastRun = generateRandomDate(new Date(2024, 0, 1), new Date());
+
+            const stages: Stage[] = [
+                generateStage('Checkout'),
+                generateStage('Unit Tests'),
+                generateStage('Integration Tests'),
+                generateStage('Deploy Canary'),
+                generateStage('Deploy Prod'),
+            ];
+
+            return {
+                id: generateId(),
+                name: name,
+                description: description,
+                lastBuildId: generateId(),
+                status: status,
+                lastRun: lastRun.toISOString(),
+                durationMs: durationMs,
+                stages: stages,
+                branch: branch,
+            };
+        }
+
+        // Generate mock pipelines
+        export const pipelines: Pipeline[] = [
+            generatePipeline(
+                'Core Payment API',
+                'Handles all account transactions and settlement logic.',
+                'main'
+            ),
+            generatePipeline(
+                'Sovereign UI/UX',
+                'Build and deployment pipeline for the React front-end application.',
+                'feat/new-sidebar'
+            ),
+            generatePipeline(
+                'AI Model Service',
+                'Retrain, test, and deploy the Quantum AI Advisor model.',
+                'main'
+            ),
+            generatePipeline(
+                'Fraud Detection Engine',
+                'Pipeline for training and deploying the real-time fraud detection model.',
+                'develop'
+            ),
+            generatePipeline(
+                'Customer Onboarding Service',
+                'Build and deploy the microservice responsible for new customer onboarding.',
+                'release/v1.0'
+            ),
+            generatePipeline(
+                'Regulatory Reporting System',
+                'Automated pipeline for generating and submitting regulatory reports.',
+                'main'
+            ),
+            generatePipeline(
+                'Data Warehouse ETL',
+                'Extract, transform, and load pipeline for the enterprise data warehouse.',
+                'staging'
+            ),
+            generatePipeline(
+                'Mobile Banking App',
+                'CI/CD pipeline for the iOS and Android mobile banking applications.',
+                'hotfix/security'
+            ),
+            generatePipeline(
+                'Open Banking API Gateway',
+                'Deployment pipeline for the API gateway managing open banking integrations.',
+                'main'
+            ),
+            generatePipeline(
+                'Cloud Infrastructure Provisioning',
+                'Automated infrastructure provisioning and configuration management.',
+                'production'
+            ),
+        ];
+    }
+
+    // --- Business Model Branches ---
+    export namespace viewit {
+        export namespace movieplayform {
+            // Mission: Revolutionize movie streaming with AI-driven recommendations and personalized experiences.
+            // Monetization: Subscription fees, targeted advertising, premium content rentals.
+            // IP Moat: Proprietary AI recommendation algorithms, exclusive content partnerships.
+        }
+    }
+
+    export namespace lendfast {
+        export namespace microloanplatform {
+            // Mission: Provide instant microloans to underserved communities using AI-powered risk assessment.
+            // Monetization: Interest on loans, transaction fees, data analytics services.
+            // IP Moat: AI-based credit scoring algorithms, proprietary risk models.
+        }
+    }
+
+    export namespace savewise {
+        export namespace automatedsavings {
+            // Mission: Automate savings and investment strategies for users based on AI-driven financial planning.
+            // Monetization: Management fees, commission on investment products, premium advisory services.
+            // IP Moat: AI-driven financial planning algorithms, personalized investment strategies.
+        }
+    }
+
+    export namespace tradex {
+        export namespace aiassistedtrading {
+            // Mission: Empower retail investors with AI-assisted trading tools and real-time market analysis.
+            // Monetization: Subscription fees, commission on trades, premium analytics services.
+            // IP Moat: AI-based trading algorithms, real-time market analysis tools.
+        }
+    }
+
+    export namespace insuretech {
+        export namespace aipoweredinsurance {
+            // Mission: Disrupt the insurance industry with AI-powered underwriting and personalized policies.
+            // Monetization: Premiums, data analytics services, risk assessment tools.
+            // IP Moat: AI-based underwriting algorithms, personalized insurance policies.
+        }
+    }
+
+    export namespace healthwise {
+        export namespace aihealthadvisor {
+            // Mission: Provide personalized health advice and wellness plans using AI-driven health analysis.
+            // Monetization: Subscription fees, data analytics services, premium health plans.
+            // IP Moat: AI-based health analysis algorithms, personalized wellness plans.
+        }
+    }
+
+    export namespace edify {
+        export namespace aipoweredtutoring {
+            // Mission: Revolutionize education with AI-powered tutoring and personalized learning experiences.
+            // Monetization: Subscription fees, data analytics services, premium educational content.
+            // IP Moat: AI-based tutoring algorithms, personalized learning paths.
+        }
+    }
+
+    export namespace lawassist {
+        export namespace aiassistedlegal {
+            // Mission: Provide affordable legal assistance and document review using AI-driven legal analysis.
+            // Monetization: Subscription fees, data analytics services, premium legal services.
+            // IP Moat: AI-based legal analysis algorithms, automated document review tools.
+        }
+    }
+
+    export namespace realinvest {
+        export namespace airealestate {
+            // Mission: Simplify real estate investment with AI-driven property analysis and personalized recommendations.
+            // Monetization: Commission on transactions, data analytics services, premium investment advice.
+            // IP Moat: AI-based property analysis algorithms, personalized investment recommendations.
+        }
+    }
+
+    export namespace supplychainx {
+        export namespace aisupplychain {
+            // Mission: Optimize supply chain operations with AI-driven forecasting and logistics management.
+            // Monetization: Subscription fees, data analytics services, premium logistics solutions.
+            // IP Moat: AI-based forecasting algorithms, optimized logistics management tools.
+        }
+    }
+}
+
 export default CiCdView;
-```
