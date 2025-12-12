@@ -1,4 +1,3 @@
-```tsx
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Typography, Grid, TextField, Button, Slider, Paper } from '@mui/material';
 import { styled } from '@mui/system';
@@ -165,4 +164,3 @@ const FractionalReserveView: React.FC = () => {
 };
 
 export default FractionalReserveView;
-```
