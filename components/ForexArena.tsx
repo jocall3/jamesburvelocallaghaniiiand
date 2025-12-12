@@ -554,22 +554,22 @@ const ForexArena: React.FC = () => {
             </div>
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {[
-                    { id: 'DASHBOARD', label: 'Command Center', icon: '⚡' },
-                    { id: 'FOREX_ARENA', label: 'Forex Arena', icon: '📈' },
-                    { id: 'AI_CHAT', label: 'Neural Chat', icon: '🧠' },
-                    { id: 'GEMINI_INSIGHTS', label: 'Gemini Insights', icon: '💎' },
-                    { id: 'THINKING_VISUALIZER', label: 'Thinking Visualizer', icon: '🌐' },
-                    { id: 'GLOBAL_KPIS', label: 'Global KPIs', icon: '📊' },
-                    { id: 'MARKET_ANALYSIS', label: 'Market Analysis', icon: '🌍' },
-                    { id: 'TRADE_LOGS', label: 'Trade Logs', icon: '📝' },
-                    { id: 'AI_CONFIG', label: 'AI Configuration', icon: '⚙️' },
-                    { id: 'PROFILE', label: 'Executive Profile', icon: '👤' },
-                    { id: 'SYSTEM_HEALTH', label: 'System Health', icon: '❤️‍🩹' },
-                    { id: 'MULTIMODAL_ANALYSIS', label: 'Multimodal Analysis', icon: '📸' },
-                    { id: 'SENTIMENT_STREAM', label: 'Sentiment Stream', icon: '📰' },
-                    { id: 'RISK_SIMULATOR', label: 'Risk Simulator', icon: '🎲' },
-                    { id: 'COMPLIANCE_AI', label: 'Compliance AI', icon: '⚖️' },
-                    { id: 'QUANTUM_COMPUTING_INTERFACE', label: 'Quantum Interface', icon: '⚛️' },
+                    { id: 'DASHBOARD', label: 'Command Center', icon: 'âš¡' },
+                    { id: 'FOREX_ARENA', label: 'Forex Arena', icon: 'ðŸ“ˆ' },
+                    { id: 'AI_CHAT', label: 'Neural Chat', icon: 'ðŸ§ ' },
+                    { id: 'GEMINI_INSIGHTS', label: 'Gemini Insights', icon: 'ðŸ’Ž' },
+                    { id: 'THINKING_VISUALIZER', label: 'Thinking Visualizer', icon: 'ðŸŒ ' },
+                    { id: 'GLOBAL_KPIS', label: 'Global KPIs', icon: 'ðŸ“Š' },
+                    { id: 'MARKET_ANALYSIS', label: 'Market Analysis', icon: 'ðŸŒ ' },
+                    { id: 'TRADE_LOGS', label: 'Trade Logs', icon: 'ðŸ“ ' },
+                    { id: 'AI_CONFIG', label: 'AI Configuration', icon: 'âš™ï¸ ' },
+                    { id: 'PROFILE', label: 'Executive Profile', icon: 'ðŸ‘¤' },
+                    { id: 'SYSTEM_HEALTH', label: 'System Health', icon: 'â ¤ï¸ â€ ðŸ©¹' },
+                    { id: 'MULTIMODAL_ANALYSIS', label: 'Multimodal Analysis', icon: 'ðŸ“¸' },
+                    { id: 'SENTIMENT_STREAM', label: 'Sentiment Stream', icon: 'ðŸ“°' },
+                    { id: 'RISK_SIMULATOR', label: 'Risk Simulator', icon: 'ðŸŽ²' },
+                    { id: 'COMPLIANCE_AI', label: 'Compliance AI', icon: 'âš–ï¸ ' },
+                    { id: 'QUANTUM_COMPUTING_INTERFACE', label: 'Quantum Interface', icon: 'âš›ï¸ ' },
                 ].map(item => (
                     <button key={item.id} onClick={() => setActiveModule(item.id as ModuleType)} style={{ background: activeModule === item.id ? 'rgba(100, 255, 218, 0.1)' : 'transparent', border: 'none', borderLeft: activeModule === item.id ? '3px solid #64ffda' : '3px solid transparent', padding: '0.8rem 1rem', textAlign: 'left', color: activeModule === item.id ? '#64ffda' : '#8892b0', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.9rem', transition: 'all 0.2s' }}>
                         <span>{item.icon}</span> {item.label}
@@ -597,12 +597,12 @@ const ForexArena: React.FC = () => {
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ color: kpi.trend === 'UP' ? '#64ffda' : kpi.trend === 'DOWN' ? '#ef473a' : '#fdbb2d', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                            {kpi.trend === 'UP' ? '▲' : kpi.trend === 'DOWN' ? '▼' : '■'} {Math.abs(kpi.change)}%
+                            {kpi.trend === 'UP' ? 'â–²' : kpi.trend === 'DOWN' ? 'â–¼' : 'â– '} {Math.abs(kpi.change)}%
                         </span>
                         <SparklineChart data={kpi.historicalData} color={kpi.trend === 'UP' ? '#64ffda' : '#ef473a'} />
                     </div>
                     <div style={{ marginTop: '1rem', padding: '0.5rem', background: 'rgba(255, 0, 0, 0.1)', borderRadius: '4px', fontSize: '0.8rem', color: '#ef473a' }}>
-                        🤖 AI: {kpi.aiPrediction} (Conf: {(kpi.confidence * 100).toFixed(1)}%)
+                        ðŸ¤– AI: {kpi.aiPrediction} (Conf: {(kpi.confidence * 100).toFixed(1)}%)
                     </div>
                 </Card>
             ))}
@@ -676,7 +676,7 @@ const ForexArena: React.FC = () => {
             <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem', paddingRight: '1rem', marginBottom: '1rem' }}>
                 {chatHistory.map(msg => (
                     <div key={msg.id} style={{ alignSelf: msg.sender === 'USER' ? 'flex-end' : 'flex-start', maxWidth: '70%', background: msg.sender === 'USER' ? '#112240' : 'rgba(100, 255, 218, 0.1)', color: msg.sender === 'USER' ? '#fff' : '#e6f1ff', padding: '1rem', borderRadius: '12px', border: msg.sender === 'AI' ? '1px solid rgba(100, 255, 218, 0.3)' : 'none' }}>
-                        <div style={{ fontSize: '0.7rem', color: '#8892b0', marginBottom: '0.3rem' }}>{msg.sender} • {new Date(msg.timestamp).toLocaleTimeString()}</div>
+                        <div style={{ fontSize: '0.7rem', color: '#8892b0', marginBottom: '0.3rem' }}>{msg.sender} â€¢ {new Date(msg.timestamp).toLocaleTimeString()}</div>
                         {msg.text}
                         {msg.sender === 'AI' && msg.thinkingTimeMs && (
                             <div style={{ fontSize: '0.7rem', color: '#8892b0', marginTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.5rem' }}>
@@ -738,7 +738,7 @@ const ForexArena: React.FC = () => {
                             </div>
                             <div style={{ fontSize: '1.8rem', color: '#fff', fontWeight: 'bold' }}>{comp.value.toFixed(1)} <span style={{ fontSize: '1rem', color: '#8892b0' }}>{comp.metricUnit}</span></div>
                             <div style={{ fontSize: '0.8rem', color: '#8892b0' }}>{comp.metric}</div>
-                            <div style={{ fontSize: '0.7rem', color: '#8892b0', marginTop: '0.5rem' }}>Temp: {comp.temperature}°C | Q-State: {comp.quantumState}</div>
+                            <div style={{ fontSize: '0.7rem', color: '#8892b0', marginTop: '0.5rem' }}>Temp: {comp.temperature}Â°C | Q-State: {comp.quantumState}</div>
                         </div>
                     );
                 })}
@@ -823,7 +823,7 @@ const ForexArena: React.FC = () => {
                             {process.steps.map((step, index) => (
                                 <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                     <span style={{ color: step.status === 'COMPLETED' ? '#64ffda' : step.status === 'RUNNING' ? '#fdbb2d' : '#8892b0', width: '20px' }}>
-                                        {step.status === 'COMPLETED' ? '✔' : step.status === 'RUNNING' ? '...' : '○'}
+                                        {step.status === 'COMPLETED' ? 'âœ”' : step.status === 'RUNNING' ? '...' : 'â—‹'}
                                     </span>
                                     <span style={{ color: '#ccd6f6', flex: 1 }}>{step.name}</span>
                                     {step.durationMs && <span style={{ color: '#8892b0', fontSize: '0.8rem' }}>{step.durationMs.toFixed(0)}ms</span>}
@@ -855,8 +855,8 @@ const ForexArena: React.FC = () => {
                             <div style={{ fontWeight: 'bold', color: '#64ffda' }}>{systemTime.toLocaleTimeString('en-GB', { timeZone: 'UTC' })} UTC</div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: '#233554', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🔔</div>
-                            <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: '#233554', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>⚙️</div>
+                            <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: '#233554', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>ðŸ””</div>
+                            <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: '#233554', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>âš™ï¸ </div>
                         </div>
                     </div>
                 </header>
