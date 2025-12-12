@@ -98,7 +98,7 @@ const VariableCollectionItem: React.FC<VariableCollectionItemProps> = ({
           {collectionName}
           {isPublished ? ' (Published)' : ' (Local)'} ({collectionVariables.length})
         </Text>
-        <Text>{isExpanded ? '▲' : '▼'}</Text>
+        <Text>{isExpanded ? 'â²' : 'â¼'}</Text>
       </TouchableOpacity>
 
       {isExpanded && (
