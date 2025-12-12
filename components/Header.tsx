@@ -94,7 +94,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                             <div className="p-3 font-semibold text-white border-b border-gray-700">Notifications</div>
                             <div className="max-h-96 overflow-y-auto">
                                 {notifications.map(n => (
-                                    <div key={n.id} onClick={() => handleNotificationClick(n)} className={`p-3 text-sm flex items-start border-b border-gray-700/50 cursor-pointer ${n.read ? 'opacity-60' : 'bg-cyan-500/10'}`}>
+                                    <div key={n.id} onClick={() => handleNotificationClick(n)} className={`p-3 text-sm flex items-start border-b border-700/50 cursor-pointer ${n.read ? 'opacity-60' : 'bg-cyan-500/10'}`}>
                                         {!n.read && <div className="w-2 h-2 rounded-full bg-cyan-400 mt-1.5 flex-shrink-0"></div>}
                                         <div className="ml-2">
                                             <p className="text-gray-200">{n.message}</p>
