@@ -1,4 +1,3 @@
-
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
@@ -137,7 +136,7 @@ export const LoginView: React.FC = () => {
                                 <div className="space-y-2">
                                     <label className="text-xs font-mono text-gray-500 uppercase">Security Key</label>
                                     <div className="relative group">
-                                        <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-gray-800/50 border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-cyan-500 transition-all pl-10" placeholder="••••••••••••" disabled={isLoading} />
+                                        <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-gray-800/50 border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-cyan-500 transition-all pl-10" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" disabled={isLoading} />
                                         <Lock className="w-4 h-4 text-gray-500 absolute left-3 top-3.5" />
                                     </div>
                                 </div>
@@ -168,7 +167,7 @@ export const LoginView: React.FC = () => {
                                 <div className="space-y-2">
                                     <label className="text-xs font-mono text-gray-500 uppercase">Create Password</label>
                                     <div className="relative">
-                                        <input type="password" value={regPassword} onChange={e => setRegPassword(e.target.value)} className="w-full bg-gray-800/50 border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-cyan-500 transition-all pl-10" placeholder="••••••••••••" required />
+                                        <input type="password" value={regPassword} onChange={e => setRegPassword(e.target.value)} className="w-full bg-gray-800/50 border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-cyan-500 transition-all pl-10" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required />
                                         <Lock className="w-4 h-4 text-gray-500 absolute left-3 top-3.5" />
                                     </div>
                                 </div>
