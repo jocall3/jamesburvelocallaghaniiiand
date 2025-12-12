@@ -1,251 +1,90 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  TableContainer,
-  Paper,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Alert,
-  Snackbar,
-  Button,
-  CircularProgress,
-} from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { styled } from '@mui/material/styles';
-import {
-  getSecurityLogs,
-  getComplianceStatus,
-  getConsentRecords,
-  revokeConsentRecord,
-} from '../api/securityComplianceApi'; // Assuming you have an API file
-import { useAuth } from '../context/AuthContext';
+import React from 'react';
+import { Box, Typography, Paper } from '@mui/material';
 
-const StyledAccordion = styled(Accordion)(({ theme }) => ({
-  marginBottom: theme.spacing(2),
-  '&.Mui-expanded': {
-    backgroundColor: theme.palette.mode === 'dark' ? '#303030' : '#f0f0f0',
-  },
-}));
+const BlogQuote = ({ children }: { children: React.ReactNode }) => (
+  <Paper
+    elevation={0}
+    sx={{
+      borderLeft: '4px solid',
+      borderColor: 'primary.main',
+      pl: 2,
+      py: 1,
+      my: 3,
+      backgroundColor: 'action.hover',
+    }}
+  >
+    <Typography variant="body1" component="blockquote" sx={{ fontStyle: 'italic' }}>
+      {children}
+    </Typography>
+  </Paper>
+);
 
 const SecurityComplianceView = () => {
-  const { user } = useAuth() || {}; // Access user information from the AuthContext
-  const [securityLogs, setSecurityLogs] = useState<any[]>([]);
-  const [complianceStatus, setComplianceStatus] = useState<any>(null);
-  const [consentRecords, setConsentRecords] = useState<any[]>([]);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
-  const [loading, setLoading] = useState({
-    securityLogs: false,
-    complianceStatus: false,
-    consentRecords: false,
-    revokeConsent: false, // New loading state
-  });
-
-  useEffect(() => {
-    const fetchSecurityLogs = async () => {
-      setLoading(prev => ({ ...prev, securityLogs: true }));
-      try {
-        const data = await getSecurityLogs();
-        setSecurityLogs(data);
-      } catch (error: any) {
-        setSnackbarMessage(`Error fetching security logs: ${error.message}`);
-        setSnackbarSeverity('error');
-        setSnackbarOpen(true);
-        console.error('Error fetching security logs:', error);
-      } finally {
-        setLoading(prev => ({ ...prev, securityLogs: false }));
-      }
-    };
-
-    const fetchComplianceStatus = async () => {
-      setLoading(prev => ({ ...prev, complianceStatus: true }));
-      try {
-        const data = await getComplianceStatus();
-        setComplianceStatus(data);
-      } catch (error: any) {
-        setSnackbarMessage(`Error fetching compliance status: ${error.message}`);
-        setSnackbarSeverity('error');
-        setSnackbarOpen(true);
-        console.error('Error fetching compliance status:', error);
-      } finally {
-        setLoading(prev => ({ ...prev, complianceStatus: false }));
-      }
-    };
-
-    const fetchConsentRecords = async () => {
-      setLoading(prev => ({ ...prev, consentRecords: true }));
-      try {
-        const data = await getConsentRecords();
-        setConsentRecords(data);
-      } catch (error: any) {
-        setSnackbarMessage(`Error fetching consent records: ${error.message}`);
-        setSnackbarSeverity('error');
-        setSnackbarOpen(true);
-        console.error('Error fetching consent records:', error);
-      } finally {
-        setLoading(prev => ({ ...prev, consentRecords: false }));
-      }
-    };
-
-
-    fetchSecurityLogs();
-    fetchComplianceStatus();
-    fetchConsentRecords();
-  }, []);
-
-  const handleRevokeConsent = async (recordId: string) => {
-    setLoading(prev => ({ ...prev, revokeConsent: true }));
-    try {
-      await revokeConsentRecord(recordId);
-      setSnackbarMessage('Consent record revoked successfully!');
-      setSnackbarSeverity('success');
-      setSnackbarOpen(true);
-      // Refresh consent records after successful revocation
-      const data = await getConsentRecords();
-      setConsentRecords(data);
-    } catch (error: any) {
-      setSnackbarMessage(`Error revoking consent record: ${error.message}`);
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      console.error('Error revoking consent record:', error);
-    } finally {
-      setLoading(prev => ({ ...prev, revokeConsent: false }));
-    }
-  };
-
-  const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
-
-  if (!user || !user.isAdmin) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <Alert severity="error">You do not have permission to view this page.</Alert>
-      </Box>
-    );
-  }
-
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Security and Compliance Dashboard
+    <Box sx={{ p: { xs: 2, sm: 3, md: 5 }, maxWidth: '800px', mx: 'auto' }}>
+      <Typography
+        variant="h3"
+        component="h1"
+        gutterBottom
+        sx={{ fontWeight: 'bold', letterSpacing: '-0.5px' }}
+      >
+        Beyond the Firewall: 3 Things Your App's Code Reveals About Your Data
       </Typography>
 
-      <StyledAccordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="security-logs-content" id="security-logs-header">
-          <Typography variant="h6">Security Logs</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {loading.securityLogs ? (
-            <CircularProgress />
-          ) : (
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Timestamp</TableCell>
-                    <TableCell>User</TableCell>
-                    <TableCell>Action</TableCell>
-                    <TableCell>Details</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {securityLogs.map((log, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{new Date(log.timestamp).toLocaleString()}</TableCell>
-                      <TableCell>{log.user}</TableCell>
-                      <TableCell>{log.action}</TableCell>
-                      <TableCell>{JSON.stringify(log.details)}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </AccordionDetails>
-      </StyledAccordion>
+      <Typography variant="body1" paragraph sx={{ fontSize: '1.1rem', color: 'text.secondary', mb: 4 }}>
+        We click "agree," we sign in, we share. Every day, we place a tremendous amount of trust in the digital platforms that run our lives. But have you ever wondered what that trust looks like from the other side? We dove into the code of a typical security and compliance dashboard to uncover what’s really happening behind the scenes. The findings are more revealing—and empowering—than you might think.
+      </Typography>
 
-      <StyledAccordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="compliance-status-content" id="compliance-status-header">
-          <Typography variant="h6">Compliance Status</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {loading.complianceStatus ? (
-            <CircularProgress />
-          ) : complianceStatus ? (
-            <Typography>
-              Current Compliance Status: {complianceStatus.status}
-            </Typography>
-          ) : (
-            <Typography>No compliance status available.</Typography>
-          )}
-        </AccordionDetails>
-      </StyledAccordion>
+      <Box component="section" sx={{ mb: 5 }}>
+        <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 'bold' }}>
+          1. Absolute Transparency: Every Action Leaves a Trace
+        </Typography>
+        <Typography variant="body1" paragraph>
+          The first thing you notice in a security dashboard isn't a fortress of defenses; it's a meticulous logbook. Every significant action—a login attempt, a settings change, a data export—is recorded with a timestamp, the user involved, and the specific action taken.
+        </Typography>
+        <Typography variant="body1" paragraph>
+          This isn't about surveillance. It's about accountability. This detailed audit trail, represented in the code as `getSecurityLogs()`, is the system's source of truth. If a data breach occurs or an unauthorized change is made, this log is the first place engineers look to trace the digital breadcrumbs. It transforms security from a passive wall into an active, transparent record of events, ensuring that every action has an owner.
+        </Typography>
+      </Box>
 
-      <StyledAccordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="consent-records-content" id="consent-records-header">
-          <Typography variant="h6">Consent Records</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {loading.consentRecords ? (
-            <CircularProgress />
-          ) : (
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Record ID</TableCell>
-                    <TableCell>User</TableCell>
-                    <TableCell>Consent Granted Date</TableCell>
-                    <TableCell>Revoke</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {consentRecords.map((record, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{record.recordId}</TableCell>
-                      <TableCell>{record.user}</TableCell>
-                      <TableCell>{new Date(record.consentGrantedDate).toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        {loading.revokeConsent ? (
-                          <CircularProgress size={24} />
-                        ) : (
-                          <Button
-                            variant="outlined"
-                            color="secondary"
-                            size="small"
-                            onClick={() => handleRevokeConsent(record.recordId)}
-                            disabled={loading.revokeConsent}
-                          >
-                            Revoke
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </AccordionDetails>
-      </StyledAccordion>
+      <Box component="section" sx={{ mb: 5 }}>
+        <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 'bold' }}>
+          2. Compliance is a Living, Breathing Status—Not a Certificate on the Wall
+        </Typography>
+        <Typography variant="body1" paragraph>
+          In one corner of the dashboard sits a simple indicator: "Compliance Status." It might seem trivial, but its presence implies something profound. Compliance with regulations like GDPR or HIPAA isn't a one-time certification you hang on the wall. It's a continuous, dynamic state that must be monitored constantly.
+        </Typography>
+        <BlogQuote>
+          The code doesn't just check for a certificate; it calls a function like `getComplianceStatus()` to get a real-time report. This suggests the system is always asking itself, "Are we still following the rules?"
+        </BlogQuote>
+        <Typography variant="body1" paragraph>
+          This is a powerful shift in perspective. It treats regulatory adherence not as a bureaucratic hurdle to be cleared, but as a vital sign for the application's health, checked and re-checked with every update and change.
+        </Typography>
+      </Box>
 
-      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      <Box component="section" sx={{ mb: 5 }}>
+        <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 'bold' }}>
+          3. The Most Powerful Button You Don't See: Your Right to Say "No"
+        </Typography>
+        <Typography variant="body1" paragraph>
+          Perhaps the most impactful discovery is the "Consent Records" table. It doesn't just list who agreed to what; it includes a function to actively *revoke* that consent. This is where abstract legal rights become tangible lines of code.
+        </Typography>
+        <Typography variant="body1" paragraph>
+          Your right to withdraw consent isn't just a clause in a privacy policy; it's an actual function call: `revokeConsentRecord(recordId)`. This single line of code is the mechanism that empowers users to take back control over their data. It's a reminder that good systems are built not just to acquire consent, but to respect its withdrawal. It’s the digital embodiment of "no means no."
+        </Typography>
+      </Box>
+
+      <Box component="footer" sx={{ mt: 5, pt: 3, borderTop: '1px solid', borderColor: 'divider' }}>
+        <Typography variant="h6" gutterBottom>
+          Code as a Contract
+        </Typography>
+        <Typography variant="body1" paragraph>
+          Looking at the code behind a security dashboard reveals that true digital trust isn't built on promises, but on processes. It's built on transparent logging, continuous compliance checks, and the fundamental ability to revoke consent.
+        </Typography>
+        <Typography variant="body1" paragraph sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+          The next time you click 'Agree,' you're not just accepting terms; you're entering into a relationship with the application's code. So, the real question is: is that code built to respect you back?
+        </Typography>
+      </Box>
     </Box>
   );
 };
