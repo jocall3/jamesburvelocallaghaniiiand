@@ -26,29 +26,52 @@ interface SystemMetricsData {
   services: ServiceStatus[];
 }
 
+const generateInitialServices = (): ServiceStatus[] => {
+  const serviceNames = [
+    'OpenBanking Core API',
+    'Risk-Weighted Asset Calculator',
+    'Liquidity Simulation Engine',
+    'Compliance Automation Service',
+    'Investor Deck Generator',
+    'Capital Planning Engine',
+    'Stress Scenario Modeler',
+    'Cross-Branch Orchestrator',
+    'Shared Identity Layer',
+    'Automated Audit Validator',
+  ];
+
+  return serviceNames.map(name => ({
+    name,
+    status: 'up',
+    lastCheck: new Date().toLocaleTimeString(),
+  }));
+};
+
 const initialMetrics: SystemMetricsData = {
   cpuUsage: 0,
   memory: { used: 0, total: 0, percentage: 0 },
   disk: { used: 0, total: 0, percentage: 0 },
   network: { uploadSpeed: 0, downloadSpeed: 0 },
   uptime: 0,
-  services: [
-    { name: 'Auth Service', status: 'up', lastCheck: new Date().toLocaleTimeString() },
-    { name: 'Database Service', status: 'up', lastCheck: new Date().toLocaleTimeString() },
-    { name: 'API Gateway', status: 'up', lastCheck: new Date().toLocaleTimeString() },
-    { name: 'Payment Processor', status: 'up', lastCheck: new Date().toLocaleTimeString() },
-    { name: 'Notification Service', status: 'up', lastCheck: new Date().toLocaleTimeString() },
-  ],
+  services: generateInitialServices(),
 };
 
 const SystemMetrics: React.FC = () => {
-  const [metrics, setMetrics] = useState<SystemMetricsData>(initialMetrics);
+  const [systemSpecs] = useState(() => ({
+    totalMemory: [16, 32, 64, 128][Math.floor(Math.random() * 4)],
+    totalDisk: [512, 1024, 2048, 4096][Math.floor(Math.random() * 4)],
+  }));
+
+  const [metrics, setMetrics] = useState<SystemMetricsData>({
+    ...initialMetrics,
+    memory: { ...initialMetrics.memory, total: systemSpecs.totalMemory },
+    disk: { ...initialMetrics.disk, total: systemSpecs.totalDisk },
+  });
   const [loading, setLoading] = useState(true);
 
   // Function to generate mock metric data
   const generateMockMetrics = (prevMetrics: SystemMetricsData): SystemMetricsData => {
-    const totalMemory = 16; // GB
-    const totalDisk = 500; // GB
+    const { totalMemory, totalDisk } = systemSpecs;
     const intervalDuration = 3; // seconds, matches setInterval
 
     const newCpuUsage = parseFloat((Math.random() * 80 + 10).toFixed(2)); // 10-90%
@@ -57,12 +80,13 @@ const SystemMetrics: React.FC = () => {
 
     const newServices = prevMetrics.services.map(service => {
       // Randomly change status for some services
-      if (Math.random() < 0.15) { // 15% chance to change status for any service
+      if (Math.random() < 0.1) { // 10% chance to change status for any service
         const statuses: ServiceStatus['status'][] = ['up', 'down', 'degraded'];
         const newStatus = statuses[Math.floor(Math.random() * statuses.length)];
         return { ...service, status: newStatus, lastCheck: new Date().toLocaleTimeString() };
       }
-      return service;
+      // Even if status doesn't change, update the lastCheck time
+      return { ...service, lastCheck: new Date().toLocaleTimeString() };
     });
 
     return {
@@ -90,7 +114,7 @@ const SystemMetrics: React.FC = () => {
     // Simulate initial data fetch
     const fetchInitialData = () => {
       setTimeout(() => {
-        setMetrics(generateMockMetrics(initialMetrics)); // Generate some initial non-zero data
+        setMetrics(prevMetrics => generateMockMetrics(prevMetrics)); // Generate some initial non-zero data
         setLoading(false);
       }, 500); // Simulate network delay
     };
@@ -99,11 +123,11 @@ const SystemMetrics: React.FC = () => {
 
     // Simulate real-time updates
     const intervalId = setInterval(() => {
-      setMetrics((prevMetrics) => generateMockMetrics(prevMetrics));
+      setMetrics(prevMetrics => generateMockMetrics(prevMetrics));
     }, 3000); // Update every 3 seconds
 
     return () => clearInterval(intervalId); // Cleanup on unmount
-  }, []);
+  }, []); // Empty dependency array is correct here
 
   // Helper to format uptime from seconds to human-readable string
   const formatUptime = (seconds: number) => {
@@ -129,7 +153,7 @@ const SystemMetrics: React.FC = () => {
   if (loading) {
     return (
       <div className="p-6 bg-white rounded-lg shadow-md animate-pulse">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">System Metrics</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Citibankdemobusinessinc System Metrics</h2>
         <p className="text-gray-600">Loading real-time system metrics...</p>
       </div>
     );
@@ -137,7 +161,7 @@ const SystemMetrics: React.FC = () => {
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">System Metrics</h2>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Citibankdemobusinessinc System Metrics</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* CPU Usage */}
