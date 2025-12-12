@@ -1,4 +1,3 @@
-```tsx
 import React, { useState, useEffect, useCallback } from 'react';
 
 // Define the type for a single API's health status
@@ -293,4 +292,3 @@ const styles: { [key: string]: React.CSSProperties } = {
 };
 
 export default SystemHealthMonitor;
-```
