@@ -1,0 +1,321 @@
+// Copyright (c) 2024 Aether-Framework
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+syntax = "proto3";
+
+package aether_ontology.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "google/type/money.proto";
+import "schemas/aether_ontology/v1/common.proto";
+
+option go_package = "github.com/aether-framework/aether-ontology/gen/go/v1;aetherv1";
+option java_package = "com.aetherframework.ontology.v1";
+option java_multiple_files = true;
+
+// The Trade message represents a single, atomic transaction of an asset between two parties.
+// It is designed to be a canonical representation for a wide variety of transactions,
+// from traditional financial instruments to novel digital assets specific to the AI ecosystem,
+// such as compute resources, API credits, or dataset licenses. This schema is a core
+// component of the Aether ontology, enabling interoperability between marketplace,
+// accounting, governance, and analytics applications.
+message Trade {
+  // Unique identifier for the trade, typically a UUID.
+  UUID trade_id = 1;
+
+  // Optional identifier from an external system or exchange.
+  string external_id = 2;
+
+  // Identifier of the order that this trade fulfills or partially fulfills.
+  UUID order_id = 3;
+
+  // The asset that was traded.
+  Asset asset = 4;
+
+  // The quantity of the asset that was traded. Represented as a string to handle
+  // arbitrary precision for fractional assets (e.g., cryptocurrencies, compute seconds).
+  string quantity = 5;
+
+  // The price per unit of the asset at the time of execution.
+  google.type.Money price = 6;
+
+  // The total value of the trade before fees (price * quantity).
+  google.type.Money gross_consideration = 7;
+
+  // The net value of the trade after all fees and commissions.
+  google.type.Money net_consideration = 8;
+
+  // A list of all fees associated with this trade.
+  repeated Fee fees = 9;
+
+  // The direction of the trade.
+  TradeType trade_type = 10;
+
+  // The current status of the trade in its lifecycle.
+  TradeStatus status = 11;
+
+  // The timestamp when the trade was executed.
+  google.protobuf.Timestamp execution_timestamp = 12;
+
+  // The timestamp when the trade is expected to be settled.
+  google.protobuf.Timestamp expected_settlement_timestamp = 13;
+
+  // The timestamp when the trade was actually settled.
+  google.protobuf.Timestamp actual_settlement_timestamp = 14;
+
+  // The settlement cycle for this trade.
+  SettlementType settlement_type = 15;
+
+  // The venue where the trade was executed (e.g., exchange name, platform ID).
+  string execution_venue = 16;
+
+  // The primary buying party in the trade.
+  Counterparty buyer = 17;
+
+  // The primary selling party in the trade.
+  Counterparty seller = 18;
+
+  // A list of other parties involved in the trade, such as brokers, custodians, or clearing houses.
+  repeated Counterparty ancillary_parties = 19;
+
+  // The legal jurisdiction governing the trade. (e.g., "USA", "EU").
+  string jurisdiction = 20;
+
+  // A log of status changes for audit purposes.
+  repeated StatusTransition status_history = 21;
+
+  // A map of key-value pairs for arbitrary metadata. Useful for system-specific information
+  // or integration with third-party platforms.
+  google.protobuf.Struct metadata = 22;
+
+  // Tags for categorization, filtering, and reporting.
+  repeated string tags = 23;
+
+  // Timestamp of when this trade record was created in the system.
+  google.protobuf.Timestamp created_at = 24;
+
+  // Timestamp of when this trade record was last updated.
+  google.protobuf.Timestamp updated_at = 25;
+}
+
+// Represents an asset being traded. This is a flexible structure designed to
+// accommodate both traditional financial assets and novel digital/AI assets.
+message Asset {
+  // Unique identifier for the asset within the Aether ecosystem.
+  UUID asset_id = 1;
+
+  // The broad classification of the asset.
+  AssetClass asset_class = 2;
+
+  // The common symbol or ticker for the asset (e.g., "GOOGL", "BTC", "NVIDIA_A100_HOUR").
+  string symbol = 3;
+
+  // A human-readable description of the asset.
+  string description = 4;
+
+  // A map of standard industry identifiers for the asset.
+  // Keys could be "ISIN", "CUSIP", "FIGI", "CONTRACT_ADDRESS", etc.
+  map<string, string> standard_identifiers = 5;
+
+  // Details specific to the type of asset being traded.
+  oneof asset_details {
+    ComputeResourceDetails compute_resource = 6;
+    ApiCreditDetails api_credit = 7;
+    DatasetLicenseDetails dataset_license = 8;
+    ModelAccessDetails model_access = 9;
+    // Add other digital or traditional asset types here.
+  }
+}
+
+// Details for a traded compute resource.
+message ComputeResourceDetails {
+  // The provider of the compute resource (e.g., "AWS", "GCP", "Aether_Internal").
+  string provider = 1;
+  // The specific region or zone (e.g., "us-east-1").
+  string region = 2;
+  // The type of instance or SKU (e.g., "p4d.24xlarge", "H100_SXM").
+  string instance_type = 3;
+  // The unit of measurement for the quantity (e.g., "SECONDS", "HOURS", "INSTANCE_MONTHS").
+  string unit = 4;
+}
+
+// Details for traded API credits.
+message ApiCreditDetails {
+  // The provider of the API (e.g., "OpenAI", "Anthropic", "Aether_Inference_Gateway").
+  string provider = 1;
+  // The specific API or service (e.g., "gpt-4-turbo", "claude-3-opus").
+  string service_name = 2;
+  // The unit of measurement for the credits (e.g., "TOKENS", "REQUESTS", "UNITS").
+  string unit = 3;
+  // Expiration policy for the credits, if any.
+  google.protobuf.Timestamp expiration_timestamp = 4;
+}
+
+// Details for a traded dataset license.
+message DatasetLicenseDetails {
+  // The unique identifier for the dataset.
+  UUID dataset_id = 1;
+  // The type of license granted (e.g., "READ_ONLY", "COMMERCIAL_USE", "LIMITED_DERIVATIVES").
+  string license_type = 2;
+  // A URI pointing to the full terms of the license.
+  string terms_uri = 3;
+  // The duration of the license validity in seconds. 0 for perpetual.
+  int64 duration_seconds = 4;
+}
+
+// Details for traded access to an AI model.
+message ModelAccessDetails {
+  // The unique identifier for the model.
+  UUID model_id = 1;
+  // The type of access granted (e.g., "INFERENCE", "FINE_TUNING", "EMBEDDINGS").
+  string access_type = 2;
+  // The unit of measurement for usage quota (e.g., "CALLS", "TOKENS_PROCESSED").
+  string unit = 3;
+  // The total quota granted by this trade. 0 for unlimited.
+  int64 quota_amount = 4;
+}
+
+// Represents a party involved in a trade.
+message Counterparty {
+  // Unique identifier for the counterparty.
+  UUID counterparty_id = 1;
+  // The legal name of the entity.
+  string name = 2;
+  // The role of this party in this specific trade.
+  CounterpartyRole role = 3;
+  // A map of legal and regulatory identifiers.
+  // Keys could be "LEI", "TAX_ID", "BIC", etc.
+  map<string, string> identifiers = 4;
+}
+
+// Represents a fee or commission associated with a trade.
+message Fee {
+  // The amount of the fee.
+  google.type.Money amount = 1;
+  // The type of fee.
+  FeeType fee_type = 2;
+  // A description of the fee, e.g., "Exchange Fee for NASDAQ".
+  string description = 3;
+}
+
+// Records a transition in the trade's status.
+message StatusTransition {
+  // The status being transitioned to.
+  TradeStatus to_status = 1;
+  // The timestamp of the transition.
+  google.protobuf.Timestamp transition_timestamp = 2;
+  // Optional reason or note for the status change.
+  string reason = 3;
+  // The entity or system that initiated the change.
+  string changed_by = 4;
+}
+
+// The direction of the trade from the perspective of the primary party.
+enum TradeType {
+  TRADE_TYPE_UNSPECIFIED = 0;
+  // A purchase of an asset.
+  BUY = 1;
+  // A sale of an asset.
+  SELL = 2;
+  // An exchange of one asset for another.
+  SWAP = 3;
+}
+
+// The lifecycle status of a trade.
+enum TradeStatus {
+  TRADE_STATUS_UNSPECIFIED = 0;
+  // The trade has been acknowledged but not yet executed.
+  PENDING = 1;
+  // The trade has been successfully executed on the venue.
+  EXECUTED = 2;
+  // The trade has been partially filled.
+  PARTIALLY_FILLED = 3;
+  // The transfer of assets and funds is complete.
+  SETTLED = 4;
+  // The trade has been cancelled before settlement.
+  CANCELLED = 5;
+  // The trade failed to execute or settle.
+  FAILED = 6;
+}
+
+// The settlement cycle for a trade.
+enum SettlementType {
+  SETTLEMENT_TYPE_UNSPECIFIED = 0;
+  // Same-day settlement (Trade Date).
+  T_PLUS_0 = 1;
+  // Settlement on Trade Date + 1 business day.
+  T_PLUS_1 = 2;
+  // Settlement on Trade Date + 2 business days.
+  T_PLUS_2 = 3;
+  // Settlement occurs immediately upon execution.
+  INSTANTANEOUS = 4;
+}
+
+// The classification of the traded asset.
+enum AssetClass {
+  ASSET_CLASS_UNSPECIFIED = 0;
+  EQUITY = 1;
+  FIXED_INCOME = 2;
+  CURRENCY = 3;
+  COMMODITY = 4;
+  CRYPTOCURRENCY = 5;
+  DERIVATIVE = 6;
+  // A catch-all for novel digital assets.
+  DIGITAL_ASSET = 7;
+  // Specific class for compute time.
+  COMPUTE_RESOURCE = 8;
+  // Specific class for API credits/tokens.
+  API_CREDIT = 9;
+  // Specific class for data access rights.
+  DATASET_LICENSE = 10;
+  // Specific class for model access rights.
+  MODEL_ACCESS = 11;
+}
+
+// The role of a party in a trade.
+enum CounterpartyRole {
+  COUNTERPARTY_ROLE_UNSPECIFIED = 0;
+  BUYER = 1;
+  SELLER = 2;
+  BROKER = 3;
+  CUSTODIAN = 4;
+  CLEARING_HOUSE = 5;
+  AGENT = 6;
+}
+
+// The type of fee applied to a trade.
+enum FeeType {
+  FEE_TYPE_UNSPECIFIED = 0;
+  // Fee paid to a broker for executing the trade.
+  COMMISSION = 1;
+  // Fee charged by the exchange or execution venue.
+  EXCHANGE_FEE = 2;
+  // Fee required by a regulatory body.
+  REGULATORY_FEE = 3;
+  // Fee for clearing and settling the trade.
+  CLEARING_FEE = 4;
+  // Fee for custody of the asset.
+  CUSTODY_FEE = 5;
+  // A fee charged by the Aether platform.
+  PLATFORM_FEE = 6;
+  // Other miscellaneous fees.
+  OTHER = 7;
+}
