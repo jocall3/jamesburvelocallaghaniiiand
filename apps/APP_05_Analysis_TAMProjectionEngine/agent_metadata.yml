@@ -1,0 +1,21 @@
+purpose: Generate data-driven Total Addressable Market (TAM) projections for potential investments, leveraging AI-driven market analysis.
+dependencies:
+  - Databricks API (for data processing and analytics)
+  - Snowflake (for data warehousing and integration with market data)
+  - Google DeepMind (for advanced predictive modeling and forecasting)
+  - External economic data APIs (e.g., World Bank, IMF, national statistics agencies)
+  - Industry-specific market research APIs (e.g., Gartner, Forrester, IDC)
+  - Internal APP_04_Data_MarketDataIngestor (for raw market data feeds)
+invalidation_conditions:
+  - Significant global economic shifts (e.g., recessions, booms, major policy changes)
+  - Introduction of disruptive technologies or business models that fundamentally alter market structure
+  - Major geopolitical events impacting global trade or specific industries
+  - Changes in underlying data source methodologies or availability
+  - Detection of significant anomalies or biases in input data streams
+  - Scheduled periodic review (e.g., quarterly, annually)
+adjacent_apps:
+  - APP_04_Data_MarketDataIngestor
+  - APP_17_Diligence_CompetitiveLandscapeMapper
+  - APP_22_Strategy_InvestmentThesisGenerator
+  - APP_31_Analytics_GrowthOpportunityIdentifier
+  - APP_45_Reporting_ExecutiveDashboardService
