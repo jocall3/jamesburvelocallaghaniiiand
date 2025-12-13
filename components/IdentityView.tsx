@@ -1,267 +1,389 @@
-import React, { useState, useEffect } from 'react';
+```typescript
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  IdentityVerificationSession,
-  IdentityVerificationReport,
-  Stripe,
+    IdentityVerificationSession,
+    IdentityVerificationReport,
+    Stripe,
 } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import {
-  Box,
-  Typography,
-  CircularProgress,
-  Button,
-  Alert,
-  Stack,
+    Box,
+    Typography,
+    CircularProgress,
+    Button,
+    Alert,
+    Stack,
+    Tabs,
+    Tab,
+    TextField,
+    Grid,
+    Paper,
+    List,
+    ListItem,
+    ListItemText,
+    Divider,
+    AppBar,
+    Toolbar,
+    IconButton,
+    Menu,
+    MenuItem,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
 } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import AccountCircle from '@mui/icons-material/AccountCircle';
 
-// Replace with your actual publishable key
-const stripePublishableKey = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || '';
+const JBOC_COMPANY_NAME = "The James Burvel O’Callaghan III Code";
+const JBOC_STRIPE_KEY = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || '';
 
-interface IdentityViewProps {
-  // Define any props if necessary
+interface JBOC_IdentityViewProps {
 }
 
-const IdentityView: React.FC<IdentityViewProps> = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [stripe, setStripe] = useState<Stripe | null>(null);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [verificationSession, setVerificationSession] =
-    useState<IdentityVerificationSession | null>(null);
-  const [verificationReport, setVerificationReport] =
-    useState<IdentityVerificationReport | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+const JBOC_IdentityView: React.FC<JBOC_IdentityViewProps> = () => {
 
-  useEffect(() => {
-    if (!stripePublishableKey) {
-      setError('Missing Stripe publishable key.  Please set REACT_APP_STRIPE_PUBLISHABLE_KEY in your .env file.');
-      setLoading(false);
-      return;
-    }
-    const initializeStripe = async () => {
-      try {
-        const stripeInstance = await loadStripe(stripePublishableKey);
-        setStripe(stripeInstance);
-      } catch (err) {
-        console.error('Error loading Stripe.js', err);
-        setError('Failed to load Stripe.  Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initializeStripe();
-  }, []);
-
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const clientSecretFromParams = searchParams.get('client_secret');
-    if (clientSecretFromParams) {
-      setClientSecret(clientSecretFromParams);
-    }
-  }, [location.search]);
-
-
-  useEffect(() => {
-    const fetchVerificationSessionAndReport = async () => {
-      if (!clientSecret || !stripe) {
-        return;
-      }
-      setLoading(true);
-      setError(null);
-
-      try {
-        const verificationSessionResult =
-          await stripe.identity.getVerificationSession(clientSecret);
-
-        if (verificationSessionResult.error) {
-          throw new Error(
-            `Failed to retrieve verification session: ${verificationSessionResult.error.message}`,
-          );
-        }
-        setVerificationSession(verificationSessionResult);
-
-        if (verificationSessionResult.status === "verified") {
-            setSuccessMessage("Verification successful!");
-            const verificationReportResult = await stripe.identity.getVerificationReport(verificationSessionResult.last_verification_report as string)
-          if (verificationReportResult.error) {
-            throw new Error(
-                `Failed to retrieve verification report: ${verificationReportResult.error.message}`,
-            );
-          }
-          setVerificationReport(verificationReportResult);
-        }
-      } catch (err: any) {
-        console.error('Error fetching verification session or report', err);
-        setError(err.message || 'An unexpected error occurred.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchVerificationSessionAndReport();
-  }, [clientSecret, stripe]);
-
-
-  const handleStartVerification = async () => {
-      if (!stripe) {
-          setError("Stripe is not initialized.");
-          return;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      try {
-          const response = await fetch("/.netlify/functions/create-verification-session", {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ return_url: window.location.href })
-          });
-          const data = await response.json();
-
-          if (data.error) {
-              throw new Error(data.error.message || "Failed to create verification session.");
-          }
-
-          if (data.clientSecret) {
-              setClientSecret(data.clientSecret);
-              // Navigate to the verification page
-              window.location.href = `?client_secret=${data.clientSecret}`;
-          }
-          else {
-              throw new Error("No clientSecret received.");
-          }
-
-      } catch (err: any) {
-          console.error("Error creating verification session:", err);
-          setError(err.message || "Failed to start verification.");
-      } finally {
-          setLoading(false);
-      }
-
-  }
-
-  const renderVerificationStatus = () => {
-    if (loading) {
-      return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', padding: 2 }}>
-          <CircularProgress />
-        </Box>
-      );
-    }
-
-    if (error) {
-      return (
-        <Alert severity="error" sx={{ margin: 2 }}>
-          {error}
-        </Alert>
-      );
-    }
-
-    if (successMessage) {
-        return (
-          <Alert severity="success" sx={{ margin: 2 }}>
-            {successMessage}
-          </Alert>
-        )
-    }
-
-    if (verificationSession) {
-      switch (verificationSession.status) {
-        case 'processing':
-          return (
-            <Box sx={{ padding: 2 }}>
-              <Typography variant="h6">Verification in progress...</Typography>
-              <CircularProgress />
-            </Box>
-          );
-        case 'verified':
-          return (
-            <Box sx={{ padding: 2 }}>
-              <Alert severity="success">Verification successful!</Alert>
-              {verificationReport && (
-                  <Box>
-                      <Typography variant="subtitle1">Verification Report:</Typography>
-                      <pre>{JSON.stringify(verificationReport, null, 2)}</pre>
-                  </Box>
-              )}
-            </Box>
-          );
-
-        case 'requires_input':
-          if (stripe && clientSecret) {
-            return (
-              <Box sx={{ padding: 2 }}>
-                <Typography variant="h6">
-                  Provide Identity Verification Information
-                </Typography>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => {
-                      if (stripe) {
-                          stripe.identity.verifyIdentity({
-                              clientSecret: clientSecret,
-                          });
-                      }
-                  }}
-                  disabled={loading}
-                >
-                  Continue Verification
-                </Button>
-              </Box>
-            );
-          } else {
-            return <Alert severity="warning">Client Secret not found.  Please try again.</Alert>;
-          }
-        case 'canceled':
-            return (
-                <Alert severity="warning" sx={{ margin: 2 }}>
-                    Verification was cancelled.
-                </Alert>
-            );
-        case 'failed':
-            return (
-                <Alert severity="error" sx={{ margin: 2 }}>
-                    Verification failed.
-                </Alert>
-            );
-        default:
-          return (
-            <Alert severity="info" sx={{ margin: 2 }}>
-              Verification status: {verificationSession.status}
-            </Alert>
-          );
-      }
-    }
-
-    // Initial state, no session yet
-    return (
-        <Stack spacing={2} sx={{ padding: 2 }}>
-          <Typography variant="h6">Start Identity Verification</Typography>
-          <Button variant="contained" color="primary" onClick={handleStartVerification} disabled={loading}>
-            Start Verification
-          </Button>
-        </Stack>
-    );
-  };
-
-
-
-  return (
-    <Box sx={{ padding: 2 }}>
-      <Typography variant="h4" gutterBottom>
-        Identity Verification
-      </Typography>
-      {renderVerificationStatus()}
-    </Box>
-  );
-};
-
-export default IdentityView;
+    const [JBOC_A_stripe, JBOC_B_setStripe] = useState<Stripe | null>(null);
+    const [JBOC_C_clientSecret, JBOC_D_setClientSecret] = useState<string | null>(null);
+    const [JBOC_E_verificationSession, JBOC_F_setVerificationSession] = useState<IdentityVerificationSession | null>(null);
+    const [JBOC_G_verificationReport, JBOC_H_setVerificationReport] = useState<IdentityVerificationReport | null>(null);
+    const [JBOC_I_loading, JBOC_J_setLoading] = useState(true);
+    const [JBOC_K_error, JBOC_L_setError] = useState<string | null>(null);
+    const [JBOC_M_successMessage, JBOC_N_setSuccessMessage] = useState<string | null>(null);
+    const JBOC_O_location = useLocation();
+    const JBOC_P_navigate = useNavigate();
+    const [JBOC_Q_tabValue, JBOC_R_setTabValue] = React.useState(0);
+    const [JBOC_S_anchorEl, JBOC_T_setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const JBOC_U_isMenuOpen = Boolean(JBOC_S_anchorEl);
+    const [JBOC_V_dialogOpen, JBOC_W_setDialogOpen] = React.useState(false);
+    const [JBOC_X_apiEndpoint, JBOC_Y_setApiEndpoint] = useState('');
+    const [JBOC_Z_apiResponse, JBOC_AA_setApiResponse] = useState('');
+    const [JBOC_BB_useCaseDescription, JBOC_CC_setUseCaseDescription] = useState('');
+    const [JBOC_DD_featureDescription, JBOC_EE_setFeatureDescription] = useState('');
+	const [JBOC_FF_allCompanies, JBOC_GG_setAllCompanies] = useState([
+        { id: 'company1', name: 'Acme Corp' },
+        { id: 'company2', name: 'Beta Industries' },
+		{ id: 'company3', name: 'Gamma Solutions' },
+		{ id: 'company4', name: 'Delta Innovations' },
+		{ id: 'company5', name: 'Epsilon Technologies' },
+		{ id: 'company6', name: 'Zeta Systems' },
+		{ id: 'company7', name: 'Eta Dynamics' },
+		{ id: 'company8', name: 'Theta Enterprises' },
+		{ id: 'company9', name: 'Iota Group' },
+		{ id: 'company10', name: 'Kappa Ventures' },
+		{ id: 'company11', name: 'Lambda Labs' },
+		{ id: 'company12', name: 'Mu Holdings' },
+		{ id: 'company13', name: 'Nu Capital' },
+		{ id: 'company14', name: 'Xi Partners' },
+		{ id: 'company15', name: 'Omicron Global' },
+		{ id: 'company16', name: 'Pi Investments' },
+		{ id: 'company17', name: 'Rho Acquisitions' },
+		{ id: 'company18', name: 'Sigma Strategies' },
+		{ id: 'company19', name: 'Tau Resources' },
+		{ id: 'company20', name: 'Upsilon Ventures' },
+		{ id: 'company21', name: 'Phi Enterprises' },
+		{ id: 'company22', name: 'Chi Holdings' },
+		{ id: 'company23', name: 'Psi Capital' },
+		{ id: 'company24', name: 'Omega Partners' },
+		{ id: 'company25', name: 'Alpha Prime' },
+		{ id: 'company26', name: 'Beta Prime' },
+		{ id: 'company27', name: 'Gamma Prime' },
+		{ id: 'company28', name: 'Delta Prime' },
+		{ id: 'company29', name: 'Epsilon Prime' },
+		{ id: 'company30', name: 'Zeta Prime' },
+		{ id: 'company31', name: 'Eta Prime' },
+		{ id: 'company32', name: 'Theta Prime' },
+		{ id: 'company33', name: 'Iota Prime' },
+		{ id: 'company34', name: 'Kappa Prime' },
+		{ id: 'company35', name: 'Lambda Prime' },
+		{ id: 'company36', name: 'Mu Prime' },
+		{ id: 'company37', name: 'Nu Prime' },
+		{ id: 'company38', name: 'Xi Prime' },
+		{ id: 'company39', name: 'Omicron Prime' },
+		{ id: 'company40', name: 'Pi Prime' },
+		{ id: 'company41', name: 'Rho Prime' },
+		{ id: 'company42', name: 'Sigma Prime' },
+		{ id: 'company43', name: 'Tau Prime' },
+		{ id: 'company44', name: 'Upsilon Prime' },
+		{ id: 'company45', name: 'Phi Prime' },
+		{ id: 'company46', name: 'Chi Prime' },
+		{ id: 'company47', name: 'Psi Prime' },
+		{ id: 'company48', name: 'Omega Prime' },
+		{ id: 'company49', name: 'Alpha Elite' },
+		{ id: 'company50', name: 'Beta Elite' },
+		{ id: 'company51', name: 'Gamma Elite' },
+		{ id: 'company52', name: 'Delta Elite' },
+		{ id: 'company53', name: 'Epsilon Elite' },
+		{ id: 'company54', name: 'Zeta Elite' },
+		{ id: 'company55', name: 'Eta Elite' },
+		{ id: 'company56', name: 'Theta Elite' },
+		{ id: 'company57', name: 'Iota Elite' },
+		{ id: 'company58', name: 'Kappa Elite' },
+		{ id: 'company59', name: 'Lambda Elite' },
+		{ id: 'company60', name: 'Mu Elite' },
+		{ id: 'company61', name: 'Nu Elite' },
+		{ id: 'company62', name: 'Xi Elite' },
+		{ id: 'company63', name: 'Omicron Elite' },
+		{ id: 'company64', name: 'Pi Elite' },
+		{ id: 'company65', name: 'Rho Elite' },
+		{ id: 'company66', name: 'Sigma Elite' },
+		{ id: 'company67', name: 'Tau Elite' },
+		{ id: 'company68', name: 'Upsilon Elite' },
+		{ id: 'company69', name: 'Phi Elite' },
+		{ id: 'company70', name: 'Chi Elite' },
+		{ id: 'company71', name: 'Psi Elite' },
+		{ id: 'company72', name: 'Omega Elite' },
+		{ id: 'company73', name: 'Alpha Zenith' },
+		{ id: 'company74', name: 'Beta Zenith' },
+		{ id: 'company75', name: 'Gamma Zenith' },
+		{ id: 'company76', name: 'Delta Zenith' },
+		{ id: 'company77', name: 'Epsilon Zenith' },
+		{ id: 'company78', name: 'Zeta Zenith' },
+		{ id: 'company79', name: 'Eta Zenith' },
+		{ id: 'company80', name: 'Theta Zenith' },
+		{ id: 'company81', name: 'Iota Zenith' },
+		{ id: 'company82', name: 'Kappa Zenith' },
+		{ id: 'company83', name: 'Lambda Zenith' },
+		{ id: 'company84', name: 'Mu Zenith' },
+		{ id: 'company85', name: 'Nu Zenith' },
+		{ id: 'company86', name: 'Xi Zenith' },
+		{ id: 'company87', name: 'Omicron Zenith' },
+		{ id: 'company88', name: 'Pi Zenith' },
+		{ id: 'company89', name: 'Rho Zenith' },
+		{ id: 'company90', name: 'Sigma Zenith' },
+		{ id: 'company91', name: 'Tau Zenith' },
+		{ id: 'company92', name: 'Upsilon Zenith' },
+		{ id: 'company93', name: 'Phi Zenith' },
+		{ id: 'company94', name: 'Chi Zenith' },
+		{ id: 'company95', name: 'Psi Zenith' },
+		{ id: 'company96', name: 'Omega Zenith' },
+		{ id: 'company97', name: 'Alpha Apex' },
+		{ id: 'company98', name: 'Beta Apex' },
+		{ id: 'company99', name: 'Gamma Apex' },
+		{ id: 'company100', name: 'Delta Apex' }
+    ]);
+	const [JBOC_HH_selectedCompany, JBOC_II_setSelectedCompany] = useState(JBOC_FF_allCompanies[0]);
+	const [JBOC_JJ_allApiEndpoints, JBOC_KK_setAllApiEndpoints] = useState([
+        { id: 'api1', name: 'Create User', companyId: 'company1' },
+        { id: 'api2', name: 'Get User', companyId: 'company2' },
+		{ id: 'api3', name: 'Update User', companyId: 'company3' },
+		{ id: 'api4', name: 'Delete User', companyId: 'company4' },
+		{ id: 'api5', name: 'List Users', companyId: 'company5' },
+		{ id: 'api6', name: 'Create Product', companyId: 'company6' },
+		{ id: 'api7', name: 'Get Product', companyId: 'company7' },
+		{ id: 'api8', name: 'Update Product', companyId: 'company8' },
+		{ id: 'api9', name: 'Delete Product', companyId: 'company9' },
+		{ id: 'api10', name: 'List Products', companyId: 'company10' },
+		{ id: 'api11', name: 'Create Order', companyId: 'company11' },
+		{ id: 'api12', name: 'Get Order', companyId: 'company12' },
+		{ id: 'api13', name: 'Update Order', companyId: 'company13' },
+		{ id: 'api14', name: 'Delete Order', companyId: 'company14' },
+		{ id: 'api15', name: 'List Orders', companyId: 'company15' },
+		{ id: 'api16', name: 'Create Customer', companyId: 'company16' },
+		{ id: 'api17', name: 'Get Customer', companyId: 'company17' },
+		{ id: 'api18', name: 'Update Customer', companyId: 'company18' },
+		{ id: 'api19', name: 'Delete Customer', companyId: 'company19' },
+		{ id: 'api20', name: 'List Customers', companyId: 'company20' },
+		{ id: 'api21', name: 'Create Payment', companyId: 'company21' },
+		{ id: 'api22', name: 'Get Payment', companyId: 'company22' },
+		{ id: 'api23', name: 'Update Payment', companyId: 'company23' },
+		{ id: 'api24', name: 'Delete Payment', companyId: 'company24' },
+		{ id: 'api25', name: 'List Payments', companyId: 'company25' },
+		{ id: 'api26', name: 'Create Invoice', companyId: 'company26' },
+		{ id: 'api27', name: 'Get Invoice', companyId: 'company27' },
+		{ id: 'api28', name: 'Update Invoice', companyId: 'company28' },
+		{ id: 'api29', name: 'Delete Invoice', companyId: 'company29' },
+		{ id: 'api30', name: 'List Invoices', companyId: 'company30' },
+		{ id: 'api31', name: 'Create Subscription', companyId: 'company31' },
+		{ id: 'api32', name: 'Get Subscription', companyId: 'company32' },
+		{ id: 'api33', name: 'Update Subscription', companyId: 'company33' },
+		{ id: 'api34', name: 'Delete Subscription', companyId: 'company34' },
+		{ id: 'api35', name: 'List Subscriptions', companyId: 'company35' },
+		{ id: 'api36', name: 'Create Cart', companyId: 'company36' },
+		{ id: 'api37', name: 'Get Cart', companyId: 'company37' },
+		{ id: 'api38', name: 'Update Cart', companyId: 'company38' },
+		{ id: 'api39', name: 'Delete Cart', companyId: 'company39' },
+		{ id: 'api40', name: 'List Carts', companyId: 'company40' },
+		{ id: 'api41', name: 'Create Review', companyId: 'company41' },
+		{ id: 'api42', name: 'Get Review', companyId: 'company42' },
+		{ id: 'api43', name: 'Update Review', companyId: 'company43' },
+		{ id: 'api44', name: 'Delete Review', companyId: 'company44' },
+		{ id: 'api45', name: 'List Reviews', companyId: 'company45' },
+		{ id: 'api46', name: 'Create Coupon', companyId: 'company46' },
+		{ id: 'api47', name: 'Get Coupon', companyId: 'company47' },
+		{ id: 'api48', name: 'Update Coupon', companyId: 'company48' },
+		{ id: 'api49', name: 'Delete Coupon', companyId: 'company49' },
+		{ id: 'api50', name: 'List Coupons', companyId: 'company50' },
+		{ id: 'api51', name: 'Create Discount', companyId: 'company51' },
+		{ id: 'api52', name: 'Get Discount', companyId: 'company52' },
+		{ id: 'api53', name: 'Update Discount', companyId: 'company53' },
+		{ id: 'api54', name: 'Delete Discount', companyId: 'company54' },
+		{ id: 'api55', name: 'List Discounts', companyId: 'company55' },
+		{ id: 'api56', name: 'Create ShippingRate', companyId: 'company56' },
+		{ id: 'api57', name: 'Get ShippingRate', companyId: 'company57' },
+		{ id: 'api58', name: 'Update ShippingRate', companyId: 'company58' },
+		{ id: 'api59', name: 'Delete ShippingRate', companyId: 'company59' },
+		{ id: 'api60', name: 'List ShippingRates', companyId: 'company60' },
+		{ id: 'api61', name: 'Create TaxRate', companyId: 'company61' },
+		{ id: 'api62', name: 'Get TaxRate', companyId: 'company62' },
+		{ id: 'api63', name: 'Update TaxRate', companyId: 'company63' },
+		{ id: 'api64', name: 'Delete TaxRate', companyId: 'company64' },
+		{ id: 'api65', name: 'List TaxRates', companyId: 'company65' },
+		{ id: 'api66', name: 'Create Refund', companyId: 'company66' },
+		{ id: 'api67', name: 'Get Refund', companyId: 'company67' },
+		{ id: 'api68', name: 'Update Refund', companyId: 'company68' },
+		{ id: 'api69', name: 'Delete Refund', companyId: 'company69' },
+		{ id: 'api70', name: 'List Refunds', companyId: 'company70' },
+		{ id: 'api71', name: 'Create Promotion', companyId: 'company71' },
+		{ id: 'api72', name: 'Get Promotion', companyId: 'company72' },
+		{ id: 'api73', name: 'Update Promotion', companyId: 'company73' },
+		{ id: 'api74', name: 'Delete Promotion', companyId: 'company74' },
+		{ id: 'api75', name: 'List Promotions', companyId: 'company75' },
+		{ id: 'api76', name: 'Create Notification', companyId: 'company76' },
+		{ id: 'api77', name: 'Get Notification', companyId: 'company77' },
+		{ id: 'api78', name: 'Update Notification', companyId: 'company78' },
+		{ id: 'api79', name: 'Delete Notification', companyId: 'company79' },
+		{ id: 'api80', name: 'List Notifications', companyId: 'company80' },
+		{ id: 'api81', name: 'Create Report', companyId: 'company81' },
+		{ id: 'api82', name: 'Get Report', companyId: 'company82' },
+		{ id: 'api83', name: 'Update Report', companyId: 'company83' },
+		{ id: 'api84', name: 'Delete Report', companyId: 'company84' },
+		{ id: 'api85', name: 'List Reports', companyId: 'company85' },
+		{ id: 'api86', name: 'Create Setting', companyId: 'company86' },
+		{ id: 'api87', name: 'Get Setting', companyId: 'company87' },
+		{ id: 'api88', name: 'Update Setting', companyId: 'company88' },
+		{ id: 'api89', name: 'Delete Setting', companyId: 'company89' },
+		{ id: 'api90', name: 'List Settings', companyId: 'company90' },
+		{ id: 'api91', name: 'Create Log', companyId: 'company91' },
+		{ id: 'api92', name: 'Get Log', companyId: 'company92' },
+		{ id: 'api93', name: 'Update Log', companyId: 'company93' },
+		{ id: 'api94', name: 'Delete Log', companyId: 'company94' },
+		{ id: 'api95', name: 'List Logs', companyId: 'company95' },
+		{ id: 'api96', name: 'Create Event', companyId: 'company96' },
+		{ id: 'api97', name: 'Get Event', companyId: 'company97' },
+		{ id: 'api98', name: 'Update Event', companyId: 'company98' },
+		{ id: 'api99', name: 'Delete Event', companyId: 'company99' },
+		{ id: 'api100', name: 'List Events', companyId: 'company100' }
+    ]);
+	const [JBOC_LL_selectedApiEndpoint, JBOC_MM_setSelectedApiEndpoint] = useState(JBOC_JJ_allApiEndpoints[0]);
+	const [JBOC_NN_allUseCases, JBOC_OO_setAllUseCases] = useState([
+        { id: 'usecase1', name: 'Process Order', companyId: 'company1' },
+        { id: 'usecase2', name: 'Manage Inventory', companyId: 'company2' },
+		{ id: 'usecase3', name: 'Send Newsletter', companyId: 'company3' },
+		{ id: 'usecase4', name: 'Analyze Sales Data', companyId: 'company4' },
+		{ id: 'usecase5', name: 'Track User Activity', companyId: 'company5' },
+		{ id: 'usecase6', name: 'Generate Report', companyId: 'company6' },
+		{ id: 'usecase7', name: 'Automate Task', companyId: 'company7' },
+		{ id: 'usecase8', name: 'Optimize Campaign', companyId: 'company8' },
+		{ id: 'usecase9', name: 'Secure Data', companyId: 'company9' },
+		{ id: 'usecase10', name: 'Improve Customer Service', companyId: 'company10' },
+		{ id: 'usecase11', name: 'Streamline Workflow', companyId: 'company11' },
+		{ id: 'usecase12', name: 'Enhance Collaboration', companyId: 'company12' },
+		{ id: 'usecase13', name: 'Predict Trends', companyId: 'company13' },
+		{ id: 'usecase14', name: 'Monitor Performance', companyId: 'company14' },
+		{ id: 'usecase15', name: 'Scale Operations', companyId: 'company15' },
+		{ id: 'usecase16', name: 'Reduce Costs', companyId: 'company16' },
+		{ id: 'usecase17', name: 'Increase Revenue', companyId: 'company17' },
+		{ id: 'usecase18', name: 'Expand Market Reach', companyId: 'company18' },
+		{ id: 'usecase19', name: 'Attract New Customers', companyId: 'company19' },
+		{ id: 'usecase20', name: 'Retain Existing Customers', companyId: 'company20' },
+		{ id: 'usecase21', name: 'Manage Risk', companyId: 'company21' },
+		{ id: 'usecase22', name: 'Comply with Regulations', companyId: 'company22' },
+		{ id: 'usecase23', name: 'Innovate Products', companyId: 'company23' },
+		{ id: 'usecase24', name: 'Develop New Services', companyId: 'company24' },
+		{ id: 'usecase25', name: 'Explore New Markets', companyId: 'company25' },
+		{ id: 'usecase26', name: 'Build Brand Awareness', companyId: 'company26' },
+		{ id: 'usecase27', name: 'Improve Public Image', companyId: 'company27' },
+		{ id: 'usecase28', name: 'Engage with Community', companyId: 'company28' },
+		{ id: 'usecase29', name: 'Support Local Causes', companyId: 'company29' },
+		{ id: 'usecase30', name: 'Promote Sustainability', companyId: 'company30' },
+		{ id: 'usecase31', name: 'Invest in Research', companyId: 'company31' },
+		{ id: 'usecase32', name: 'Encourage Innovation', companyId: 'company32' },
+		{ id: 'usecase33', name: 'Reward Employees', companyId: 'company33' },
+		{ id: 'usecase34', name: 'Foster Creativity', companyId: 'company34' },
+		{ id: 'usecase35', name: 'Empower Teams', companyId: 'company35' },
+		{ id: 'usecase36', name: 'Delegate Tasks', companyId: 'company36' },
+		{ id: 'usecase37', name: 'Monitor Progress', companyId: 'company37' },
+		{ id: 'usecase38', name: 'Provide Feedback', companyId: 'company38' },
+		{ id: 'usecase39', name: 'Recognize Achievements', companyId: 'company39' },
+		{ id: 'usecase40', name: 'Celebrate Successes', companyId: 'company40' },
+		{ id: 'usecase41', name: 'Adapt to Change', companyId: 'company41' },
+		{ id: 'usecase42', name: 'Embrace Uncertainty', companyId: 'company42' },
+		{ id: 'usecase43', name: 'Learn from Mistakes', companyId: 'company43' },
+		{ id: 'usecase44', name: 'Improve Processes', companyId: 'company44' },
+		{ id: 'usecase45', name: 'Automate Repetitive Tasks', companyId: 'company45' },
+		{ id: 'usecase46', name: 'Reduce Manual Work', companyId: 'company46' },
+		{ id: 'usecase47', name: 'Increase Efficiency', companyId: 'company47' },
+		{ id: 'usecase48', name: 'Optimize Resource Allocation', companyId: 'company48' },
+		{ id: 'usecase49', name: 'Minimize Waste', companyId: 'company49' },
+		{ id: 'usecase50', name: 'Maximize Productivity', companyId: 'company50' },
+		{ id: 'usecase51', name: 'Improve Communication', companyId: 'company51' },
+		{ id: 'usecase52', name: 'Foster Collaboration', companyId: 'company52' },
+		{ id: 'usecase53', name: 'Build Relationships', companyId: 'company53' },
+		{ id: 'usecase54', name: 'Strengthen Partnerships', companyId: 'company54' },
+		{ id: 'usecase55', name: 'Expand Network', companyId: 'company55' },
+		{ id: 'usecase56', name: 'Gain Insights', companyId: 'company56' },
+		{ id: 'usecase57', name: 'Make Informed Decisions', companyId: 'company57' },
+		{ id: 'usecase58', name: 'Analyze Data', companyId: 'company58' },
+		{ id: 'usecase59', name: 'Identify Trends', companyId: 'company59' },
+		{ id: 'usecase60', name: 'Predict Outcomes', companyId: 'company60' },
+		{ id: 'usecase61', name: 'Manage Projects', companyId: 'company61' },
+		{ id: 'usecase62', name: 'Track Progress', companyId: 'company62' },
+		{ id: 'usecase63', name: 'Meet Deadlines', companyId: 'company63' },
+		{ id: 'usecase64', name: 'Allocate Resources', companyId: 'company64' },
+		{ id: 'usecase65', name: 'Mitigate Risks', companyId: 'company65' },
+		{ id: 'usecase66', name: 'Solve Problems', companyId: 'company66' },
+		{ id: 'usecase67', name: 'Resolve Conflicts', companyId: 'company67' },
+		{ id: 'usecase68', name: 'Find Solutions', companyId: 'company68' },
+		{ id: 'usecase69', name: 'Overcome Challenges', companyId: 'company69' },
+		{ id: 'usecase70', name: 'Achieve Goals', companyId: 'company70' },
+		{ id: 'usecase71', name: 'Plan Strategies', companyId: 'company71' },
+		{ id: 'usecase72', name: 'Set Objectives', companyId: 'company72' },
+		{ id: 'usecase73', name: 'Define Metrics', companyId: 'company73' },
+		{ id: 'usecase74', name: 'Measure Results', companyId: 'company74' },
+		{ id: 'usecase75', name: 'Analyze Performance', companyId: 'company75' },
+		{ id: 'usecase76', name: 'Improve Efficiency', companyId: 'company76' },
+		{ id: 'usecase77', name: 'Optimize Processes', companyId: 'company77' },
+		{ id: 'usecase78', name: 'Reduce Costs', companyId: 'company78' },
+		{ id: 'usecase79', name: 'Increase Revenue', companyId: 'company79' },
+		{ id: 'usecase80', name: 'Maximize Profits', companyId: 'company80' },
+		{ id: 'usecase81', name: 'Manage Time', companyId: 'company81' },
+		{ id: 'usecase82', name: 'Prioritize Tasks', companyId: 'company82' },
+		{ id: 'usecase83', name: 'Delegate Responsibilities', companyId: 'company83' },
+		{ id: 'usecase84', name: 'Organize Schedules', companyId: 'company84' },
+		{ id: 'usecase85', name: 'Track Activities', companyId: 'company85' },
+		{ id: 'usecase86', name: 'Improve Customer Satisfaction', companyId: 'company86' },
+		{ id: 'usecase87', name: 'Enhance User Experience', companyId: 'company87' },
+		{ id: 'usecase88', name: 'Personalize Interactions', companyId: 'company88' },
+		{ id: 'usecase89', name: 'Provide Support', companyId: 'company89' },
+		{ id: 'usecase90', name: 'Address Concerns', companyId: 'company90' },
+		{ id: 'usecase91', name: 'Automate Marketing', companyId: 'company91' },
+		{ id: 'usecase92', name: 'Personalize Campaigns', companyId: 'company92' },
+		{ id: 'usecase93', name: 'Track Performance', companyId: 'company93' },
+		{ id: 'usecase94', name: 'Measure ROI', companyId: 'company94' },
+		{ id: 'usecase95', name: 'Optimize Spend', companyId: 'company95' },
+		{ id: 'usecase96', name: 'Secure Data', companyId: 'company96' },
+		{ id: 'usecase97', name: 'Protect Privacy', companyId: 'company97' },
+		{ id: 'usecase98', name: 'Comply with Regulations', companyId: 'company98' },
+		{ id: 'usecase99', name: 'Prevent Breaches', companyId: 'company99' },
+		{ id: 'usecase100', name: 'Manage Compliance', companyId: 'company100' }
+    ]);
+	const [JBOC_PP_selectedUseCase, JBOC_QQ_setSelectedUseCase] = useState(JBOC_NN_allUseCases[0]);
+	const [JBOC_RR_allFeatures, JBOC_SS_setAllFeatures] = useState([
+        { id: 'feature1', name: 'User Authentication', companyId: 'company1' },
+        { id: 'feature2', name: 'Payment Gateway Integration', companyId: 'company2' },
+		{ id: 'feature3', name: 'Email Marketing Automation', companyId: 'company3' },
+		{ id: 'feature4', name: 'Data Analytics Dashboard', companyId: 'company4' },
+		{ id: 'feature5', name: 'Real-time Activity Tracking', companyId: 'company5' },
+		{ id: 'feature6', name: 'Custom Report Generator', companyId: 'company6' },
+		{ id: 'feature7', name: 'Automated Task Scheduler', companyId: 'company7' },
+		{ id: 'feature8', name: 'Campaign Optimization Engine', companyId: 'company8' },
+		{ id: 'feature9', name: 'Data Encryption Module', companyId: 'company9' },
+		{ id: 'feature10', name: 'Customer Service Chatbot', companyId: 'company10' },
+		{ id: 'feature11', name: 'Workflow Automation Tool', companyId: 'company11' },
+		{ id: 'feature12', name: 'Collaborative Document Editor', companyId: 'company12' },
+		{ id: 'feature13', name: 'Predictive Analytics System', companyId: 'company13' },
+		{ id: 'feature14', name: 'Performance Monitoring Platform', companyId: 'company14' },
+		{ id: 'feature15', name: 'Scalable Infrastructure', companyId: 'company15' },
+		{ id: 'feature16', name: 'Cost Reduction Analysis Tool', companyId: '
