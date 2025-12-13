@@ -1,0 +1,23 @@
+purpose: "Generates high-fidelity synthetic datasets for model training, testing, and simulation by composing outputs from multiple generative AI providers."
+dependencies:
+  - "core_sdk"
+  - "shared_auth"
+  - "message_bus"
+  - "api:openai"
+  - "api:stability_ai"
+  - "api:anthropic"
+  - "api:google_vertex_ai"
+  - "api:midjourney" # Via abstracted interface
+invalidation_conditions:
+  - "Upstream generative model API schema changes or deprecation."
+  - "Significant drift in generative model output quality or style for a given prompt, exceeding configured thresholds."
+  - "Changes in the target data schema definitions managed by APP_11_Datasets_LifecycleManager."
+  - "New compliance or governance policies restricting the generation or content of synthetic data, as flagged by APP_37_Governance_AuditTrailEngine."
+  - "Deprecation of core SDK primitives for data serialization or transport."
+  - "Cost of generation for a specific provider exceeds the budget defined in APP_21_Billing_CostAccountant."
+adjacent_apps:
+  - "APP_11_Datasets_LifecycleManager": "Consumes generated datasets and manages their lifecycle, versioning, and storage."
+  - "APP_16_Evaluation_Benchmarker": "Evaluates the quality, diversity, and fidelity of generated synthetic data against reference datasets or quality metrics."
+  - "APP_18_Risk_RedTeamSimulator": "Uses synthetic data to create adversarial scenarios and stress-test models for vulnerabilities."
+  - "APP_25_Finetuning_Orchestrator": "Uses generated datasets as training or validation input for fine-tuning jobs."
+  - "APP_21_Billing_CostAccountant": "Tracks the token and compute costs associated with data generation jobs."
