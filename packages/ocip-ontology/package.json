@@ -1,0 +1,62 @@
+{
+  "name": "@ocip/ontology",
+  "version": "0.1.0",
+  "description": "Shared ontology, data models, and type definitions for the Open Core Intelligence Platform (OCIP) ecosystem.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "dev": "tsc -w -p tsconfig.build.json",
+    "lint": "eslint src/**/*.ts",
+    "test": "jest",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "ocip",
+    "ontology",
+    "ai",
+    "ecosystem",
+    "data-models",
+    "schema",
+    "types",
+    "zod"
+  ],
+  "author": "OCIP Engineering <eng@ocip.ai>",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/ocip/ocip-mono/tree/main/packages/ocip-ontology#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ocip/ocip-mono.git",
+    "directory": "packages/ocip-ontology"
+  },
+  "bugs": {
+    "url": "https://github.com/ocip/ocip-mono/issues"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.12",
+    "@typescript-eslint/eslint-plugin": "^7.10.0",
+    "@typescript-eslint/parser": "^7.10.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "jest": "^29.7.0",
+    "prettier": "^3.2.5",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.4.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
