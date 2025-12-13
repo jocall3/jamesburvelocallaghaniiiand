@@ -1,0 +1,247 @@
+// Copyright (c) 2024 YourOrg. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package ontology.financial;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+// Common options for generated code across different languages.
+option go_package = "github.com/your-org/core-sdk/gen/ontology/financial;financial";
+option java_package = "com.your_org.ontology.financial";
+option java_multiple_files = true;
+option csharp_namespace = "YourOrg.Ontology.Financial";
+option php_namespace = "YourOrg\\Ontology\\Financial";
+option swift_prefix = "FIN";
+
+// =============================================================================
+// Core Trade Message
+// =============================================================================
+
+// Trade represents a single, canonical transaction of a financial instrument
+// between two or more parties. It is designed to be a comprehensive and
+// unambiguous representation, suitable for use in trading, settlement, risk,
+// and compliance systems. This object is a fundamental part of the financial
+// ontology and is designed for high-throughput event streams and durable storage.
+message Trade {
+  // A unique, immutable identifier for the trade, typically a UUIDv4.
+  // This is the primary key for the trade object within the ecosystem.
+  string trade_id = 1;
+
+  // A map of external identifiers for this trade from other systems,
+  // e.g., exchange execution ID, clearing house ID, or counterparty trade ID.
+  // Key: Name of the external system (e.g., "BLOOMBERG_TOMS", "ICE_CLEAR")
+  // Value: The identifier in that system.
+  map<string, string> external_ids = 2;
+
+  // The current lifecycle status of the trade.
+  TradeStatus status = 3;
+
+  // The direction of the trade from the perspective of the entity recording it.
+  TradeDirection direction = 4;
+
+  // The financial instrument that was traded.
+  Instrument instrument = 5;
+
+  // The quantity of the instrument traded. Can be fractional.
+  DecimalValue quantity = 6;
+
+  // The price per unit of the instrument.
+  DecimalValue price = 7;
+
+  // The ISO 4217 currency code for the price and notional amounts.
+  // Example: "USD", "EUR", "JPY".
+  string currency = 8;
+
+  // The total value of the trade (price * quantity).
+  // While derivable, it's often included for convenience and reconciliation.
+  DecimalValue notional_amount = 9;
+
+  // The date on which the trade was agreed upon or executed.
+  // Represented as YYYY-MM-DD in UTC.
+  string trade_date = 10;
+
+  // The date on which the trade is scheduled to be settled (delivery vs. payment).
+  // Represented as YYYY-MM-DD in UTC.
+  string settlement_date = 11;
+
+  // The precise timestamp of trade execution.
+  google.protobuf.Timestamp execution_timestamp = 12;
+
+  // The timestamp when this trade record was first created in the system.
+  google.protobuf.Timestamp created_timestamp = 13;
+
+  // The timestamp of the last modification to this trade record.
+  google.protobuf.Timestamp last_updated_timestamp = 14;
+
+  // A list of all parties involved in the trade and their respective roles.
+  // Must include at least a buyer and a seller, or principal and counterparty.
+  repeated TradeParty parties = 15;
+
+  // The venue where the trade was executed.
+  // Example: "NYSE", "LSE", "OTC".
+  string execution_venue = 16;
+
+  // The legal jurisdiction governing the trade agreement.
+  // Example: "US-NY", "GB-ENG".
+  string jurisdiction = 17;
+
+  // A list of regulatory flags applicable to this trade for reporting purposes.
+  repeated RegulatoryFlag regulatory_flags = 18;
+
+  // The system or user that originated this trade record.
+  // Example: "oms-prod-1", "trader-john.doe".
+  string source_system = 19;
+
+  // Version number for optimistic concurrency control. Incremented on each update.
+  int32 version = 20;
+
+  // A map for arbitrary, non-structured metadata.
+  map<string, string> tags = 21;
+
+  // A field for structured, asset-class specific data or other complex attributes
+  // that are not part of the core trade model. This allows for extensibility
+  // without modifying the core schema.
+  google.protobuf.Struct extended_attributes = 22;
+}
+
+// =============================================================================
+// Supporting Messages
+// =============================================================================
+
+// DecimalValue provides a high-precision representation of decimal numbers,
+// suitable for financial calculations. The value is represented as:
+// `units` + `nanos` / 1,000,000,000.
+message DecimalValue {
+  // The whole part of the decimal value.
+  int64 units = 1;
+
+  // The fractional part of the decimal value, expressed in nanos.
+  // Must be between -999,999,999 and +999,999,999 inclusive.
+  // The sign of nanos must match the sign of units.
+  sint32 nanos = 2;
+}
+
+// Instrument defines the financial asset being traded.
+message Instrument {
+  // A unique internal identifier for the instrument.
+  string instrument_id = 1;
+
+  // A map of common industry standard identifiers.
+  // Key: Identifier type (e.g., "ISIN", "CUSIP", "SEDOL", "TICKER")
+  // Value: The identifier value.
+  map<string, string> standard_identifiers = 2;
+
+  // A human-readable description of the instrument.
+  // Example: "Apple Inc. Common Stock".
+  string description = 3;
+
+  // The type of the financial instrument.
+  InstrumentType instrument_type = 4;
+
+  // The ISO 4217 currency code of the instrument's denomination.
+  string asset_currency = 5;
+
+  // A structure for asset-class specific attributes.
+  // For example, for a bond, this could contain maturity_date, coupon_rate, etc.
+  // For an option, it could contain strike_price, expiry_date, option_type.
+  google.protobuf.Struct attributes = 6;
+}
+
+// TradeParty represents a party's involvement in a trade.
+message TradeParty {
+  // A unique identifier for the party (e.g., a legal entity ID).
+  string party_id = 1;
+
+  // The legal name of the party.
+  string party_name = 2;
+
+  // The role of this party in the context of this specific trade.
+  PartyRole role = 3;
+
+  // A map of identifiers for the party.
+  // Key: Identifier type (e.g., "LEI", "BIC")
+  // Value: The identifier value.
+  map<string, string> identifiers = 4;
+}
+
+// =============================================================================
+// Enumerations
+// =============================================================================
+
+// TradeStatus defines the possible lifecycle states of a trade.
+enum TradeStatus {
+  TRADE_STATUS_UNSPECIFIED = 0; // Default, invalid value.
+  TRADE_STATUS_NEW = 1;         // Newly booked, not yet confirmed.
+  TRADE_STATUS_PENDING = 2;     // Awaiting confirmation or matching.
+  TRADE_STATUS_CONFIRMED = 3;   // Both parties have agreed on the trade details.
+  TRADE_STATUS_ALLOCATED = 4;   // For block trades, portions have been allocated.
+  TRADE_STATUS_SETTLING = 5;    // In the process of settlement.
+  TRADE_STATUS_SETTLED = 6;     // Settlement is complete.
+  TRADE_STATUS_CANCELLED = 7;   // The trade has been cancelled by mutual agreement.
+  TRADE_STATUS_ERRORED = 8;     // The trade is in an error state.
+  TRADE_STATUS_NOVATED = 9;     // The trade has been novated to a new counterparty.
+}
+
+// TradeDirection indicates the direction of the trade from the perspective
+// of the firm recording the trade.
+enum TradeDirection {
+  TRADE_DIRECTION_UNSPECIFIED = 0;
+  TRADE_DIRECTION_BUY = 1;  // Buying the instrument.
+  TRADE_DIRECTION_SELL = 2; // Selling the instrument.
+}
+
+// InstrumentType categorizes the financial instrument.
+enum InstrumentType {
+  INSTRUMENT_TYPE_UNSPECIFIED = 0;
+  INSTRUMENT_TYPE_EQUITY = 1;
+  INSTRUMENT_TYPE_BOND = 2;
+  INSTRUMENT_TYPE_FUTURE = 3;
+  INSTRUMENT_TYPE_OPTION = 4;
+  INSTRUMENT_TYPE_SWAP = 5;
+  INSTRUMENT_TYPE_FX_SPOT = 6;
+  INSTRUMENT_TYPE_FX_FORWARD = 7;
+  INSTRUMENT_TYPE_COMMODITY = 8;
+  INSTRUMENT_TYPE_CRYPTO = 9;
+  INSTRUMENT_TYPE_MUTUAL_FUND = 10;
+  INSTRUMENT_TYPE_ETF = 11; // Exchange-Traded Fund
+  INSTRUMENT_TYPE_OTHER = 99;
+}
+
+// PartyRole defines the function of a party in a trade.
+enum PartyRole {
+  PARTY_ROLE_UNSPECIFIED = 0;
+  PARTY_ROLE_PRINCIPAL = 1;       // The primary entity for whom the trade is booked.
+  PARTY_ROLE_COUNTERPARTY = 2;    // The other side of the trade.
+  PARTY_ROLE_AGENT = 3;           // An entity acting on behalf of a principal.
+  PARTY_ROLE_BROKER = 4;          // The broker who facilitated the trade.
+  PARTY_ROLE_CLEARING_HOUSE = 5;  // The central counterparty clearing the trade.
+  PARTY_ROLE_CUSTODIAN = 6;       // The entity holding the assets.
+  PARTY_ROLE_EXECUTING_BROKER = 7; // The broker that executed the trade on an exchange.
+  PARTY_ROLE_BENEFICIARY = 8;     // The ultimate beneficiary of the trade.
+}
+
+// RegulatoryFlag indicates specific regulatory reporting requirements.
+enum RegulatoryFlag {
+  REGULATORY_FLAG_UNSPECIFIED = 0;
+  REGULATORY_FLAG_MIFID_II = 1; // Markets in Financial Instruments Directive II (EU)
+  REGULATORY_FLAG_EMIR = 2;     // European Market Infrastructure Regulation
+  REGULATORY_FLAG_DODD_FRANK = 3; // Dodd-Frank Wall Street Reform (US)
+  REGULATORY_FLAG_CAT = 4;      // Consolidated Audit Trail (US)
+  REGULATORY_FLAG_SFTR = 5;     // Securities Financing Transactions Regulation (EU)
+  REGULATORY_FLAG_ASIC = 6;     // Australian Securities and Investments Commission reporting
+  REGULATORY_FLAG_MAS = 7;      // Monetary Authority of Singapore reporting
+}
