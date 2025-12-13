@@ -1,0 +1,12 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="50" fill="#4A90E2"/>
+  
+  <!-- Stylized 'A' for App Template -->
+  <text x="50" y="65" font-family="Arial, sans-serif" font-size="60" font-weight="bold" fill="white" text-anchor="middle">
+    A
+  </text>
+  
+  <!-- Small decorative element -->
+  <circle cx="50" cy="30" r="8" fill="#FFFFFF" opacity="0.7"/>
+</svg>
