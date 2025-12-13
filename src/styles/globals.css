@@ -1,0 +1,79 @@
+/* src/styles/globals.css */
+
+/* Tailwind CSS directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom global styles */
+
+/* Apply border-box globally for easier layout management */
+html {
+  box-sizing: border-box;
+  /* Define a default font stack for the entire application */
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%; /* Prevent text size adjustment on mobile */
+  -moz-tab-size: 4;
+  tab-size: 4;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/* Basic body styles */
+body {
+  margin: 0;
+  /* Set a neutral background and text color, common for web applications */
+  background-color: #f9fafb; /* Equivalent to Tailwind's gray-50 */
+  color: #111827; /* Equivalent to Tailwind's gray-900 */
+  -webkit-font-smoothing: antialiased; /* Improve font rendering on macOS/iOS */
+  -moz-osx-font-smoothing: grayscale; /* Improve font rendering on Firefox */
+}
+
+/* Reset heading styles to inherit font properties */
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/* Reset anchor tag styles to inherit color and remove underline */
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+/* Accessibility: Custom focus-visible styles */
+/* This ensures keyboard users have a clear indication of focus */
+:focus-visible {
+  outline: 2px solid #2563eb; /* Tailwind's blue-600 */
+  outline-offset: 2px;
+  border-radius: 2px; /* Slightly rounded corners for the outline */
+}
+
+/* Basic button reset */
+button {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Inherit font styles for form elements */
+input,
+select,
+textarea,
+button {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: inherit;
+  margin: 0;
+}
+
+/* Placeholder for any future custom utility classes or components */
+/* .custom-utility-class {
+  // ...
+} */
