@@ -1,0 +1,23 @@
+agent_metadata:
+  purpose: "Aggregates, normalizes, and ranks early-stage investment signals from a diverse set of public data sources, including social media, code repositories, academic papers, and news feeds. It identifies emerging companies, technologies, and talent."
+  dependencies:
+    - app: CORE_SDK
+    - app: APP_44_Auth_IdentityProvider
+    - app: APP_63_Infra_EventBusController
+    - api: OpenAI # For summarization and entity extraction
+    - api: Anthropic # For sentiment analysis and thematic clustering
+    - api: Perplexity # For contextual search and source validation
+    - api: GoogleNews # Data source
+    - api: GitHub # Data source for repository trends
+    - api: HuggingFace # For specialized NLP models (e.g., domain-specific NER)
+  invalidation_conditions:
+    - "Upstream data source API schemas change or are deprecated, breaking ingestion pipelines."
+    - "The core ranking model's weights drift and no longer accurately reflect market priorities, requiring retraining. This can be triggered by a sustained drop in the correlation between high-ranked signals and subsequent successful funding rounds."
+    - "Significant changes in social media platform policies that restrict data access or change content algorithms, skewing the input data."
+    - "The underlying NLP models for entity recognition or sentiment analysis are superseded by versions with significantly different performance characteristics."
+    - "Regulatory changes (e.g., GDPR, CCPA extensions) impact the legality of processing certain types of publicly available personal or company data."
+  adjacent_apps:
+    - app: APP_02_Sourcing_EmergingTrendForecaster # Consumes ranked signals to predict macro trends.
+    - app: APP_25_Data_LifecycleManager # Manages the storage, versioning, and eventual archival of raw and processed signal data.
+    - app: APP_37_Governance_AuditTrailEngine # Logs all data sourcing and ranking decisions for compliance and review.
+    - app: APP_58_Narrative_ModelExplainabilityUI # Provides an interface to understand why a specific signal was ranked highly.
