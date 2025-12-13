@@ -1,0 +1,21 @@
+agent_metadata:
+  purpose: "Provides a comprehensive, multi-provider service for benchmarking and evaluating the performance, cost, and safety of AI models against standardized and custom datasets. It generates quantitative and qualitative reports to inform model selection and fine-tuning strategies."
+  dependencies:
+    - "APP_01_Inference_CostRouter": "For fetching real-time cost data associated with model inference during benchmarks."
+    - "APP_02_Inference_MultiProviderGateway": "To programmatically access and run inference on a wide range of models from different vendors."
+    - "APP_11_Datasets_LifecycleManager": "To source, version, and manage the evaluation datasets used in benchmarking."
+    - "core_sdk": "For shared utilities, authentication, and communication protocols."
+  invalidation_conditions:
+    - "New foundation model release by a major provider (e.g., OpenAI, Anthropic, Google, Mistral), requiring inclusion in benchmark suites."
+    - "Significant API changes or deprecations from integrated model providers."
+    - "Publication of new, industry-standard evaluation benchmarks (e.g., new versions of HELM, MMLU, Big-Bench)."
+    - "Substantial drift detected in production model performance, triggering a re-evaluation requirement."
+    - "Updates to dataset schemas or versions in APP_11_Datasets_LifecycleManager."
+    - "Changes in pricing models for integrated AI services, affecting cost-performance metrics."
+  adjacent_apps:
+    - "APP_12_Evaluation_RedTeamingEngine": "Provides adversarial testing, which is a complementary form of evaluation to standard benchmarking."
+    - "APP_13_Evaluation_SyntheticDataComparator": "Uses synthetic data for evaluation, which can be compared against results from real-data benchmarks."
+    - "APP_15_Finetuning_Orchestrator": "Consumes benchmark results to decide which base models are suitable candidates for fine-tuning."
+    - "APP_58_Narrative_ModelExplainabilityUI": "Visualizes and explains the results and model behaviors observed during benchmarking."
+    - "APP_09_Governance_PolicyEnforcement": "Uses benchmark scores to enforce policies on model usage and deployment."
+    - "APP_37_Governance_AuditTrailEngine": "Logs all benchmark execution events and results for compliance and traceability."
