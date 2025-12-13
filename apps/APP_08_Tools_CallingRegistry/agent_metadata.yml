@@ -1,0 +1,30 @@
+agent_metadata:
+  purpose: "To provide a secure, versioned, and discoverable registry of tools (APIs, functions, services) that can be dynamically called by AI agents and orchestration engines within the ecosystem. It manages tool schemas, access control policies, and usage metrics."
+  dependencies:
+    - "sdk/CoreSDK"
+    - "sdk/AuthSDK"
+    - "sdk/ProtocolSDK"
+    - "APP_01_Inference_CostRouter" # For estimating tool execution costs before invocation.
+    - "APP_61_Governance_IdentityAccessManager" # For managing permissions on who can register and call tools.
+    - "APP_37_Governance_AuditTrailEngine" # For logging tool registration, discovery, and invocation events.
+    - "APP_17_Data_SchemaRegistry" # For managing and validating tool input/output schemas (e.g., OpenAPI, JSON Schema).
+  invalidation_conditions:
+    - "A registered tool's API contract (schema, endpoint) changes without a corresponding version update in the registry."
+    - "The underlying access control policy for a tool becomes invalid or is deleted from APP_61_Governance_IdentityAccessManager."
+    - "Deprecation of a major version of the shared ProtocolSDK, affecting tool communication standards."
+    - "Network partitioning or sustained failure of the primary data store backing the registry, leading to stale data."
+    - "A critical security vulnerability is discovered in a registered tool's implementation, requiring its immediate suspension."
+  update_triggers:
+    - "Deployment of a new application that exposes a tool-callable API, triggering a registration event via the ecosystem's event bus."
+    - "A registered tool is updated, and a new version is published to the registry via its management API."
+    - "An access policy associated with a tool or a tool-caller (agent/user) is modified in APP_61_Governance_IdentityAccessManager."
+    - "A tool is explicitly deprecated or decommissioned via the registry's management API."
+    - "Periodic health checks fail for a registered tool's endpoint, causing its status to be updated to 'unhealthy' or 'degraded'."
+    - "Usage metrics for a tool cross a predefined threshold, triggering a re-evaluation of its cost or performance tier."
+  adjacent_apps:
+    - "APP_14_Agents_MultiModelOrchestrator" # Consumes the registry to find and bind tools for agents at runtime.
+    - "APP_22_Workflows_AutomationBuilder" # Uses the registry to populate its library of available actions and services.
+    - "APP_51_DevEx_ObservabilityHub" # Ingests tool usage metrics and logs from the registry for monitoring and dashboarding.
+    - "APP_45_Prompt_Compiler" # Queries the registry to inject available tool definitions and schemas into prompts for models that support tool calling.
+    - "APP_71_Marketplace_FunctionExchange" # Acts as a public-facing layer or monetization gateway on top of the internal tool registry.
+    - "APP_33_Evaluation_RedTeamer" # Uses the registry to discover and test tools for vulnerabilities, edge cases, and safety violations.
