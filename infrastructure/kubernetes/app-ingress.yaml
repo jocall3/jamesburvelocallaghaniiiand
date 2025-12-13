@@ -1,0 +1,83 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  namespace: default # Adjust if your apps are in a different namespace
+  annotations:
+    kubernetes.io/ingress.class: nginx # Or your preferred ingress controller
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2 # Important for path-based routing
+    # Add more annotations as needed, e.g., for TLS, rate limiting, etc.
+spec:
+  rules:
+  # Example using hostname-based routing:
+  - host: app1.example.com # Replace with your actual domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: app1-service # Replace with your app's service name
+            port:
+              number: 80 # Or the port your app service exposes
+  - host: app2.example.com # Replace with your actual domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: app2-service # Replace with your app's service name
+            port:
+              number: 80 # Or the port your app service exposes
+
+  # Example using path-based routing (if you don't have separate domains):
+  - http:
+      paths:
+      - path: /app1(/|$)(.*) # Matches /app1 and /app1/anything
+        pathType: Prefix
+        backend:
+          service:
+            name: app1-service # Replace with your app's service name
+            port:
+              number: 80 # Or the port your app service exposes
+      - path: /app2(/|$)(.*) # Matches /app2 and /app2/anything
+        pathType: Prefix
+        backend:
+          service:
+            name: app2-service # Replace with your app's service name
+            port:
+              number: 80 # Or the port your app service exposes
+
+  # Add more rules for the remaining apps (app3 to app500)
+  # You can generate these rules programmatically based on your app naming convention.
+  # Example (pseudocode):
+  # for i in range(3, 501):
+  #   app_name = f"app{i}"
+  #   rule = {
+  #     "http": {
+  #       "paths": [
+  #         {
+  #           "path": f"/{app_name}(/|$)(.*)",
+  #           "pathType": "Prefix",
+  #           "backend": {
+  #             "service": {
+  #               "name": f"{app_name}-service",
+  #               "port": {
+  #                 "number": 80
+  #               }
+  #             }
+  #           }
+  #         }
+  #       ]
+  #     }
+  #   }
+  #   rules.append(rule)
+
+  # TLS configuration (optional, but highly recommended for production):
+  # tls:
+  # - hosts:
+  #   - app1.example.com
+  #   - app2.example.com
+  #   secretName: tls-secret # Replace with your TLS secret name
