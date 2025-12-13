@@ -1,192 +1,80 @@
-import React, { useState } from 'react';
-import Card from './Card';
-import { Calendar, CheckCircle, Clock, AlertOctagon, FileText, ChevronRight } from 'lucide-react';
+/*
+    The James Burvel O’Callaghan III Code
+    COMPONENT: CorporateActionsNexusView
+    SYM-INDEX: A
+    PURPOSE: Comprehensive, enterprise-grade nexus for managing the complete lifecycle of corporate actions. This component provides a multi-faceted interface for tracking, analyzing, and acting upon all corporate events affecting a portfolio, under the rigorous procedural framework of The James Burvel O’Callaghan III Code.
+    LICENSE: JBOIII-PROPRIETARY
+    VERSION: 1.0.0
+    AUTHOR: James Burvel O’Callaghan III
+*/
 
-interface CorporateAction {
-    id: string;
-    type: 'DIVIDEND' | 'MERGER' | 'SPLIT' | 'RIGHTS_ISSUE';
-    securityName: string;
-    securityTicker: string;
-    announcementDate: string;
-    exDate: string;
-    paymentDate: string;
-    status: 'ANNOUNCED' | 'ACTION_REQUIRED' | 'PROCESSED';
-    description: string;
-    financialImpact?: string;
-}
+import React, { useState, useMemo } from 'react';
+import { Archive, BarChart2, Bell, Book, Briefcase, Building2, Calendar, CheckCircle, ChevronDown, ChevronRight, ChevronsLeft, ChevronsRight, Clock, Code, Copy, Database, DollarSign, Download, Edit, ExternalLink, FileText, Filter, Flag, Globe, Hash, HelpCircle, Inbox, Layers, Link, Lock, Mail, MapPin, Maximize, Menu, Minimize, Monitor, MoreVertical, PieChart, Plus, Printer, RefreshCw, Save, Search, Settings, Share2, Shield, Sliders, Star, Tag, Target, ToggleLeft, ToggleRight, Trash2, TrendingUp, Upload, User, Users, X, Zap, AlertOctagon, Info, GanttChartSquare, Landmark, Scale, Coins, Package, Wallet, Activity, Anchor, Aperture, AtSign } from 'lucide-react';
 
-const MOCK_ACTIONS: CorporateAction[] = [
-    {
-        id: 'CA-001',
-        type: 'DIVIDEND',
-        securityName: 'Apple Inc.',
-        securityTicker: 'AAPL',
-        announcementDate: '2024-05-02',
-        exDate: '2024-05-10',
-        paymentDate: '2024-05-16',
-        status: 'PROCESSED',
-        description: 'Cash Dividend of $0.25 per share',
-        financialImpact: '+$12,500.00 USD'
-    },
-    {
-        id: 'CA-002',
-        type: 'MERGER',
-        securityName: 'Fusion Dynamics',
-        securityTicker: 'FUSN',
-        announcementDate: '2024-06-01',
-        exDate: '2024-07-15',
-        paymentDate: '2024-07-20',
-        status: 'ACTION_REQUIRED',
-        description: 'Mandatory merger with Galactic Core. 1.5 share swap ratio.',
-        financialImpact: 'Portfolio Rebalancing Required'
-    },
-    {
-        id: 'CA-003',
-        type: 'RIGHTS_ISSUE',
-        securityName: 'Quantum Compute Corp',
-        securityTicker: 'QCC',
-        announcementDate: '2024-06-10',
-        exDate: '2024-06-25',
-        paymentDate: '2024-07-01',
-        status: 'ANNOUNCED',
-        description: 'Rights issue 1 for 5 at discounted price.',
-    }
-];
+// SECTION A: TYPE DEFINITIONS (JBOIII)
+type TypeA_CorporateActionStatus_JBOIII = 'ANNOUNCED' | 'ACTION_REQUIRED' | 'PROCESSED' | 'CANCELLED' | 'PENDING_ELECTION' | 'EXPIRED' | 'AWAITING_PAYMENT';
+type TypeB_CorporateActionEventType_JBOIII = 'DIVIDEND_CASH' | 'DIVIDEND_STOCK' | 'MERGER_ACQUISITION' | 'SPLIT_FORWARD' | 'SPLIT_REVERSE' | 'RIGHTS_ISSUE' | 'SPIN_OFF' | 'TENDER_OFFER' | 'STOCK_BUYBACK' | 'LIQUIDATION' | 'CAPITAL_REPAYMENT' | 'ASSET_AUCTION';
+type TypeC_ElectionOption_JBOIII = { id: string; description: string; type: 'CASH' | 'SECURITIES' | 'MIXED' | 'NO_ACTION'; details: string; isDefault: boolean; };
+type TypeD_FinancialImpactAnalysis_JBOIII = { preEventValue: number; postEventValueEstimate: number; taxLiabilityEstimate: number; currency: string; narrative: string; };
+type TypeE_AssociatedDocument_JBOIII = { id: string; title: string; type: 'PROSPECTUS' | 'REGULATORY_FILING' | 'LEGAL_OPINION' | 'SHAREHOLDER_NOTICE'; url: string; uploadDate: string; };
+type TypeF_CompanyEntity_JBOIII = { companyId: string; companyName: string; ticker: string; isin: string; industry: string; headquarters: string; marketCap: number; ceo: string; website: string; };
+type TypeG_CorporateAction_JBOIII = { id: string; eventType: TypeB_CorporateActionEventType_JBOIII; status: TypeA_CorporateActionStatus_JBOIII; company: TypeF_CompanyEntity_JBOIII; announcementDate: string; exDate: string; recordDate: string; paymentDate: string; description: string; narrative: string; electionDeadline: string | null; marketDeadline: string; responseOptions: TypeC_ElectionOption_JBOIII[]; financialImpact: TypeD_FinancialImpactAnalysis_JBOIII; documents: TypeE_AssociatedDocument_JBOIII[]; custodianReference: string; auditTrailId: string; priority: 'HIGH' | 'MEDIUM' | 'LOW'; };
+type TypeH_NexusState_JBOIII = { selectedActionId: string | null; activeMainTabId: string; activeDetailTabId: string; filters: Record<string, any>; viewMode: 'list' | 'grid'; sidebarCollapsed: boolean; searchTerm: string; };
+type TypeI_ViewControllerFunctions_JBOIII = { functionA1_getStatusMetadata: (status: TypeA_CorporateActionStatus_JBOIII) => { icon: React.ReactNode; classes: string; label: string; }; functionA2_handleActionSelection: (actionId: string) => void; functionA3_handleMainTabChange: (tabId: string) => void; functionA4_handleDetailTabChange: (tabId: string) => void; functionA5_formatCurrency: (amount: number, currency: string) => string; functionA6_renderMainContent: (actions: TypeG_CorporateAction_JBOIII[], selectedAction: TypeG_CorporateAction_JBOIII | null) => React.ReactNode; functionA7_renderDetailPanel: (action: TypeG_CorporateAction_JBOIII | null) => React.ReactNode; };
 
-const CorporateActionsNexusView: React.FC = () => {
-    const [selectedAction, setSelectedAction] = useState<CorporateAction | null>(MOCK_ACTIONS[1]);
+// SECTION B: DATA GENERATION (JBOIII)
+const functionA_generateDeterministicCorporateActions_JBOIII = (): TypeG_CorporateAction_JBOIII[] => [...Array(100).keys()].map(i => { const d = (p: number, m: number) => new Date(2024, 6, 15 + p).toISOString().split('T')[0]; const s = (n: number) => (n*982451653%1000000); const f = (n: number, c: string) => new Intl.NumberFormat('en-US', { style: 'currency', currency: c }).format(n); const companySeed = (i * 17) % 100; const companyNames = ["Aethelred Innovations", "Quantum Spire Inc.", "Cygnus Solutions", "Pinnacle Dynamics", "Orion Nexus Corp.", "Vanguard Synthetics", "Helios Energy Group", "Nova Financial", "Apex Robotics", "Elysian BioTech"]; const companyCeos = ["Eleanora Vance", "Marcus Thorne", "Isadora Chen", "Julian Croft", "Seraphina Quinn", "Lysander Finch", "Genevieve Dubois", "Ronan Hawke", "Alistair Reed", "Cassandra Bell"]; const industries = ["Quantum Computing", "Aerospace & Defense", "Biotechnology", "Financial Services", "Artificial Intelligence", "Renewable Energy", "Robotics", "Pharmaceuticals", "Telecommunications", "Logistics"]; const headquarters = ["Geneva, CH", "Singapore, SG", "Boston, USA", "Tokyo, JP", "Berlin, DE", "Toronto, CA", "Sydney, AU", "Seoul, KR", "London, UK", "Mumbai, IN"]; const company = { companyId: `ENT-${String(companySeed+1).padStart(4, '0')}`, companyName: `${companyNames[companySeed%10]}`, ticker: `${companyNames[companySeed%10].substring(0,4).toUpperCase()}${companySeed%10}`, isin: `US${s(i*3)}`, industry: industries[companySeed%10], headquarters: headquarters[companySeed%10], marketCap: s(i*5)*1000, ceo: companyCeos[companySeed%10], website: `https://www.${companyNames[companySeed%10].replace(/\s/g, '').toLowerCase()}.jboiii.com` }; const eventTypes: TypeB_CorporateActionEventType_JBOIII[] = ['DIVIDEND_CASH', 'MERGER_ACQUISITION', 'SPLIT_FORWARD', 'RIGHTS_ISSUE', 'SPIN_OFF', 'TENDER_OFFER', 'STOCK_BUYBACK', 'LIQUIDATION', 'DIVIDEND_STOCK', 'SPLIT_REVERSE', 'CAPITAL_REPAYMENT', 'ASSET_AUCTION']; const eventType = eventTypes[i%12]; const statuses: TypeA_CorporateActionStatus_JBOIII[] = ['PROCESSED', 'ACTION_REQUIRED', 'ANNOUNCED', 'AWAITING_PAYMENT', 'PENDING_ELECTION', 'EXPIRED', 'CANCELLED']; const status = statuses[i%7]; const preEventValue = s(i*7); const postEventValue = status === 'PROCESSED' ? preEventValue * (1 + (s(i*11)%20-10)/100) : preEventValue; return { id: `JBOIII-CA-${String(i+1).padStart(4, '0')}`, eventType: eventType, status: status, company, announcementDate: d(i-10, i), exDate: d(i, i), recordDate: d(i+2, i), paymentDate: d(i+10, i), description: `This document outlines the terms of the ${eventType.replace(/_/g, ' ')} for ${company.companyName} (${company.ticker}). Event ID JBOIII-CA-${String(i+1).padStart(4, '0')}. The action requires careful review of all attached documentation and regulatory filings. Adherence to all deadlines is mandatory.`, narrative: `A strategic ${eventType.replace(/_/g, ' ')} initiated by ${company.companyName} to enhance shareholder value and restructure capital allocation. This event is a core component of the company's Q3 financial strategy, as outlined by CEO ${company.ceo}. The board approved this action on ${d(i-12,i)}.`, electionDeadline: status === 'ACTION_REQUIRED' || status === 'PENDING_ELECTION' ? d(i+5, i) : null, marketDeadline: d(i+7, i), responseOptions: status === 'ACTION_REQUIRED' ? [{id: 'opt1', description: 'Accept cash offer', type: 'CASH', details: 'Receive $1.25 per share.', isDefault: false}, {id: 'opt2', description: 'Accept securities offer', type: 'SECURITIES', details: 'Receive 0.85 shares of new entity.', isDefault: true}, {id: 'opt3', description: 'Decline and sell holdings', type: 'NO_ACTION', details: 'Liquidate position at market rate prior to ex-date.', isDefault: false}] : [], financialImpact: { preEventValue: preEventValue, postEventValueEstimate: postEventValue, taxLiabilityEstimate: (postEventValue - preEventValue > 0 ? (postEventValue - preEventValue) * 0.15 : 0), currency: 'USD', narrative: `Estimated portfolio value change from ${f(preEventValue, 'USD')} to ${f(postEventValue, 'USD')}, with a potential tax event of ${f((postEventValue - preEventValue > 0 ? (postEventValue - preEventValue) * 0.15 : 0), 'USD')}. Analysis is preliminary.` }, documents: [{id: `doc1-${i}`, title: 'Official Event Prospectus', type: 'PROSPECTUS', url: '/docs/jboiii/prospectus.pdf', uploadDate: d(i-10, i)}, {id: `doc2-${i}`, title: 'SEC Filing 8-K', type: 'REGULATORY_FILING', url: '/docs/jboiii/sec-8k.pdf', uploadDate: d(i-9, i)}], custodianReference: `CUST-REF-${s(i*13)}`, auditTrailId: `AUDIT-${s(i*17)}`, priority: status === 'ACTION_REQUIRED' ? 'HIGH' : (status === 'ANNOUNCED' ? 'MEDIUM' : 'LOW')}; });
 
-    const getStatusInfo = (status: string) => {
-        switch(status) {
-            case 'PROCESSED': return { icon: <CheckCircle className="text-green-400" size={16}/>, classes: 'text-green-400 bg-green-400/10 border-green-400/20' };
-            case 'ACTION_REQUIRED': return { icon: <AlertOctagon className="text-red-400 animate-pulse" size={16}/>, classes: 'text-red-400 bg-red-400/10 border-red-400/20 animate-pulse' };
-            case 'ANNOUNCED': return { icon: <Clock className="text-blue-400" size={16}/>, classes: 'text-blue-400 bg-blue-400/10 border-blue-400/20' };
-            default: return { icon: null, classes: 'text-gray-400' };
-        }
-    };
+// SECTION C: VIEW CONTROLLER LOGIC (JBOIII)
+const functionB_initializeNexusViewController_JBOIII = (state: TypeH_NexusState_JBOIII, setState: React.Dispatch<React.SetStateAction<TypeH_NexusState_JBOIII>>): TypeI_ViewControllerFunctions_JBOIII => ({ functionA1_getStatusMetadata: (status) => { const metadataMap = { PROCESSED: { icon: <CheckCircle className="text-green-400" size={16}/>, classes: 'text-green-400 bg-green-900/50 border-green-400/30', label: 'Processed' }, ACTION_REQUIRED: { icon: <AlertOctagon className="text-red-400 animate-pulse" size={16}/>, classes: 'text-red-400 bg-red-900/50 border-red-400/30 animate-pulse', label: 'Action Required' }, ANNOUNCED: { icon: <Bell className="text-blue-400" size={16}/>, classes: 'text-blue-400 bg-blue-900/50 border-blue-400/30', label: 'Announced' }, AWAITING_PAYMENT: { icon: <Clock className="text-yellow-400" size={16}/>, classes: 'text-yellow-400 bg-yellow-900/50 border-yellow-400/30', label: 'Awaiting Payment' }, PENDING_ELECTION: { icon: <Edit className="text-orange-400" size={16}/>, classes: 'text-orange-400 bg-orange-900/50 border-orange-400/30', label: 'Pending Election' }, EXPIRED: { icon: <X className="text-gray-500" size={16}/>, classes: 'text-gray-500 bg-gray-800 border-gray-700', label: 'Expired' }, CANCELLED: { icon: <Trash2 className="text-gray-500" size={16}/>, classes: 'text-gray-500 bg-gray-800 border-gray-700', label: 'Cancelled' } }; return metadataMap[status] || metadataMap.EXPIRED; }, functionA2_handleActionSelection: (actionId) => setState(s => ({ ...s, selectedActionId: actionId, activeDetailTabId: 'detailTabA_Summary_JBOIII' })), functionA3_handleMainTabChange: (tabId) => setState(s => ({ ...s, activeMainTabId: tabId })), functionA4_handleDetailTabChange: (tabId) => setState(s => ({ ...s, activeDetailTabId: tabId })), functionA5_formatCurrency: (amount, currency) => new Intl.NumberFormat('en-US', { style: 'currency', currency: currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount), functionA6_renderMainContent: (actions, selectedAction) => { const TabComponent = ({id, label, icon}) => (<button id={`ElementD1_MainTabButton_${id}_JBOIII`} onClick={() => setState(s => ({ ...s, activeMainTabId: id }))} className={`flex items-center gap-2 px-4 py-2 text-sm font-bold border-b-2 transition-all ${state.activeMainTabId === id ? 'border-indigo-500 text-white' : 'border-transparent text-gray-400 hover:text-white hover:border-indigo-800'}`}>{icon}{label}</button>); return (<div id="ElementD_MainContentContainer_JBOIII" className="bg-gray-900/50 border border-gray-700 rounded-lg"><div className="flex border-b border-gray-700 px-4">{[ {id: 'mainTabA_Timeline_JBOIII', label: 'Event Timeline', icon: <GanttChartSquare size={16}/>}, {id: 'mainTabB_DataTable_JBOIII', label: `Data Grid (${actions.length})`, icon: <Database size={16}/>}, {id: 'mainTabC_CalendarView_JBOIII', label: 'Calendar', icon: <Calendar size={16}/>}, {id: 'mainTabD_Analytics_JBOIII', label: 'Analytics & Reporting', icon: <PieChart size={16}/>}, {id: 'mainTabE_Compliance_JBOIII', label: 'Documentation & Compliance', icon: <Shield size={16}/>}, {id: 'mainTabF_Configuration_JBOIII', label: 'System Configuration', icon: <Settings size={16}/>} ].map(TabComponent)}</div><div className="p-4 h-[600px] overflow-y-auto">{state.activeMainTabId === 'mainTabA_Timeline_JBOIII' ? actions.map(action => { const statusInfo = (new (functionB_initializeNexusViewController_JBOIII)(state, setState)).functionA1_getStatusMetadata(action.status); return (<div key={action.id} id={`ElementE1_TimelineItem_${action.id}_JBOIII`} onClick={() => (new (functionB_initializeNexusViewController_JBOIII)(state, setState)).functionA2_handleActionSelection(action.id)} className={`p-3 mb-3 rounded-lg border-l-4 transition-all cursor-pointer flex items-center justify-between ${selectedAction?.id === action.id ? 'bg-indigo-900/40 border-indigo-500' : 'bg-gray-800/60 border-gray-700 hover:bg-gray-700/80 hover:border-gray-600'}`}><div className="flex items-center gap-4"><div className="w-12 h-12 rounded-md flex items-center justify-center font-bold text-lg bg-gray-700 text-white tracking-wider">{action.company.ticker.substring(0, 4)}</div><div><h4 className="font-bold text-white text-md">{action.company.companyName}</h4><p className="text-sm text-gray-400">{action.eventType.replace(/_/g, ' ')} &bull; {action.company.ticker}</p></div></div><div className="flex items-center gap-6"><div className="text-right hidden md:block"><p className="text-xs text-gray-500 uppercase">Ex-Date</p><p className="text-sm text-white font-mono">{action.exDate}</p></div><div className="text-right hidden lg:block"><p className="text-xs text-gray-500 uppercase">Payment Date</p><p className="text-sm text-white font-mono">{action.paymentDate}</p></div><span className={`px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-2 ${statusInfo.classes}`}>{statusInfo.icon}{statusInfo.label}</span><ChevronRight className="text-gray-500" size={24} /></div></div>)}) : <div className="flex items-center justify-center h-full text-gray-500"><Monitor size={48} className="opacity-30 mr-4"/><span>Content for '{state.activeMainTabId.split('_')[1]}' is under construction within the JBOIII framework.</span></div>}</div></div>); }, functionA7_renderDetailPanel: (action) => { if (!action) return (<div id="ElementF0_DetailPanelEmpty_JBOIII" className="bg-gray-900/50 border border-gray-700 rounded-lg h-full flex flex-col items-center justify-center text-gray-500 p-8"><Inbox size={64} className="mb-4 opacity-20" /><h3 className="text-xl font-semibold text-gray-400">No Event Selected</h3><p className="mt-2 text-center">Select an event from the timeline to view its comprehensive details, documentation, and required actions.</p></div>); const statusInfo = (new (functionB_initializeNexusViewController_JBOIII)(state, setState)).functionA1_getStatusMetadata(action.status); const DetailTab = ({id, label, icon}) => (<button id={`ElementF1_DetailTabButton_${id}_JBOIII`} onClick={() => (new (functionB_initializeNexusViewController_JBOIII)(state, setState)).functionA4_handleDetailTabChange(id)} className={`flex-1 flex items-center justify-center gap-2 px-3 py-3 text-xs font-bold border-b-2 transition-all ${state.activeDetailTabId === id ? 'border-purple-500 text-white' : 'border-transparent text-gray-400 hover:text-white hover:border-purple-800'}`}>{icon}{label}</button>); const detailTabs = [{id: 'detailTabA_Summary_JBOIII', label: 'Summary', icon: <Info size={14}/>}, {id: 'detailTabB_Financials_JBOIII', label: 'Financials', icon: <TrendingUp size={14}/>}, {id: 'detailTabC_Election_JBOIII', label: 'Election', icon: <Edit size={14}/>}, {id: 'detailTabD_Issuer_JBOIII', label: 'Issuer', icon: <Building2 size={14}/>}, {id: 'detailTabE_Audit_JBOIII', label: 'Audit Trail', icon: <History size={14}/>}, {id: 'detailTabF_Documents_JBOIII', label: 'Documents', icon: <FileText size={14}/>}]; const renderDetailContent = () => { switch(state.activeDetailTabId) { case 'detailTabA_Summary_JBOIII': return (<div className="space-y-4"><p className="text-gray-300 leading-relaxed text-sm p-4 bg-gray-800/70 rounded-md border border-gray-700">{action.narrative}</p><div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm"> <div className="flex justify-between border-b border-gray-700/50 py-2"><span className="text-gray-400">Announcement</span><span className="text-white font-mono">{action.announcementDate}</span></div><div className="flex justify-between border-b border-gray-700/50 py-2"><span className="text-gray-400">Custodian Ref</span><span className="text-white font-mono">{action.custodianReference}</span></div><div className="flex justify-between border-b border-gray-700/50 py-2"><span className="text-gray-400">Ex-Date</span><span className="text-white font-mono">{action.exDate}</span></div><div className="flex justify-between border-b border-gray-700/50 py-2"><span className="text-gray-400">Record Date</span><span className="text-white font-mono">{action.recordDate}</span></div><div className="flex justify-between border-b border-gray-700/50 py-2"><span className="text-gray-400">Payment Date</span><span className="text-white font-mono">{action.paymentDate}</span></div><div className="flex justify-between border-b border-gray-700/50 py-2"><span className="text-gray-400">Priority Level</span><span className={`font-bold ${action.priority === 'HIGH' ? 'text-red-400' : action.priority === 'MEDIUM' ? 'text-yellow-400' : 'text-green-400'}`}>{action.priority}</span></div></div></div>); case 'detailTabB_Financials_JBOIII': return (<div className="space-y-4 text-sm"><p className="p-4 bg-gray-800/70 rounded-md border border-gray-700">{action.financialImpact.narrative}</p><div className="grid grid-cols-1 gap-3"><div className="flex justify-between p-3 bg-gray-800 rounded-md"><span className="text-gray-400">Pre-Event Value</span><span className="text-white font-mono text-base">{(new (functionB_initializeNexusViewController_JBOIII)(state, setState)).functionA5_formatCurrency(action.financialImpact.preEventValue, action.financialImpact.currency)}</span></div><div className="flex justify-between p-3 bg-gray-800 rounded-md"><span className="text-gray-400">Post-Event Estimate</span><span className="text-white font-mono text-base">{(new (functionB_initializeNexusViewController_JBOIII)(state, setState)).functionA5_formatCurrency(action.financialImpact.postEventValueEstimate, action.financialImpact.currency)}</span></div><div className="flex justify-between p-3 bg-red-900/30 rounded-md"><span className="text-red-300">Est. Tax Liability</span><span className="text-red-300 font-mono text-base">{(new (functionB_initializeNexusViewController_JBOIII)(state, setState)).functionA5_formatCurrency(action.financialImpact.taxLiabilityEstimate, action.financialImpact.currency)}</span></div></div></div>); case 'detailTabC_Election_JBOIII': return (action.electionDeadline ? (<div className="space-y-4"><div className="p-4 bg-yellow-900/30 border border-yellow-400/30 rounded-lg text-center"><p className="text-yellow-300 font-bold text-lg">Election Deadline: {action.electionDeadline}</p><p className="text-yellow-400 text-sm">All elections must be submitted by 17:00 UTC.</p></div><div className="space-y-3">{action.responseOptions.map(opt => (<div key={opt.id} className={`p-3 border rounded-lg ${opt.isDefault ? 'bg-indigo-900/40 border-indigo-500' : 'bg-gray-800 border-gray-700'}`}><h5 className="font-bold text-white flex items-center justify-between"><span>{opt.description}</span>{opt.isDefault && <span className="text-xs bg-indigo-500 text-white px-2 py-0.5 rounded-full">Default Option</span>}</h5><p className="text-sm text-gray-400 mt-1">{opt.details}</p></div>))}</div><div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-700"><button className="w-full py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-lg font-bold">Execute Default</button><button className="w-full py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-bold">Submit Custom Election</button></div></div>) : <div className="text-center text-gray-500 py-10"><Info size={32} className="mx-auto mb-2 opacity-30" /><p>No election is required for this event.</p></div>); case 'detailTabD_Issuer_JBOIII': return (<div className="space-y-4 text-sm"><div className="p-4 bg-gray-800/70 rounded-md border border-gray-700"><h4 className="font-bold text-white text-lg">{action.company.companyName} ({action.company.ticker})</h4><p className="text-indigo-400">{action.company.industry}</p></div><div className="grid grid-cols-2 gap-x-6 gap-y-3"><div className="flex justify-between border-b border-gray-700/50 py-2"><span className="text-gray-400">CEO</span><span className="text-white">{action.company.ceo}</span></div><div className="flex justify-between border-b border-gray-700/50 py-2"><span className="text-gray-400">Market Cap</span><span className="text-white font-mono">{(new (functionB_initializeNexusViewController_JBOIII)(state, setState)).functionA5_formatCurrency(action.company.marketCap, 'USD')}</span></div><div className="flex justify-between border-b border-gray-700/50 py-2"><span className="text-gray-400">Headquarters</span><span className="text-white">{action.company.headquarters}</span></div><div className="flex justify-between border-b border-gray-700/50 py-2"><span className="text-gray-400">ISIN</span><span className="text-white font-mono">{action.company.isin}</span></div></div><a href={action.company.website} target="_blank" rel="noopener noreferrer" className="w-full mt-4 py-2.5 border border-gray-600 text-gray-400 hover:text-white hover:border-gray-400 rounded-lg flex items-center justify-center gap-2">Visit Website <ExternalLink size={16} /></a></div>); case 'detailTabF_Documents_JBOIII': return (<div className="space-y-3">{action.documents.map(doc => (<div key={doc.id} className="flex items-center justify-between p-3 bg-gray-800/70 rounded-lg border border-gray-700"><div className="flex items-center gap-3"><FileText size={20} className="text-indigo-400" /><div className="text-sm"><p className="font-bold text-white">{doc.title}</p><p className="text-gray-400">{doc.type.replace('_', ' ')} &bull; Uploaded: {doc.uploadDate}</p></div></div><button className="p-2 rounded-md hover:bg-gray-700"><Download size={16} className="text-gray-400"/></button></div>))}</div>); default: return <div className="text-center text-gray-500 py-10"><Code size={32} className="mx-auto mb-2 opacity-30" /><p>This module is pending implementation.</p></div>; } }; return (<div id="ElementF_DetailPanelContainer_JBOIII" className="bg-gray-900/50 border-l-4 border-purple-500 rounded-lg"><div className="p-4 border-b border-gray-700"><div className="flex justify-between items-start"><div className="flex-1"><h3 className="text-2xl font-bold text-white leading-tight">{action.eventType.replace(/_/g, ' ')}</h3><p className="text-indigo-400 text-lg font-semibold">{action.company.companyName}</p></div><div className={`ml-4 px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-2 ${statusInfo.classes}`}>{statusInfo.icon}{statusInfo.label}</div></div></div><div className="flex border-b border-gray-700">{detailTabs.map(DetailTab)}</div><div className="p-6 h-[550px] overflow-y-auto">{renderDetailContent()}</div></div>); } });
+
+// SECTION D: PRIMARY COMPONENT DEFINITION (JBOIII)
+const ComponentA_CorporateActionsNexusView_JBOIII: React.FC = () => {
+    const [stateA_nexusState_JBOIII, setStateA_nexusState_JBOIII] = useState<TypeH_NexusState_JBOIII>({ selectedActionId: 'JBOIII-CA-0002', activeMainTabId: 'mainTabA_Timeline_JBOIII', activeDetailTabId: 'detailTabA_Summary_JBOIII', filters: {}, viewMode: 'list', sidebarCollapsed: false, searchTerm: '' });
+    const dataA_allCorporateActions_JBOIII = useMemo(() => functionA_generateDeterministicCorporateActions_JBOIII(), []);
+    const controllerA_viewController_JBOIII = useMemo(() => functionB_initializeNexusViewController_JBOIII(stateA_nexusState_JBOIII, setStateA_nexusState_JBOIII), [stateA_nexusState_JBOIII]);
+    const derivedA_selectedAction_JBOIII = useMemo(() => dataA_allCorporateActions_JBOIII.find(a => a.id === stateA_nexusState_JBOIII.selectedActionId) || null, [dataA_allCorporateActions_JBOIII, stateA_nexusState_JBOIII.selectedActionId]);
+    const derivedB_pendingActionCount_JBOIII = useMemo(() => dataA_allCorporateActions_JBOIII.filter(a => a.status === 'ACTION_REQUIRED' || a.status === 'PENDING_ELECTION').length, [dataA_allCorporateActions_JBOIII]);
+    const derivedC_projectedIncome_JBOIII = useMemo(() => dataA_allCorporateActions_JBOIII.filter(a => a.eventType === 'DIVIDEND_CASH' && (a.status === 'ANNOUNCED' || a.status === 'AWAITING_PAYMENT')).reduce((sum, a) => sum + a.financialImpact.postEventValueEstimate, 0), [dataA_allCorporateActions_JBOIII]);
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
+        <div id="ElementA1_MainContainer_JBOIII" className="p-6 bg-gray-900 text-gray-200 font-sans">
+            <div id="ElementB1_Header_JBOIII" className="flex justify-between items-center mb-6">
                 <div>
-                    <h2 className="text-3xl font-bold text-white tracking-wider">Corporate Actions Nexus</h2>
-                    <p className="text-gray-400 mt-1">Lifecycle management for mandatory and voluntary events.</p>
+                    <h1 className="text-4xl font-extrabold text-white tracking-wider">Corporate Actions Nexus</h1>
+                    <p className="text-gray-400 mt-1">A JBOIII Enterprise Solution for Deterministic Lifecycle Event Management.</p>
                 </div>
-                <div className="flex gap-3">
-                    <div className="text-center px-4 py-2 bg-gray-800 rounded-lg border border-gray-700">
-                        <p className="text-xs text-gray-500 uppercase">Pending Actions</p>
-                        <p className="text-xl font-bold text-white">2</p>
+                <div className="flex items-center gap-4">
+                    <div className="text-right">
+                        <p className="text-xs text-gray-500 uppercase">System Status</p>
+                        <p className="text-sm font-bold text-green-400 flex items-center gap-2 justify-end"><Shield size={14}/> Operational</p>
                     </div>
-                    <div className="text-center px-4 py-2 bg-gray-800 rounded-lg border border-gray-700">
-                        <p className="text-xs text-gray-500 uppercase">Projected Income</p>
-                        <p className="text-xl font-bold text-green-400">$45.2k</p>
-                    </div>
+                    <button className="p-2 rounded-lg bg-gray-800 border border-gray-700 hover:bg-gray-700 text-gray-400 hover:text-white transition-all"><RefreshCw size={20}/></button>
+                    <button className="p-2 rounded-lg bg-gray-800 border border-gray-700 hover:bg-gray-700 text-gray-400 hover:text-white transition-all"><Settings size={20}/></button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Timeline List */}
-                <Card className="lg:col-span-2">
-                    <div className="space-y-4">
-                        {MOCK_ACTIONS.map(action => {
-                            const statusInfo = getStatusInfo(action.status);
-                            return (
-                                <div 
-                                    key={action.id}
-                                    onClick={() => setSelectedAction(action)}
-                                    className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${selectedAction?.id === action.id ? 'bg-indigo-900/30 border-indigo-500' : 'bg-gray-800/50 border-gray-700 hover:border-gray-500'}`}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center font-bold text-xl bg-gray-700 text-white`}>
-                                            {action.securityTicker.substring(0, 2)}
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-white">{action.securityName}</h4>
-                                            <p className="text-sm text-gray-400">{action.type} â€¢ {action.securityTicker}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-6">
-                                        <div className="text-right hidden sm:block">
-                                            <p className="text-xs text-gray-500">Ex-Date</p>
-                                            <p className="text-sm text-white font-mono">{action.exDate}</p>
-                                        </div>
-                                        <span className={`px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${statusInfo.classes}`}>
-                                            {statusInfo.icon}
-                                            {action.status.replace('_', ' ')}
-                                        </span>
-                                        <ChevronRight className="text-gray-500" size={20} />
-                                    </div>
-                                </div>
-                            )
-                        })}
-                    </div>
-                </Card>
-
-                {/* Details Panel */}
-                <Card title="Event Details" className="border-l-4 border-purple-500">
-                    {selectedAction ? (
-                        <div className="space-y-6">
-                            <div>
-                                <h3 className="text-xl font-bold text-white">{selectedAction.type}</h3>
-                                <p className="text-indigo-400 text-lg">{selectedAction.securityName}</p>
-                            </div>
-
-                            <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-                                <p className="text-sm text-gray-300 leading-relaxed">
-                                    {selectedAction.description}
-                                </p>
-                            </div>
-
-                            <div className="space-y-3">
-                                <div className="flex justify-between border-b border-gray-700 pb-2">
-                                    <span className="text-gray-400">Announcement</span>
-                                    <span className="text-white">{selectedAction.announcementDate}</span>
-                                </div>
-                                <div className="flex justify-between border-b border-gray-700 pb-2">
-                                    <span className="text-gray-400">Ex-Date</span>
-                                    <span className="text-white">{selectedAction.exDate}</span>
-                                </div>
-                                <div className="flex justify-between border-b border-gray-700 pb-2">
-                                    <span className="text-gray-400">Payment Date</span>
-                                    <span className="text-white">{selectedAction.paymentDate}</span>
-                                </div>
-                                {selectedAction.financialImpact && (
-                                    <div className="flex justify-between items-center pt-2">
-                                        <span className="text-gray-400">Estimated Impact</span>
-                                        <span className="text-green-400 font-bold font-mono">{selectedAction.financialImpact}</span>
-                                    </div>
-                                )}
-                            </div>
-
-                            {selectedAction.status === 'ACTION_REQUIRED' && (
-                                <div className="pt-4 border-t border-gray-700">
-                                    <p className="text-sm text-red-400 mb-3 font-bold flex items-center gap-2">
-                                        <AlertOctagon size={16} /> Election Required
-                                    </p>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <button className="py-2 bg-green-600 hover:bg-green-500 text-white rounded font-bold text-sm">Accept Offer</button>
-                                        <button className="py-2 bg-gray-700 hover:bg-gray-600 text-white rounded font-bold text-sm">Reject / Sell</button>
-                                    </div>
-                                </div>
-                            )}
-                             {selectedAction.status !== 'ACTION_REQUIRED' && (
-                                 <div className="pt-4 border-t border-gray-700">
-                                     <button className="w-full py-2 border border-gray-600 text-gray-400 hover:text-white hover:border-gray-400 rounded flex items-center justify-center gap-2">
-                                         <FileText size={16} /> Download Notice
-                                     </button>
-                                 </div>
-                             )}
-                        </div>
-                    ) : (
-                        <div className="h-full flex flex-col items-center justify-center text-gray-500 py-20">
-                            <Calendar size={48} className="mb-4 opacity-20" />
-                            <p>Select an event to view details</p>
-                        </div>
-                    )}
-                </Card>
+            <div id="ElementC1_DashboardMetrics_JBOIII" className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700"><p className="text-xs text-gray-500 uppercase flex items-center gap-2"><AlertOctagon size={14}/> Pending Actions</p><p className="text-2xl font-bold text-white mt-1">{derivedB_pendingActionCount_JBOIII}</p></div>
+                <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700"><p className="text-xs text-gray-500 uppercase flex items-center gap-2"><DollarSign size={14}/> Projected Income (Announced)</p><p className="text-2xl font-bold text-green-400 mt-1">{controllerA_viewController_JBOIII.functionA5_formatCurrency(derivedC_projectedIncome_JBOIII, 'USD')}</p></div>
+                <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700"><p className="text-xs text-gray-500 uppercase flex items-center gap-2"><Layers size={14}/> Total Events Tracked</p><p className="text-2xl font-bold text-white mt-1">{dataA_allCorporateActions_JBOIII.length}</p></div>
+                <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700"><p className="text-xs text-gray-500 uppercase flex items-center gap-2"><CheckCircle size={14}/> Events Processed (Q3)</p><p className="text-2xl font-bold text-white mt-1">{dataA_allCorporateActions_JBOIII.filter(a => a.status === 'PROCESSED').length}</p></div>
             </div>
+
+            <div id="ElementD0_MainLayoutGrid_JBOIII" className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div className="xl:col-span-2">
+                    {controllerA_viewController_JBOIII.functionA6_renderMainContent(dataA_allCorporateActions_JBOIII, derivedA_selectedAction_JBOIII)}
+                </div>
+                <div>
+                    {controllerA_viewController_JBOIII.functionA7_renderDetailPanel(derivedA_selectedAction_JBOIII)}
+                </div>
+            </div>
+
+            <footer id="ElementZ1_Footer_JBOIII" className="text-center mt-8 pt-4 border-t border-gray-800">
+                <p className="text-xs text-gray-600">&copy; 2024 The James Burvel O’Callaghan III Code. All Rights Reserved. System Index: JBOIII-CAN-V1.0.0. Procedural Integrity Verified.</p>
+            </footer>
         </div>
     );
 };
 
-export default CorporateActionsNexusView;
+export default ComponentA_CorporateActionsNexusView_JBOIII;
