@@ -1,0 +1,302 @@
+// Copyright (c) 2024 Aetherinox, Inc.
+// All rights reserved.
+//
+// This software is the confidential and proprietary information of
+// Aetherinox, Inc. ("Confidential Information"). You shall not
+// disclose such Confidential Information and shall use it only in
+// accordance with the terms of the license agreement you entered into
+// with Aetherinox, Inc.
+
+syntax = "proto3";
+
+package aether_ontology.financial;
+
+import "google/protobuf/timestamp.proto";
+import "packages/ontology/schemas/common/identifiers.proto";
+import "packages/ontology/schemas/financial/money.proto";
+import "packages/ontology/schemas/financial/instrument.proto";
+
+option go_package = "github.com/aetherinox/aether-ontology/gen/go/financial;financial_pb";
+option java_package = "com.aetherinox.ontology.financial";
+option java_multiple_files = true;
+option csharp_namespace = "Aetherinox.Ontology.Financial";
+
+// SettlementInstruction represents a detailed instruction to settle a securities transaction.
+// This schema is heavily inspired by the ISO 20022 sese.023 (SecuritiesSettlementTransactionInstruction) message,
+// adapted for a modern, multi-party, multi-asset distributed system. It serves as a canonical data model
+// for settlement operations across the Aetherinox ecosystem.
+message SettlementInstruction {
+  // Unique identifier for this settlement instruction message.
+  common.UUID message_id = 1;
+
+  // Unique identifier for the transaction being settled. This can be a client-provided ID,
+  // a trade ID from an execution venue, or an internal transaction reference.
+  string transaction_identification = 2;
+
+  // Reference to a previously sent instruction that this message amends, cancels, or relates to.
+  string related_instruction_reference = 3;
+
+  // Specifies the function of the message (e.g., New, Cancel, Replace).
+  InstructionFunction function = 4;
+
+  // Core details of the trade that resulted in this settlement instruction.
+  TradeDetails trade_details = 5;
+
+  // Details of the financial instrument being settled.
+  instrument.FinancialInstrumentIdentification financial_instrument = 6;
+
+  // Quantity of the financial instrument to be settled.
+  QuantityChoice quantity = 7;
+
+  // Specifies the type of settlement and other parameters.
+  SettlementParameters settlement_parameters = 8;
+
+  // The party that owns the account.
+  PartyIdentification account_owner = 9;
+
+  // The account at the CSD or custodian where the securities are held.
+  SecuritiesAccount safekeeping_account = 10;
+
+  // The agent responsible for delivering the securities.
+  PartyIdentification delivering_agent = 11;
+
+  // The agent responsible for receiving the securities.
+  PartyIdentification receiving_agent = 12;
+
+  // The central securities depository (CSD) or international central securities depository (ICSD)
+  // where the settlement will take place.
+  PartyIdentification place_of_settlement = 13;
+
+  // The cash amount to be settled, applicable for Delivery Versus Payment (DVP) transactions.
+  Money settlement_amount = 14;
+
+  // The current processing status of the instruction.
+  InstructionProcessingStatus status = 15;
+
+  // Timestamp when the instruction was created.
+  google.protobuf.Timestamp creation_timestamp = 16;
+
+  // Timestamp of the last update to this instruction.
+  google.protobuf.Timestamp last_update_timestamp = 17;
+
+  // Optional field for additional, non-standard settlement instructions or details.
+  // Can be used for bilateral agreements or specific market practices.
+  map<string, string> supplementary_data = 18;
+}
+
+// Specifies the function of the instruction message.
+enum InstructionFunction {
+  // Default, unspecified function.
+  FUNCTION_UNSPECIFIED = 0;
+  // A new settlement instruction.
+  NEW = 1;
+  // A request to cancel a previously sent instruction.
+  CANCEL = 2;
+  // A request to replace a previously sent instruction.
+  REPLACE = 3;
+}
+
+// Contains the core details of the trade.
+// Maps to the TradeDetails block in sese.023.
+message TradeDetails {
+  // The date on which the trade was executed.
+  google.protobuf.Timestamp trade_date = 1;
+
+  // The date on which the settlement is expected to happen.
+  google.protobuf.Timestamp settlement_date = 2;
+
+  // The price at which the financial instrument was traded.
+  Price deal_price = 3;
+
+  // The place where the trade was executed (e.g., exchange MIC code).
+  string place_of_trade = 4;
+
+  // Unique identifier for the trade as assigned by the execution venue.
+  string trade_transaction_id = 5;
+}
+
+// Represents a price, which can be a monetary value, a percentage, or another basis.
+message Price {
+  oneof price_type {
+    // Price expressed as a monetary value per unit of the financial instrument.
+    Money amount = 1;
+    // Price expressed as a percentage.
+    double percentage = 2;
+    // Price expressed in basis points.
+    int32 basis_points = 3;
+    // Price expressed as a yield.
+    double yield = 4;
+  }
+}
+
+// Defines the parameters for the settlement process.
+// Maps to SettlementParameters block in sese.023.
+message SettlementParameters {
+  // Specifies the type of settlement.
+  SettlementType settlement_type = 1;
+
+  // Specifies whether the transaction is a delivery or a receipt.
+  DeliveryReceiptType delivery_receipt_type = 2;
+
+  // Indicates whether the settlement instruction is a corporate action related settlement.
+  bool corporate_action_related = 3;
+
+  // Specifies if the settlement is to be processed for partial settlement.
+  PartialSettlementIndicator partial_settlement = 4;
+}
+
+// Type of settlement.
+// Based on ISO 20022 SettlementTransactionCondition1Code.
+enum SettlementType {
+  SETTLEMENT_TYPE_UNSPECIFIED = 0;
+  // Delivery Versus Payment: securities are delivered against a cash payment.
+  DELIVERY_VERSUS_PAYMENT = 1;
+  // Free Of Payment: securities are delivered without a corresponding cash payment.
+  FREE_OF_PAYMENT = 2;
+  // Delivery with Payment: securities are delivered with a cash payment.
+  DELIVERY_WITH_PAYMENT = 3;
+  // Against Payment: settlement is against a cash payment.
+  AGAINST_PAYMENT = 4;
+}
+
+// Specifies whether the transaction is a delivery or a receipt.
+enum DeliveryReceiptType {
+  DELIVERY_RECEIPT_TYPE_UNSPECIFIED = 0;
+  // Delivery of financial instruments.
+  DELIVER = 1;
+  // Receipt of financial instruments.
+  RECEIVE = 2;
+}
+
+// Indicator for partial settlement.
+enum PartialSettlementIndicator {
+  PARTIAL_SETTLEMENT_INDICATOR_UNSPECIFIED = 0;
+  // Partial settlement is allowed.
+  PARTIAL_ALLOWED = 1;
+  // Partial settlement is not allowed.
+  NO_PARTIAL = 2;
+}
+
+// Represents a party involved in the settlement process.
+// Can be an individual, a company, or a financial institution.
+message PartyIdentification {
+  // The primary identifier for the party.
+  oneof party_id {
+    // Business Identifier Code (BIC) of the party.
+    string bic = 1;
+    // Legal Entity Identifier (LEI) of the party.
+    string lei = 2;
+    // A proprietary identifier.
+    ProprietaryId proprietary_id = 3;
+  }
+  // Full legal name of the party.
+  string name = 4;
+  // Address of the party.
+  common.PostalAddress address = 5;
+}
+
+// A proprietary identifier for a party.
+message ProprietaryId {
+  // The identifier itself.
+  string id = 1;
+  // The entity that issued the identifier (e.g., a clearing house).
+  string issuer = 2;
+}
+
+// Represents a securities account.
+message SecuritiesAccount {
+  // The account number.
+  string account_number = 1;
+  // The party that services the account (e.g., custodian).
+  PartyIdentification account_servicer = 2;
+}
+
+// Represents a quantity of a financial instrument, which can be expressed in different ways.
+message QuantityChoice {
+  oneof quantity_type {
+    // Quantity expressed as a number of units.
+    double unit = 1;
+    // Quantity expressed as a nominal value.
+    Money nominal_value = 2;
+    // Quantity expressed as a percentage of a total.
+    double percentage_of_total = 3;
+  }
+}
+
+// Represents the processing status of the settlement instruction.
+message InstructionProcessingStatus {
+  // The overall status code.
+  StatusCode code = 1;
+  // Provides a reason for the status, especially in case of failure or rejection.
+  Reason reason = 2;
+  // Additional narrative information about the status.
+  string additional_reason_information = 3;
+}
+
+// High-level status codes for settlement instructions.
+// Based on ISO 20022 InstructionProcessingStatus1Code.
+enum StatusCode {
+  STATUS_CODE_UNSPECIFIED = 0;
+  // Instruction has been acknowledged by the recipient.
+  ACKNOWLEDGED = 1;
+  // Instruction has been accepted for processing.
+  ACCEPTED = 2;
+  // Instruction is pending, waiting for some condition to be met (e.g., matching).
+  PENDING = 3;
+  // Instruction has been matched with a counterparty instruction.
+  MATCHED = 4;
+  // Instruction has been settled.
+  SETTLED = 5;
+  // Instruction has been rejected.
+  REJECTED = 6;
+  // Instruction has been cancelled.
+  CANCELLED = 7;
+  // Instruction has failed to settle.
+  FAILED = 8;
+}
+
+// Provides a reason for a given status.
+message Reason {
+  oneof reason_type {
+    // A standardized reason code.
+    ReasonCode code = 1;
+    // A proprietary, non-standard reason.
+    ProprietaryReason proprietary = 2;
+  }
+}
+
+// Standardized reason codes for settlement status.
+// Based on ISO 20022 RejectionReason codes and similar standards.
+enum ReasonCode {
+  REASON_CODE_UNSPECIFIED = 0;
+  // Instruction is a duplicate of a previously received instruction.
+  DUPLICATE_INSTRUCTION = 1;
+  // The counterparty's instruction has not been received.
+  UNMATCHED = 2;
+  // Insufficient securities in the account to settle.
+  INSUFFICIENT_SECURITIES = 3;
+  // Insufficient funds in the account to settle.
+  INSUFFICIENT_FUNDS = 4;
+  // The specified safekeeping account is invalid or unknown.
+  INVALID_SAFEKEEPING_ACCOUNT = 5;
+  // The financial instrument identifier is unknown.
+  UNKNOWN_FINANCIAL_INSTRUMENT = 6;
+  // The settlement date is in the past.
+  SETTLEMENT_DATE_IN_PAST = 7;
+  // The instruction was cancelled by the instructing party.
+  CANCELLED_BY_PARTY = 8;
+  // The instruction is not compliant with market practice or regulations.
+  MARKET_PRACTICE_VIOLATION = 9;
+  // The agent is not authorized to perform the action.
+  AGENT_NOT_AUTHORIZED = 10;
+  // Other reason, see additional information.
+  OTHER = 99;
+}
+
+// A proprietary reason code.
+message ProprietaryReason {
+  // The proprietary reason code.
+  string code = 1;
+  // The entity that defines the proprietary code.
+  string issuer = 2;
+}
