@@ -1,0 +1,272 @@
+// Copyright 2024 The Autonomy Architect Ecosystem Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package ontology.audit;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/autonomy-architect/platform/packages/ontology/gen/audit;auditpb";
+option java_package = "com.autonomyarchitect.platform.ontology.audit";
+option java_multiple_files = true;
+
+// AuditLog represents a single, standardized event record within the ecosystem.
+// It is designed to be comprehensive, capturing the "who, what, where, when, and why"
+// of any significant action, from user logins to automated system operations.
+// This schema is a cornerstone of the platform's governance, security, and compliance capabilities.
+message AuditLog {
+  // A unique identifier for this specific log entry (e.g., a UUID).
+  string event_id = 1;
+
+  // The time the event occurred, in UTC.
+  google.protobuf.Timestamp timestamp = 2;
+
+  // The high-level category of the event.
+  EventType event_type = 3;
+
+  // The name of the service or application that generated the event.
+  // e.g., "APP_01_Inference_CostRouter", "APP_37_Governance_AuditTrailEngine"
+  string event_source = 4;
+
+  // The version of this audit log schema.
+  string schema_version = 5;
+
+  // The entity (user, service, system) that initiated the event.
+  Principal principal = 6;
+
+  // Details of the action that was performed.
+  Action action = 7;
+
+  // A list of resources that were affected by the action.
+  repeated Resource resources = 8;
+
+  // Information about how the principal was authenticated.
+  AuthenticationInfo authentication_info = 9;
+
+  // Information about the authorization decision for this action.
+  AuthorizationInfo authorization_info = 10;
+
+  // Network and location information related to the event's origin.
+  NetworkInfo network_info = 11;
+
+  // Context for multi-tenant environments.
+  TenancyInfo tenancy_info = 12;
+
+  // The legal or regulatory jurisdiction under which this action was processed.
+  // This is critical for data residency and compliance. e.g., "EU", "US-CA".
+  string jurisdiction = 13;
+
+  // A unique identifier to correlate related events across different services.
+  string correlation_id = 14;
+
+  // Arbitrary key-value metadata for additional context.
+  // Useful for custom application-specific data that doesn't fit the standard schema.
+  map<string, string> metadata = 15;
+}
+
+// EventType categorizes the audit log entry.
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+
+  // Security and Access
+  USER_LOGIN_SUCCESS = 1;
+  USER_LOGIN_FAILURE = 2;
+  USER_LOGOUT = 3;
+  API_KEY_CREATED = 4;
+  API_KEY_DELETED = 5;
+  API_KEY_USED = 6;
+  PERMISSION_GRANTED = 7;
+  PERMISSION_REVOKED = 8;
+
+  // Data Lifecycle
+  DATA_CREATED = 20;
+  DATA_READ = 21;
+  DATA_UPDATED = 22;
+  DATA_DELETED = 23;
+  DATA_EXPORTED = 24;
+  DATA_IMPORTED = 25;
+
+  // Resource Management
+  RESOURCE_CREATED = 40;
+  RESOURCE_UPDATED = 41;
+  RESOURCE_DELETED = 42;
+  RESOURCE_STATE_CHANGED = 43; // e.g., model deployment status
+
+  // System and Service Calls
+  SERVICE_API_CALL = 60;
+  SYSTEM_CONFIGURATION_CHANGED = 61;
+  POLICY_EVALUATION = 62;
+  WORKFLOW_STARTED = 63;
+  WORKFLOW_COMPLETED = 64;
+  WORKFLOW_FAILED = 65;
+
+  // AI-specific events
+  MODEL_INFERENCE = 80;
+  MODEL_TRAINING_STARTED = 81;
+  MODEL_TRAINING_COMPLETED = 82;
+  MODEL_FINE_TUNE = 83;
+  AGENT_ACTION = 84;
+  SYNTHETIC_DATA_GENERATED = 85;
+  EVALUATION_RUN = 86;
+}
+
+// Principal represents the actor who initiated the event.
+message Principal {
+  // The unique identifier for the principal.
+  string id = 1;
+
+  // The type of the principal.
+  PrincipalType type = 2;
+
+  // For impersonation scenarios, this field captures the original actor.
+  // e.g., An admin acting on behalf of a user.
+  optional Principal impersonator = 3;
+
+  // A list of roles or groups the principal belongs to at the time of the event.
+  repeated string roles = 4;
+}
+
+enum PrincipalType {
+  PRINCIPAL_TYPE_UNSPECIFIED = 0;
+  USER = 1;
+  SERVICE_ACCOUNT = 2;
+  SYSTEM = 3; // An automated, internal system process.
+  ANONYMOUS_USER = 4;
+}
+
+// Action describes the operation that was performed.
+message Action {
+  // The name of the service or component where the action occurred.
+  // e.g., "InferenceGateway", "VectorStoreManager"
+  string service_name = 1;
+
+  // The specific method or function that was invoked.
+  // e.g., "CreateVectorIndex", "RouteInferenceRequest"
+  string method_name = 2;
+
+  // The outcome of the action.
+  ActionStatus status = 3;
+
+  // A more specific status code, e.g., HTTP status code or gRPC status code.
+  int32 status_code = 4;
+
+  // A human-readable message, especially useful for failures.
+  string status_message = 5;
+
+  // The duration of the operation in milliseconds.
+  int64 duration_ms = 6;
+
+  // The request payload or parameters. For security, sensitive fields
+  // should be masked or omitted. Stored as a structured object.
+  google.protobuf.Struct request_payload = 7;
+}
+
+enum ActionStatus {
+  ACTION_STATUS_UNSPECIFIED = 0;
+  SUCCESS = 1;
+  FAILURE = 2;
+  PENDING = 3;
+}
+
+// Resource represents an entity that was affected by the action.
+message Resource {
+  // The unique identifier of the resource.
+  string id = 1;
+
+  // The type of the resource.
+  // e.g., "Model", "Dataset", "ApiKey", "AgentConfiguration"
+  string type = 2;
+
+  // A user-friendly name for the resource.
+  string display_name = 3;
+
+  // A snapshot of the resource's state before the change.
+  // This can be large and should be used judiciously.
+  // Stored as a structured object for queryability.
+  optional google.protobuf.Struct state_before = 4;
+
+  // A snapshot of the resource's state after the change.
+  optional google.protobuf.Struct state_after = 5;
+}
+
+// AuthenticationInfo provides details about how the principal was authenticated.
+message AuthenticationInfo {
+  // The method used for authentication.
+  AuthMethod method = 1;
+
+  // The identity provider that issued the credentials.
+  // e.g., "Google", "Okta", "Internal"
+  string issuer = 2;
+
+  // The identifier of the credential used, e.g., the first few chars of an API key.
+  // Must NOT be the full secret.
+  string credential_id = 3;
+}
+
+enum AuthMethod {
+  AUTH_METHOD_UNSPECIFIED = 0;
+  PASSWORD = 1;
+  API_KEY = 2;
+  OAUTH2_TOKEN = 3;
+  SAML = 4;
+  JWT = 5;
+  INTERNAL_SERVICE_TOKEN = 6; // mTLS or similar
+}
+
+// AuthorizationInfo provides details about the policy decision.
+message AuthorizationInfo {
+  // The authorization decision.
+  AuthorizationDecision decision = 1;
+
+  // The names of the policies that were evaluated to reach the decision.
+  repeated string policies = 2;
+
+  // The reason for the decision, especially for DENIED cases.
+  string reason = 3;
+}
+
+enum AuthorizationDecision {
+  AUTHORIZATION_DECISION_UNSPECIFIED = 0;
+  ALLOWED = 1;
+  DENIED = 2;
+}
+
+// NetworkInfo captures network-related context.
+message NetworkInfo {
+  // The source IP address of the request.
+  string source_ip = 1;
+
+  // The user agent string from the client.
+  string user_agent = 2;
+
+  // Geographic information derived from the source IP.
+  Geolocation geolocation = 3;
+}
+
+message Geolocation {
+  string country_code = 1; // ISO 3166-1 alpha-2
+  string region = 2;
+  string city = 3;
+}
+
+// TenancyInfo provides context for multi-tenant systems.
+message TenancyInfo {
+  // The unique identifier for the tenant.
+  string tenant_id = 1;
+
+  // The unique identifier for the organization, which may contain multiple tenants.
+  string organization_id = 2;
+}
