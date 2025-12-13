@@ -1,0 +1,219 @@
+// Copyright 2024 OCIp Stack Engineering. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+syntax = "proto3";
+
+package ocip.event.v1;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "ocip/common/v1/common.proto";
+import "ocip/event/v1/event_metadata.proto";
+
+option go_package = "github.com/ocip-stack/ocip-go/gen/event/v1;eventv1";
+option java_package = "com.ocip.event.v1";
+option java_multiple_files = true;
+
+// Represents the core Deal entity within the ecosystem.
+// This message is used both as a payload in events and as a standalone data model.
+message Deal {
+  // Unique identifier for the deal, typically a UUID.
+  string deal_id = 1;
+
+  // Human-readable name for the deal.
+  string deal_name = 2;
+
+  // The name of the company associated with the deal.
+  string company_name = 3;
+
+  // The unique identifier for the company in the OCIP ecosystem.
+  string company_id = 4;
+
+  // The current high-level status of the deal.
+  DealStatus status = 5;
+
+  // The current stage of the deal in the pipeline.
+  DealStage stage = 6;
+
+  // The timestamp when the deal was first created.
+  google.protobuf.Timestamp created_at = 7;
+
+  // The timestamp of the last update to the deal.
+  google.protobuf.Timestamp updated_at = 8;
+
+  // The ID of the primary contact person for this deal.
+  string primary_contact_id = 9;
+
+  // A list of internal team member IDs assigned to this deal.
+  repeated string team_member_ids = 10;
+
+  // The proposed or actual investment amount.
+  ocip.common.v1.CurrencyAmount investment_amount = 11;
+
+  // The valuation of the company at the time of the deal.
+  ocip.common.v1.CurrencyAmount valuation = 12;
+
+  // A free-text field describing the source of the deal.
+  // For structured source information, see SourceDetails in DealSourcedEvent.
+  string source_description = 13;
+
+  // A flexible key-value store for any custom data related to the deal.
+  google.protobuf.Struct custom_fields = 14;
+}
+
+// Enumerates the possible high-level statuses of a deal.
+enum DealStatus {
+  DEAL_STATUS_UNSPECIFIED = 0;
+  DEAL_STATUS_PENDING = 1;     // Awaiting initial review or action.
+  DEAL_STATUS_ACTIVE = 2;      // Actively being worked on.
+  DEAL_STATUS_ON_HOLD = 3;     // Temporarily paused.
+  DEAL_STATUS_CLOSED_WON = 4;  // Successfully closed.
+  DEAL_STATUS_CLOSED_LOST = 5; // Lost to a competitor or abandoned.
+  DEAL_STATUS_ARCHIVED = 6;    // No longer active but kept for records.
+}
+
+// Enumerates the distinct stages in a typical deal pipeline.
+enum DealStage {
+  DEAL_STAGE_UNSPECIFIED = 0;
+  DEAL_STAGE_SOURCED = 1;         // Initial entry into the system.
+  DEAL_STAGE_QUALIFIED = 2;       // Initial screening passed.
+  DEAL_STAGE_DUE_DILIGENCE = 3;   // In-depth investigation is underway.
+  DEAL_STAGE_TERM_SHEET = 4;      // A term sheet has been offered or is in negotiation.
+  DEAL_STAGE_CLOSING = 5;         // Final legal and financial steps are being taken.
+  DEAL_STAGE_COMPLETED = 6;       // The deal is finalized and funds have been transferred.
+}
+
+// --- Event Definitions ---
+
+// Event published when a new deal is sourced and enters the system.
+// Event Type: "ocip.deal.sourced.v1"
+message DealSourcedEvent {
+  // Common metadata for all OCIP events.
+  EventMetadata metadata = 1;
+
+  // The full state of the deal at the time of its creation.
+  Deal deal_payload = 2;
+
+  // Structured information about how the deal was sourced.
+  SourceDetails source_details = 3;
+}
+
+// Provides structured data about the origin of a deal.
+message SourceDetails {
+  // The type of source.
+  SourceType type = 1;
+
+  // If the source was a referral, this is the ID of the referrer (e.g., a contact or user).
+  string referral_source_id = 2;
+
+  // If the source was an outbound campaign, this is the campaign's ID.
+  string campaign_id = 3;
+
+  // The ID of the user or system that manually entered the deal.
+  string entered_by_user_id = 4;
+}
+
+// Enumerates the types of deal sources.
+enum SourceType {
+  SOURCE_TYPE_UNSPECIFIED = 0;
+  SOURCE_TYPE_INBOUND_WEB = 1;     // e.g., from a website contact form.
+  SOURCE_TYPE_REFERRAL = 2;        // Referred by a contact or partner.
+  SOURCE_TYPE_OUTBOUND_CAMPAIGN = 3; // From a marketing or sales campaign.
+  SOURCE_TYPE_CONFERENCE = 4;      // Sourced at an industry event.
+  SOURCE_TYPE_MANUAL_ENTRY = 5;    // Manually added by a team member.
+  SOURCE_TYPE_API_INGESTION = 6;   // Ingested from a third-party system.
+}
+
+// Event published after a deal has been processed by an analysis engine.
+// This could be a financial model, a risk assessment AI, or a market analysis tool.
+// Event Type: "ocip.deal.analyzed.v1"
+message DealAnalyzedEvent {
+  // Common metadata for all OCIP events.
+  EventMetadata metadata = 1;
+
+  // The ID of the deal that was analyzed.
+  string deal_id = 2;
+
+  // The results of the analysis.
+  AnalysisResult analysis_result = 3;
+}
+
+// Contains the output of a deal analysis process.
+message AnalysisResult {
+  // Unique identifier for this specific analysis run.
+  string analysis_id = 1;
+
+  // The identifier of the model or system that performed the analysis.
+  // e.g., "ocip-deal-scorer-v2.1-alpha"
+  string model_id_used = 2;
+
+  // A composite score from 0.0 to 1.0 representing the overall quality or potential of the deal.
+  float score = 3;
+
+  // A breakdown of key metrics and their individual scores.
+  map<string, float> key_metrics = 4; // e.g., {"TAM_score": 0.85, "Team_score": 0.92}
+
+  // An AI-generated natural language summary of the analysis.
+  string summary = 5;
+
+  // A list of specific findings, both positive and negative.
+  repeated Finding findings = 6;
+
+  // The timestamp when the analysis was completed.
+  google.protobuf.Timestamp analyzed_at = 7;
+}
+
+// Represents a single, discrete finding from an analysis.
+message Finding {
+  // The category of the finding.
+  FindingType type = 1;
+
+  // A detailed description of the finding.
+  string description = 2;
+
+  // A score from 0.0 to 1.0 indicating the severity or importance of the finding.
+  float impact_score = 3;
+
+  // A list of document or data source IDs that provide evidence for this finding.
+  repeated string evidence_document_ids = 4;
+}
+
+// Enumerates the types of findings from an analysis.
+enum FindingType {
+  FINDING_TYPE_UNSPECIFIED = 0;
+  FINDING_TYPE_STRENGTH = 1;     // A positive attribute.
+  FINDING_TYPE_WEAKNESS = 2;     // A negative attribute.
+  FINDING_TYPE_OPPORTUNITY = 3;  // A potential upside.
+  FINDING_TYPE_RISK = 4;         // A potential downside or threat.
+}
+
+// Event published whenever a deal's status or stage changes.
+// This is a critical event for tracking deal progression and triggering workflows.
+// Event Type: "ocip.deal.status.changed.v1"
+message DealStatusChangedEvent {
+  // Common metadata for all OCIP events.
+  EventMetadata metadata = 1;
+
+  // The ID of the deal that was changed.
+  string deal_id = 2;
+
+  // The status of the deal before the change.
+  DealStatus old_status = 3;
+
+  // The new status of the deal.
+  DealStatus new_status = 4;
+
+  // The stage of the deal before the change.
+  DealStage old_stage = 5;
+
+  // The new stage of the deal.
+  DealStage new_stage = 6;
+
+  // A human-readable reason for the change.
+  // e.g., "Term sheet signed", "Due diligence failed on key financial metric".
+  string reason = 7;
+
+  // The ID of the user or system that initiated the change.
+  string changed_by_actor_id = 8;
+}
