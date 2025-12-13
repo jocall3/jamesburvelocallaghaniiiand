@@ -1,0 +1,295 @@
+// Copyright 2024 Aether Framework Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package aether_ontology.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/aether-framework/schemas/aether_ontology/v1;aether_ontology_v1";
+option java_package = "com.aetherframework.schemas.aether_ontology.v1";
+option java_multiple_files = true;
+
+// =============================================================================
+// Position Schema
+//
+// Defines the core data contract for a "Position," a fundamental concept
+// across the Aether ecosystem. A Position represents a holding of a specific
+// quantity of an instrument by an entity (account).
+//
+// This schema is designed with intentional tensions:
+// - Structure vs. Flexibility: Provides strongly-typed definitions for common
+//   AI/Cloud assets (e.g., DigitalAsset, ModelLicense) while allowing for
+//   unstructured, custom instruments via google.protobuf.Struct. This reflects
+//   the tension between ecosystem-wide standardization and individual app-level
+//   extensibility.
+// - Point-in-Time vs. Ledger: The Position message represents a snapshot, but
+//   its fields (e.g., version, last_transaction_id) hint at an underlying
+//   event-sourced or ledger-based system. This captures the tension between
+//   efficient state retrieval and auditable, immutable history.
+// - Abstraction vs. Concreteness: The generic "Instrument" concept can model
+//   anything from fungible API tokens to non-fungible compute reservations,
+//   abstracting the core logic of ownership and accounting away from the
+//   specifics of the underlying asset.
+// =============================================================================
+
+
+// -----------------------------------------------------------------------------
+// Common Primitives
+// Note: In a real implementation, these would be in a shared `common.proto`.
+// They are included here for self-containment of this file.
+// -----------------------------------------------------------------------------
+
+// AetherUUID represents a universally unique identifier across the ecosystem.
+// It uses a string representation to be compatible with various UUID formats
+// (e.g., UUIDv4, ULID).
+message AetherUUID {
+  string id = 1;
+}
+
+// DecimalValue provides a high-precision representation for financial and
+// quantitative values, avoiding floating-point inaccuracies. It's based on
+// Google's Money type pattern.
+// The value is represented as (units + nanos / 1,000,000,000).
+message DecimalValue {
+  // The whole units of the amount.
+  int64 units = 1;
+
+  // Number of nano (10^-9) units. The value must be between -999,999,999
+  // and +999,999,999 inclusive. If `units` is positive, `nanos` must be
+  // positive or zero. If `units` is zero, `nanos` can be positive, zero, or
+  // negative. If `units` is negative, `nanos` must be negative or zero.
+  // For example, -1.75 is represented as `units`=-1 and `nanos`=-750,000,000.
+  sfixed32 nanos = 2;
+}
+
+
+// -----------------------------------------------------------------------------
+// Enums
+// -----------------------------------------------------------------------------
+
+// PositionStatus defines the lifecycle state of a position.
+enum PositionStatus {
+  POSITION_STATUS_UNSPECIFIED = 0;
+  // The position is active and part of current holdings.
+  POSITION_STATUS_OPEN = 1;
+  // The position has been fully closed out (quantity is zero).
+  POSITION_STATUS_CLOSED = 2;
+  // The position is pending creation or settlement.
+  POSITION_STATUS_PENDING = 3;
+  // The position has been liquidated, possibly due to a margin call or contract expiry.
+  POSITION_STATUS_LIQUIDATED = 4;
+  // The position is in an error state and requires manual intervention.
+  POSITION_STATUS_ERROR = 5;
+}
+
+// PositionSide indicates whether the position is long or short.
+// This is often redundant with the sign of the quantity but provides explicit
+// semantic meaning, which is crucial for financial and risk systems.
+enum PositionSide {
+  POSITION_SIDE_UNSPECIFIED = 0;
+  // A long position, benefiting from an increase in the instrument's value.
+  // Corresponds to a positive quantity.
+  POSITION_SIDE_LONG = 1;
+  // A short position, benefiting from a decrease in the instrument's value.
+  // Corresponds to a negative quantity.
+  POSITION_SIDE_SHORT = 2;
+}
+
+
+// -----------------------------------------------------------------------------
+// Core Position and Supporting Messages
+// -----------------------------------------------------------------------------
+
+// Position represents the holding of a certain quantity of an instrument
+// within a specific account.
+message Position {
+  // Unique identifier for this specific position record.
+  AetherUUID position_id = 1;
+
+  // The version of this position record, used for optimistic concurrency control.
+  // Incremented on every modification.
+  int64 version = 2;
+
+  // The account that holds this position.
+  AetherUUID account_id = 3;
+
+  // The instrument being held.
+  Instrument instrument = 4;
+
+  // The quantity of the instrument held. Can be positive (long) or negative (short).
+  DecimalValue quantity = 5;
+
+  // The explicit side of the position.
+  PositionSide side = 6;
+
+  // The current lifecycle status of the position.
+  PositionStatus status = 7;
+
+  // The cost basis of the position, detailing acquisition costs.
+  CostBasis cost_basis = 8;
+
+  // The most recent valuation of the position.
+  // This may be updated more frequently than the position's quantity.
+  Valuation latest_valuation = 9;
+
+  // Timestamp when the position was first opened.
+  google.protobuf.Timestamp opened_at = 10;
+
+  // Timestamp of the last modification to the position (e.g., quantity change).
+  google.protobuf.Timestamp updated_at = 11;
+
+  // Timestamp when the position was closed (status changed to CLOSED).
+  // This is null for open positions.
+  google.protobuf.Timestamp closed_at = 12;
+
+  // Identifier of the last transaction that modified this position.
+  // Provides a link into a transaction ledger for auditability.
+  AetherUUID last_transaction_id = 13;
+
+  // A flexible key-value map for application-specific metadata.
+  // Example: {"portfolio_id": "pf-123", "strategy": "long-term-hold"}
+  map<string, string> metadata = 14;
+
+  // A structured field for complex, nested metadata that doesn't fit the
+  // simple key-value map.
+  google.protobuf.Struct extended_attributes = 15;
+}
+
+// Instrument defines the asset being held in a position. It is a flexible
+// structure that can represent a wide variety of financial, digital, or
+// abstract assets.
+message Instrument {
+  // Unique identifier for the instrument.
+  AetherUUID instrument_id = 1;
+
+  // A human-readable symbol or ticker for the instrument.
+  // e.g., "OPENAI-GPT4-TOKENS", "AWS-EC2-C5.XLARGE-HOURS", "MODEL-LICENSE-XYZ".
+  string symbol = 2;
+
+  // A detailed description of the instrument.
+  string description = 3;
+
+  // The specific type of the instrument. The `oneof` structure ensures that
+  // an instrument can only be of one type, providing strong typing while
+  // maintaining flexibility.
+  oneof instrument_type {
+    // A fungible digital asset, like API credits or compute time.
+    DigitalAsset digital_asset = 4;
+    // A license to use a specific AI model.
+    ModelLicense model_license = 5;
+    // A reservation for a specific block of compute resources.
+    ComputeReservation compute_reservation = 6;
+    // A lease granting access to a dataset for a period of time.
+    DataLease data_lease = 7;
+    // A catch-all for custom or proprietary instrument types defined by
+    // individual applications within the ecosystem.
+    google.protobuf.Struct custom_instrument = 8;
+  }
+}
+
+// CostBasis tracks the acquisition cost of a position, essential for
+// calculating profit and loss.
+message CostBasis {
+  // The total cost of acquiring the current quantity, in the specified currency.
+  DecimalValue total_cost = 1;
+
+  // The average price paid per unit of the instrument.
+  // average_price = total_cost / quantity
+  DecimalValue average_price = 2;
+
+  // The currency of the cost basis (e.g., "USD", "EUR", "AETHER_CREDITS").
+  string currency = 3;
+}
+
+// Valuation represents a point-in-time market value of a position.
+message Valuation {
+  // The market price per unit of the instrument at the time of valuation.
+  DecimalValue mark_price = 1;
+
+  // The total market value of the position.
+  // market_value = mark_price * quantity
+  DecimalValue market_value = 2;
+
+  // The currency of the valuation.
+  string currency = 3;
+
+  // The timestamp when this valuation was calculated or sourced.
+  google.protobuf.Timestamp valued_at = 4;
+
+  // The source of the valuation data (e.g., "internal-pricer", "api.vendor.com").
+  string source = 5;
+}
+
+
+// -----------------------------------------------------------------------------
+// Specific Instrument Type Definitions
+// -----------------------------------------------------------------------------
+
+// DigitalAsset represents a fungible, countable resource.
+message DigitalAsset {
+  // The provider of the asset (e.g., "openai", "anthropic", "aws").
+  string provider = 1;
+  // The specific type or class of the asset (e.g., "gpt-4-turbo-input-tokens").
+  string asset_class = 2;
+  // The unit of measurement for the asset's quantity (e.g., "tokens", "credits", "seconds").
+  string unit_of_measure = 3;
+}
+
+// ModelLicense represents the right to use a specific AI model.
+// This can be treated as a non-fungible or semi-fungible token.
+message ModelLicense {
+  // The provider of the model.
+  string model_provider = 1;
+  // The name of the model.
+  string model_name = 2;
+  // The specific version of the model.
+  string model_version = 3;
+  // A URI pointing to the detailed terms and conditions of the license.
+  string license_terms_uri = 4;
+  // The expiration date of the license, if applicable.
+  google.protobuf.Timestamp expires_at = 5;
+}
+
+// ComputeReservation represents a reserved block of computing resources.
+message ComputeReservation {
+  // The cloud or infrastructure provider.
+  string provider = 1;
+  // The geographical region of the reserved resources.
+  string region = 2;
+  // The specific type of instance or hardware (e.g., "nvidia-h100-80gb", "gcp-tpu-v5").
+  string instance_type = 3;
+  // The start time of the reservation.
+  google.protobuf.Timestamp start_time = 4;
+  // The end time of the reservation.
+  google.protobuf.Timestamp end_time = 5;
+  // The provider-specific ID for the reservation.
+  string reservation_id = 6;
+}
+
+// DataLease represents the right to access or use a dataset for a defined period.
+message DataLease {
+  // The Aether-native unique identifier for the dataset.
+  AetherUUID dataset_id = 1;
+  // The provider or owner of the dataset.
+  string provider = 2;
+  // The start date of the lease.
+  google.protobuf.Timestamp start_date = 3;
+  // The end date of the lease.
+  google.protobuf.Timestamp end_date = 4;
+  // A URI pointing to the data usage agreement or terms.
+  string usage_terms_uri = 5;
+}
