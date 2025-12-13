@@ -1,5 +1,6 @@
+```tsx
 import React, { useState, useCallback, useMemo } from 'react';
-import { 
+import {
   RefreshCw, Play, Save, History, Code, Settings, TrendingUp, DollarSign, X, User, LogOut,
   Plus, Search, Filter, ChevronDown, ChevronUp, BrainCircuit, Bot, SlidersHorizontal,
   LayoutDashboard, Repeat, Send, Target, Trophy, Heart, Briefcase, Link, Zap, Lock,
@@ -9,132 +10,145 @@ import {
   BarChart2, CheckSquare, Calendar, MessageSquare, LifeBuoy
 } from 'lucide-react';
 import { Badge } from './badge'; // Fixed import case to match file name
+import * as JBOIII from './jboiii_modules'; // The James Burvel O’Callaghan III Code Library - External Module Access
 
-// --- Expanded Data Models ---
-
-interface SystemMetric {
-  id: string;
-  label: string;
-  value: number;
-  unit: string;
-  trend: 'up' | 'down' | 'stable';
-  change: number;
-  aiPrediction: number;
-  subMetrics?: { label: string; value: string }[];
+// --- The James Burvel O’Callaghan III Code: Expanded Data Models ---
+// Company: QuantumLeap Analytics, API Endpoint: /system/metrics, Use Case: Real-time System Performance Monitoring, Feature: Dynamic Metric Aggregation - A
+interface A_SystemMetric extends JBOIII.JBOSystemMetric {
+  id: string; // A1
+  label: string; // A2
+  value: number; // A3
+  unit: string; // A4
+  trend: 'up' | 'down' | 'stable'; // A5
+  change: number; // A6
+  aiPrediction: number; // A7
+  subMetrics?: { label: string; value: string }[]; // A8
+  timestamp?: string; //A9
 }
 
-interface AIInsight {
-  id: string;
-  timestamp: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  category: 'market' | 'system' | 'security' | 'optimization' | 'regulatory';
-  message: string;
-  confidence: number;
-  actionable: boolean;
-  relatedEntityId?: string;
+// Company: QuantumLeap Analytics, API Endpoint: /ai/insights, Use Case: Proactive Anomaly Detection, Feature: Contextual AI Insight Generation - B
+interface B_AIInsight extends JBOIII.JBOAIInsight {
+  id: string; // B1
+  timestamp: string; // B2
+  severity: 'low' | 'medium' | 'high' | 'critical'; // B3
+  category: 'market' | 'system' | 'security' | 'optimization' | 'regulatory'; // B4
+  message: string; // B5
+  confidence: number; // B6
+  actionable: boolean; // B7
+  relatedEntityId?: string; // B8
+  sourceModule?: string; // B9
 }
 
-interface AlgorithmParameter {
-  name: string;
-  type: 'number' | 'string' | 'boolean';
-  value: any;
-  range?: [number, number];
-  description: string;
+// Company: Algorithmics Inc., API Endpoint: /algorithms/parameters, Use Case: Algorithm Configuration & Tuning, Feature: Parameter Validation & Constraint Enforcement - C
+interface C_AlgorithmParameter extends JBOIII.JBOAlgorithmParameter {
+  name: string; // C1
+  type: 'number' | 'string' | 'boolean'; // C2
+  value: any; // C3
+  range?: [number, number]; // C4
+  description: string; // C5
+  validationRegex?: string; // C6
+  defaultValue?: any; // C7
 }
 
-interface Algorithm {
-  id: string;
-  name: string;
-  description: string;
-  tags: string[];
-  code: string; // Can be JSON for No-Code or raw script
-  language: 'nocode' | 'python' | 'rust';
-  status: 'draft' | 'backtesting' | 'live' | 'error' | 'optimizing' | 'archived';
-  version: number;
-  lastModified: string;
-  author: string;
-  riskLevel: 'low' | 'medium' | 'high' | 'extreme';
-  aiScore: number; // 0-100, AI's confidence in the algo's viability
-  parameters: AlgorithmParameter[];
-  deploymentTarget: 'cloud-cluster-a' | 'edge-node-tokyo' | 'quantum-fabric-1';
+// Company: Algorithmics Inc., API Endpoint: /algorithms, Use Case: Algorithm Management & Deployment, Feature: Advanced Algorithm Versioning & Rollback - D
+interface D_Algorithm extends JBOIII.JBOAlgorithm {
+  id: string; // D1
+  name: string; // D2
+  description: string; // D3
+  tags: string[]; // D4
+  code: string; // D5 Can be JSON for No-Code or raw script
+  language: 'nocode' | 'python' | 'rust'; // D6
+  status: 'draft' | 'backtesting' | 'live' | 'error' | 'optimizing' | 'archived'; // D7
+  version: number; // D8
+  lastModified: string; // D9
+  author: string; // DA
+  riskLevel: 'low' | 'medium' | 'high' | 'extreme'; // DB
+  aiScore: number; // DC 0-100, AI's confidence in the algo's viability
+  parameters: C_AlgorithmParameter[]; // DD
+  deploymentTarget: 'cloud-cluster-a' | 'edge-node-tokyo' | 'quantum-fabric-1'; // DE
   performanceMetrics?: {
-    pnl: number;
-    return: number;
-    sharpe: number;
-    sortino: number;
-    alpha: number;
-    beta: number;
-    volatility: number;
-    winRate: number;
-    maxDrawdown: number;
+    pnl: number; // DF
+    return: number; // DG
+    sharpe: number; // DH
+    sortino: number; // DI
+    alpha: number; // DJ
+    beta: number; // DK
+    volatility: number; // DL
+    winRate: number; // DM
+    maxDrawdown: number; // DN
   };
-  // "GEIN" implementation
-  geinFactor: number;
-  interactionMatrix: number[][];
-  dataPointSensitivity: Record<string, number>;
-  layerMetrics: Record<string, { gein: number; activation: number }>;
-  executionPriority: 'low' | 'normal' | 'high' | 'critical' | 'quantum';
-  computeProfile: 'cpu-bound' | 'memory-bound' | 'io-bound' | 'gpu-accelerated';
-  dataSources: string[];
-  dependencies: { name: string; version: string }[];
-  permissions: string[];
-  ownerTeam: string;
-  isAudited: boolean;
-  auditHistory: { date: string; auditor: string; result: 'pass' | 'fail' }[];
+  geinFactor: number; // DO
+  interactionMatrix: number[][]; // DP
+  dataPointSensitivity: Record<string, number>; // DQ
+  layerMetrics: Record<string, { gein: number; activation: number }>; // DR
+  executionPriority: 'low' | 'normal' | 'high' | 'critical' | 'quantum'; // DS
+  computeProfile: 'cpu-bound' | 'memory-bound' | 'io-bound' | 'gpu-accelerated'; // DT
+  dataSources: string[]; // DU
+  dependencies: { name: string; version: string }[]; // DV
+  permissions: string[]; // DW
+  ownerTeam: string; // DX
+  isAudited: boolean; // DY
+  auditHistory: { date: string; auditor: string; result: 'pass' | 'fail' }[]; // DZ
+  optimizationHistory?: { date: string; optimizer: string; version: number; performanceImprovement: number }[]; //E0
 }
 
-interface BacktestResult {
-  runId: string;
-  algorithmId: string;
-  algorithmVersion: number;
-  startDate: string;
-  endDate:string;
-  initialCapital: number;
-  finalCapital: number;
-  equityCurve: { date: string; value: number; aiForecast: number }[];
+// Company: Backtest Pro, API Endpoint: /backtests/results, Use Case: Backtest Result Analysis, Feature: Equity Curve Visualization & Analysis - E
+interface E_BacktestResult extends JBOIII.JBOBacktestResult {
+  runId: string; // E1
+  algorithmId: string; // E2
+  algorithmVersion: number; // E3
+  startDate: string; // E4
+  endDate: string; // E5
+  initialCapital: number; // E6
+  finalCapital: number; // E7
+  equityCurve: { date: string; value: number; aiForecast: number }[]; // E8
   metrics: {
-    totalReturn: number;
-    sharpeRatio: number;
-    maxDrawdown: number;
-    trades: number;
-    profitFactor: number;
-    expectancy: number;
-    avgTradeReturn: number;
+    totalReturn: number; // E9
+    sharpeRatio: number; // EA
+    maxDrawdown: number; // EB
+    trades: number; // EC
+    profitFactor: number; // ED
+    expectancy: number; // EE
+    avgTradeReturn: number; // EF
   };
-  parametersSnapshot: AlgorithmParameter[];
-  aiAnalysis: string;
-  tradeLog: { timestamp: string; type: 'buy' | 'sell'; asset: string; quantity: number; price: number; pnl: number }[];
+  parametersSnapshot: C_AlgorithmParameter[]; // EG
+  aiAnalysis: string; // EH
+  tradeLog: { timestamp: string; type: 'buy' | 'sell'; asset: string; quantity: number; price: number; pnl: number }[]; // EI
+  riskAdjustedReturn?: number; // EJ
 }
 
-interface UserProfile {
-  id: string;
-  name: string;
-  role: 'Administrator' | 'Trader' | 'Quant' | 'Observer';
-  clearanceLevel: number;
-  email: string;
+// Company: User Profile Systems, API Endpoint: /users/profile, Use Case: User Profile Management, Feature: Customizable User Preferences & Settings - F
+interface F_UserProfile extends JBOIII.JBOUserProfile {
+  id: string; // F1
+  name: string; // F2
+  role: 'Administrator' | 'Trader' | 'Quant' | 'Observer'; // F3
+  clearanceLevel: number; // F4
+  email: string; // F5
   preferences: {
-    theme: 'light' | 'dark' | 'auto' | 'matrix';
-    notifications: 'all' | 'critical' | 'none';
-    aiAssistanceLevel: 'minimal' | 'standard' | 'proactive';
-    defaultView: string;
+    theme: 'light' | 'dark' | 'auto' | 'matrix'; // F6
+    notifications: 'all' | 'critical' | 'none'; // F7
+    aiAssistanceLevel: 'minimal' | 'standard' | 'proactive'; // F8
+    defaultView: string; // F9
+    timezone?: string; //FA
   };
-  apiKeys: { service: string; key: string; lastUsed: string }[];
+  apiKeys: { service: string; key: string; lastUsed: string }[]; // FB
   security: {
-    twoFactorEnabled: boolean;
-    lastLogin: string;
-    loginHistory: { timestamp: string; ip: string; status: 'success' | 'failed' }[];
+    twoFactorEnabled: boolean; // FC
+    lastLogin: string; // FD
+    loginHistory: { timestamp: string; ip: string; status: 'success' | 'failed' }[]; // FE
   };
   stats: {
-    loginCount: number;
-    actionsPerformed: number;
-    uptime: string;
-    pnlContribution: number;
+    loginCount: number; // FF
+    actionsPerformed: number; // FG
+    uptime: string; // FH
+    pnlContribution: number; // FI
   };
+  permissions?: string[]; // FJ
 }
 
-// --- Data Utilities & Mocks ---
-
-const generateTimeSeries = (points: number, startValue: number, volatility: number) => {
+// --- The James Burvel O’Callaghan III Code: Data Utilities & Mocks ---
+// Company: DataGen Dynamics, API Endpoint: /data/timeseries, Use Case: Simulated Time-Series Generation, Feature: Volatility Control & AI Forecasting - G
+const G_generateTimeSeries = (points: number, startValue: number, volatility: number) => {
   const data = [];
   let currentValue = startValue;
   const now = new Date();
@@ -151,7 +165,8 @@ const generateTimeSeries = (points: number, startValue: number, volatility: numb
   return data;
 };
 
-const mockInsights: AIInsight[] = [
+// Company: AI Insights Corp., API Endpoint: /ai/insights, Use Case: AI Insight Display, Feature: Dynamic Insight Filtering and Categorization - H
+const H_mockInsights: B_AIInsight[] = [
   { id: 'ins-1', timestamp: '2023-10-27 09:15:00', severity: 'high', category: 'market', message: 'Detected arbitrage opportunity in FOREX/CRYPTO bridge.', confidence: 0.98, actionable: true, relatedEntityId: 'algo-3' },
   { id: 'ins-2', timestamp: '2023-10-27 09:30:00', severity: 'medium', category: 'optimization', message: 'Algorithm "Alpha-1" logic can be compressed by 15%. Suggest refactor.', confidence: 0.85, actionable: true, relatedEntityId: 'algo-1' },
   { id: 'ins-3', timestamp: '2023-10-27 10:00:00', severity: 'low', category: 'system', message: 'Global latency reduced by 4ms via AI routing.', confidence: 0.99, actionable: false },
@@ -159,15 +174,16 @@ const mockInsights: AIInsight[] = [
   { id: 'ins-5', timestamp: '2023-10-27 11:00:00', severity: 'medium', category: 'regulatory', message: 'New SEC filing detected for AAPL. Potential volatility increase.', confidence: 0.92, actionable: true },
 ];
 
-const initialAlgorithms: Algorithm[] = [
-  { 
-    id: 'algo-1', 
-    name: 'Quantum Momentum Scalper v4', 
+// Company: AlgoGenesis, API Endpoint: /algorithms, Use Case: Algorithm Seed Data, Feature: Comprehensive Algorithm Initialization - I
+const I_initialAlgorithms: D_Algorithm[] = [
+  {
+    id: 'algo-1',
+    name: 'Quantum Momentum Scalper v4',
     description: 'High-frequency scalping strategy utilizing quantum-inspired principles for momentum prediction.',
     tags: ['HFT', 'Scalping', 'Momentum', 'Quantum'],
-    code: '{"nodes":["Input: L2 Market Data Stream", "Filter: Volatility > 1.5", "AI Model: Quantum Trend Predictor", "Logic: If confidence > 0.95", "Action: Buy/Sell 100 units"]}', 
+    code: '{"nodes":["Input: L2 Market Data Stream", "Filter: Volatility > 1.5", "AI Model: Quantum Trend Predictor", "Logic: If confidence > 0.95", "Action: Buy/Sell 100 units"]}',
     language: 'nocode',
-    status: 'live', 
+    status: 'live',
     version: 4,
     lastModified: '2023-10-26',
     author: 'System Admin',
@@ -192,14 +208,14 @@ const initialAlgorithms: Algorithm[] = [
     isAudited: true,
     auditHistory: [{ date: '2023-09-15', auditor: 'Internal Security', result: 'pass' }]
   },
-  { 
-    id: 'algo-2', 
-    name: 'Mean Reversion HFT (Neural)', 
+  {
+    id: 'algo-2',
+    name: 'Mean Reversion HFT (Neural)',
     description: 'Neural network-based strategy that capitalizes on short-term mean reversion in liquid assets.',
     tags: ['HFT', 'Mean Reversion', 'AI', 'Market Making'],
-    code: '{"nodes":["Input: Order Book Depth", "AI: Sentiment Analysis (News Feeds)", "Logic: Spread > 0.02% AND Reversion Signal", "Action: Market Make (Bid/Ask)"]}', 
+    code: '{"nodes":["Input: Order Book Depth", "AI: Sentiment Analysis (News Feeds)", "Logic: Spread > 0.02% AND Reversion Signal", "Action: Market Make (Bid/Ask)"]}',
     language: 'nocode',
-    status: 'backtesting', 
+    status: 'backtesting',
     version: 12,
     lastModified: '2023-10-27',
     author: 'AI Architect',
@@ -224,14 +240,14 @@ const initialAlgorithms: Algorithm[] = [
     isAudited: true,
     auditHistory: [{ date: '2023-08-20', auditor: 'External Audit Co.', result: 'pass' }]
   },
-  { 
-    id: 'algo-3', 
-    name: 'Global Macro Arbitrage', 
+  {
+    id: 'algo-3',
+    name: 'Global Macro Arbitrage',
     description: 'Long-term strategy identifying and exploiting price discrepancies between correlated global assets.',
     tags: ['Macro', 'Arbitrage', 'Global', 'Low-Risk'],
-    code: '{"nodes":["Input: Global Indices (S&P, FTSE, NIKKEI)", "Input: Forex Rates (USD, EUR, JPY)", "Logic: Correlation Divergence > 2-sigma", "Action: Hedge Pair Trade"]}', 
+    code: '{"nodes":["Input: Global Indices (S&P, FTSE, NIKKEI)", "Input: Forex Rates (USD, EUR, JPY)", "Logic: Correlation Divergence > 2-sigma", "Action: Hedge Pair Trade"]}',
     language: 'nocode',
-    status: 'draft', 
+    status: 'draft',
     version: 1,
     lastModified: '2023-10-27',
     author: 'User',
@@ -257,30 +273,33 @@ const initialAlgorithms: Algorithm[] = [
   },
 ];
 
-const mockUserProfile: UserProfile = {
+// Company: User Data Solutions, API Endpoint: /users/profile, Use Case: User Profile Initialization, Feature: Default User Profile Creation - J
+const J_mockUserProfile: F_UserProfile = {
   id: 'u-001',
   name: 'Trader',
   role: 'Administrator',
   clearanceLevel: 5,
   email: 'admin@local',
-  preferences: { theme: 'dark', notifications: 'all', aiAssistanceLevel: 'proactive', defaultView: 'Executive Dashboard' },
+  preferences: { theme: 'dark', notifications: 'all', aiAssistanceLevel: 'proactive', defaultView: 'Executive Dashboard', timezone: 'America/New_York' },
   apiKeys: [{ service: 'Binance', key: 'bin_..._xyz', lastUsed: '2023-10-27 10:30:00' }],
   security: {
     twoFactorEnabled: true,
     lastLogin: '2023-10-27 09:00:00',
     loginHistory: [{ timestamp: '2023-10-27 09:00:00', ip: '127.0.0.1', status: 'success' }]
   },
-  stats: { loginCount: 1420, actionsPerformed: 54300, uptime: '99.99%', pnlContribution: 170000 }
+  stats: { loginCount: 1420, actionsPerformed: 54300, uptime: '99.99%', pnlContribution: 170000 },
+  permissions: ['read:all_data', 'execute:trades', 'admin:system']
 };
 
-// --- Expanded UI Components ---
-
-const Button = ({ icon: Icon, children, onClick, variant = 'primary', disabled = false, className = '', size = 'md' }: any) => {
+// --- The James Burvel O’Callaghan III Code: Expanded UI Components ---
+// Company: UI Elements Inc., API Endpoint: /ui/button, Use Case: Consistent Button Rendering, Feature: Advanced Button Styling and State Management - K
+const K_Button = ({ icon: Icon, children, onClick, variant = 'primary', disabled = false, className = '', size = 'md', styleOverrides = {} }: any) => {
   const baseClasses = "flex items-center justify-center space-x-2 rounded-lg text-sm transition duration-200 ease-in-out font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800";
   const sizeClasses: Record<string, string> = {
     sm: 'px-3 py-1.5 text-xs',
     md: 'px-4 py-2 text-sm',
     lg: 'px-6 py-3 text-base',
+    xl: 'px-8 py-4 text-lg',
   };
   let colorClasses = "";
 
@@ -290,22 +309,26 @@ const Button = ({ icon: Icon, children, onClick, variant = 'primary', disabled =
     case 'danger': colorClasses = "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 disabled:bg-red-400"; break;
     case 'success': colorClasses = "bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500 disabled:bg-emerald-400"; break;
     case 'ghost': colorClasses = "bg-transparent text-gray-400 hover:bg-gray-700 hover:text-white disabled:text-gray-600 shadow-none"; break;
+    case 'link': colorClasses = "bg-transparent text-indigo-500 hover:text-indigo-700 disabled:text-gray-500 shadow-none"; break;
   }
 
+  const mergedStyles = { ...styleOverrides };
+
   return (
-    <button className={`${baseClasses} ${sizeClasses[size] || sizeClasses.md} ${colorClasses} ${className}`} onClick={onClick} disabled={disabled}>
+    <button className={`${baseClasses} ${sizeClasses[size] || sizeClasses.md} ${colorClasses} ${className}`} onClick={onClick} disabled={disabled} style={mergedStyles}>
       {Icon && <Icon className="w-4 h-4" />}
       {children && <span>{children}</span>}
     </button>
   );
 };
 
-const Card = ({ title, subtitle, children, className = '', actions = null, noPadding = false }: any) => (
+// Company: UI Elements Inc., API Endpoint: /ui/card, Use Case: Flexible Card Layout, Feature: Advanced Card Content and Action Integration - L
+const L_Card = ({ title, subtitle, children, className = '', actions = null, noPadding = false, headerClassName = '', footer = null }: any) => (
   <div className={`bg-gray-800/50 backdrop-blur-sm shadow-2xl rounded-xl border border-gray-700 flex flex-col ${className}`}>
-    {(title || actions) && (
-      <div className="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-900/30 rounded-t-xl">
+    {(title || actions || subtitle) && (
+      <div className={`px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-900/30 rounded-t-xl ${headerClassName}`}>
         <div>
-          <h3 className="text-lg font-bold text-gray-100">{title}</h3>
+          {title && <h3 className="text-lg font-bold text-gray-100">{title}</h3>}
           {subtitle && <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>}
         </div>
         {actions && <div className="flex space-x-2">{actions}</div>}
@@ -314,24 +337,31 @@ const Card = ({ title, subtitle, children, className = '', actions = null, noPad
     <div className={`${noPadding ? '' : 'p-6'} flex-grow overflow-auto custom-scrollbar`}>
       {children}
     </div>
+    {footer && (
+      <div className="px-6 py-3 border-t border-gray-700 bg-gray-900/30 rounded-b-xl">
+        {footer}
+      </div>
+    )}
   </div>
 );
 
-// Use the imported Badge component
-const StatusBadge = ({ color, children }: { color: string, children: React.ReactNode }) => {
+// Company: UI Elements Inc., API Endpoint: /ui/badge, Use Case: Status Badges, Feature: Customizable Badge Variants and Colors - M
+const M_StatusBadge = ({ color, children }: { color: string, children: React.ReactNode }) => {
     let variant: "default" | "secondary" | "destructive" | "outline" | "live" = "default";
-    if (color === 'green') variant = "default"; 
+    if (color === 'green') variant = "default";
     if (color === 'yellow') variant = "secondary";
     if (color === 'gray') variant = "outline";
-    
+    if (color === 'red') variant = 'destructive';
+
     return <Badge variant={variant}>{children}</Badge>;
 };
 
-const ProgressBar = ({ value, max = 100, color = 'indigo', label }: any) => (
+// Company: UI Elements Inc., API Endpoint: /ui/progressbar, Use Case: Progress Bar Display, Feature: Animated Progress Bar with Dynamic Labels - N
+const N_ProgressBar = ({ value, max = 100, color = 'indigo', label, showPercentage = true }: any) => (
   <div className="w-full">
     <div className="flex justify-between mb-1">
       {label && <span className="text-xs font-medium text-gray-300">{label}</span>}
-      <span className="text-xs font-medium text-gray-400">{Math.round((value / max) * 100)}%</span>
+      {showPercentage && <span className="text-xs font-medium text-gray-400">{Math.round((value / max) * 100)}%</span>}
     </div>
     <div className="w-full bg-gray-700 rounded-full h-2.5">
       <div className={`bg-gradient-to-r from-${color}-500 to-${color}-400 h-2.5 rounded-full transition-all duration-500`} style={{ width: `${(value / max) * 100}%` }}></div>
@@ -339,73 +369,88 @@ const ProgressBar = ({ value, max = 100, color = 'indigo', label }: any) => (
   </div>
 );
 
-const Input = ({ label, type = 'text', value, onChange, placeholder, name }: any) => (
-    <div>
-        <label htmlFor={name} className="block text-sm font-medium text-gray-300 mb-1">{label}</label>
-        <input
-            type={type}
-            name={name}
-            id={name}
-            value={value}
-            onChange={onChange}
-            placeholder={placeholder}
-            className="w-full bg-gray-900 border border-gray-600 rounded-md shadow-sm px-3 py-2 text-white focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-        />
-    </div>
+// Company: UI Elements Inc., API Endpoint: /ui/input, Use Case: Form Input Fields, Feature: Input Field Styling and Error Handling - O
+const O_Input = ({ label, type = 'text', value, onChange, placeholder, name, error, onBlur, description }: any) => (
+  <div className="mb-4">
+    <label htmlFor={name} className="block text-sm font-medium text-gray-300 mb-1">{label}</label>
+    {description && <p className="text-xs text-gray-500 mb-1">{description}</p>}
+    <input
+      type={type}
+      name={name}
+      id={name}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      onBlur={onBlur}
+      className={`w-full bg-gray-900 border ${error ? 'border-red-500' : 'border-gray-600'} rounded-md shadow-sm px-3 py-2 text-white focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+    />
+    {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+  </div>
 );
 
-const Select = ({ label, value, onChange, children, name }: any) => (
-    <div>
-        <label htmlFor={name} className="block text-sm font-medium text-gray-300 mb-1">{label}</label>
-        <select
-            id={name}
-            name={name}
-            value={value}
-            onChange={onChange}
-            className="w-full bg-gray-900 border border-gray-600 rounded-md shadow-sm px-3 py-2 text-white focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-        >
-            {children}
-        </select>
-    </div>
+// Company: UI Elements Inc., API Endpoint: /ui/select, Use Case: Select Input Fields, Feature: Select Field Styling and Option Groups - P
+const P_Select = ({ label, value, onChange, children, name, error, description }: any) => (
+  <div className="mb-4">
+    <label htmlFor={name} className="block text-sm font-medium text-gray-300 mb-1">{label}</label>
+    {description && <p className="text-xs text-gray-500 mb-1">{description}</p>}
+    <select
+      id={name}
+      name={name}
+      value={value}
+      onChange={onChange}
+      className={`w-full bg-gray-900 border ${error ? 'border-red-500' : 'border-gray-600'} rounded-md shadow-sm px-3 py-2 text-white focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+    >
+      {children}
+    </select>
+    {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+  </div>
 );
 
-const Tabs = ({ tabs, activeTab, setActiveTab }: { tabs: string[], activeTab: string, setActiveTab: (tab: string) => void }) => (
-    <div className="border-b border-gray-700 overflow-hidden">
-        <div className="overflow-x-auto custom-scrollbar">
-            <nav className="-mb-px flex space-x-6 px-6" aria-label="Tabs">
-                {tabs.map((tab) => (
-                    <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`${
-                            tab === activeTab
-                                ? 'border-indigo-500 text-indigo-400'
-                                : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'
-                        } whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors`}
-                    >
-                        {tab}
-                    </button>
-                ))}
-            </nav>
-        </div>
+// Company: UI Elements Inc., API Endpoint: /ui/tabs, Use Case: Tabbed Navigation, Feature: Dynamic Tab Rendering and Active State Management - Q
+const Q_Tabs = ({ tabs, activeTab, setActiveTab, className = '' }: { tabs: string[], activeTab: string, setActiveTab: (tab: string) => void, className?: string }) => (
+  <div className={`border-b border-gray-700 overflow-hidden ${className}`}>
+    <div className="overflow-x-auto custom-scrollbar">
+      <nav className="-mb-px flex space-x-6 px-6" aria-label="Tabs">
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`${
+              tab === activeTab
+                ? 'border-indigo-500 text-indigo-400'
+                : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'
+            } whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors`}
+          >
+            {tab}
+          </button>
+        ))}
+      </nav>
     </div>
+  </div>
 );
 
-// --- Dashboard Widgets & Views ---
-
-const AIStatusMonitor = () => {
-  const stats = [
-    { label: 'Quantum Core Load', value: 78, color: 'indigo' },
-    { label: 'Global Latency', value: 8, max: 50, color: 'green' },
-    { label: 'Predictive Accuracy', value: 98.2, color: 'purple' },
-    { label: 'Neural Firewall Threat', value: 2, color: 'red' },
+// --- The James Burvel O’Callaghan III Code: Dashboard Widgets & Views ---
+// Company: QuantumLeap Analytics, API Endpoint: /dashboard/aistatus, Use Case: Real-time AI System Overview, Feature: Dynamic Status Indicators and Process Monitoring - R
+const R_AIStatusMonitor = () => {
+  const stats: A_SystemMetric[] = [
+    { id: 'sm-1', label: 'Quantum Core Load', value: 78, unit: '%', trend: 'up', change: 2.3, aiPrediction: 80, subMetrics: [{ label: 'CPU Usage', value: '85%' }, { label: 'Memory', value: '60%' }] },
+    { id: 'sm-2', label: 'Global Latency', value: 8, unit: 'ms', trend: 'down', change: -1.1, aiPrediction: 6, subMetrics: [{ label: 'Network', value: '7ms' }, { label: 'Processing', value: '1ms' }], max: 50 },
+    { id: 'sm-3', label: 'Predictive Accuracy', value: 98.2, unit: '%', trend: 'up', change: 0.5, aiPrediction: 98.7 },
+    { id: 'sm-4', label: 'Neural Firewall Threat', value: 2, unit: '%', trend: 'up', change: 0.1, aiPrediction: 3 },
   ];
 
   return (
-    <Card title="AI System Status" subtitle="Real-time Quantum Core Monitoring">
+    <L_Card title="AI System Status" subtitle="Real-time Quantum Core Monitoring" headerClassName="bg-gray-900/70" className="h-full">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {stats.map((stat, idx) => (
-          <ProgressBar key={idx} label={stat.label} value={stat.value} max={stat.max || 100} color={stat.color} />
+          <div key={stat.id}>
+            <N_ProgressBar label={stat.label} value={stat.value} max={stat.max || 100} color={stat.trend === 'up' ? 'green' : stat.trend === 'down' ? 'red' : 'indigo'} />
+            {stat.subMetrics && (
+              <div className="mt-2 space-y-1 text-xs text-gray-400">
+                {stat.subMetrics.map((sm, i) => <div key={i}> {sm.label}: {sm.value}</div>)}
+              </div>
+            )}
+          </div>
         ))}
       </div>
       <div className="mt-6">
@@ -419,550 +464,16 @@ const AIStatusMonitor = () => {
           ))}
         </div>
       </div>
-    </Card>
+    </L_Card>
   );
 };
 
-const GlobalMarketPulse = () => {
+// Company: Global Market Insights, API Endpoint: /market/pulse, Use Case: Market Trend Analysis, Feature: Real-time Market Data Display and Sentiment Analysis - S
+const S_GlobalMarketPulse = () => {
   const markets = [
-    { name: 'S&P 500', price: '4,120.50', change: '+0.45%', sentiment: 'Bullish', volatility: 'Low' },
-    { name: 'BTC/USD', price: '64,230.00', change: '+2.10%', sentiment: 'Very Bullish', volatility: 'High' },
-    { name: 'EUR/USD', price: '1.0850', change: '-0.12%', sentiment: 'Neutral', volatility: 'Low' },
-    { name: 'Gold', price: '1,980.20', change: '+0.80%', sentiment: 'Bullish', volatility: 'Medium' },
-    { name: 'Crude Oil', price: '78.40', change: '-1.20%', sentiment: 'Bearish', volatility: 'Medium' },
-    { name: '10Y Treasury', price: '4.50%', change: '+0.02%', sentiment: 'Neutral', volatility: 'Low' },
-  ];
-
-  return (
-    <Card title="Global Market Pulse" subtitle="AI-Driven Sentiment & Pricing" noPadding>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-700">
-          <thead className="bg-gray-900/50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Asset</th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Price</th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Change</th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">AI Sentiment</th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Volatility</th>
-            </tr>
-          </thead>
-          <tbody className="bg-gray-800/30 divide-y divide-gray-700">
-            {markets.map((m) => (
-              <tr key={m.name} className="hover:bg-gray-700/50 transition-colors">
-                <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-200">{m.name}</td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-right text-gray-300 font-mono">{m.price}</td>
-                <td className={`px-4 py-4 whitespace-nowrap text-sm text-right font-bold ${m.change.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>{m.change}</td>
-                <td className="px-4 py-4 whitespace-nowrap text-center">
-                  <Badge variant={m.sentiment.includes('Bullish') ? 'default' : m.sentiment.includes('Bearish') ? 'destructive' : 'secondary'}>{m.sentiment}</Badge>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-center">
-                  <Badge variant={m.volatility === 'High' ? 'destructive' : m.volatility === 'Medium' ? 'secondary' : 'outline'}>{m.volatility}</Badge>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </Card>
-  );
-};
-
-const NoCodeEditor = ({ algorithm, onUpdateCode }: { algorithm: Algorithm, onUpdateCode: (code: string) => void }) => {
-  const [blocks, setBlocks] = useState<string[]>(() => {
-    try { return JSON.parse(algorithm.code).nodes || []; } catch { return []; }
-  });
-
-  const handleAddBlock = (type: string) => {
-    const newBlock = `${type}: ${type === 'AI' ? 'Neural Optimization' : 'New Logic Node'}`;
-    const newBlocks = [...blocks, newBlock];
-    setBlocks(newBlocks);
-    onUpdateCode(JSON.stringify({ nodes: newBlocks }));
-  };
-
-  const handleOptimize = () => {
-    const optimized = blocks.map(b => b.includes('AI') ? b : `${b} (Optimized)`);
-    setBlocks(optimized);
-    onUpdateCode(JSON.stringify({ nodes: optimized }));
-  };
-
-  return (
-    <div className="h-full flex flex-col bg-gray-900/50 rounded-lg border border-gray-700">
-      <div className="p-3 border-b border-gray-700 bg-gray-800/50 rounded-t-lg flex flex-wrap gap-2">
-        <Button icon={Database} onClick={() => handleAddBlock('Input')} variant="secondary" size="sm">Input</Button>
-        <Button icon={TrendingUp} onClick={() => handleAddBlock('Indicator')} variant="secondary" size="sm">Indicator</Button>
-        <Button icon={SlidersHorizontal} onClick={() => handleAddBlock('Logic')} variant="secondary" size="sm">Logic</Button>
-        <Button icon={DollarSign} onClick={() => handleAddBlock('Action')} variant="secondary" size="sm">Action</Button>
-        <div className="flex-grow"></div>
-        <Button icon={Bot} onClick={handleOptimize} variant="primary" size="sm" className="bg-purple-600 hover:bg-purple-700">AI Auto-Optimize</Button>
-      </div>
-      <div className="flex-grow p-4 overflow-y-auto space-y-3 custom-scrollbar">
-        {blocks.length === 0 && (
-          <div className="h-full flex flex-col items-center justify-center text-gray-500">
-            <Code className="w-12 h-12 mb-2 opacity-20" />
-            <p>Use the toolbar to build your strategy.</p>
-          </div>
-        )}
-        {blocks.map((block, index) => (
-          <div key={index} className="group relative bg-gray-800 border border-indigo-900/50 p-4 rounded-lg shadow-sm hover:shadow-indigo-500/20 hover:shadow-lg transition-all flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className={`w-2 h-full absolute left-0 top-0 bottom-0 rounded-l-lg ${block.startsWith('Input') ? 'bg-blue-500' : block.startsWith('Action') ? 'bg-green-500' : 'bg-indigo-500'}`}></div>
-              <span className="font-mono text-sm text-gray-300 ml-2">{block}</span>
-            </div>
-            <X className="w-4 h-4 text-gray-600 cursor-pointer hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => {
-              const newBlocks = blocks.filter((_, i) => i !== index);
-              setBlocks(newBlocks);
-              onUpdateCode(JSON.stringify({ nodes: newBlocks }));
-            }} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const AlgorithmParametersForm = ({ algorithm, onUpdate }: { algorithm: Algorithm, onUpdate: (params: AlgorithmParameter[]) => void }) => {
-    const [params, setParams] = useState(algorithm.parameters);
-
-    const handleChange = (index: number, value: any) => {
-        const newParams = [...params];
-        newParams[index].value = value;
-        setParams(newParams);
-    };
-
-    const handleSave = () => {
-        onUpdate(params);
-    };
-
-    return (
-        <div className="p-6 space-y-6">
-            {params.map((param, index) => (
-                <div key={param.name}>
-                    <label className="block text-sm font-medium text-gray-300">{param.name}</label>
-                    <p className="text-xs text-gray-500 mb-2">{param.description}</p>
-                    {param.type === 'number' && (
-                        <input
-                            type="number"
-                            value={param.value}
-                            onChange={(e) => handleChange(index, parseFloat(e.target.value))}
-                            className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white"
-                        />
-                    )}
-                    {/* Add other types like boolean, string etc. */}
-                </div>
-            ))}
-            <div className="pt-4 border-t border-gray-700">
-                <Button icon={Save} onClick={handleSave} variant="primary">Save Parameters</Button>
-            </div>
-        </div>
-    );
-};
-
-const Backtester = ({ algorithm }: { algorithm: Algorithm }) => {
-  const [results, setResults] = useState<BacktestResult[]>([]);
-  const [isBacktesting, setIsBacktesting] = useState(false);
-
-  const handleRun = useCallback(() => {
-    setIsBacktesting(true);
-    setTimeout(() => {
-      const newResult: BacktestResult = {
-        runId: `bt-${Date.now()}`,
-        algorithmId: algorithm.id,
-        algorithmVersion: algorithm.version,
-        startDate: '2023-01-01',
-        endDate: '2023-12-31',
-        initialCapital: 100000,
-        finalCapital: 100000 * (1 + (Math.random() * 40 + 10) / 100),
-        equityCurve: generateTimeSeries(50, 100000, 0.05),
-        metrics: {
-          totalReturn: parseFloat((Math.random() * 40 + 10).toFixed(2)),
-          sharpeRatio: parseFloat((Math.random() * 2 + 1).toFixed(2)),
-          maxDrawdown: parseFloat((-Math.random() * 15).toFixed(2)),
-          trades: Math.floor(Math.random() * 500 + 100),
-          profitFactor: parseFloat((Math.random() * 1 + 1.2).toFixed(2)),
-          expectancy: parseFloat((Math.random() * 0.5).toFixed(2)),
-          avgTradeReturn: parseFloat((Math.random() * 0.2).toFixed(2)),
-        },
-        parametersSnapshot: algorithm.parameters,
-        aiAnalysis: "Strategy exhibits strong momentum characteristics but may be overfitted to Q2 volatility. Suggest increasing stop-loss buffer by 0.5% and testing against 2022 data.",
-        tradeLog: []
-      };
-      setResults([newResult, ...results]);
-      setIsBacktesting(false);
-    }, 1500);
-  }, [algorithm, results]);
-
-  const latest = results[0];
-
-  return (
-    <Card title="Simulation & Deployment" subtitle="Hyper-Realistic Backtesting Engine">
-      <div className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2">
-             <Button icon={Play} onClick={handleRun} disabled={isBacktesting} variant="primary" className="w-full" size="lg">
-               {isBacktesting ? 'Running Simulation...' : 'Run Hyper-Simulation'}
-             </Button>
-          </div>
-        </div>
-
-        {latest && (
-          <div className="animate-fade-in space-y-4">
-            <div className="bg-indigo-900/50 p-4 rounded-lg border border-indigo-700">
-              <h4 className="font-bold text-indigo-300 flex items-center mb-2">
-                <Bot className="w-4 h-4 mr-2" /> AI Analysis & Recommendations
-              </h4>
-              <p className="text-sm text-indigo-200 leading-relaxed">{latest.aiAnalysis}</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { label: 'Total Return', value: `+${latest.metrics.totalReturn}%`, color: 'text-green-400' },
-                { label: 'Sharpe Ratio', value: latest.metrics.sharpeRatio, color: 'text-blue-400' },
-                { label: 'Max Drawdown', value: `${latest.metrics.maxDrawdown}%`, color: 'text-red-400' },
-                { label: 'Profit Factor', value: latest.metrics.profitFactor, color: 'text-purple-400' },
-              ].map(m => (
-                <div key={m.label} className="bg-gray-900/50 p-3 rounded border border-gray-700 shadow-sm">
-                  <div className="text-xs text-gray-400 uppercase">{m.label}</div>
-                  <div className={`text-2xl font-bold ${m.color}`}>{m.value}</div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="h-32 bg-gray-900/50 rounded border border-gray-700 flex items-end justify-between px-2 pb-2 overflow-hidden">
-               {latest.equityCurve.map((pt, i) => (
-                 <div key={i} className="w-1 bg-indigo-500 hover:bg-indigo-400 transition-colors" style={{ height: `${(pt.value / 150000) * 100}%` }} title={`Date: ${pt.date}, Val: ${pt.value.toFixed(2)}`}></div>
-               ))}
-            </div>
-          </div>
-        )}
-      </div>
-    </Card>
-  );
-};
-
-const AlgoList = ({ algorithms, selectedAlgo, onSelect, onCreate }: any) => (
-  <Card title="Strategy Portfolio" subtitle="Managed Algorithms" actions={<Button icon={Plus} onClick={onCreate} variant="secondary" size="sm">New</Button>} className="h-full" noPadding>
-    <div className="p-4 border-b border-gray-700">
-        <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-            <input type="text" placeholder="Search strategies..." className="w-full bg-gray-900 border border-gray-600 rounded-md pl-9 pr-3 py-2 text-white focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-        </div>
-    </div>
-    <div className="space-y-3 p-4 overflow-y-auto custom-scrollbar">
-      {(algorithms as Algorithm[]).map((algo: Algorithm) => (
-        <div
-          key={algo.id}
-          onClick={() => onSelect(algo)}
-          className={`p-4 rounded-lg cursor-pointer border-2 transition-all duration-200 ${selectedAlgo?.id === algo.id ? 'bg-indigo-900/50 border-indigo-500 shadow-lg shadow-indigo-900/50' : 'bg-gray-800 border-gray-700 hover:bg-gray-700/50 hover:border-gray-600'}`}
-        >
-          <div className="flex justify-between items-start mb-2">
-            <h4 className="font-bold text-gray-100">{algo.name}</h4>
-            <Badge variant={algo.status === 'live' ? 'live' : algo.status === 'backtesting' ? 'secondary' : 'outline'}>{algo.status.toUpperCase()}</Badge>
-          </div>
-          <div className="flex justify-between items-center text-xs text-gray-400">
-            <span>v{algo.version} &bull; {algo.author}</span>
-            <span className="flex items-center text-indigo-400 font-semibold"><Bot className="w-3 h-3 mr-1" /> AI Score: {algo.aiScore}</span>
-          </div>
-          {algo.performanceMetrics && (
-            <div className="mt-3 pt-3 border-t border-gray-700 grid grid-cols-3 gap-2 text-xs">
-              <div><span className="text-gray-500 block">Return</span><span className="font-medium text-green-400">+{algo.performanceMetrics.return}%</span></div>
-              <div><span className="text-gray-500 block">Sharpe</span><span className="font-medium text-gray-300">{algo.performanceMetrics.sharpe}</span></div>
-              <div><span className="text-gray-500 block">Win Rate</span><span className="font-medium text-gray-300">{algo.performanceMetrics.winRate}%</span></div>
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  </Card>
-);
-
-// --- Navigation & Layout ---
-
-const NAV_ITEMS = [
-    { name: 'Executive Dashboard', icon: LayoutDashboard, category: 'Core' },
-    { name: 'Algo-Trading Lab', icon: Code, category: 'Core', current: true },
-    { name: 'Quantum Weaver AI', icon: BrainCircuit, category: 'Core' },
-    { name: 'AI Financial Advisor', icon: Bot, category: 'Core' },
-    { name: 'Advanced Charting', icon: BarChart2, category: 'Core' },
-    { name: 'Market Scanner', icon: Search, category: 'Core' },
-    { name: 'Gemini Thinking Console', icon: Sparkles, category: 'Gemini 2.5' },
-    { name: 'Multimodal Input Analysis', icon: Eye, category: 'Gemini 2.5' },
-    { name: 'Streaming Response Monitor', icon: Zap, category: 'Gemini 2.5' },
-    { name: 'System Instruction Editor', icon: Terminal, category: 'Gemini 2.5' },
-    { name: 'Chat History Explorer', icon: MessageSquare, category: 'Gemini 2.5' },
-    { name: 'Global Transactions', icon: History, category: 'Treasury' },
-    { name: 'Liquidity Transfer', icon: Send, category: 'Treasury' },
-    { name: 'Budgetary Control', icon: Target, category: 'Treasury' },
-    { name: 'Corporate Treasury', icon: Globe, category: 'Treasury' },
-    { name: 'Modern Treasury API', icon: Key, category: 'Treasury' },
-    { name: 'Strategic Goals', icon: Trophy, category: 'Strategy' },
-    { name: 'Credit Health Monitor', icon: Heart, category: 'Strategy' },
-    { name: 'Investment Portfolio', icon: Briefcase, category: 'Strategy' },
-    { name: 'Venture Capital', icon: Rocket, category: 'Strategy' },
-    { name: 'Private Equity', icon: Briefcase, category: 'Strategy' },
-    { name: 'Mutual Fund Screener', icon: Filter, category: 'Strategy' },
-    { name: 'ETF Hub', icon: PieChart, category: 'Strategy' },
-    { name: 'Robo-Advisor Config', icon: Bot, category: 'Strategy' },
-    { name: 'Web3 & Crypto Bridge', icon: Link, category: 'Markets' },
-    { name: 'Forex Arbitrage Arena', icon: Scale, category: 'Markets' },
-    { name: 'Commodities Exchange', icon: Wheat, category: 'Markets' },
-    { name: 'Real Estate Empire', icon: Building, category: 'Markets' },
-    { name: 'Art & NFT Vault', icon: Palette, category: 'Markets' },
-    { name: 'Derivatives Desk', icon: PieChart, category: 'Markets' },
-    { name: 'Options Chain', icon: Link, category: 'Markets' },
-    { name: 'Futures Contracts', icon: FileText, category: 'Markets' },
-    { name: 'Bond Analytics', icon: Scale, category: 'Markets' },
-    { name: 'Dark Pool Routing', icon: Network, category: 'Markets' },
-    { name: 'Exotic Derivatives', icon: Sparkles, category: 'Markets' },
-    { name: 'Carbon Credit Trading', icon: Wheat, category: 'Markets' },
-    { name: 'Tax Optimization AI', icon: Receipt, category: 'Finance' },
-    { name: 'Legacy Planning', icon: BookOpen, category: 'Finance' },
-    { name: 'Wealth Management', icon: Crown, category: 'Finance' },
-    { name: 'Billing & Invoicing', icon: CreditCard, category: 'Finance' },
-    { name: 'Expense Management', icon: Receipt, category: 'Finance' },
-    { name: 'Capital Call Management', icon: Phone, category: 'Finance' },
-    { name: 'Card Issuance (Marqeta)', icon: CreditCard, category: 'Integrations' },
-    { name: 'Data Aggregation (Plaid)', icon: Link, category: 'Integrations' },
-    { name: 'Payment Rails (Stripe)', icon: Zap, category: 'Integrations' },
-    { name: 'Open Banking API', icon: Link, category: 'Integrations' },
-    { name: 'Identity (SSO)', icon: Lock, category: 'Platform' },
-    { name: 'Agent Marketplace', icon: Users, category: 'Platform' },
-    { name: 'Ad Studio AI', icon: Megaphone, category: 'Platform' },
-    { name: 'Card Customization', icon: CreditCard, category: 'Platform' },
-    { name: 'DAO Governance', icon: Handshake, category: 'Platform' },
-    { name: 'API Key Management', icon: Key, category: 'Platform' },
-    { name: 'Webhook Subscriptions', icon: Send, category: 'Platform' },
-    { name: 'System Status', icon: Activity, category: 'System' },
-    { name: 'Security Center', icon: Shield, category: 'System' },
-    { name: 'System Manifesto', icon: Eye, category: 'System' },
-    { name: 'Audit Logs', icon: History, category: 'System' },
-    { name: 'Disaster Recovery', icon: Server, category: 'System' },
-    { name: 'Concierge', icon: Phone, category: 'Support' },
-    { name: 'Philanthropy', icon: Heart, category: 'Support' },
-    { name: 'Personalization', icon: Sparkles, category: 'Support' },
-    { name: 'Knowledge Base', icon: BookOpen, category: 'Support' },
-    { name: 'Live Chat Support', icon: MessageSquare, category: 'Support' },
-    { name: 'Feature Requests', icon: Megaphone, category: 'Support' },
-    { name: 'Risk Dashboard', icon: Shield, category: 'Risk Management' },
-    { name: 'VaR Simulation', icon: BarChart2, category: 'Risk Management' },
-    { name: 'Stress Testing', icon: Activity, category: 'Risk Management' },
-    { name: 'Counterparty Risk', icon: Users, category: 'Risk Management' },
-    { name: 'Credit Default Swaps', icon: FileText, category: 'Risk Management' },
-    { name: 'Liquidity Risk', icon: LifeBuoy, category: 'Risk Management' },
-    { name: 'Operational Risk', icon: SlidersHorizontal, category: 'Risk Management' },
-    { name: 'Geopolitical Risk Map', icon: Globe, category: 'Risk Management' },
-    { name: 'Model Risk Governance', icon: BrainCircuit, category: 'Risk Management' },
-    { name: 'Compliance Hub', icon: CheckSquare, category: 'Compliance' },
-    { name: 'Regulatory Reporting', icon: FileText, category: 'Compliance' },
-    { name: 'Audit Trail', icon: History, category: 'Compliance' },
-    { name: 'AML Monitoring', icon: Eye, category: 'Compliance' },
-    { name: 'Trade Surveillance', icon: Search, category: 'Compliance' },
-    { name: 'Policy Management', icon: BookOpen, category: 'Compliance' },
-    { name: 'SEC Rule 15c3-5', icon: CheckSquare, category: 'Compliance' },
-    { name: 'MiFID II Reporting', icon: FileText, category: 'Compliance' },
-    { name: 'Data Lake Explorer', icon: Database, category: 'Data Science' },
-    { name: 'Jupyter Notebooks', icon: BookOpen, category: 'Data Science' },
-    { name: 'Model Training', icon: Cpu, category: 'Data Science' },
-    { name: 'Feature Store', icon: HardDrive, category: 'Data Science' },
-    { name: 'Data Visualization Lab', icon: BarChart2, category: 'Data Science' },
-    { name: 'ETL Pipelines', icon: Repeat, category: 'Data Science' },
-    { name: 'Alternative Data Hub', icon: HardDrive, category: 'Data Science' },
-    { name: 'Cloud Infrastructure', icon: Cloud, category: 'Infrastructure' },
-    { name: 'Network Topology', icon: Network, category: 'Infrastructure' },
-    { name: 'Server Fleet Management', icon: Server, category: 'Infrastructure' },
-    { name: 'CI/CD Pipelines', icon: GitBranch, category: 'Infrastructure' },
-    { name: 'Terminal Access', icon: Terminal, category: 'Infrastructure' },
-    { name: 'Quantum Fabric Status', icon: Atom, category: 'Infrastructure' },
-    { name: 'Kubernetes Cluster', icon: Cloud, category: 'Infrastructure' },
-    { name: 'Quarterly Reports', icon: PieChart, category: 'Reporting' },
-    { name: 'Performance Attribution', icon: Trophy, category: 'Reporting' },
-    { name: 'Client Statements', icon: Receipt, category: 'Reporting' },
-    { name: 'P&L Analytics', icon: TrendingUp, category: 'Reporting' },
-    { name: 'AUM Tracker', icon: DollarSign, category: 'Reporting' },
-    { name: 'Investor Relations Portal', icon: Users, category: 'Client Relations' },
-    { name: 'CRM Integration', icon: Handshake, category: 'Client Relations' },
-    { name: 'Support Tickets', icon: LifeBuoy, category: 'Client Relations' },
-    { name: 'Onboarding Wizard', icon: User, category: 'Client Relations' },
-    { name: 'Global News Feed', icon: Globe, category: 'Market Intel' },
-    { name: 'SEC Filings', icon: FileText, category: 'Market Intel' },
-    { name: 'Social Media Sentiment', icon: Megaphone, category: 'Market Intel' },
-    { name: 'Economic Calendar', icon: Calendar, category: 'Market Intel' },
-    { name: 'Insider Trading Monitor', icon: Eye, category: 'Market Intel' },
-    { name: 'Back Office Operations', icon: Briefcase, category: 'Operations' },
-    { name: 'Settlements & Clearing', icon: CheckSquare, category: 'Operations' },
-    { name: 'Corporate Actions', icon: Megaphone, 'category': 'Operations' },
-    { name: 'Reconciliation Engine', icon: Repeat, category: 'Operations' },
-    { name: 'Multi-Factor Auth', icon: Lock, category: 'Security' },
-    { name: 'Intrusion Detection', icon: Shield, category: 'Security' },
-    { name: 'Penetration Testing', icon: Target, category: 'Security' },
-    { name: 'Bug Bounty Program', icon: Trophy, category: 'Security' },
-];
-
-const AppSidebar = ({ onNavigate, activeView }: any) => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
-    const groupedNavItems = useMemo(() => NAV_ITEMS.reduce((acc, item) => {
-        if (!acc[item.category]) acc[item.category] = [];
-        acc[item.category].push(item);
-        return acc;
-    }, {} as Record<string, typeof NAV_ITEMS>), []);
-
-    return (
-        <div className={`h-full bg-gray-900 text-white flex flex-col transition-all duration-300 shadow-2xl z-20 ${isCollapsed ? 'w-20' : 'w-72'}`}>
-            <div className="p-5 flex items-center justify-between border-b border-gray-800 bg-gray-900 h-16">
-                {!isCollapsed && (
-                  <div>
-                    <h1 className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 tracking-tighter">FAMILY OS</h1>
-                    <p className="text-[10px] text-gray-500 tracking-widest uppercase">High Frequency Trading</p>
-                  </div>
-                )}
-                <button onClick={() => setIsCollapsed(!isCollapsed)} className="p-1.5 rounded-md hover:bg-gray-800 text-gray-400 transition-colors">
-                    <Settings className="w-5 h-5" />
-                </button>
-            </div>
-            
-            <div className="p-4 border-b border-gray-800 bg-gray-800/50">
-                <div className="flex items-center space-x-3 cursor-pointer hover:bg-gray-800 p-2 rounded-lg transition-colors" onClick={() => onNavigate("Profile")}>
-                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg border-2 border-gray-700">TR</div>
-                    {!isCollapsed && (
-                      <div className="overflow-hidden"><p className="text-sm font-bold text-gray-200 truncate">Trader</p><p className="text-xs text-green-400 flex items-center"><span className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse"></span> Online</p></div>
-                    )}
-                </div>
-            </div>
-
-            <nav className="flex-grow overflow-y-auto p-3 space-y-1 custom-scrollbar">
-                {Object.entries(groupedNavItems).map(([category, items]: [string, typeof NAV_ITEMS]) => (
-                    <div key={category}>
-                        {!isCollapsed && <h3 className="px-3 pt-4 pb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">{category}</h3>}
-                        {items.map((item) => {
-                            const Icon = item.icon;
-                            const isActive = item.name === activeView;
-                            return (
-                                <a key={item.name} href="#" onClick={(e) => { e.preventDefault(); onNavigate(item.name); }}
-                                    className={`flex items-center p-3 rounded-lg transition-all duration-200 group ${isActive ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/50' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
-                                >
-                                    <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500 group-hover:text-white'}`} />
-                                    <span className={`ml-3 font-medium whitespace-nowrap overflow-hidden transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>{item.name}</span>
-                                </a>
-                            );
-                        })}
-                    </div>
-                ))}
-            </nav>
-            
-            <div className="p-4 border-t border-gray-800 bg-gray-900 text-xs text-gray-600 text-center">
-              {!isCollapsed && "v12.8.1-Quantum | Secure Connection"}
-            </div>
-        </div>
-    );
-}
-
-// --- Placeholder & Special Views ---
-
-const AlgoTradingLab: React.FC = () => {
-  const [algorithms, setAlgorithms] = useState<Algorithm[]>(initialAlgorithms);
-  const [selectedAlgo, setSelectedAlgo] = useState<Algorithm | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'editor' | 'backtest' | 'params'>('list');
-
-  const handleSelectAlgo = (algo: Algorithm) => {
-    setSelectedAlgo(algo);
-    setViewMode('editor');
-  };
-
-  const handleCreateAlgo = () => {
-    const newAlgo: Algorithm = {
-      id: `algo-${Date.now()}`,
-      name: 'New Strategy',
-      description: 'Draft strategy',
-      tags: ['Draft'],
-      code: '{"nodes":[]}',
-      language: 'nocode',
-      status: 'draft',
-      version: 1,
-      lastModified: new Date().toISOString().split('T')[0],
-      author: 'User',
-      riskLevel: 'low',
-      aiScore: 50,
-      parameters: [],
-      deploymentTarget: 'cloud-cluster-a',
-      geinFactor: 0.5,
-      interactionMatrix: [],
-      dataPointSensitivity: {},
-      layerMetrics: {},
-      executionPriority: 'normal',
-      computeProfile: 'cpu-bound',
-      dataSources: [],
-      dependencies: [],
-      permissions: [],
-      ownerTeam: 'User',
-      isAudited: false,
-      auditHistory: []
-    };
-    setAlgorithms([...algorithms, newAlgo]);
-    setSelectedAlgo(newAlgo);
-    setViewMode('editor');
-  };
-
-  const updateAlgoCode = (code: string) => {
-    if (selectedAlgo) {
-      const updated = { ...selectedAlgo, code, lastModified: new Date().toISOString().split('T')[0] };
-      setAlgorithms(algorithms.map(a => a.id === selectedAlgo.id ? updated : a));
-      setSelectedAlgo(updated);
-    }
-  };
-
-  const updateAlgoParams = (params: AlgorithmParameter[]) => {
-    if (selectedAlgo) {
-      const updated = { ...selectedAlgo, parameters: params, lastModified: new Date().toISOString().split('T')[0] };
-      setAlgorithms(algorithms.map(a => a.id === selectedAlgo.id ? updated : a));
-      setSelectedAlgo(updated);
-    }
-  };
-
-  return (
-    <div className="flex h-full space-x-6 p-6 bg-gray-900 min-h-screen text-white">
-      <div className="w-1/4 min-w-[300px]">
-        <AlgoList 
-            algorithms={algorithms} 
-            selectedAlgo={selectedAlgo} 
-            onSelect={handleSelectAlgo} 
-            onCreate={handleCreateAlgo}
-        />
-      </div>
-      <div className="flex-grow flex flex-col space-y-6">
-        {selectedAlgo ? (
-          <Card title={selectedAlgo.name} subtitle={`${selectedAlgo.language.toUpperCase()} | v${selectedAlgo.version}`} 
-            actions={
-              <>
-                <Button variant={viewMode === 'editor' ? 'primary' : 'ghost'} onClick={() => setViewMode('editor')} size="sm">Editor</Button>
-                <Button variant={viewMode === 'params' ? 'primary' : 'ghost'} onClick={() => setViewMode('params')} size="sm">Params</Button>
-                <Button variant={viewMode === 'backtest' ? 'primary' : 'ghost'} onClick={() => setViewMode('backtest')} size="sm">Simulate</Button>
-              </>
-            }
-          >
-            <div className="h-[600px]">
-              {viewMode === 'editor' && <NoCodeEditor algorithm={selectedAlgo} onUpdateCode={updateAlgoCode} />}
-              {viewMode === 'params' && <AlgorithmParametersForm algorithm={selectedAlgo} onUpdate={updateAlgoParams} />}
-              {viewMode === 'backtest' && <Backtester algorithm={selectedAlgo} />}
-            </div>
-          </Card>
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-500">
-            <div className="text-center">
-              <Code className="w-16 h-16 mx-auto mb-4 opacity-20" />
-              <h2 className="text-2xl font-bold mb-2">Select a Strategy</h2>
-              <p>Choose an algorithm from the list or create a new one to begin.</p>
-            </div>
-          </div>
-        )}
-        
-        <div className="grid grid-cols-3 gap-6">
-             <AIStatusMonitor />
-             <div className="col-span-2">
-                <GlobalMarketPulse />
-             </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default AlgoTradingLab;
+    { name: 'S&P 500', price: '4,120.50', change: '+0.45%', sentiment: 'Bullish', volatility: 'Low', id: 'm-1' },
+    { name: 'BTC/USD', price: '64,230.00', change: '+2.10%', sentiment: 'Very Bullish', volatility: 'High', id: 'm-2' },
+    { name: 'EUR/USD', price: '1.0850', change: '-0.12%', sentiment: 'Neutral', volatility: 'Low', id: 'm-3' },
+    { name: 'Gold', price: '1,980.20', change: '+0.80%', sentiment: 'Bullish', volatility: 'Medium', id: 'm-4' },
+    { name: 'Crude Oil', price: '78.40', change: '-1.20%', sentiment: 'Bearish', volatility: 'Medium', id: 'm-5' },
+    { name: '10Y Treasury', price: '4.50%', change: '+0.02%',
