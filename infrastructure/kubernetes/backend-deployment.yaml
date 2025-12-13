@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: your-dockerhub-username/backend-image:latest # Replace with your actual image
+          imagePullPolicy: Always # Or IfNotPresent for development
+          ports:
+            - containerPort: 8080 # Adjust if your app uses a different port
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: database-credentials
+                  key: url
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: redis-config
+                  key: host
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: redis-config
+                  key: port
+            - name: SUBSCRIPTION_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: subscription-api-key
+                  key: api_key
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /healthz # Or your health check endpoint
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /healthz # Or your health check endpoint
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+      # Add a service account if needed for RBAC
+      # serviceAccountName: backend-service-account
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080 # Adjust if your app uses a different port
+  type: LoadBalancer # Or ClusterIP if you're using an Ingress controller
