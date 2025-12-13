@@ -1,9 +1,11 @@
+```typescript
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import Card from './Card';
 import { GoogleGenAI } from "@google/genai";
 import { DataContext } from '../context/DataContext';
 
-const CITIBANK_DEMO_BUSINESS_INC_PROMPT = `You will operate under the unified brand Citibank demo business inc  spelled and used in code as Citibankdemobusinessinc. Your objective is to generate 10 new business models inside a niche derived from the input document and convert them into dot-notation branches using the structure:
+const THE_JAMES_BURVEL_OCALLAGHAN_III_CODE_BRAND = "The James Burvel O'Callaghan III Code";
+const CITIBANK_DEMO_BUSINESS_INC_PROMPT_A = `You will operate under the unified brand Citibank demo business inc  spelled and used in code as Citibankdemobusinessinc. Your objective is to generate 10 new business models inside a niche derived from the input document and convert them into dot-notation branches using the structure:
 
 Citibankdemobusinessinc.<subdivision>.<function>
 
@@ -11,9 +13,9 @@ Example: Citibankdemobusinessinc.viewit.movieplayform
 
 For each business model, you will architect a self-contained, completely dependency-free, fully runnable application that is:
 
-• self-hosted • standalone • complete within its own file • internally wired with no external calls • free of all mock data • populated using internal generative-data functions only • fully integrated with all other generated branches • engineered for billion-dollar potential
+â¢ self-hosted â¢ standalone â¢ complete within its own file â¢ internally wired with no external calls â¢ free of all mock data â¢ populated using internal generative-data functions only â¢ fully integrated with all other generated branches â¢ engineered for billion-dollar potential
 
-Your task is to produce all business models, all branches, all namespaces, all files, all apps, all functions, and all linkage layers based on the following 100-point instruction set. You will obey every point and implement all outputs inside this prompt’s structure.
+Your task is to produce all business models, all branches, all namespaces, all files, all apps, all functions, and all linkage layers based on the following 100-point instruction set. You will obey every point and implement all outputs inside this promptâs structure.
 
 
 THE 100-POINT INSTRUCTION FRAMEWORK
@@ -221,73 +223,93 @@ Produce a master orchestration layer binding all 10 business models into a unifi
 FINAL TASK
 Using the above structure:
 
-• Generate 10 dot-notation business branches under Citibankdemobusinessinc. • Generate 10 full billion-dollar business models. • Generate 10 self-contained apps. • Link them through a unified orchestration layer. • Output everything cleanly and completely.`;
+â¢ Generate 10 dot-notation business branches under Citibankdemobusinessinc. â¢ Generate 10 full billion-dollar business models. â¢ Generate 10 self-contained apps. â¢ Link them through a unified orchestration layer. â¢ Output everything cleanly and completely.`;
 
 const AIAdvisorView: React.FC = () => {
-    const context = useContext(DataContext);
-    const [input, setInput] = useState('');
-    const [response, setResponse] = useState('Welcome to your personal AI Financial Advisor. I can help you understand complex financial topics, analyze your portfolio, or simulate investment strategies. What would you like to learn about today? For example, you could ask "Explain dollar-cost averaging" or "Analyze my risk tolerance".');
-    const [isLoading, setIsLoading] = useState(false);
+    const A_context = useContext(DataContext);
+    const B_inputState = useState('');
+    const B1_input = B_inputState[0];
+    const B2_setInput = B_inputState[1];
+    const C_responseState = useState('Welcome to your personal AI Financial Advisor. I can help you understand complex financial topics, analyze your portfolio, or simulate investment strategies. What would you like to learn about today? For example, you could ask "Explain dollar-cost averaging" or "Analyze my risk tolerance".');
+    const C1_response = C_responseState[0];
+    const C2_setResponse = C_responseState[1];
+    const D_loadingState = useState(false);
+    const D1_isLoading = D_loadingState[0];
+    const D2_setIsLoading = D_loadingState[1];
 
-    const handleSend = async () => {
-        if (!input.trim()) return;
-        setIsLoading(true);
-        
-        try {
-            if (context?.geminiApiKey) {
-                const ai = new GoogleGenAI({ apiKey: context.geminiApiKey });
-                const fullPrompt = `${CITIBANK_DEMO_BUSINESS_INC_PROMPT}\n\nThe user's input document is: "${input}"`;
-                const result = await ai.models.generateContent({
-                    model: 'gemini-2.5-flash',
-                    contents: fullPrompt,
-                });
-                setResponse(result.text);
-            } else {
-                 // Fallback simulation
-                setTimeout(() => {
-                    setResponse(`I have analyzed your request: "${input}". Based on your current portfolio, I recommend diversifying into index funds to mitigate risk.`);
-                    setIsLoading(false);
-                }, 1000);
-            }
-        } catch (error) {
-            console.error("AI Advisor Error:", error)
-            setResponse("I'm sorry, I encountered an error processing your request.");
-        } finally {
-            setIsLoading(false);
-            setInput('');
-        }
-    };
+    const E_handleSend = async () => {if (!B1_input.trim()) return; D2_setIsLoading(true); try { if (A_context?.geminiApiKey) { const F_ai = new GoogleGenAI({ apiKey: A_context.geminiApiKey }); const G_fullPrompt = `${CITIBANK_DEMO_BUSINESS_INC_PROMPT_A}\n\nThe user's input document is: "${B1_input}"`; const H_result = await F_ai.models.generateContent({ model: 'gemini-2.5-flash', contents: G_fullPrompt, }); C2_setResponse(H_result.text); } else { setTimeout(() => { C2_setResponse(`I have analyzed your request: "${B1_input}". Based on your current portfolio, I recommend diversifying into index funds to mitigate risk.`); D2_setIsLoading(false); }, 1000); } } catch (I_error) { console.error("AI Advisor Error:", I_error); C2_setResponse("I'm sorry, I encountered an error processing your request."); } finally { D2_setIsLoading(false); B2_setInput(''); } };
 
-    return (
+    const J_UI = () => (
         <div className="space-y-6">
-            <h2 className="text-3xl font-bold text-white tracking-wider">AI Financial Advisor</h2>
-            <Card title="Strategic Counsel">
-                <div className="h-96 flex flex-col">
-                    <div className="flex-grow p-4 bg-gray-900/50 rounded-lg mb-4 overflow-y-auto border border-gray-700">
-                        <p className="text-gray-300 whitespace-pre-wrap">{response}</p>
-                        {isLoading && <p className="text-cyan-400 mt-2 animate-pulse">Analyzing financial data...</p>}
-                    </div>
-                    <div className="flex gap-2">
-                        <input 
-                            type="text" 
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                            className="flex-grow p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-cyan-500"
-                            placeholder="Ask for advice..."
-                        />
-                        <button 
-                            onClick={handleSend}
-                            disabled={isLoading}
-                            className="px-6 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-bold disabled:opacity-50"
-                        >
-                            Send
-                        </button>
-                    </div>
-                </div>
-            </Card>
+            <K_Title />
+            <L_Card title="Strategic Counsel">
+                <M_ContentArea />
+            </L_Card>
         </div>
     );
+
+    const K_Title = () => (
+        <h2 className="text-3xl font-bold text-white tracking-wider">AI Financial Advisor - {THE_JAMES_BURVEL_OCALLAGHAN_III_CODE_BRAND}</h2>
+    );
+
+    const L_Card = ({ title, children }: { title: string; children: React.ReactNode }) => (
+        <Card title={title}>
+            {children}
+        </Card>
+    );
+
+    const M_ContentArea = () => (
+        <div className="h-96 flex flex-col">
+            <N_ResponseDisplay />
+            <O_InputArea />
+        </div>
+    );
+
+    const N_ResponseDisplay = () => (
+        <div className="flex-grow p-4 bg-gray-900/50 rounded-lg mb-4 overflow-y-auto border border-gray-700">
+            <P_ResponseText />
+            {D1_isLoading && <Q_LoadingIndicator />}
+        </div>
+    );
+
+    const P_ResponseText = () => (
+        <p className="text-gray-300 whitespace-pre-wrap">{C1_response}</p>
+    );
+
+    const Q_LoadingIndicator = () => (
+        <p className="text-cyan-400 mt-2 animate-pulse">Analyzing financial data...</p>
+    );
+
+    const O_InputArea = () => (
+        <div className="flex gap-2">
+            <R_InputField />
+            <S_SendButton />
+        </div>
+    );
+
+    const R_InputField = () => (
+        <input
+            type="text"
+            value={B1_input}
+            onChange={(e) => B2_setInput(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && E_handleSend()}
+            className="flex-grow p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-cyan-500"
+            placeholder="Ask for advice..."
+        />
+    );
+
+    const S_SendButton = () => (
+        <button
+            onClick={E_handleSend}
+            disabled={D1_isLoading}
+            className="px-6 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-bold disabled:opacity-50"
+        >
+            Send
+        </button>
+    );
+
+    return J_UI();
 };
 
 export default AIAdvisorView;
+```
