@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    app: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: your-dockerhub-username/frontend:latest # Replace with your actual image
+          ports:
+            - containerPort: 3000 # Or the port your frontend app uses
+          env:
+            - name: REACT_APP_API_BASE_URL
+              value: "http://api-service:8080" # Replace with your API service URL
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+      imagePullSecrets:
+        - name: regcred # If you're using a private registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000 # Or the port your frontend app uses
+  type: LoadBalancer # Or ClusterIP if you're using an Ingress controller
