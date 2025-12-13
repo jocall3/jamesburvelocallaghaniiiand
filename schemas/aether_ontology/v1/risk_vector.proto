@@ -1,0 +1,312 @@
+// Copyright 2024 Aether Framework Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package aether_ontology.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "schemas/aether_ontology/v1/common.proto";
+
+option go_package = "github.com/aether-framework/schemas/aether_ontology/v1;aether_ontology_v1";
+option java_package = "com.aetherframework.schemas.aether_ontology.v1";
+option java_multiple_files = true;
+
+// RiskVector is a standardized, multi-faceted representation of risk associated
+// with a financial asset, portfolio, or counterparty at a specific point in time.
+// It serves as a core data contract for risk calculation, aggregation, and
+// reporting services within the Aether ecosystem.
+message RiskVector {
+  // Unique identifier for this specific risk vector instance.
+  UUID id = 1;
+
+  // The timestamp when this risk assessment was calculated or became effective.
+  google.protobuf.Timestamp as_of_timestamp = 2;
+
+  // The asset, portfolio, or entity this risk vector applies to.
+  string subject_identifier = 3;
+
+  // The type of the subject identifier.
+  IdentifierType subject_identifier_type = 4;
+
+  // The specific type of risk being represented. This allows for a single
+  // message structure to handle various risk domains.
+  oneof risk_type {
+    MarketRisk market_risk = 5;
+    CreditRisk credit_risk = 6;
+    LiquidityRisk liquidity_risk = 7;
+    OperationalRisk operational_risk = 8;
+    ComplianceRisk compliance_risk = 9;
+    ModelRisk model_risk = 10;
+  }
+
+  // The system or application that generated this risk vector.
+  // e.g., "APP_23_Risk_QuantEngine", "APP_37_Governance_AuditTrailEngine"
+  string source_system = 11;
+
+  // A reference to the calculation request that triggered the generation of this vector,
+  // enabling full traceability.
+  UUID calculation_request_id = 12;
+
+  // Arbitrary key-value metadata for extensibility. Can be used for model versions,
+  // scenario parameters, or other contextual information.
+  google.protobuf.Struct metadata = 13;
+}
+
+// MarketRisk represents the risk of losses in positions arising from movements
+// in market prices.
+message MarketRisk {
+  // Value at Risk (VaR) represents the potential loss in value of a position or
+  // portfolio over a defined period for a given confidence interval.
+  ValueAtRisk value_at_risk = 1;
+
+  // Expected Shortfall (ES), also known as Conditional VaR (CVaR), is the
+  // expected loss on a position or portfolio, given that the loss exceeds the
+  // VaR threshold.
+  ExpectedShortfall expected_shortfall = 2;
+
+  // A collection of "Greeks," which measure the sensitivity of a position's
+  // value to changes in various market parameters.
+  repeated Greek greeks = 3;
+
+  // Results from applying predefined stress scenarios to the position or portfolio.
+  repeated StressTestResult stress_tests = 4;
+}
+
+// CreditRisk represents the risk of loss arising from a borrower or counterparty
+// failing to meet their financial obligations.
+message CreditRisk {
+  // The counterparty whose credit risk is being assessed.
+  string counterparty_id = 1;
+
+  // Probability of Default (PD) over a specified time horizon (e.g., 1 year).
+  // Expressed as a value between 0.0 and 1.0.
+  double probability_of_default_1yr = 2;
+
+  // Loss Given Default (LGD) is the share of an asset that is lost if a
+  // borrower defaults. Expressed as a value between 0.0 and 1.0.
+  double loss_given_default = 3;
+
+  // Exposure at Default (EAD) is the total value that a lender is exposed to
+  // when a borrower defaults.
+  double exposure_at_default = 4;
+
+  // The currency of the Exposure at Default amount.
+  CurrencyCode ead_currency = 5;
+
+  // Credit ratings from various rating agencies.
+  repeated CreditRating ratings = 6;
+
+  // Credit Value Adjustment (CVA) represents the market price of counterparty credit risk.
+  double credit_value_adjustment = 7;
+}
+
+// LiquidityRisk represents the risk that an entity cannot meet its short-term
+// debt obligations without incurring unacceptable losses.
+message LiquidityRisk {
+  // The bid-ask spread for the asset, expressed as a percentage of the mid-price.
+  // A key indicator of market liquidity.
+  double bid_ask_spread_pct = 1;
+
+  // The volume of the asset available at the best bid and ask prices.
+  // Indicates the market's ability to absorb large orders.
+  double market_depth_volume = 2;
+
+  // Estimated time in days to liquidate a position of a standard size without
+  // causing a significant adverse price movement.
+  int32 time_to_liquidate_days = 3;
+
+  // For financial institutions, the Liquidity Coverage Ratio (LCR) as defined
+  // by Basel III. Ratio of high-quality liquid assets to total net cash outflows.
+  double liquidity_coverage_ratio = 4;
+
+  // For financial institutions, the Net Stable Funding Ratio (NSFR) as defined
+  // by Basel III. Ratio of available stable funding to required stable funding.
+  double net_stable_funding_ratio = 5;
+}
+
+// OperationalRisk represents the risk of loss resulting from inadequate or
+// failed internal processes, people, and systems, or from external events.
+message OperationalRisk {
+  // A unique identifier for the specific operational risk scenario being evaluated.
+  // e.g., "DATA_CENTER_OUTAGE", "INTERNAL_FRAUD_SCENARIO_A"
+  string risk_scenario_id = 1;
+
+  // The estimated potential financial loss if the event occurs.
+  double potential_loss_amount = 2;
+
+  // The currency of the potential loss amount.
+  CurrencyCode currency = 3;
+
+  // The probability of the risk event occurring within a defined period (e.g., 1 year).
+  // Expressed as a value between 0.0 and 1.0.
+  double probability_of_occurrence = 4;
+
+  // A qualitative or quantitative rating of the effectiveness of controls in place
+  // to mitigate this risk. e.g., "High", "Medium", "Low", or a numeric score.
+  string control_effectiveness_rating = 5;
+}
+
+// ComplianceRisk represents the risk of legal or regulatory sanctions, material
+// financial loss, or loss to reputation an organization may suffer as a result
+// of its failure to comply with laws, regulations, rules, and standards.
+message ComplianceRisk {
+  // An identifier for the specific regulation, law, or policy in question.
+  // e.g., "GDPR", "MiFID_II_ART_27", "INTERNAL_AML_POLICY"
+  string regulation_id = 1;
+
+  // The current compliance status regarding the specified regulation.
+  ComplianceStatus status = 2;
+
+  // A brief, human-readable description of the compliance issue or risk.
+  string issue_description = 3;
+
+  // The estimated maximum fine or financial penalty associated with non-compliance.
+  double potential_fine_amount = 4;
+
+  // The currency of the potential fine amount.
+  CurrencyCode currency = 5;
+
+  // The timestamp of the last compliance assessment.
+  google.protobuf.Timestamp last_assessment_date = 6;
+}
+
+// ModelRisk represents the potential for adverse consequences from decisions
+// based on incorrect or misused model outputs and reports.
+message ModelRisk {
+  // Unique identifier for the model being assessed.
+  string model_id = 1;
+
+  // Version of the model.
+  string model_version = 2;
+
+  // A score representing the overall risk associated with the model (e.g., 1-5).
+  double model_risk_score = 3;
+
+  // Description of the primary source of risk (e.g., data quality, conceptual
+  // soundness, implementation error).
+  string primary_risk_driver = 4;
+
+  // Timestamp of the last model validation.
+  google.protobuf.Timestamp last_validation_date = 5;
+}
+
+// --- Supporting Messages and Enums ---
+
+// Defines the type of identifier used for an asset, portfolio, or counterparty.
+enum IdentifierType {
+  IDENTIFIER_TYPE_UNSPECIFIED = 0;
+  // Committee on Uniform Security Identification Procedures
+  CUSIP = 1;
+  // International Securities Identification Number
+  ISIN = 2;
+  // Financial Instrument Global Identifier
+  FIGI = 3;
+  // A ticker symbol
+  TICKER = 4;
+  // An internal identifier specific to the Aether ecosystem or a connected system.
+  INTERNAL = 5;
+  // A legal entity identifier
+  LEI = 6;
+}
+
+// A single Greek value.
+message Greek {
+  GreekType type = 1;
+  double value = 2;
+  // The underlying parameter for which the sensitivity is measured (e.g., a specific stock ticker for delta).
+  string underlying_identifier = 3;
+}
+
+// Standard financial "Greeks".
+enum GreekType {
+  GREEK_TYPE_UNSPECIFIED = 0;
+  DELTA = 1;   // Rate of change of portfolio value with respect to the underlying asset's price.
+  GAMMA = 2;   // Rate of change of delta.
+  VEGA = 3;    // Rate of change with respect to volatility.
+  THETA = 4;   // Rate of change with respect to the passage of time.
+  RHO = 5;     // Rate of change with respect to the interest rate.
+}
+
+// The result of a single stress test scenario.
+message StressTestResult {
+  // A unique identifier for the stress scenario applied.
+  // e.g., "2008_FINANCIAL_CRISIS_REPLAY", "INTEREST_RATE_SHOCK_UP_200BPS"
+  string scenario_id = 1;
+  // The projected profit or loss under this scenario.
+  double projected_pnl = 2;
+  // The currency of the projected PnL.
+  CurrencyCode currency = 3;
+}
+
+// A credit rating from a specific agency.
+message CreditRating {
+  // The rating agency, e.g., "S&P", "Moody's", "Fitch".
+  string agency = 1;
+  // The assigned rating, e.g., "AAA", "B-".
+  string rating = 2;
+  // The outlook associated with the rating.
+  RatingOutlook outlook = 3;
+}
+
+// Standard outlooks for credit ratings.
+enum RatingOutlook {
+  RATING_OUTLOOK_UNSPECIFIED = 0;
+  STABLE = 1;
+  POSITIVE = 2;
+  NEGATIVE = 3;
+  DEVELOPING = 4;
+}
+
+// Standardized representation of Value at Risk.
+message ValueAtRisk {
+  // The confidence level, e.g., 0.99 for 99%.
+  double confidence_level = 1;
+  // The time horizon in trading days.
+  int32 time_horizon_days = 2;
+  // The calculated VaR amount (a positive number representing a potential loss).
+  double amount = 3;
+  // The currency of the VaR amount.
+  CurrencyCode currency = 4;
+  // The method used for calculation, e.g., "Historical", "MonteCarlo", "Parametric".
+  string calculation_method = 5;
+}
+
+// Standardized representation of Expected Shortfall.
+message ExpectedShortfall {
+  // The confidence level, e.g., 0.975 for 97.5%.
+  double confidence_level = 1;
+  // The time horizon in trading days.
+  int32 time_horizon_days = 2;
+  // The calculated ES amount (a positive number representing a potential loss).
+  double amount = 3;
+  // The currency of the ES amount.
+  CurrencyCode currency = 4;
+  // The method used for calculation.
+  string calculation_method = 5;
+}
+
+// Status of compliance with a given regulation or policy.
+enum ComplianceStatus {
+  COMPLIANCE_STATUS_UNSPECIFIED = 0;
+  // All requirements are met.
+  COMPLIANT = 1;
+  // One or more requirements are not met.
+  NON_COMPLIANT = 2;
+  // There is a significant risk of becoming non-compliant.
+  AT_RISK = 3;
+  // Compliance status is currently being assessed.
+  UNDER_REVIEW = 4;
+}
