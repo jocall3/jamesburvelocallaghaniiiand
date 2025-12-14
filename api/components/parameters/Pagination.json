@@ -1,0 +1,71 @@
+{
+  "limit": {
+    "name": "limit",
+    "in": "query",
+    "description": "Specifies the maximum number of records to return in a single API response. This parameter is essential for controlling the volume of data transferred and is used in conjunction with 'offset' or 'cursor' for pagination. If the requested limit exceeds the system maximum, the API will return the maximum allowed number of records.",
+    "required": false,
+    "deprecated": false,
+    "allowEmptyValue": false,
+    "style": "form",
+    "explode": true,
+    "schema": {
+      "type": "integer",
+      "format": "int32",
+      "minimum": 1,
+      "maximum": 1000,
+      "default": 20,
+      "title": "Page Limit",
+      "description": "The integer value representing the page size."
+    },
+    "example": 50
+  },
+  "offset": {
+    "name": "offset",
+    "in": "query",
+    "description": "Indicates the number of records to skip before starting to collect the result set. This parameter is used for standard offset-based pagination. For example, to retrieve the second page of 50 items, set the offset to 50. It defaults to 0 if not provided.",
+    "required": false,
+    "deprecated": false,
+    "allowEmptyValue": false,
+    "style": "form",
+    "explode": true,
+    "schema": {
+      "type": "integer",
+      "format": "int32",
+      "minimum": 0,
+      "default": 0,
+      "title": "Pagination Offset",
+      "description": "The integer value representing the number of items to skip."
+    },
+    "example": 0
+  },
+  "cursor": {
+    "name": "cursor",
+    "in": "query",
+    "description": "An opaque string token used for keyset pagination (cursor-based pagination). This is preferred for deep pagination or real-time data feeds as it is more performant than offset-based pagination. The value should be taken directly from the `next_cursor` field in a previous response.",
+    "required": false,
+    "style": "form",
+    "explode": true,
+    "schema": {
+      "type": "string",
+      "title": "Pagination Cursor",
+      "description": "Base64 encoded or opaque string representing the position in the dataset."
+    },
+    "example": "eyJpZCI6IjYwZGRjYmEwLTEyMzQtNTY3OC05MGFiLWNkZWYxMjM0NTY3OCIsImNyZWF0ZWRfYXQiOiIyMDIzLTEwLTI3VDEwOjAwOjAwWiJ9"
+  },
+  "sort_order": {
+    "name": "sort_order",
+    "in": "query",
+    "description": "Determines the sorting order of the paginated results. Can be set to 'asc' for ascending or 'desc' for descending order based on the primary sort key (usually creation time or ID).",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "enum": [
+        "asc",
+        "desc"
+      ],
+      "default": "desc",
+      "title": "Sort Order"
+    },
+    "example": "desc"
+  }
+}
