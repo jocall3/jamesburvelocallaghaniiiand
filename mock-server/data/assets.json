@@ -1,0 +1,255 @@
+[
+  {
+    "id": "ast-001-abc",
+    "name": "Project Orion UI Kit v1.2",
+    "type": "design-asset",
+    "description": "Comprehensive UI kit for Project Orion, including components, styles, and guidelines. Updated with new dark mode elements.",
+    "url": "https://cdn.example.com/assets/orion/ui-kit-v1.2.zip",
+    "status": "active",
+    "createdAt": "2023-03-10T14:30:00Z",
+    "updatedAt": "2024-01-20T11:15:00Z",
+    "ownerId": "usr-design-lead",
+    "tags": ["design", "ui", "orion", "figma", "sketch"],
+    "metadata": {
+      "version": "1.2",
+      "fileSizeMB": 125.7,
+      "format": "zip",
+      "compatibleSoftware": ["Figma", "Sketch", "Adobe XD"]
+    }
+  },
+  {
+    "id": "ast-002-def",
+    "name": "Q4 2023 Marketing Performance Report",
+    "type": "document",
+    "description": "Detailed analysis of marketing campaign performance for the fourth quarter of 2023, including ROI and conversion rates.",
+    "url": "https://cdn.example.com/assets/reports/q4-2023-marketing-report.pdf",
+    "status": "archived",
+    "createdAt": "2024-01-05T09:00:00Z",
+    "updatedAt": "2024-01-05T09:00:00Z",
+    "ownerId": "usr-marketing-analyst",
+    "tags": ["report", "marketing", "performance", "2023"],
+    "metadata": {
+      "pages": 38,
+      "confidential": true,
+      "department": "Marketing"
+    }
+  },
+  {
+    "id": "ast-003-ghi",
+    "name": "Server Rack 3 Inventory List",
+    "type": "physical-asset-record",
+    "description": "Inventory list for all hardware components located in Server Rack 3 in the main data center.",
+    "url": null,
+    "status": "in-use",
+    "createdAt": "2023-01-01T08:00:00Z",
+    "updatedAt": "2024-02-15T10:00:00Z",
+    "ownerId": "usr-it-ops",
+    "tags": ["hardware", "inventory", "datacenter", "server"],
+    "metadata": {
+      "location": "Data Center A, Rack 3",
+      "lastAuditDate": "2024-02-10",
+      "itemsCount": 24
+    }
+  },
+  {
+    "id": "ast-004-jkl",
+    "name": "API Documentation - User Service v2.1",
+    "type": "documentation",
+    "description": "Updated OpenAPI specification and usage guide for the User Management Service API, reflecting v2.1 changes.",
+    "url": "https://docs.example.com/api/user-service/v2.1/openapi.yaml",
+    "status": "active",
+    "createdAt": "2023-11-20T16:00:00Z",
+    "updatedAt": "2024-03-01T10:00:00Z",
+    "ownerId": "usr-dev-lead",
+    "tags": ["api", "documentation", "user-service", "openapi"],
+    "metadata": {
+      "version": "2.1",
+      "format": "YAML",
+      "generatedBy": "Swagger Codegen"
+    }
+  },
+  {
+    "id": "ast-005-mno",
+    "name": "Company Logo - High Resolution",
+    "type": "image",
+    "description": "Official company logo in high resolution for print and large-scale digital use.",
+    "url": "https://cdn.example.com/assets/branding/company-logo-hires.png",
+    "status": "active",
+    "createdAt": "2022-05-01T10:00:00Z",
+    "updatedAt": "2022-05-01T10:00:00Z",
+    "ownerId": "usr-marketing-manager",
+    "tags": ["branding", "logo", "image"],
+    "metadata": {
+      "resolution": "4000x2000",
+      "fileSizeKB": 850,
+      "transparentBackground": true
+    }
+  },
+  {
+    "id": "ast-006-pqr",
+    "name": "Onboarding Video for New Employees",
+    "type": "video",
+    "description": "Introductory video for new hires covering company culture, benefits, and initial setup procedures.",
+    "url": "https://cdn.example.com/assets/hr/onboarding-video.mp4",
+    "status": "active",
+    "createdAt": "2023-07-15T11:00:00Z",
+    "updatedAt": "2023-07-15T11:00:00Z",
+    "ownerId": "usr-hr-specialist",
+    "tags": ["hr", "onboarding", "training", "video"],
+    "metadata": {
+      "durationSeconds": 900,
+      "resolution": "1920x1080",
+      "language": "English"
+    }
+  },
+  {
+    "id": "ast-007-stu",
+    "name": "Legal Agreement Template - NDA v3",
+    "type": "legal-document",
+    "description": "Standard Non-Disclosure Agreement (NDA) template, version 3, approved by legal department.",
+    "url": "https://cdn.example.com/assets/legal/nda-template-v3.docx",
+    "status": "active",
+    "createdAt": "2023-09-01T10:00:00Z",
+    "updatedAt": "2023-09-01T10:00:00Z",
+    "ownerId": "usr-legal-counsel",
+    "tags": ["legal", "template", "nda", "contract"],
+    "metadata": {
+      "version": "3.0",
+      "lastReviewedDate": "2023-08-28"
+    }
+  },
+  {
+    "id": "ast-008-vwx",
+    "name": "Software License Key - Adobe Creative Cloud",
+    "type": "license-key",
+    "description": "Master license key for Adobe Creative Cloud enterprise subscription.",
+    "url": null,
+    "status": "active",
+    "createdAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z",
+    "ownerId": "usr-it-admin",
+    "tags": ["software", "license", "adobe", "creative-cloud"],
+    "metadata": {
+      "licenseType": "enterprise",
+      "expirationDate": "2025-01-01",
+      "seats": 50
+    }
+  },
+  {
+    "id": "ast-009-yza",
+    "name": "Product Roadmap Q3 2024",
+    "type": "document",
+    "description": "Strategic product roadmap outlining key features and initiatives for Q3 2024.",
+    "url": "https://cdn.example.com/assets/product/roadmap-q3-2024.pptx",
+    "status": "pending-review",
+    "createdAt": "2024-04-10T14:00:00Z",
+    "updatedAt": "2024-04-12T09:30:00Z",
+    "ownerId": "usr-product-manager",
+    "tags": ["product", "roadmap", "strategy", "2024"],
+    "metadata": {
+      "quarter": "Q3",
+      "status": "Draft",
+      "lastEditor": "Alice Johnson"
+    }
+  },
+  {
+    "id": "ast-010-bcd",
+    "name": "Customer Feedback Survey Results - March 2024",
+    "type": "data-report",
+    "description": "Aggregated results and analysis from the customer satisfaction survey conducted in March 2024.",
+    "url": "https://cdn.example.com/assets/data/customer-survey-march-2024.xlsx",
+    "status": "active",
+    "createdAt": "2024-04-05T10:00:00Z",
+    "updatedAt": "2024-04-05T10:00:00Z",
+    "ownerId": "usr-data-analyst",
+    "tags": ["customer-feedback", "survey", "data", "report"],
+    "metadata": {
+      "responseCount": 1250,
+      "npsScore": 45,
+      "format": "xlsx"
+    }
+  },
+  {
+    "id": "ast-011-efg",
+    "name": "Development Environment Setup Guide",
+    "type": "documentation",
+    "description": "Step-by-step guide for setting up a local development environment for new engineers.",
+    "url": "https://docs.example.com/dev/setup-guide.md",
+    "status": "active",
+    "createdAt": "2023-02-01T09:00:00Z",
+    "updatedAt": "2024-01-10T14:00:00Z",
+    "ownerId": "usr-dev-ops",
+    "tags": ["development", "onboarding", "guide", "engineering"],
+    "metadata": {
+      "platforms": ["macOS", "Linux", "Windows"],
+      "requiredTools": ["Docker", "Git", "Node.js"]
+    }
+  },
+  {
+    "id": "ast-012-hij",
+    "name": "Marketing Campaign Banner - Summer Sale",
+    "type": "image",
+    "description": "Promotional banner image for the upcoming summer sale campaign.",
+    "url": "https://cdn.example.com/assets/marketing/summer-sale-banner.jpg",
+    "status": "scheduled",
+    "createdAt": "2024-04-15T10:00:00Z",
+    "updatedAt": "2024-04-15T10:00:00Z",
+    "ownerId": "usr-graphic-designer",
+    "tags": ["marketing", "campaign", "banner", "image", "sale"],
+    "metadata": {
+      "resolution": "1600x400",
+      "fileSizeKB": 320,
+      "campaignId": "CMP-SUMMER-2024"
+    }
+  },
+  {
+    "id": "ast-013-klm",
+    "name": "Employee Handbook v5.1",
+    "type": "document",
+    "description": "The official employee handbook, updated with new remote work policies and benefits.",
+    "url": "https://cdn.example.com/assets/hr/employee-handbook-v5.1.pdf",
+    "status": "active",
+    "createdAt": "2022-10-01T09:00:00Z",
+    "updatedAt": "2024-03-20T11:00:00Z",
+    "ownerId": "usr-hr-director",
+    "tags": ["hr", "policy", "handbook", "employee"],
+    "metadata": {
+      "version": "5.1",
+      "lastRevisionDate": "2024-03-15"
+    }
+  },
+  {
+    "id": "ast-014-nop",
+    "name": "Database Schema Diagram - Core Services",
+    "type": "diagram",
+    "description": "UML diagram illustrating the database schema for core application services.",
+    "url": "https://cdn.example.com/assets/architecture/db-schema-core-services.svg",
+    "status": "active",
+    "createdAt": "2023-05-01T13:00:00Z",
+    "updatedAt": "2024-02-28T16:00:00Z",
+    "ownerId": "usr-architect",
+    "tags": ["architecture", "database", "schema", "diagram", "engineering"],
+    "metadata": {
+      "format": "svg",
+      "tool": "draw.io",
+      "relatedServices": ["User", "Product", "Order"]
+    }
+  },
+  {
+    "id": "ast-015-qrs",
+    "name": "Server Log Archive - 2023-12",
+    "type": "log-archive",
+    "description": "Compressed archive of all server logs for December 2023, stored for compliance.",
+    "url": "s3://example-logs/server-logs-2023-12.tar.gz",
+    "status": "archived",
+    "createdAt": "2024-01-01T02:00:00Z",
+    "updatedAt": "2024-01-01T02:00:00Z",
+    "ownerId": "usr-it-ops",
+    "tags": ["logs", "archive", "compliance", "server"],
+    "metadata": {
+      "storageLocation": "AWS S3 Glacier",
+      "retentionPolicyYears": 7,
+      "compressedSizeGB": 15.2
+    }
+  }
+]
