@@ -1,0 +1,26 @@
+type: object
+description: |
+  A key-value pair used for tagging resources. Tags are arbitrary, user-defined metadata that can be used for categorization, billing, access control, and other purposes. Each resource can have a set of tags, and each tag must have a unique key within that set.
+title: Resource Tag
+properties:
+  key:
+    type: string
+    description: |
+      The key part of the tag. It's a user-defined string that acts as a descriptor for the value. Keys are case-sensitive and must be unique for a given resource.
+    example: "project-id"
+    minLength: 1
+    maxLength: 128
+    pattern: '^[a-zA-Z0-9_.:/=+\-@]+$'
+  value:
+    type: string
+    description: |
+      The value part of the tag. It's a user-defined string that provides the specific metadata associated with the key. Values are case-sensitive.
+    example: "blue-heron-3451"
+    minLength: 0
+    maxLength: 256
+required:
+  - key
+  - value
+example:
+  key: "environment"
+  value: "production"
