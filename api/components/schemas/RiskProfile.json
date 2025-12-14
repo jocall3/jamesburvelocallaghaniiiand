@@ -1,0 +1,35 @@
+{
+  "title": "RiskProfile",
+  "type": "object",
+  "description": "Represents the detailed risk assessment profile associated with an AccountDeepModel. This object encapsulates critical financial metrics including volatility, total market exposure, and maximum historical drawdown to facilitate automated risk management and compliance auditing.",
+  "properties": {
+    "volatility": {
+      "type": "number",
+      "format": "float",
+      "description": "The annualized standard deviation of the account's returns. This metric serves as a proxy for the risk associated with the account's trading strategy. A value of 0.0 indicates no volatility (cash), while higher values indicate significant price fluctuations.",
+      "minimum": 0.0,
+      "example": 0.185
+    },
+    "exposure": {
+      "type": "number",
+      "format": "double",
+      "description": "The current total market exposure expressed in the account's base currency. This value represents the aggregate notional value of all open positions, adjusted for leverage where applicable.",
+      "minimum": 0.0,
+      "example": 125000.50
+    },
+    "maxDrawdown": {
+      "type": "number",
+      "format": "float",
+      "description": "The maximum observed loss from a historical peak to a trough of the portfolio, expressed as a decimal fraction (e.g., 0.15 for 15%). This metric highlights the downside risk and the largest single drop in asset value over the account's lifespan.",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "example": 0.12
+    }
+  },
+  "required": [
+    "volatility",
+    "exposure",
+    "maxDrawdown"
+  ],
+  "additionalProperties": false
+}
