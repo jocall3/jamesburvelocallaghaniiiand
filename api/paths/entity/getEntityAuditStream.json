@@ -1,0 +1,461 @@
+{
+  "summary": "Retrieve Fiscal Audit Stream",
+  "description": "Retrieves the immutable fiscal audit stream for a specific entity. This endpoint corresponds to the 'fiscalEndpoint' property and provides a chronologically sorted, cryptographically verifiable log of all state changes, financial transactions, and compliance events associated with the entity. It supports extensive filtering by date range, actor, event type, and fiscal period. The response includes detailed diffs of state changes, actor metadata, and ledger integrity hashes suitable for regulatory auditing.",
+  "operationId": "getEntityAuditStream",
+  "tags": [
+    "Entity",
+    "Audit",
+    "Fiscal",
+    "Compliance"
+  ],
+  "security": [
+    {
+      "bearerAuth": [
+        "read:audit",
+        "read:entity"
+      ]
+    },
+    {
+      "apiKeyAuth": []
+    }
+  ],
+  "parameters": [
+    {
+      "name": "entityId",
+      "in": "path",
+      "description": "The unique identifier (UUID) of the entity for which to retrieve the audit stream.",
+      "required": true,
+      "schema": {
+        "type": "string",
+        "format": "uuid",
+        "example": "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+      }
+    },
+    {
+      "name": "startDate",
+      "in": "query",
+      "description": "ISO 8601 start timestamp for the audit range (inclusive).",
+      "required": false,
+      "schema": {
+        "type": "string",
+        "format": "date-time",
+        "example": "2023-01-01T00:00:00Z"
+      }
+    },
+    {
+      "name": "endDate",
+      "in": "query",
+      "description": "ISO 8601 end timestamp for the audit range (exclusive).",
+      "required": false,
+      "schema": {
+        "type": "string",
+        "format": "date-time",
+        "example": "2023-12-31T23:59:59Z"
+      }
+    },
+    {
+      "name": "eventTypes",
+      "in": "query",
+      "description": "Filter by specific event types. Accepts a comma-separated list of event categories.",
+      "style": "form",
+      "explode": false,
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "ENTITY_CREATED",
+            "ENTITY_UPDATED",
+            "ENTITY_DELETED",
+            "FISCAL_TRANSACTION",
+            "COMPLIANCE_CHECK",
+            "ACCESS_CONTROL_CHANGE",
+            "DOCUMENT_UPLOAD",
+            "LEDGER_ANCHOR"
+          ]
+        },
+        "example": [
+          "FISCAL_TRANSACTION",
+          "ENTITY_UPDATED"
+        ]
+      }
+    },
+    {
+      "name": "actorId",
+      "in": "query",
+      "description": "Filter audit logs by the specific user or system actor ID who performed the action.",
+      "schema": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    {
+      "name": "includeDiffs",
+      "in": "query",
+      "description": "If true, includes the full JSON patch diff for every state change.",
+      "schema": {
+        "type": "boolean",
+        "default": false
+      }
+    },
+    {
+      "name": "fiscalYear",
+      "in": "query",
+      "description": "Filter records strictly within a specific fiscal year context.",
+      "schema": {
+        "type": "integer",
+        "example": 2024
+      }
+    },
+    {
+      "name": "limit",
+      "in": "query",
+      "description": "Maximum number of audit records to return.",
+      "schema": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 1000,
+        "default": 100
+      }
+    },
+    {
+      "name": "cursor",
+      "in": "query",
+      "description": "Opaque cursor string for pagination.",
+      "schema": {
+        "type": "string"
+      }
+    }
+  ],
+  "responses": {
+    "200": {
+      "description": "Successful retrieval of the audit stream. Returns a paginated list of audit events with cryptographic integrity proofs.",
+      "headers": {
+        "X-Total-Count": {
+          "description": "Total number of audit records matching the filter.",
+          "schema": {
+            "type": "integer"
+          }
+        },
+        "X-Ledger-Hash": {
+          "description": "Cryptographic hash of the returned batch for integrity verification.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "meta": {
+                "type": "object",
+                "properties": {
+                  "total_records": {
+                    "type": "integer",
+                    "description": "Total records found."
+                  },
+                  "next_cursor": {
+                    "type": "string",
+                    "description": "Cursor for the next page of results.",
+                    "nullable": true
+                  },
+                  "generated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "integrity_hash": {
+                    "type": "string",
+                    "description": "SHA-256 hash of the data payload."
+                  }
+                }
+              },
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Unique identifier for the audit event."
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "UTC timestamp when the event occurred."
+                    },
+                    "event_type": {
+                      "type": "string",
+                      "enum": [
+                        "ENTITY_CREATED",
+                        "ENTITY_UPDATED",
+                        "ENTITY_DELETED",
+                        "FISCAL_TRANSACTION",
+                        "COMPLIANCE_CHECK",
+                        "ACCESS_CONTROL_CHANGE",
+                        "DOCUMENT_UPLOAD",
+                        "LEDGER_ANCHOR"
+                      ]
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "INFO",
+                        "WARNING",
+                        "CRITICAL",
+                        "FATAL"
+                      ]
+                    },
+                    "actor": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "USER",
+                            "SYSTEM",
+                            "API_KEY",
+                            "EXTERNAL_INTEGRATION"
+                          ]
+                        },
+                        "ip_address": {
+                          "type": "string",
+                          "format": "ipv4"
+                        },
+                        "user_agent": {
+                          "type": "string"
+                        },
+                        "geo_location": {
+                          "type": "object",
+                          "properties": {
+                            "country": {
+                              "type": "string"
+                            },
+                            "city": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "resource": {
+                      "type": "object",
+                      "properties": {
+                        "entity_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "resource_type": {
+                          "type": "string"
+                        },
+                        "resource_path": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "fiscal_context": {
+                      "type": "object",
+                      "description": "Financial and compliance specific metadata.",
+                      "properties": {
+                        "fiscal_year": {
+                          "type": "integer"
+                        },
+                        "quarter": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 4
+                        },
+                        "currency": {
+                          "type": "string",
+                          "minLength": 3,
+                          "maxLength": 3
+                        },
+                        "transaction_amount": {
+                          "type": "number",
+                          "format": "double"
+                        },
+                        "ledger_reference": {
+                          "type": "string",
+                          "description": "Reference ID in the immutable ledger."
+                        }
+                      }
+                    },
+                    "changes": {
+                      "type": "array",
+                      "description": "List of field-level changes.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string"
+                          },
+                          "old_value": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean",
+                              "object",
+                              "null"
+                            ]
+                          },
+                          "new_value": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean",
+                              "object",
+                              "null"
+                            ]
+                          },
+                          "operation": {
+                            "type": "string",
+                            "enum": [
+                              "ADD",
+                              "REPLACE",
+                              "REMOVE"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "Arbitrary metadata associated with the event."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "examples": {
+            "standard_response": {
+              "summary": "Standard Audit Stream Response",
+              "value": {
+                "meta": {
+                  "total_records": 145,
+                  "next_cursor": "eyJ0aW1lc3RhbXAiOjE2NzI1MzExMDB9",
+                  "generated_at": "2023-10-27T10:00:00Z",
+                  "integrity_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                },
+                "data": [
+                  {
+                    "id": "550e8400-e29b-41d4-a716-446655440000",
+                    "timestamp": "2023-10-27T09:55:00Z",
+                    "event_type": "ENTITY_UPDATED",
+                    "severity": "INFO",
+                    "actor": {
+                      "id": "123e4567-e89b-12d3-a456-426614174000",
+                      "type": "USER",
+                      "ip_address": "192.168.1.1",
+                      "user_agent": "Mozilla/5.0...",
+                      "geo_location": {
+                        "country": "US",
+                        "city": "New York"
+                      }
+                    },
+                    "resource": {
+                      "entity_id": "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
+                      "resource_type": "EntityProfile",
+                      "resource_path": "/entities/a1b2c3d4/profile"
+                    },
+                    "fiscal_context": {
+                      "fiscal_year": 2023,
+                      "quarter": 4,
+                      "currency": "USD",
+                      "transaction_amount": 0,
+                      "ledger_reference": "L-99887766"
+                    },
+                    "changes": [
+                      {
+                        "field": "status",
+                        "old_value": "PENDING",
+                        "new_value": "ACTIVE",
+                        "operation": "REPLACE"
+                      }
+                    ],
+                    "metadata": {
+                      "approval_id": "APP-101"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "400": {
+      "description": "Bad Request. Invalid parameters provided.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          },
+          "example": {
+            "code": "INVALID_DATE_RANGE",
+            "message": "startDate cannot be after endDate",
+            "trace_id": "req_123abc"
+          }
+        }
+      }
+    },
+    "401": {
+      "description": "Unauthorized. Missing or invalid authentication credentials.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        }
+      }
+    },
+    "403": {
+      "description": "Forbidden. The authenticated user does not have permission to view the audit stream for this entity.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        }
+      }
+    },
+    "404": {
+      "description": "Entity Not Found. The specified entityId does not exist.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        }
+      }
+    },
+    "429": {
+      "description": "Too Many Requests. Rate limit exceeded.",
+      "headers": {
+        "Retry-After": {
+          "description": "Seconds to wait before retrying.",
+          "schema": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "500": {
+      "description": "Internal Server Error. An unexpected error occurred while retrieving the audit stream.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        }
+      }
+    }
+  }
+}
