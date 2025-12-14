@@ -1,0 +1,56 @@
+openapi: 3.1.0
+info:
+  title: AlgoTradingLab Quantum API
+  version: 4.2.0
+  description: |
+    # QuantumLeap Analytics & Algorithmics Inc. API
+    
+    A massive-scale, production-grade API for high-frequency algorithmic trading, quantum-inspired analytics, and AI-driven market insights.
+    
+    ## Features
+    - **Quantum Metrics**: Real-time system performance monitoring.
+    - **AI Insights**: Proactive anomaly detection and market sentiment analysis.
+    - **Algo Management**: Full lifecycle management for No-Code, Python, and Rust algorithms.
+    - **Backtesting**: High-fidelity simulation with equity curve visualization.
+    
+  contact:
+    name: API Support
+    email: support@algotradinglab.com
+    url: https://algotradinglab.com/support
+  license:
+    name: Proprietary
+    url: https://algotradinglab.com/license
+servers:
+  - url: https://api.algotradinglab.com/v1
+    description: Production Quantum Cluster
+  - url: https://staging-api.algotradinglab.com/v1
+    description: Staging / Backtesting Environment
+  - url: http://localhost:3000/api
+    description: Local Development
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []
+tags:
+  - name: System
+    description: System health, metrics, and process monitoring.
+  - name: AI
+    description: Artificial Intelligence insights, predictions, and neural firewall status.
+  - name: Algorithms
+    description: Management, deployment, and versioning of trading strategies.
+  - name: Backtesting
+    description: Historical simulation and performance analysis.
+  - name: Users
+    description: User profile management, security settings, and API keys.
+  - name: Market
+    description: Real-time market data, order books, and sentiment streams.
+paths:
+  $ref: './paths/_index.yaml'
+components:
+  securitySchemes:
+    $ref: './components/security/_index.yaml'
+  schemas:
+    $ref: './components/schemas/_index.yaml'
+  parameters:
+    $ref: './components/parameters/_index.yaml'
+  responses:
+    $ref: './components/responses/_index.yaml'
