@@ -1,0 +1,34 @@
+{
+  "description": "Entity Not Found. The server has not found anything matching the Request-URI. This is a common error when a specific resource (like an account, user, or transaction) identified by a unique ID in the URL path does not exist. The response body contains a standardized error object providing more context.",
+  "content": {
+    "application/json": {
+      "schema": {
+        "$ref": "../schemas/Error.json"
+      },
+      "examples": {
+        "accountNotFound": {
+          "summary": "Example of an Account Not Found error",
+          "value": {
+            "error": {
+              "code": "RESOURCE_NOT_FOUND",
+              "message": "The specified account with ID 'acc_1234567890abcdef' could not be found.",
+              "target": "accountId",
+              "traceId": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            }
+          }
+        },
+        "genericEntityNotFound": {
+          "summary": "Example of a generic Entity Not Found error",
+          "value": {
+            "error": {
+              "code": "RESOURCE_NOT_FOUND",
+              "message": "The requested resource could not be found.",
+              "target": "id",
+              "traceId": "b2c3d4e5-f6a7-8901-2345-67890abcdef1"
+            }
+          }
+        }
+      }
+    }
+  }
+}
