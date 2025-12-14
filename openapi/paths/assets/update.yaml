@@ -1,0 +1,107 @@
+patch:
+  tags:
+    - Assets
+  summary: Update an Asset
+  description: |
+    Partially updates an existing asset by its unique identifier.
+    Only the fields provided in the request body will be modified. All other fields will remain unchanged.
+    This operation is idempotent if the same patch is applied multiple times, assuming no other changes occur.
+    For optimistic concurrency control, you can provide the asset's current version in the `If-Match` header.
+  operationId: updateAsset
+  parameters:
+    - name: id
+      in: path
+      description: The unique identifier (UUID) for the asset.
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: "123e4567-e89b-12d3-a456-426614174000"
+  requestBody:
+    description: A JSON object containing the fields to update on the asset. At least one field must be provided.
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/assets/UpdateAssetRequest.yaml'
+        examples:
+          updateNameAndStatus:
+            summary: Update Name and Status
+            description: An example of updating the asset's name and its operational status.
+            value:
+              name: "Main Production Server - Updated"
+              status: "in_maintenance"
+          updateMetadata:
+            summary: Update Custom Metadata
+            description: An example of adding or modifying custom metadata fields. This performs a shallow merge; nested objects are replaced, not merged.
+            value:
+              metadata:
+                owner_department: "IT Operations"
+                last_serviced_by: "jane.doe@example.com"
+                purchase_order: "PO-2024-98765"
+          updateLocation:
+            summary: Update Physical Location
+            description: An example of updating the asset's physical location coordinates and description.
+            value:
+              location:
+                latitude: 34.052235
+                longitude: -118.243683
+                description: "Los Angeles Data Center, Rack 42, Unit 15"
+          reassignAsset:
+            summary: Reassign Asset
+            description: An example of assigning the asset to a different user.
+            value:
+              assigned_to: "user-8a8b8c8d-e29b-41d4-a716-446655440000"
+  responses:
+    '200':
+      description: Asset updated successfully. The response returns the complete, updated asset object.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/assets/Asset.yaml'
+          example:
+            id: "123e4567-e89b-12d3-a456-426614174000"
+            name: "Main Production Server - Updated"
+            asset_tag: "SRV-PROD-001"
+            serial_number: "SN-ABC-123-XYZ-789"
+            model: "PowerEdge R740"
+            vendor: "Dell EMC"
+            category: "Server"
+            status: "in_maintenance"
+            location:
+              latitude: 34.052235
+              longitude: -118.243683
+              description: "Los Angeles Data Center, Rack 42, Unit 15"
+            purchase_date: "2022-01-15T00:00:00Z"
+            warranty_expires: "2025-01-15T00:00:00Z"
+            assigned_to: "user-8a8b8c8d-e29b-41d4-a716-446655440000"
+            metadata:
+              os: "Ubuntu 22.04 LTS"
+              cpu_cores: 32
+              ram_gb: 256
+              storage_tb: 10
+              ip_address: "192.168.1.100"
+              owner_department: "IT Operations"
+              last_serviced_by: "jane.doe@example.com"
+              purchase_order: "PO-2024-98765"
+            created_at: "2023-01-10T10:00:00Z"
+            updated_at: "2024-07-23T14:30:00Z"
+            version: 2
+    '400':
+      $ref: '../../components/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../components/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../components/responses/Forbidden.yaml'
+    '404':
+      $ref: '../../components/responses/NotFound.yaml'
+    '409':
+      $ref: '../../components/responses/Conflict.yaml'
+    '422':
+      $ref: '../../components/responses/UnprocessableEntity.yaml'
+    '500':
+      $ref: '../../components/responses/InternalServerError.yaml'
+  security:
+    - OAuth2:
+        - assets:write
+        - assets:manage
