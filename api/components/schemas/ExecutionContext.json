@@ -1,0 +1,11 @@
+{
+  "title": "ExecutionContext",
+  "description": "Enumeration representing the specific execution context or operational mode of the system at the time of the request. This setting dictates the behavior of internal logic, the granularity of audit logging, and the activation of safety mechanisms. Used extensively across system state endpoints to determine processing rules.",
+  "type": "string",
+  "enum": [
+    "PRODUCTION_GRADE_A",
+    "AUDIT_MODE",
+    "FAILSAFE_TRIGGERED"
+  ],
+  "example": "PRODUCTION_GRADE_A"
+}
