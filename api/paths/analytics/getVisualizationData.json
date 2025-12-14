@@ -1,0 +1,369 @@
+{
+  "get": {
+    "tags": [
+      "Analytics",
+      "Visualization"
+    ],
+    "summary": "Retrieve Aggregated Visualization Data",
+    "description": "Fetches high-performance, pre-aggregated analytics data formatted specifically for frontend visualization libraries like Recharts (Area, Bar, Line charts). This endpoint performs complex aggregations over large datasets based on the provided time range, metric, and granularity, returning a normalized JSON structure suitable for direct binding to chart components.",
+    "operationId": "getVisualizationData",
+    "parameters": [
+      {
+        "name": "metric",
+        "in": "query",
+        "description": "The primary performance metric to visualize. Determines the value keys in the response data array.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "total_revenue",
+            "recurring_revenue",
+            "active_users",
+            "new_signups",
+            "churn_rate",
+            "session_duration",
+            "page_views",
+            "conversion_rate"
+          ],
+          "example": "total_revenue"
+        }
+      },
+      {
+        "name": "startDate",
+        "in": "query",
+        "description": "The start timestamp for the data range (ISO 8601 format).",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-01-01T00:00:00.000Z"
+        }
+      },
+      {
+        "name": "endDate",
+        "in": "query",
+        "description": "The end timestamp for the data range (ISO 8601 format). Defaults to current time if omitted.",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-12-31T23:59:59.999Z"
+        }
+      },
+      {
+        "name": "interval",
+        "in": "query",
+        "description": "The time granularity for grouping data points. Affects the density of the returned array.",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "1h",
+            "6h",
+            "12h",
+            "1d",
+            "1w",
+            "1m",
+            "1q",
+            "1y"
+          ],
+          "default": "1d",
+          "example": "1m"
+        }
+      },
+      {
+        "name": "segmentBy",
+        "in": "query",
+        "description": "Optional dimension to segment the data by (e.g., splitting revenue by product category or region). This results in multiple keys per data point for stacked charts.",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "none",
+            "region",
+            "device_type",
+            "user_tier",
+            "product_category",
+            "acquisition_channel"
+          ],
+          "default": "none"
+        }
+      },
+      {
+        "name": "chartType",
+        "in": "query",
+        "description": "Hint for the backend to optimize data structure for specific Recharts components (e.g., 'area' might return cumulative data, 'bar' might return discrete buckets).",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "line",
+            "area",
+            "bar",
+            "composed",
+            "scatter"
+          ],
+          "default": "line"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Successful response containing visualization-ready data.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "description": "Metadata regarding the aggregation context and summary statistics.",
+                  "properties": {
+                    "metric": {
+                      "type": "string",
+                      "description": "The metric requested."
+                    },
+                    "interval": {
+                      "type": "string",
+                      "description": "The granularity applied."
+                    },
+                    "totalCount": {
+                      "type": "integer",
+                      "description": "Total number of data points returned."
+                    },
+                    "summary": {
+                      "type": "object",
+                      "description": "High-level summary stats for the period.",
+                      "properties": {
+                        "sum": {
+                          "type": "number"
+                        },
+                        "average": {
+                          "type": "number"
+                        },
+                        "min": {
+                          "type": "number"
+                        },
+                        "max": {
+                          "type": "number"
+                        },
+                        "changePercentage": {
+                          "type": "number",
+                          "description": "Percentage change compared to the previous equivalent period."
+                        }
+                      }
+                    },
+                    "seriesKeys": {
+                      "type": "array",
+                      "description": "List of keys present in the data objects (excluding the axis key), useful for dynamically generating <Line /> or <Bar /> components.",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "colors": {
+                      "type": "object",
+                      "description": "Suggested color mapping for the series keys.",
+                      "additionalProperties": {
+                        "type": "string",
+                        "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "array",
+                  "description": "The dataset formatted for Recharts. Each object represents a point on the X-axis (time) and contains values for one or more series.",
+                  "items": {
+                    "type": "object",
+                    "description": "A single data point.",
+                    "properties": {
+                      "timestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "ISO 8601 timestamp for this bucket."
+                      },
+                      "label": {
+                        "type": "string",
+                        "description": "Human-readable label for the X-axis (e.g., 'Jan 01')."
+                      }
+                    },
+                    "additionalProperties": {
+                      "type": "number",
+                      "description": "Dynamic metric values (e.g., 'revenue', 'desktop', 'mobile')."
+                    }
+                  }
+                }
+              },
+              "required": [
+                "meta",
+                "data"
+              ]
+            },
+            "examples": {
+              "simpleLineChart": {
+                "summary": "Simple Revenue Line Chart",
+                "description": "Data for a single-series line chart showing total revenue over 6 months.",
+                "value": {
+                  "meta": {
+                    "metric": "total_revenue",
+                    "interval": "1m",
+                    "totalCount": 6,
+                    "summary": {
+                      "sum": 154000,
+                      "average": 25666.66,
+                      "min": 18000,
+                      "max": 35000,
+                      "changePercentage": 12.5
+                    },
+                    "seriesKeys": [
+                      "value"
+                    ],
+                    "colors": {
+                      "value": "#8884d8"
+                    }
+                  },
+                  "data": [
+                    {
+                      "timestamp": "2023-01-01T00:00:00Z",
+                      "label": "Jan",
+                      "value": 24000
+                    },
+                    {
+                      "timestamp": "2023-02-01T00:00:00Z",
+                      "label": "Feb",
+                      "value": 18000
+                    },
+                    {
+                      "timestamp": "2023-03-01T00:00:00Z",
+                      "label": "Mar",
+                      "value": 28000
+                    },
+                    {
+                      "timestamp": "2023-04-01T00:00:00Z",
+                      "label": "Apr",
+                      "value": 35000
+                    },
+                    {
+                      "timestamp": "2023-05-01T00:00:00Z",
+                      "label": "May",
+                      "value": 22000
+                    },
+                    {
+                      "timestamp": "2023-06-01T00:00:00Z",
+                      "label": "Jun",
+                      "value": 27000
+                    }
+                  ]
+                }
+              },
+              "stackedBarChart": {
+                "summary": "Stacked Bar Chart by Device",
+                "description": "Data segmented by device type, suitable for a stacked bar chart.",
+                "value": {
+                  "meta": {
+                    "metric": "active_users",
+                    "interval": "1d",
+                    "totalCount": 3,
+                    "summary": {
+                      "sum": 4500,
+                      "average": 1500,
+                      "min": 1400,
+                      "max": 1600,
+                      "changePercentage": 5.2
+                    },
+                    "seriesKeys": [
+                      "desktop",
+                      "mobile",
+                      "tablet"
+                    ],
+                    "colors": {
+                      "desktop": "#8884d8",
+                      "mobile": "#82ca9d",
+                      "tablet": "#ffc658"
+                    }
+                  },
+                  "data": [
+                    {
+                      "timestamp": "2023-06-01T00:00:00Z",
+                      "label": "Mon",
+                      "desktop": 800,
+                      "mobile": 500,
+                      "tablet": 100
+                    },
+                    {
+                      "timestamp": "2023-06-02T00:00:00Z",
+                      "label": "Tue",
+                      "desktop": 900,
+                      "mobile": 600,
+                      "tablet": 100
+                    },
+                    {
+                      "timestamp": "2023-06-03T00:00:00Z",
+                      "label": "Wed",
+                      "desktop": 850,
+                      "mobile": 550,
+                      "tablet": 100
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request. Invalid date range, unsupported metric, or malformed query parameters.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../components/schemas/Error.json"
+            },
+            "example": {
+              "code": 400,
+              "message": "Invalid interval '10y'. Supported intervals are: 1h, 1d, 1w, 1m, 1y."
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized. API key is missing or invalid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../components/schemas/Error.json"
+            }
+          }
+        }
+      },
+      "429": {
+        "description": "Too Many Requests. Rate limit exceeded for analytics queries.",
+        "headers": {
+          "Retry-After": {
+            "description": "The number of seconds to wait before making a new request.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal Server Error. Failed to aggregate data from the data warehouse.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../components/schemas/Error.json"
+            }
+          }
+        }
+      }
+    },
+    "security": [
+      {
+        "bearerAuth": []
+      },
+      {
+        "apiKey": []
+      }
+    ]
+  }
+}
