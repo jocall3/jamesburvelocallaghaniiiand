@@ -1,0 +1,200 @@
+{
+  "title": "VisualizationData",
+  "type": "object",
+  "description": "Schema for the derivative data calculated in 'C02_Compute_Analytical_Derivatives'. This object encapsulates high-precision metrics for velocity and acceleration, regulatory weighting factors for compliance analysis, and complex cryptographic metadata hashes for data integrity and lineage tracking. It is designed for downstream visualization engines and analytical dashboards.",
+  "required": [
+    "id",
+    "computationId",
+    "timestamp",
+    "velocityMetric",
+    "accelerationMetric",
+    "regulatoryWeight",
+    "metadataHashes",
+    "computationContext"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this visualization data record.",
+      "example": "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+    },
+    "computationId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference ID linking back to the specific execution of the C02_Compute_Analytical_Derivatives process.",
+      "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The exact UTC timestamp when the derivative calculations were finalized.",
+      "example": "2023-10-27T14:30:00.123Z"
+    },
+    "velocityMetric": {
+      "type": "number",
+      "format": "double",
+      "description": "The calculated rate of change for the primary dataset entity. Represents the first derivative of the core analytical vector.",
+      "minimum": -1000000.0,
+      "maximum": 1000000.0,
+      "example": 452.39102
+    },
+    "accelerationMetric": {
+      "type": "number",
+      "format": "double",
+      "description": "The calculated rate of change of the velocity metric. Represents the second derivative of the core analytical vector, used for predictive trend analysis.",
+      "minimum": -50000.0,
+      "maximum": 50000.0,
+      "example": 12.0045
+    },
+    "jerkMetric": {
+      "type": "number",
+      "format": "double",
+      "description": "The rate of change of acceleration (third derivative). Optional field used for high-fidelity motion analysis or volatile market data.",
+      "example": 0.451
+    },
+    "regulatoryWeight": {
+      "type": "number",
+      "format": "float",
+      "description": "A normalized coefficient (0.0 to 1.0) representing the impact or importance of this data point regarding regulatory compliance standards (e.g., GDPR, HIPAA, SEC, ISO).",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "example": 0.875
+    },
+    "metadataHashes": {
+      "type": "object",
+      "description": "Complex set of cryptographic hashes ensuring the integrity, lineage, and non-repudiation of the source data used to generate these metrics.",
+      "required": [
+        "sourceIntegrityHash",
+        "computationHash"
+      ],
+      "properties": {
+        "sourceIntegrityHash": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{64}$",
+          "description": "SHA-256 hash of the raw input data before processing.",
+          "example": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+        },
+        "computationHash": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{128}$",
+          "description": "SHA-512 hash representing the state of the algorithm and parameters used during the C02 phase.",
+          "example": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
+        },
+        "chainOfCustodyToken": {
+          "type": "string",
+          "description": "A signed JWT or similar token verifying the chain of custody for this data point.",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        },
+        "merkleRoot": {
+          "type": "string",
+          "description": "The Merkle root if this data point is part of a larger block or batch processing unit.",
+          "example": "a1b2c3d4e5f6..."
+        }
+      }
+    },
+    "computationContext": {
+      "type": "object",
+      "description": "Contextual parameters defining the environment and constraints under which the derivatives were computed.",
+      "properties": {
+        "algorithmVersion": {
+          "type": "string",
+          "description": "Semantic versioning of the calculation engine.",
+          "example": "2.4.1-beta"
+        },
+        "smoothingFactor": {
+          "type": "number",
+          "description": "The alpha value used in exponential smoothing if applied.",
+          "example": 0.15
+        },
+        "windowSize": {
+          "type": "integer",
+          "description": "The sliding window size used for derivative calculation.",
+          "example": 50
+        },
+        "outlierDetectionMethod": {
+          "type": "string",
+          "enum": [
+            "Z-SCORE",
+            "IQR",
+            "DBSCAN",
+            "NONE"
+          ],
+          "description": "Methodology used to identify and handle outliers during computation.",
+          "example": "IQR"
+        }
+      }
+    },
+    "visualProperties": {
+      "type": "object",
+      "description": "Pre-calculated properties to assist frontend rendering engines in visualizing this data point.",
+      "properties": {
+        "colorHex": {
+          "type": "string",
+          "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+          "description": "Suggested hex color code based on the regulatory weight and velocity intensity.",
+          "example": "#FF5733"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Suggested opacity level for heatmap or scatter plot rendering.",
+          "example": 0.9
+        },
+        "vectorCoordinates": {
+          "type": "object",
+          "description": "Normalized 3D coordinates for spatial visualization.",
+          "properties": {
+            "x": {
+              "type": "number",
+              "example": 0.12
+            },
+            "y": {
+              "type": "number",
+              "example": 0.88
+            },
+            "z": {
+              "type": "number",
+              "example": 0.45
+            }
+          }
+        }
+      }
+    },
+    "statisticalConfidence": {
+      "type": "object",
+      "description": "Statistical reliability metrics for the calculated derivatives.",
+      "properties": {
+        "pValue": {
+          "type": "number",
+          "description": "Calculated p-value indicating statistical significance.",
+          "example": 0.004
+        },
+        "standardError": {
+          "type": "number",
+          "description": "Standard error of the estimate.",
+          "example": 0.021
+        },
+        "confidenceInterval": {
+          "type": "object",
+          "properties": {
+            "lowerBound": {
+              "type": "number",
+              "example": 450.1
+            },
+            "upperBound": {
+              "type": "number",
+              "example": 454.6
+            },
+            "level": {
+              "type": "number",
+              "description": "Confidence level (e.g., 0.95 for 95%).",
+              "example": 0.95
+            }
+          }
+        }
+      }
+    }
+  }
+}
