@@ -1,0 +1,519 @@
+{
+  "summary": "Retrieve OCallaghan Entity Details",
+  "description": "Retrieves the full, detailed representation of a specific 'OCallaghanEntity' by its unique identifier. This endpoint provides a comprehensive view of the entity, including its current state, historical configuration revisions, associated metadata, computed metrics, and deep-linked relationships to other system artifacts. \n\nThis operation is optimized for high-fidelity data retrieval and supports granular field selection and expansion of nested resources to minimize network round-trips. It is the primary entry point for visualizing entity data in the dashboard and synchronizing state with external downstream systems.\n\nThe response includes strict ETag validation headers to facilitate caching and optimistic concurrency control.",
+  "operationId": "getEntityDetails",
+  "tags": [
+    "Entities",
+    "OCallaghan",
+    "Core Data"
+  ],
+  "externalDocs": {
+    "description": "Technical Specification for OCallaghan Entity Structure",
+    "url": "https://docs.api.internal/specs/entities/ocallaghan-v3"
+  },
+  "security": [
+    {
+      "bearerAuth": [
+        "read:entities",
+        "read:entities:sensitive"
+      ]
+    },
+    {
+      "apiKeyAuth": []
+    }
+  ],
+  "parameters": [
+    {
+      "name": "entityId",
+      "in": "path",
+      "description": "The unique UUID v4 identifier of the OCallaghan Entity to retrieve.",
+      "required": true,
+      "schema": {
+        "type": "string",
+        "format": "uuid",
+        "example": "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+      }
+    },
+    {
+      "name": "expand",
+      "in": "query",
+      "description": "Comma-separated list of nested resources to expand in the response. Supported values include 'audit_logs', 'configuration_history', 'related_assets', and 'computed_metrics'.",
+      "style": "form",
+      "explode": false,
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "audit_logs",
+            "configuration_history",
+            "related_assets",
+            "computed_metrics",
+            "access_policies",
+            "webhooks"
+          ]
+        }
+      }
+    },
+    {
+      "name": "verbosity",
+      "in": "query",
+      "description": "Controls the level of detail returned in the response object. 'minimal' returns only ID and status; 'standard' returns core fields; 'full' returns all available metadata and extended attributes.",
+      "schema": {
+        "type": "string",
+        "enum": [
+          "minimal",
+          "standard",
+          "full",
+          "debug"
+        ],
+        "default": "standard"
+      }
+    },
+    {
+      "name": "version_at",
+      "in": "query",
+      "description": "ISO 8601 timestamp. If provided, returns the state of the entity as it existed at this specific point in time (Time Travel Query).",
+      "schema": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    {
+      "name": "X-Correlation-ID",
+      "in": "header",
+      "description": "Unique identifier for request tracing across distributed systems.",
+      "schema": {
+        "type": "string",
+        "format": "uuid"
+      }
+    }
+  ],
+  "responses": {
+    "200": {
+      "description": "Successful operation. Returns the requested OCallaghanEntity with all specified expansions.",
+      "headers": {
+        "ETag": {
+          "description": "Entity tag for the resource version.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "Last-Modified": {
+          "description": "Timestamp of the last modification.",
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "X-RateLimit-Limit": {
+          "description": "The number of allowed requests in the current period.",
+          "schema": {
+            "type": "integer"
+          }
+        },
+        "X-RateLimit-Remaining": {
+          "description": "The number of remaining requests in the current period.",
+          "schema": {
+            "type": "integer"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "title": "OCallaghanEntityResponse",
+            "required": [
+              "id",
+              "urn",
+              "type",
+              "attributes",
+              "meta"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Unique identifier for the entity.",
+                "example": "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+              },
+              "urn": {
+                "type": "string",
+                "description": "Uniform Resource Name identifying the entity globally.",
+                "example": "urn:ocallaghan:entity:us-east-1:a1b2c3d4"
+              },
+              "type": {
+                "type": "string",
+                "description": "The specific discriminator type of the OCallaghan entity.",
+                "enum": [
+                  "standard_node",
+                  "cluster_controller",
+                  "edge_gateway",
+                  "virtual_link"
+                ],
+                "example": "cluster_controller"
+              },
+              "display_name": {
+                "type": "string",
+                "description": "Human-readable name of the entity.",
+                "example": "Primary Production Controller 01"
+              },
+              "description": {
+                "type": "string",
+                "description": "Detailed description of the entity's purpose.",
+                "example": "Handles main traffic routing for the northeast region cluster."
+              },
+              "lifecycle_state": {
+                "type": "string",
+                "description": "Current lifecycle status of the entity.",
+                "enum": [
+                  "provisioning",
+                  "active",
+                  "maintenance",
+                  "degraded",
+                  "deprecated",
+                  "decommissioned"
+                ],
+                "default": "active"
+              },
+              "attributes": {
+                "type": "object",
+                "description": "Core configuration attributes and operational parameters.",
+                "properties": {
+                  "network_config": {
+                    "type": "object",
+                    "properties": {
+                      "ipv4_address": {
+                        "type": "string",
+                        "format": "ipv4",
+                        "example": "192.168.1.50"
+                      },
+                      "ipv6_address": {
+                        "type": "string",
+                        "format": "ipv6",
+                        "example": "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
+                      },
+                      "subnet_mask": {
+                        "type": "string",
+                        "example": "255.255.255.0"
+                      },
+                      "dns_servers": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "format": "ipv4"
+                        }
+                      },
+                      "vlan_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 4094,
+                        "example": 102
+                      }
+                    }
+                  },
+                  "hardware_specs": {
+                    "type": "object",
+                    "properties": {
+                      "cpu_cores": {
+                        "type": "integer",
+                        "example": 16
+                      },
+                      "memory_gb": {
+                        "type": "integer",
+                        "example": 64
+                      },
+                      "storage_tier": {
+                        "type": "string",
+                        "enum": [
+                          "nvme",
+                          "ssd",
+                          "hdd",
+                          "hybrid"
+                        ]
+                      }
+                    }
+                  },
+                  "custom_tags": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "User-defined key-value pairs for categorization.",
+                    "example": {
+                      "cost_center": "CC-992",
+                      "environment": "production",
+                      "owner": "devops-team-a"
+                    }
+                  }
+                }
+              },
+              "metrics": {
+                "type": "object",
+                "description": "Real-time or cached metrics associated with the entity. Only returned if 'computed_metrics' is expanded.",
+                "properties": {
+                  "uptime_seconds": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1543002
+                  },
+                  "cpu_load_average": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 0.45
+                  },
+                  "active_connections": {
+                    "type": "integer",
+                    "example": 2341
+                  },
+                  "health_score": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "example": 98.5
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "description": "Links to related entities in the graph.",
+                "properties": {
+                  "parent_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "children": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "href": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "type": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "audit_log": {
+                "type": "array",
+                "description": "Recent audit events. Only returned if 'audit_logs' is expanded.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "event_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "actor": {
+                      "type": "string",
+                      "example": "user:jdoe"
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "create",
+                        "update",
+                        "delete",
+                        "scale",
+                        "restart"
+                      ]
+                    },
+                    "changes": {
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "meta": {
+                "type": "object",
+                "description": "System metadata regarding the record itself.",
+                "properties": {
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-01-15T08:30:00Z"
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-10-22T14:15:22Z"
+                  },
+                  "version": {
+                    "type": "integer",
+                    "description": "Optimistic locking version number.",
+                    "example": 42
+                  },
+                  "region": {
+                    "type": "string",
+                    "example": "us-west-2"
+                  }
+                }
+              }
+            }
+          },
+          "examples": {
+            "standard_response": {
+              "summary": "Standard Active Entity",
+              "value": {
+                "id": "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
+                "urn": "urn:ocallaghan:entity:us-east-1:a1b2c3d4",
+                "type": "cluster_controller",
+                "display_name": "Primary Production Controller 01",
+                "description": "Handles main traffic routing.",
+                "lifecycle_state": "active",
+                "attributes": {
+                  "network_config": {
+                    "ipv4_address": "192.168.1.50",
+                    "subnet_mask": "255.255.255.0",
+                    "vlan_id": 102
+                  },
+                  "custom_tags": {
+                    "env": "prod"
+                  }
+                },
+                "meta": {
+                  "created_at": "2023-01-15T08:30:00Z",
+                  "updated_at": "2023-10-22T14:15:22Z",
+                  "version": 42,
+                  "region": "us-east-1"
+                }
+              }
+            },
+            "full_expansion": {
+              "summary": "Full Expansion with Metrics and Audit",
+              "value": {
+                "id": "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
+                "urn": "urn:ocallaghan:entity:us-east-1:a1b2c3d4",
+                "type": "cluster_controller",
+                "lifecycle_state": "active",
+                "attributes": {
+                  "network_config": {
+                    "ipv4_address": "192.168.1.50"
+                  }
+                },
+                "metrics": {
+                  "uptime_seconds": 1543002,
+                  "cpu_load_average": 0.45,
+                  "health_score": 99.9
+                },
+                "audit_log": [
+                  {
+                    "event_id": "evt-123",
+                    "timestamp": "2023-10-22T14:15:22Z",
+                    "actor": "system",
+                    "action": "update"
+                  }
+                ],
+                "meta": {
+                  "created_at": "2023-01-15T08:30:00Z",
+                  "updated_at": "2023-10-22T14:15:22Z",
+                  "version": 43
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "400": {
+      "description": "Bad Request. The entityId format is invalid or query parameters are malformed.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "example": "INVALID_PARAMETER"
+              },
+              "message": {
+                "type": "string",
+                "example": "The 'verbosity' parameter must be one of: minimal, standard, full."
+              },
+              "trace_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        }
+      }
+    },
+    "401": {
+      "description": "Unauthorized. The bearer token is missing or invalid.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        }
+      }
+    },
+    "403": {
+      "description": "Forbidden. The user does not have permission to view this specific entity.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        }
+      }
+    },
+    "404": {
+      "description": "Not Found. The entity with the specified ID does not exist.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "example": "ENTITY_NOT_FOUND"
+              },
+              "message": {
+                "type": "string",
+                "example": "Entity a1b2c3d4... not found."
+              }
+            }
+          }
+        }
+      }
+    },
+    "429": {
+      "description": "Too Many Requests. Rate limit exceeded.",
+      "headers": {
+        "Retry-After": {
+          "description": "Seconds to wait before retrying.",
+          "schema": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "500": {
+      "description": "Internal Server Error. An unexpected error occurred on the server side.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        }
+      }
+    }
+  }
+}
