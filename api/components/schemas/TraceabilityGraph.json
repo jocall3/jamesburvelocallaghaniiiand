@@ -1,0 +1,219 @@
+{
+  "type": "array",
+  "description": "A comprehensive, ordered collection of traceability nodes representing the full execution flow of the C01 procedural load sequence. This graph captures every state transition, data transformation, decision point, and side effect within the system, enabling full auditability and replay capabilities.",
+  "minItems": 1,
+  "uniqueItems": true,
+  "items": {
+    "type": "object",
+    "title": "TraceNode",
+    "description": "A single unit of execution or state change within the traceability graph for the C01 sequence.",
+    "required": [
+      "nodeId",
+      "sequenceId",
+      "timestamp",
+      "nodeType",
+      "status",
+      "integritySignature"
+    ],
+    "properties": {
+      "nodeId": {
+        "type": "string",
+        "format": "uuid",
+        "description": "Unique immutable identifier for this specific trace node.",
+        "example": "550e8400-e29b-41d4-a716-446655440000"
+      },
+      "parentId": {
+        "type": "string",
+        "format": "uuid",
+        "description": "Identifier of the preceding node in the execution chain. Null if this is the root initiation node.",
+        "nullable": true,
+        "example": "550e8400-e29b-41d4-a716-446655440001"
+      },
+      "rootId": {
+        "type": "string",
+        "format": "uuid",
+        "description": "Identifier of the root node that started this specific C01 transaction flow.",
+        "example": "550e8400-e29b-41d4-a716-446655440000"
+      },
+      "sequenceId": {
+        "type": "string",
+        "description": "The specific identifier for the procedural load sequence instance (C01 context).",
+        "pattern": "^C01-[A-Z0-9]{4,}-[0-9]{8}$",
+        "example": "C01-LOAD-SEQ-99821234"
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "High-precision ISO 8601 timestamp indicating exactly when the node was recorded by the telemetry system.",
+        "example": "2023-10-27T10:00:00.123456Z"
+      },
+      "nodeType": {
+        "type": "string",
+        "enum": [
+          "INITIATION",
+          "DATA_INGESTION",
+          "SCHEMA_VALIDATION",
+          "TRANSFORMATION_LOGIC",
+          "DECISION_GATE",
+          "EXTERNAL_CALL",
+          "PERSISTENCE_WRITE",
+          "EVENT_BROADCAST",
+          "ERROR_TRAP",
+          "COMPLETION",
+          "ROLLBACK"
+        ],
+        "description": "Categorization of the operation performed at this node within the C01 lifecycle."
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "IN_PROGRESS",
+          "SUCCESS",
+          "WARNING",
+          "FAILURE",
+          "SKIPPED",
+          "RETRYING"
+        ],
+        "description": "The final execution status of the operation represented by this node."
+      },
+      "executionContext": {
+        "type": "object",
+        "description": "Details regarding the runtime environment where the C01 sequence step was executed.",
+        "properties": {
+          "hostName": {
+            "type": "string",
+            "description": "The hostname of the server or container.",
+            "example": "worker-node-alpha-04"
+          },
+          "serviceName": {
+            "type": "string",
+            "description": "The microservice responsible for this step.",
+            "example": "c01-processor-svc"
+          },
+          "processId": {
+            "type": "integer",
+            "description": "OS-level process ID.",
+            "example": 4421
+          },
+          "threadId": {
+            "type": "string",
+            "description": "Thread name or ID.",
+            "example": "pool-1-thread-4"
+          },
+          "region": {
+            "type": "string",
+            "description": "Cloud region or datacenter identifier.",
+            "example": "us-east-1"
+          },
+          "environment": {
+            "type": "string",
+            "enum": ["DEV", "QA", "UAT", "PROD", "DR"],
+            "example": "PROD"
+          }
+        }
+      },
+      "dataSnapshot": {
+        "type": "object",
+        "description": "A snapshot of the data state before and after the operation, used for debugging and audit trails.",
+        "properties": {
+          "inputPayloadRef": {
+            "type": "string",
+            "format": "uri",
+            "description": "Link to the stored input payload if too large to embed.",
+            "example": "s3://audit-logs/c01/inputs/550e8400.json"
+          },
+          "inputHash": {
+            "type": "string",
+            "description": "SHA-256 hash of the input data for integrity verification.",
+            "example": "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e"
+          },
+          "outputHash": {
+            "type": "string",
+            "description": "SHA-256 hash of the output data.",
+            "example": "f2ca1bb6c7e907d06dafe4687e579fce76b37e4e93b7605022da52e6ccc26fd2"
+          },
+          "stateDelta": {
+            "type": "string",
+            "description": "Base64 encoded JSON patch or diff representing the state change.",
+            "example": "eyAiMmRlZiI6ICJ2YWx1ZSIgfQ=="
+          },
+          "affectedEntities": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "IDs of database entities modified during this step."
+            },
+            "example": ["USER-123", "ORDER-999"]
+          }
+        }
+      },
+      "diagnostics": {
+        "type": "object",
+        "description": "Performance metrics and health indicators for this specific step in the C01 sequence.",
+        "properties": {
+          "durationMs": {
+            "type": "number",
+            "format": "float",
+            "description": "Execution time in milliseconds.",
+            "example": 12.5
+          },
+          "memoryDeltaBytes": {
+            "type": "integer",
+            "description": "Change in memory consumption during execution.",
+            "example": 1024
+          },
+          "cpuUsagePercent": {
+            "type": "number",
+            "description": "Snapshot of CPU load percentage.",
+            "example": 0.4
+          },
+          "gcOverhead": {
+            "type": "number",
+            "description": "Percentage of time spent in Garbage Collection during this step.",
+            "example": 0.01
+          }
+        }
+      },
+      "errors": {
+        "type": "array",
+        "description": "List of errors or warnings encountered during this step. Empty if status is SUCCESS.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "example": "ERR_C01_VALIDATION_FAIL"
+            },
+            "message": {
+              "type": "string",
+              "example": "Field 'currency' must be ISO 4217 compliant."
+            },
+            "stackTrace": {
+              "type": "string",
+              "description": "Truncated stack trace if applicable."
+            },
+            "severity": {
+              "type": "string",
+              "enum": ["INFO", "WARN", "ERROR", "FATAL"],
+              "example": "ERROR"
+            }
+          }
+        }
+      },
+      "integritySignature": {
+        "type": "string",
+        "description": "Cryptographic signature of the node content (excluding this field) to ensure the traceability graph has not been tampered with.",
+        "example": "hmac-sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069"
+      },
+      "tags": {
+        "type": "array",
+        "description": "Arbitrary metadata tags for filtering and searching the graph.",
+        "items": {
+          "type": "string"
+        },
+        "example": ["finance", "q4-report", "high-priority"]
+      }
+    }
+  }
+}
