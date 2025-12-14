@@ -1,0 +1,338 @@
+type: object
+description: >
+  Represents a generic asset within the system. This is a polymorphic schema that can represent different types of assets like Servers, Databases, or Services. The `assetType` field is used as a discriminator to determine the specific asset structure.
+oneOf:
+  - $ref: '#/components/schemas/ServerAsset'
+  - $ref: '#/components/schemas/DatabaseAsset'
+  - $ref: '#/components/schemas/ServiceAsset'
+discriminator:
+  propertyName: assetType
+  mapping:
+    server: '#/components/schemas/ServerAsset'
+    database: '#/components/schemas/DatabaseAsset'
+    service: '#/components/schemas/ServiceAsset'
+example:
+  # Example for a ServerAsset
+  id: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+  assetType: "server"
+  name: "Primary Web Server - PROD"
+  description: "The main production web server hosting the primary customer-facing application."
+  tags:
+    - "production"
+    - "web-server"
+    - "critical"
+  owner: "Web Operations Team"
+  createdAt: "2023-10-27T10:00:00Z"
+  updatedAt: "2023-10-27T12:30:00Z"
+  status: "active"
+  location: "us-east-1"
+  criticality: "high"
+  hostname: "web-prod-01.example.com"
+  ipAddress: "192.0.2.10"
+  os:
+    name: "Ubuntu"
+    version: "22.04 LTS"
+  cpu:
+    model: "Intel Xeon Platinum 8272CL"
+    cores: 16
+  memory:
+    totalGB: 64
+  storage:
+    - device: "/dev/sda1"
+      type: "SSD"
+      sizeGB: 512
+
+AssetBase:
+  type: object
+  description: "A base schema containing common properties shared by all asset types. Specific asset schemas should extend this using `allOf`."
+  required:
+    - id
+    - assetType
+    - name
+    - createdAt
+    - updatedAt
+    - status
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: "The unique identifier for the asset, in UUID format."
+      example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+      readOnly: true
+    assetType:
+      type: string
+      description: "Discriminator field to identify the specific type of asset. This field determines which asset schema is applicable."
+      enum:
+        - server
+        - database
+        - service
+      example: "server"
+    name:
+      type: string
+      description: "A human-readable name for the asset, used for identification in user interfaces."
+      minLength: 1
+      maxLength: 255
+      example: "Production Database Cluster"
+    description:
+      type: string
+      description: "A detailed, multi-line description of the asset, its purpose, and any relevant context. Supports markdown."
+      example: "Primary PostgreSQL database cluster for the main application, running in a high-availability configuration across multiple availability zones."
+    tags:
+      type: array
+      items:
+        type: string
+        minLength: 1
+      description: "A list of tags for categorizing, filtering, and searching for the asset."
+      example: ["database", "production", "postgres", "critical-tier-1"]
+    owner:
+      type: string
+      description: "The team, service account, or individual responsible for the asset's lifecycle and maintenance."
+      example: "Database Administration Team"
+    createdAt:
+      type: string
+      format: date-time
+      description: "The ISO 8601 timestamp when the asset was first created in the system."
+      example: "2023-01-15T09:30:00Z"
+      readOnly: true
+    updatedAt:
+      type: string
+      format: date-time
+      description: "The ISO 8601 timestamp when the asset was last updated."
+      example: "2023-10-26T14:45:10Z"
+      readOnly: true
+    status:
+      type: string
+      description: "The current operational status of the asset."
+      enum:
+        - active
+        - inactive
+        - maintenance
+        - decommissioned
+        - provisioning
+      example: "active"
+    location:
+      type: string
+      description: "The physical or logical location of the asset (e.g., data center, cloud region, rack ID, Kubernetes cluster name)."
+      example: "eu-west-1"
+    criticality:
+      type: string
+      description: "The business criticality level of the asset, used for incident response prioritization."
+      enum:
+        - low
+        - medium
+        - high
+        - critical
+      example: "critical"
+
+ServerAsset:
+  type: object
+  description: "Represents a physical or virtual server asset, including its hardware and software configuration."
+  allOf:
+    - $ref: '#/components/schemas/AssetBase'
+    - type: object
+      required:
+        - hostname
+        - ipAddress
+        - os
+      properties:
+        assetType:
+          const: "server"
+          description: "The asset type, fixed to 'server'."
+        hostname:
+          type: string
+          description: "The fully qualified domain name (FQDN) of the server."
+          example: "app-server-01.prod.example.com"
+        ipAddress:
+          type: string
+          format: ipv4
+          description: "The primary IPv4 address of the server."
+          example: "198.51.100.12"
+        os:
+          type: object
+          description: "Details about the server's operating system."
+          properties:
+            name:
+              type: string
+              example: "Red Hat Enterprise Linux"
+            version:
+              type: string
+              example: "8.6"
+            kernelVersion:
+              type: string
+              example: "4.18.0-372.19.1.el8_6.x86_64"
+        cpu:
+          type: object
+          description: "CPU specifications."
+          properties:
+            model:
+              type: string
+              example: "AMD EPYC 7R32"
+            cores:
+              type: integer
+              format: int32
+              description: "Number of CPU cores."
+              example: 32
+        memory:
+          type: object
+          description: "Memory (RAM) specifications."
+          properties:
+            totalGB:
+              type: integer
+              format: int32
+              description: "Total installed memory in Gigabytes (GB)."
+              example: 128
+        storage:
+          type: array
+          description: "A list of storage devices attached to the server."
+          items:
+            type: object
+            properties:
+              device:
+                type: string
+                description: "The device name (e.g., /dev/sda)."
+                example: "/dev/nvme0n1"
+              type:
+                type: string
+                enum: [SSD, HDD, NVMe]
+                description: "The type of storage medium."
+                example: "NVMe"
+              sizeGB:
+                type: integer
+                format: int32
+                description: "The size of the storage device in Gigabytes (GB)."
+                example: 2048
+        networkInterfaces:
+          type: array
+          description: "A list of network interfaces on the server."
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "eth0"
+              macAddress:
+                type: string
+                example: "00:1A:2B:3C:4D:5E"
+              ipAddresses:
+                type: array
+                items:
+                  type: string
+                example: ["198.51.100.12", "2001:db8::1"]
+
+DatabaseAsset:
+  type: object
+  description: "Represents a database instance or cluster asset, including its engine, version, and configuration."
+  allOf:
+    - $ref: '#/components/schemas/AssetBase'
+    - type: object
+      required:
+        - engine
+        - version
+        - endpoint
+      properties:
+        assetType:
+          const: "database"
+          description: "The asset type, fixed to 'database'."
+        engine:
+          type: string
+          description: "The database engine type."
+          enum:
+            - PostgreSQL
+            - MySQL
+            - MongoDB
+            - Redis
+            - Oracle
+            - SQLServer
+          example: "PostgreSQL"
+        version:
+          type: string
+          description: "The version of the database engine."
+          example: "14.5"
+        endpoint:
+          type: object
+          description: "Connection endpoint for the database."
+          properties:
+            host:
+              type: string
+              example: "pg-prod-cluster.c12345.us-east-1.rds.amazonaws.com"
+            port:
+              type: integer
+              format: int32
+              example: 5432
+        isClustered:
+          type: boolean
+          description: "Indicates if the database is part of a high-availability cluster."
+          example: true
+        schemas:
+          type: array
+          description: "A list of schemas or databases managed by this instance."
+          items:
+            type: string
+          example: ["users_db", "orders_db", "inventory_db"]
+        backupPolicy:
+          type: object
+          description: "Details of the backup and recovery policy."
+          properties:
+            frequency:
+              type: string
+              description: "How often backups are taken (e.g., daily, hourly)."
+              example: "daily"
+            retentionDays:
+              type: integer
+              format: int32
+              description: "How long backups are retained, in days."
+              example: 30
+            recoveryPointObjective:
+              type: string
+              description: "The Recovery Point Objective (RPO) for the database, as an ISO 8601 duration."
+              example: "PT15M"
+
+ServiceAsset:
+  type: object
+  description: "Represents a software service or API asset, including its endpoint, version, and dependencies."
+  allOf:
+    - $ref: '#/components/schemas/AssetBase'
+    - type: object
+      required:
+        - serviceUrl
+        - version
+      properties:
+        assetType:
+          const: "service"
+          description: "The asset type, fixed to 'service'."
+        serviceUrl:
+          type: string
+          format: uri
+          description: "The primary base URL for accessing the service."
+          example: "https://api.example.com/v1/users"
+        version:
+          type: string
+          description: "The semantic version of the service."
+          example: "1.2.3"
+        dependencies:
+          type: array
+          description: "A list of other asset IDs that this service depends on."
+          items:
+            type: string
+            format: uuid
+          example:
+            - "d4e5f6a1-b2c3-4567-8901-234567890abc" # DatabaseAsset ID
+            - "f6a1b2c3-d4e5-6789-0123-4567890abcd" # Another ServiceAsset ID
+        apiSpecificationUrl:
+          type: string
+          format: uri
+          description: "A URL pointing to the service's API specification (e.g., OpenAPI, GraphQL schema)."
+          example: "https://api.example.com/openapi.json"
+        runtimeEnvironment:
+          type: string
+          description: "The environment where the service is deployed."
+          enum:
+            - Kubernetes
+            - Serverless
+            - VM
+            - PaaS
+          example: "Kubernetes"
+        healthCheckEndpoint:
+          type: string
+          description: "A relative or absolute URL for health checks."
+          example: "/healthz"
