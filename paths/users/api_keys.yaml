@@ -1,0 +1,105 @@
+get:
+  summary: List User API Keys
+  description: |
+    Retrieves a paginated list of API keys belonging to the currently authenticated user.
+    For security reasons, the full API key secret is never returned. Only the key's metadata and a prefix are provided for identification.
+    Results can be paginated using the `limit` and `offset` query parameters.
+  operationId: listUserApiKeys
+  tags:
+    - API Keys
+  security:
+    - bearerAuth: []
+  parameters:
+    - $ref: '#/components/parameters/Limit'
+    - $ref: '#/components/parameters/Offset'
+  responses:
+    '200':
+      description: A paginated list of API keys was successfully retrieved.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiKeyList'
+          example:
+            object: "list"
+            data:
+              - keyId: "ak_1a2b3c4d5e6f7g8h"
+                object: "api_key_metadata"
+                label: "Production Server"
+                keyPrefix: "sk_live_a1b2..."
+                permissions:
+                  - "data:read"
+                  - "data:write"
+                createdAt: "2023-10-27T10:00:00Z"
+                lastUsedAt: "2023-10-28T15:30:00Z"
+                expiresAt: null
+              - keyId: "ak_9z8y7x6w5v4u3t2s"
+                object: "api_key_metadata"
+                label: "Read-only Analytics Key"
+                keyPrefix: "pk_live_z9y8..."
+                permissions:
+                  - "data:read"
+                createdAt: "2023-09-15T08:45:10Z"
+                lastUsedAt: "2023-10-29T09:00:15Z"
+                expiresAt: "2024-09-15T08:45:10Z"
+            has_more: true
+            url: "/v1/users/api_keys?limit=2"
+    '401':
+      $ref: '#/components/responses/Unauthorized'
+    '403':
+      $ref: '#/components/responses/Forbidden'
+    '429':
+      $ref: '#/components/responses/TooManyRequests'
+post:
+  summary: Create an API Key
+  description: |
+    Creates a new API key for the currently authenticated user.
+    You can specify a descriptive label, a set of permissions, and an optional expiration date.
+
+    **IMPORTANT:** The `secret` value is returned **only** upon creation. It cannot be retrieved again.
+    You must store this value securely. If you lose the secret, you will need to revoke the key and create a new one.
+  operationId: createApiKey
+  tags:
+    - API Keys
+  security:
+    - bearerAuth: []
+  requestBody:
+    description: Configuration for the new API key.
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/CreateApiKeyRequest'
+        example:
+          label: "New Reporting Service Key"
+          permissions:
+            - "data:read"
+            - "analytics:read"
+          expiresInDays: 90
+  responses:
+    '201':
+      description: The API key was created successfully. The full secret is included in the response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NewApiKeyResponse'
+          example:
+            keyId: "ak_3g4h5j6k7l8m9n0p"
+            object: "api_key"
+            label: "New Reporting Service Key"
+            keyPrefix: "sk_live_3g4h..."
+            secret: "sk_live_3g4h5j6k7l8m9n0p1q2r3s4t5u6v7w8x9y0z"
+            permissions:
+              - "data:read"
+              - "analytics:read"
+            createdAt: "2023-10-29T12:00:00Z"
+            expiresAt: "2024-01-27T12:00:00Z"
+    '400':
+      $ref: '#/components/responses/BadRequest'
+    '401':
+      $ref: '#/components/responses/Unauthorized'
+    '403':
+      $ref: '#/components/responses/Forbidden'
+    '422':
+      $ref: '#/components/responses/UnprocessableEntity'
+    '429':
+      $ref: '#/components/responses/TooManyRequests'
