@@ -1,0 +1,134 @@
+get:
+  summary: Get Historical Market Data
+  description: |
+    Retrieves historical candlestick (OHLCV) data for a specific trading pair.
+    This endpoint provides granular market data essential for charting, backtesting trading strategies, and performing market analysis.
+    Data can be requested for various time intervals, and the result set can be filtered by a time range and paginated.
+    The timestamps are returned as Unix epoch seconds, representing the start of the interval. Data is returned in reverse chronological order (most recent first).
+  operationId: getMarketHistory
+  tags:
+    - Market Data
+  parameters:
+    - name: symbol
+      in: query
+      description: "The unique identifier for the trading pair (e.g., BTC-USD, ETH-EUR)."
+      required: true
+      schema:
+        type: string
+        pattern: '^[A-Z0-9]+-[A-Z]{3,4}$'
+      example: 'BTC-USD'
+    - name: interval
+      in: query
+      description: "The time interval for each candlestick. 'm' stands for minute, 'h' for hour, 'd' for day, 'w' for week."
+      required: false
+      schema:
+        type: string
+        enum: [1m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 12h, 1d, 1w]
+        default: '1h'
+      example: '1d'
+    - name: start_time
+      in: query
+      description: "The start of the time range for the historical data, as a Unix epoch timestamp in seconds. If not provided, the API will return the most recent data up to the 'limit'."
+      required: false
+      schema:
+        type: integer
+        format: int64
+        description: "Unix timestamp (seconds)."
+      example: 1672531200 # 2023-01-01 00:00:00 UTC
+    - name: end_time
+      in: query
+      description: "The end of the time range for the historical data, as a Unix epoch timestamp in seconds. If not provided, the current time is used as the default."
+      required: false
+      schema:
+        type: integer
+        format: int64
+        description: "Unix timestamp (seconds)."
+      example: 1675209600 # 2023-02-01 00:00:00 UTC
+    - name: limit
+      in: query
+      description: "The maximum number of data points (candlesticks) to return. The data is returned in descending order by time (most recent first)."
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 1000
+        default: 100
+      example: 500
+  responses:
+    '200':
+      description: "A successful response returns an array of candlestick data for the requested symbol and interval."
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../../components/schemas/market/MarketCandle.yaml'
+          example:
+            - time: 1675123200
+              open: 23130.50
+              high: 23155.25
+              low: 22810.90
+              close: 22855.45
+              volume: 2450.7512
+            - time: 1675036800
+              open: 23750.10
+              high: 23810.00
+              low: 23050.60
+              close: 23130.50
+              volume: 3105.1056
+            - time: 1674950400
+              open: 23010.80
+              high: 23780.30
+              low: 22990.00
+              close: 23750.10
+              volume: 2988.4033
+    '400':
+      description: "Bad Request. The request was malformed or contained invalid parameters (e.g., invalid symbol format, unsupported interval, end_time before start_time)."
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/Error.yaml'
+          example:
+            code: "INVALID_PARAMETER"
+            message: "The 'interval' parameter '1y' is not supported. Please use one of the allowed values."
+            details:
+              parameter: "interval"
+              value: "1y"
+    '404':
+      description: "Not Found. The requested symbol does not exist or has no historical data available for the specified time range."
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/Error.yaml'
+          example:
+            code: "SYMBOL_NOT_FOUND"
+            message: "No market data found for symbol 'XYZ-ABC'."
+    '429':
+      description: "Too Many Requests. The client has exceeded the rate limit for this endpoint."
+      headers:
+        Retry-After:
+          description: "The number of seconds to wait before making a new request."
+          schema:
+            type: integer
+          example: 60
+        X-RateLimit-Limit:
+          description: "The maximum number of requests allowed in the current window."
+          schema:
+            type: integer
+          example: 1000
+        X-RateLimit-Remaining:
+          description: "The number of requests remaining in the current window."
+          schema:
+            type: integer
+          example: 0
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/Error.yaml'
+          example:
+            code: "RATE_LIMIT_EXCEEDED"
+            message: "You have exceeded the request rate limit. Please try again later."
+  security:
+    - ApiKeyAuth: []
+    - OAuth2: [read:market_data]
