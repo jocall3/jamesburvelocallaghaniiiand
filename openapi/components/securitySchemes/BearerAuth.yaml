@@ -1,0 +1,9 @@
+type: http
+scheme: bearer
+bearerFormat: JWT
+description: |
+  Authentication using a JSON Web Token (JWT).
+  The token should be provided in the `Authorization` header as a Bearer token.
+  Example: `Authorization: Bearer <your_jwt_token>`
+  This token is required to access protected endpoints and contains claims about the authenticated user.
+  Tokens are typically short-lived and can be refreshed using a refresh token mechanism (if available).
