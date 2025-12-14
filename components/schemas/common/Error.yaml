@@ -1,0 +1,88 @@
+type: object
+description: |
+  A standard error response structure used across the API to provide consistent
+  feedback when an operation fails. This schema is designed to be comprehensive
+  enough to cover various error scenarios, from client-side validation issues
+  to server-side exceptions, while remaining machine-readable for automated
+  error handling and logging.
+properties:
+  code:
+    type: integer
+    format: int32
+    description: |
+      A unique, machine-readable error code that categorizes the type of error.
+      This code can be used by client applications to implement specific error
+      handling logic without needing to parse the human-readable message.
+      Examples might include HTTP status codes (e.g., 400, 401, 404, 500) or
+      application-specific error codes (e.g., 1001 for "Invalid Input", 2003 for "Resource Not Found").
+    example: 400
+  message:
+    type: string
+    description: |
+      A human-readable message providing a brief explanation of the error.
+      This message is intended for developers and potentially end-users (if
+      appropriately localized and user-friendly). It should clearly state
+      what went wrong.
+    example: "Invalid input provided for the 'name' field."
+  details:
+    type: object
+    description: |
+      An optional, machine-readable object containing additional context or
+      specific details about the error. This can be used to provide validation
+      errors (e.g., field-specific errors), stack traces (in development/debug
+      environments), or other relevant data that helps in diagnosing the issue.
+      The structure of this object can vary depending on the specific error.
+    properties:
+      fieldErrors:
+        type: array
+        description: |
+          A list of specific validation errors, typically used when input
+          validation fails. Each item in the array describes an error
+          related to a particular field.
+        items:
+          type: object
+          properties:
+            field:
+              type: string
+              description: The name of the field that caused the validation error.
+              example: "name"
+            message:
+              type: string
+              description: The specific validation error message for the field.
+              example: "Name cannot be empty and must be at least 3 characters long."
+            code:
+              type: string
+              description: An optional, machine-readable code for the specific field error.
+              example: "VALIDATION_EMPTY_OR_TOO_SHORT"
+      trace:
+        type: string
+        description: |
+          An optional stack trace or internal error identifier, typically
+          included in development or debug environments to aid in debugging.
+          Should generally be omitted in production for security reasons.
+        example: "com.example.service.MyServiceException: Invalid input at MyService.java:45"
+      requestId:
+        type: string
+        description: |
+          An optional identifier for the specific request that generated the error,
+          useful for correlating logs and debugging.
+        example: "req_abc123def456"
+    example:
+      fieldErrors:
+        - field: "email"
+          message: "Email format is invalid."
+          code: "VALIDATION_INVALID_FORMAT"
+        - field: "password"
+          message: "Password must be at least 8 characters long."
+          code: "VALIDATION_TOO_SHORT"
+  traceId:
+    type: string
+    format: uuid
+    description: |
+      A unique identifier for the specific error instance, useful for tracing
+      the error through logs and support systems. This ID can be provided to
+      support personnel to quickly locate the relevant error logs.
+    example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+required:
+  - code
+  - message
