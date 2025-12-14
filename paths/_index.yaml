@@ -1,0 +1,37 @@
+# System Endpoints
+/system/metrics:
+  $ref: './system/metrics.yaml'
+/system/health:
+  $ref: './system/health.yaml'
+
+# AI Endpoints
+/ai/insights:
+  $ref: './ai/insights.yaml'
+/ai/predict:
+  $ref: './ai/predict.yaml'
+
+# Algorithm Endpoints
+/algorithms:
+  $ref: './algorithms/collection.yaml'
+/algorithms/{id}:
+  $ref: './algorithms/item.yaml'
+/algorithms/{id}/deploy:
+  $ref: './algorithms/deploy.yaml'
+
+# Backtest Endpoints
+/backtests/run:
+  $ref: './backtests/run.yaml'
+/backtests/results/{runId}:
+  $ref: './backtests/result.yaml'
+
+# User Endpoints
+/users/profile:
+  $ref: './users/profile.yaml'
+/users/api-keys:
+  $ref: './users/api_keys.yaml'
+
+# Market Data
+/market/quotes:
+  $ref: './market/quotes.yaml'
+/market/history:
+  $ref: './market/history.yaml'
