@@ -1,0 +1,48 @@
+{
+  "server": {
+    "port": 3000,
+    "host": "0.0.0.0",
+    "description": "Configuration for the mock server instance. Defines the network interface and port where the server will listen for incoming requests."
+  },
+  "openapi": {
+    "specPath": "./openapi-spec.json",
+    "servePath": "/openapi.json",
+    "enableMocking": true,
+    "mockResponseStrategy": "example",
+    "delay": 0,
+    "description": "Configuration for serving and mocking based on the generated OpenAPI 3.1 specification. This section dictates how the server interacts with the API definition.",
+    "mockResponseStrategyDescription": "Determines how mock responses are generated: 'example' uses examples defined in the OpenAPI spec, 'random' generates data based on schemas, 'schema-faker' uses more advanced schema-based faking.",
+    "cors": {
+      "enabled": true,
+      "origin": "*",
+      "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+      "headers": "Content-Type,Authorization,X-Requested-With,Accept",
+      "credentials": true,
+      "maxAge": 3600,
+      "description": "CORS (Cross-Origin Resource Sharing) settings for the mock server. Essential for allowing client-side applications from different origins to interact with the mock API."
+    }
+  },
+  "routes": [
+    {
+      "path": "/health",
+      "method": "GET",
+      "response": {
+        "status": 200,
+        "body": {
+          "status": "healthy",
+          "timestamp": "{{now}}"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      },
+      "description": "A basic health check endpoint to verify the mock server's operational status. Returns a simple JSON object indicating health and the current timestamp."
+    }
+  ],
+  "routesDescription": "Custom routes defined outside of the OpenAPI specification. These can be used for server-specific endpoints or to override OpenAPI-defined paths with static responses.",
+  "logging": {
+    "level": "info",
+    "description": "Logging configuration for the mock server. 'info' provides general operational messages, 'debug' offers more detailed request/response information, 'warn' for non-critical issues, and 'error' for critical failures."
+  },
+  "description": "Comprehensive configuration for a scalable OpenAPI-driven mock server. This file defines how the mock server operates, where to find the OpenAPI specification, how to generate mock responses, and includes essential server settings like CORS and logging. Designed to be easily consumed by a custom mock server application."
+}
