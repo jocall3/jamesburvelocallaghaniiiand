@@ -1,0 +1,263 @@
+get:
+  summary: List Algorithms
+  description: |
+    Retrieves a collection of registered machine learning algorithms. This endpoint supports filtering, sorting, and pagination to allow for efficient browsing of the available algorithms. Users can filter algorithms by their current status, such as 'development', 'staging', or 'production', to find algorithms relevant to their needs.
+  operationId: listAlgorithms
+  tags:
+    - Algorithms
+  parameters:
+    - name: status
+      in: query
+      description: Filter the list of algorithms by their deployment status.
+      required: false
+      schema:
+        type: string
+        enum: [development, staging, production, deprecated, archived]
+        example: production
+    - name: name
+      in: query
+      description: Filter algorithms by a specific name (case-insensitive partial match).
+      required: false
+      schema:
+        type: string
+        example: "fraud-detection"
+    - name: version
+      in: query
+      description: Filter algorithms by a specific version string.
+      required: false
+      schema:
+        type: string
+        example: "2.1.0"
+    - name: limit
+      in: query
+      description: The maximum number of algorithms to return in a single response.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
+        example: 50
+    - name: page
+      in: query
+      description: The page number of the result set to retrieve.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+        example: 1
+    - name: sort_by
+      in: query
+      description: The field to sort the algorithms by.
+      required: false
+      schema:
+        type: string
+        enum: [created_at, updated_at, name, version]
+        default: created_at
+    - name: order
+      in: query
+      description: The order to sort the results in.
+      required: false
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+  responses:
+    '200':
+      description: A paginated list of algorithms was successfully retrieved.
+      headers:
+        X-Total-Count:
+          description: The total number of algorithms matching the query.
+          schema:
+            type: integer
+            example: 42
+        Link:
+          description: Links for pagination (next, prev, first, last).
+          schema:
+            type: string
+            example: '<https://api.example.com/v1/algorithms?page=2&limit=20>; rel="next", <https://api.example.com/v1/algorithms?page=1&limit=20>; rel="first"'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '../../components/schemas/algorithms/Algorithm.yaml'
+              pagination:
+                $ref: '../../components/schemas/Pagination.yaml'
+          example:
+            data:
+              - id: "algo_a1b2c3d4e5f67890"
+                name: "Image Recognition"
+                description: "CNN-based model for classifying images into 1000 categories."
+                version: "3.5.1"
+                status: "production"
+                source_repository: "https://github.com/example-org/image-recognition"
+                docker_image_url: "registry.example.com/ml/image-recognition:3.5.1"
+                created_at: "2023-04-12T14:30:00Z"
+                updated_at: "2023-09-20T10:00:00Z"
+                author: "AI Research Team"
+                input_schema:
+                  type: object
+                  properties:
+                    image_url:
+                      type: string
+                      format: uri
+                output_schema:
+                  type: object
+                  properties:
+                    class:
+                      type: string
+                    confidence:
+                      type: number
+                      format: float
+              - id: "algo_f0e9d8c7b6a54321"
+                name: "Fraud Detection"
+                description: "Gradient Boosting model to detect fraudulent transactions in real-time."
+                version: "1.2.0"
+                status: "staging"
+                source_repository: "https://github.com/example-org/fraud-detection"
+                docker_image_url: "registry.example.com/ml/fraud-detection:1.2.0"
+                created_at: "2023-08-01T09:00:00Z"
+                updated_at: "2023-09-15T18:20:00Z"
+                author: "Finance Analytics"
+                input_schema:
+                  type: object
+                  properties:
+                    transaction_id:
+                      type: string
+                    amount:
+                      type: number
+                    user_id:
+                      type: string
+                output_schema:
+                  type: object
+                  properties:
+                    is_fraud:
+                      type: boolean
+                    score:
+                      type: number
+                      format: double
+            pagination:
+              total_items: 42
+              total_pages: 3
+              current_page: 1
+              page_size: 20
+    '400':
+      $ref: '../../components/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../components/responses/Unauthorized.yaml'
+    '500':
+      $ref: '../../components/responses/InternalServerError.yaml'
+
+post:
+  summary: Create Algorithm
+  description: |
+    Registers a new algorithm in the system. This involves providing metadata about the algorithm, such as its name, version, source code location, and the Docker image containing the executable model. Upon successful creation, the algorithm is assigned a unique ID and is typically set to a 'development' status by default, awaiting further testing and promotion.
+  operationId: createAlgorithm
+  tags:
+    - Algorithms
+  security:
+    - bearerAuth: [ "algorithms:write" ]
+  requestBody:
+    description: The algorithm definition to be created. The `id`, `created_at`, and `updated_at` fields are ignored as they are server-generated.
+    required: true
+    content:
+      application/json:
+        schema:
+          # For production APIs, it's best practice to use a separate schema for creation,
+          # e.g., AlgorithmCreate.yaml, which omits read-only fields like 'id'.
+          $ref: '../../components/schemas/algorithms/AlgorithmCreate.yaml'
+        examples:
+          full_example:
+            summary: A complete algorithm registration
+            value:
+              name: "Sentiment Analysis"
+              description: "A transformer-based model for analyzing the sentiment of a given text (positive, negative, neutral)."
+              version: "1.0.0-beta"
+              status: "development"
+              source_repository: "https://github.com/example-org/sentiment-analysis"
+              docker_image_url: "registry.example.com/ml/sentiment-analysis:1.0.0-beta"
+              author: "NLP Team"
+              input_schema:
+                type: "object"
+                required: ["text_content"]
+                properties:
+                  text_content:
+                    type: "string"
+                    description: "The text to be analyzed."
+                    minLength: 10
+                    maxLength: 5000
+              output_schema:
+                type: "object"
+                required: ["sentiment", "confidence_score"]
+                properties:
+                  sentiment:
+                    type: "string"
+                    enum: ["positive", "negative", "neutral"]
+                  confidence_score:
+                    type: "number"
+                    format: "float"
+                    minimum: 0
+                    maximum: 1
+  responses:
+    '201':
+      description: The algorithm was successfully created and registered.
+      headers:
+        Location:
+          description: The URL of the newly created algorithm resource.
+          schema:
+            type: string
+            format: uri
+            example: "/v1/algorithms/algo_a1b2c3d4e5f67890"
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/algorithms/Algorithm.yaml'
+          example:
+            id: "algo_a1b2c3d4e5f67890"
+            name: "Sentiment Analysis"
+            description: "A transformer-based model for analyzing the sentiment of a given text (positive, negative, neutral)."
+            version: "1.0.0-beta"
+            status: "development"
+            source_repository: "https://github.com/example-org/sentiment-analysis"
+            docker_image_url: "registry.example.com/ml/sentiment-analysis:1.0.0-beta"
+            created_at: "2023-10-27T10:00:00Z"
+            updated_at: "2023-10-27T10:00:00Z"
+            author: "NLP Team"
+            input_schema:
+              type: "object"
+              required: ["text_content"]
+              properties:
+                text_content:
+                  type: "string"
+                  description: "The text to be analyzed."
+                  minLength: 10
+                  maxLength: 5000
+            output_schema:
+              type: "object"
+              required: ["sentiment", "confidence_score"]
+              properties:
+                sentiment:
+                  type: "string"
+                  enum: ["positive", "negative", "neutral"]
+                confidence_score:
+                  type: "number"
+                  format: "float"
+                  minimum: 0
+                  maximum: 1
+    '400':
+      $ref: '../../components/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../components/responses/Unauthorized.yaml'
+    '409':
+      $ref: '../../components/responses/Conflict.yaml'
+    '422':
+      $ref: '../../components/responses/UnprocessableEntity.yaml'
+    '500':
+      $ref: '../../components/responses/InternalServerError.yaml'
