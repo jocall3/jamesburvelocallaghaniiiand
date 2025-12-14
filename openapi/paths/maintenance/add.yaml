@@ -1,0 +1,101 @@
+post:
+  tags:
+    - Maintenance
+  summary: Log New Maintenance Work
+  description: |
+    Creates a new maintenance log entry for a specific asset identified by its ID.
+    This endpoint is used to record all details about maintenance activities, including scheduled servicing, emergency repairs, and routine checks.
+    The created maintenance record is returned in the response body.
+
+    A successful creation will result in a `201 Created` response, with a `Location` header pointing to the URL of the newly created maintenance record.
+
+    **Permissions:**
+    Requires `assets.maintenance.write` scope.
+  operationId: logAssetMaintenance
+  parameters:
+    - $ref: '../../components/parameters/assetId.yaml'
+  requestBody:
+    description: The details of the maintenance work to be logged.
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/MaintenanceCreate.yaml'
+        example:
+          type: "REPAIR"
+          description: "Replaced faulty hydraulic pump on the main conveyor belt."
+          status: "COMPLETED"
+          cost:
+            amount: 1250.75
+            currency: "USD"
+          provider:
+            name: "Industrial Mechanics Inc."
+            contact: "John Doe"
+            phone: "1-800-555-1234"
+          technician: "Alice Williams"
+          startDate: "2023-10-26T09:00:00Z"
+          completionDate: "2023-10-26T17:30:00Z"
+          notes: "Pump failure was due to a worn-out bearing. Replaced bearing and pump assembly. System tested and is now fully operational."
+          partsUsed:
+            - partNumber: "HP-582-A"
+              description: "Hydraulic Pump Assembly"
+              quantity: 1
+              cost: 950.00
+            - partNumber: "BRG-019-C"
+              description: "High-Tension Bearing"
+              quantity: 1
+              cost: 75.50
+  responses:
+    '201':
+      description: Maintenance record successfully created. The full maintenance record object is returned.
+      headers:
+        Location:
+          $ref: '../../components/headers/Location.yaml'
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/Maintenance.yaml'
+          example:
+            id: "maint-a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            assetId: "ast-123e4567-e89b-12d3-a456-426614174000"
+            type: "REPAIR"
+            description: "Replaced faulty hydraulic pump on the main conveyor belt."
+            status: "COMPLETED"
+            cost:
+              amount: 1250.75
+              currency: "USD"
+            provider:
+              name: "Industrial Mechanics Inc."
+              contact: "John Doe"
+              phone: "1-800-555-1234"
+            technician: "Alice Williams"
+            startDate: "2023-10-26T09:00:00Z"
+            completionDate: "2023-10-26T17:30:00Z"
+            notes: "Pump failure was due to a worn-out bearing. Replaced bearing and pump assembly. System tested and is now fully operational."
+            partsUsed:
+              - partNumber: "HP-582-A"
+                description: "Hydraulic Pump Assembly"
+                quantity: 1
+                cost: 950.00
+              - partNumber: "BRG-019-C"
+                description: "High-Tension Bearing"
+                quantity: 1
+                cost: 75.50
+            createdAt: "2023-10-26T17:35:10Z"
+            updatedAt: "2023-10-26T17:35:10Z"
+            createdBy: "user-g8h9i0j1-k2l3-m4n5-o6p7-q8r9s0t1u2v3"
+    '400':
+      $ref: '../../components/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../components/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../components/responses/Forbidden.yaml'
+    '404':
+      $ref: '../../components/responses/NotFound.yaml'
+    '409':
+      $ref: '../../components/responses/Conflict.yaml'
+    '500':
+      $ref: '../../components/responses/InternalServerError.yaml'
+  security:
+    - oAuth2:
+        - assets.maintenance.write
