@@ -1,0 +1,170 @@
+{
+  "title": "UseCaseVector",
+  "type": "object",
+  "description": "A complex, multidimensional schema representing a Use Case Vector for High-Frequency Trading (HFT) and Arbitrage simulations. This vector encapsulates strategy parameters, market conditions, latency constraints, and risk profiles used to generate algorithmic trading signals.",
+  "required": [
+    "vector_id",
+    "timestamp",
+    "simulation_type",
+    "vector_components",
+    "integrity_hash"
+  ],
+  "properties": {
+    "vector_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this specific simulation vector instance.",
+      "example": "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp indicating when this vector was computed or captured.",
+      "example": "2023-10-27T14:30:00.123456Z"
+    },
+    "simulation_type": {
+      "type": "string",
+      "description": "The classification of the trading strategy being simulated.",
+      "enum": [
+        "TRIANGULAR_ARBITRAGE",
+        "STATISTICAL_ARBITRAGE",
+        "LATENCY_ARBITRAGE",
+        "MARKET_MAKING",
+        "LIQUIDITY_PROVISION",
+        "MOMENTUM_IGNITION",
+        "MEAN_REVERSION"
+      ],
+      "example": "TRIANGULAR_ARBITRAGE"
+    },
+    "vector_components": {
+      "type": "array",
+      "description": "The raw numerical representation of the use case vector, normalized for machine learning model input.",
+      "items": {
+        "type": "number",
+        "format": "double",
+        "minimum": -1.0,
+        "maximum": 1.0
+      },
+      "minItems": 128,
+      "maxItems": 2048,
+      "example": [
+        0.123,
+        -0.456,
+        0.789,
+        0.001,
+        -0.999
+      ]
+    },
+    "market_context": {
+      "type": "object",
+      "description": "Detailed snapshot of the market environment at the time of vector generation.",
+      "properties": {
+        "volatility_index": {
+          "type": "number",
+          "description": "Implied volatility metric (e.g., VIX) normalized.",
+          "example": 18.5
+        },
+        "liquidity_depth_score": {
+          "type": "number",
+          "description": "A calculated score representing the depth of the order book (0.0 to 100.0).",
+          "example": 85.4
+        },
+        "bid_ask_spread_basis_points": {
+          "type": "number",
+          "description": "The spread between the best bid and ask prices in basis points.",
+          "example": 2.5
+        },
+        "dominant_exchange": {
+          "type": "string",
+          "description": "The primary exchange venue influencing this vector.",
+          "example": "NASDAQ"
+        },
+        "correlated_assets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of asset tickers that show high correlation in this timeframe.",
+          "example": [
+            "BTC-USD",
+            "ETH-USD",
+            "SOL-USD"
+          ]
+        }
+      }
+    },
+    "hft_parameters": {
+      "type": "object",
+      "description": "Specific parameters related to High-Frequency Trading execution logic.",
+      "properties": {
+        "max_latency_tolerance_ns": {
+          "type": "integer",
+          "description": "Maximum acceptable network latency in nanoseconds before the signal is invalidated.",
+          "example": 5000
+        },
+        "co_location_tier": {
+          "type": "string",
+          "enum": [
+            "TIER_1_DIRECT_CROSS_CONNECT",
+            "TIER_2_SAME_DATACENTER",
+            "TIER_3_REGIONAL",
+            "TIER_4_PUBLIC_INTERNET"
+          ],
+          "description": "The infrastructure proximity to the exchange matching engine.",
+          "example": "TIER_1_DIRECT_CROSS_CONNECT"
+        },
+        "tick_to_trade_ratio": {
+          "type": "number",
+          "description": "Ratio of market data ticks processed to trades executed.",
+          "example": 0.004
+        },
+        "order_book_imbalance_threshold": {
+          "type": "number",
+          "description": "Threshold for order book imbalance (0.0 to 1.0) to trigger a signal.",
+          "example": 0.65
+        }
+      }
+    },
+    "risk_profile": {
+      "type": "object",
+      "description": "Risk management constraints embedded within the vector.",
+      "properties": {
+        "max_drawdown_limit": {
+          "type": "number",
+          "description": "Maximum allowable drawdown percentage.",
+          "example": 0.02
+        },
+        "sharpe_ratio_target": {
+          "type": "number",
+          "description": "Target Sharpe ratio for the strategy simulation.",
+          "example": 3.5
+        },
+        "position_sizing_model": {
+          "type": "string",
+          "enum": [
+            "KELLY_CRITERION",
+            "FIXED_FRACTIONAL",
+            "RISK_PARITY"
+          ],
+          "example": "KELLY_CRITERION"
+        }
+      }
+    },
+    "integrity_hash": {
+      "type": "string",
+      "description": "SHA-256 hash of the vector components to ensure data integrity during transmission.",
+      "pattern": "^[a-fA-F0-9]{64}$",
+      "example": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Arbitrary key-value pairs for extending the vector definition with custom simulation tags.",
+      "example": {
+        "experiment_id": "EXP-9921",
+        "model_version": "v4.2.1-beta",
+        "region": "us-east-1"
+      }
+    }
+  }
+}
