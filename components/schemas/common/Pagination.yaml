@@ -1,0 +1,35 @@
+type: object
+description: >-
+  A standard pagination object containing metadata about the list of results.
+  This object is typically included in responses that return a collection of resources.
+properties:
+  page:
+    type: integer
+    format: int32
+    description: The current page number of the result set. The first page is 1.
+    example: 1
+    minimum: 1
+  limit:
+    type: integer
+    format: int32
+    description: The maximum number of items returned on a single page.
+    example: 25
+    minimum: 1
+    maximum: 100
+  total:
+    type: integer
+    format: int64
+    description: The total number of items available across all pages.
+    example: 1234
+    minimum: 0
+  totalPages:
+    type: integer
+    format: int32
+    description: The total number of pages available for the given limit. Calculated as `ceil(total / limit)`.
+    example: 50
+    minimum: 0
+required:
+  - page
+  - limit
+  - total
+  - totalPages
