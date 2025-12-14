@@ -1,0 +1,133 @@
+# --- Core Business Logic Models ---
+
+# Users & Access Control
+User:
+  $ref: './users/User.yaml'
+UserProfile:
+  $ref: './users/UserProfile.yaml'
+UserPreferences:
+  $ref: './users/UserPreferences.yaml'
+UserAPIKey:
+  $ref: './users/UserAPIKey.yaml'
+UserRole:
+  $ref: './users/UserRole.yaml'
+Permission:
+  $ref: './users/Permission.yaml'
+
+# Workspaces & Teams
+Workspace:
+  $ref: './workspaces/Workspace.yaml'
+Team:
+  $ref: './workspaces/Team.yaml'
+TeamMember:
+  $ref: './workspaces/TeamMember.yaml'
+
+# Algorithms
+Algorithm:
+  $ref: './algorithms/Algorithm.yaml'
+AlgorithmVersion:
+  $ref: './algorithms/AlgorithmVersion.yaml'
+AlgorithmParameter:
+  $ref: './algorithms/AlgorithmParameter.yaml'
+AlgorithmConfiguration:
+  $ref: './algorithms/AlgorithmConfiguration.yaml'
+AlgorithmLog:
+  $ref: './algorithms/AlgorithmLog.yaml'
+
+# Backtesting
+Backtest:
+  $ref: './backtests/Backtest.yaml'
+BacktestConfiguration:
+  $ref: './backtests/BacktestConfiguration.yaml'
+BacktestResult:
+  $ref: './backtests/BacktestResult.yaml'
+BacktestMetrics:
+  $ref: './backtests/BacktestMetrics.yaml'
+BacktestTrade:
+  $ref: './backtests/BacktestTrade.yaml'
+
+# Live Trading & Portfolio Management
+LiveDeployment:
+  $ref: './live/LiveDeployment.yaml'
+Portfolio:
+  $ref: './live/Portfolio.yaml'
+Position:
+  $ref: './live/Position.yaml'
+Order:
+  $ref: './live/Order.yaml'
+Execution:
+  $ref: './live/Execution.yaml'
+LiveTrade:
+  $ref: './live/LiveTrade.yaml'
+
+# AI & Machine Learning
+AIInsight:
+  $ref: './ai/AIInsight.yaml'
+Model:
+  $ref: './ai/Model.yaml'
+TrainingJob:
+  $ref: './ai/TrainingJob.yaml'
+Prediction:
+  $ref: './ai/Prediction.yaml'
+FeatureSet:
+  $ref: './ai/FeatureSet.yaml'
+
+# Market Data
+DataSource:
+  $ref: './data/DataSource.yaml'
+Symbol:
+  $ref: './data/Symbol.yaml'
+MarketData:
+  $ref: './data/MarketData.yaml'
+TimeSeriesDataPoint:
+  $ref: './data/TimeSeriesDataPoint.yaml'
+
+# Billing & Subscriptions
+Plan:
+  $ref: './billing/Plan.yaml'
+Subscription:
+  $ref: './billing/Subscription.yaml'
+Invoice:
+  $ref: './billing/Invoice.yaml'
+PaymentMethod:
+  $ref: './billing/PaymentMethod.yaml'
+
+# --- System & Utility Models ---
+
+# System Monitoring
+SystemStatus:
+  $ref: './system/SystemStatus.yaml'
+SystemMetric:
+  $ref: './system/SystemMetric.yaml'
+
+# Notifications
+Notification:
+  $ref: './notifications/Notification.yaml'
+Webhook:
+  $ref: './notifications/Webhook.yaml'
+WebhookEvent:
+  $ref: './notifications/WebhookEvent.yaml'
+
+# Common/Shared Models
+Error:
+  $ref: './common/Error.yaml'
+Pagination:
+  $ref: './common/Pagination.yaml'
+APIResponse:
+  $ref: './common/APIResponse.yaml'
+Status:
+  $ref: './common/Status.yaml'
+Metadata:
+  $ref: './common/Metadata.yaml'
+Tag:
+  $ref: './common/Tag.yaml'
+
+# Primitive & Format Wrappers
+UUID:
+  $ref: './common/UUID.yaml'
+Timestamp:
+  $ref: './common/Timestamp.yaml'
+Currency:
+  $ref: './common/Currency.yaml'
+SortOrder:
+  $ref: './common/SortOrder.yaml'
