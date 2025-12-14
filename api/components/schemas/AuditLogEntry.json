@@ -1,0 +1,179 @@
+{
+  "title": "AuditLogEntry",
+  "type": "object",
+  "description": "A comprehensive record of a single event within the system, specifically tracking operations related to vector manipulation and manifest string processing. This schema is designed for high-fidelity audit trails required for compliance, debugging, and security monitoring.",
+  "required": [
+    "id",
+    "timestamp",
+    "vectorId",
+    "MANIFEST_STRING",
+    "action",
+    "actor",
+    "severity"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique 128-bit identifier for the audit log entry, generated at the time of ingestion.",
+      "example": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp when the event occurred, recorded with microsecond precision to ensure accurate chronological sorting.",
+      "example": "2023-10-27T14:30:00.123456Z"
+    },
+    "vectorId": {
+      "type": "string",
+      "description": "The unique identifier of the vector entity involved in this transaction. This links the audit log to specific high-dimensional data points within the vector database.",
+      "example": "vec_892304_abx_99_shard_01"
+    },
+    "MANIFEST_STRING": {
+      "type": "string",
+      "description": "The specific manifest fragment, configuration string, or signature active or referenced during the operation. This field is critical for version control, configuration tracking, and validating the integrity of the vector processing pipeline.",
+      "example": "config:v1:shard:eu-west-1:opt-level-3:manifest-sig-x992"
+    },
+    "action": {
+      "type": "string",
+      "description": "The specific operation performed on the resource.",
+      "enum": [
+        "VECTOR_CREATE",
+        "VECTOR_UPDATE",
+        "VECTOR_DELETE",
+        "VECTOR_QUERY",
+        "MANIFEST_SYNC",
+        "ACCESS_CONTROL_CHECK",
+        "SCHEMA_MIGRATION",
+        "SYSTEM_HEALTH_CHECK"
+      ],
+      "example": "VECTOR_UPDATE"
+    },
+    "severity": {
+      "type": "string",
+      "description": "The classification of the log entry's importance, used for filtering and alerting.",
+      "enum": [
+        "DEBUG",
+        "INFO",
+        "WARNING",
+        "ERROR",
+        "CRITICAL",
+        "FATAL"
+      ],
+      "default": "INFO",
+      "example": "INFO"
+    },
+    "actor": {
+      "type": "object",
+      "description": "Details about the entity (user, service account, or internal process) that initiated the action.",
+      "required": ["userId", "role"],
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The unique ID of the user or service account.",
+          "example": "usr_2938402"
+        },
+        "username": {
+          "type": "string",
+          "description": "Human-readable username or service name.",
+          "example": "service-vector-ingestor"
+        },
+        "role": {
+          "type": "string",
+          "description": "The permission role held by the actor at the time of the event.",
+          "example": "admin_write"
+        },
+        "ipAddress": {
+          "type": "string",
+          "format": "ipv4",
+          "description": "The source IP address of the request.",
+          "example": "192.168.1.45"
+        },
+        "userAgent": {
+          "type": "string",
+          "description": "The user agent string of the client application.",
+          "example": "Mozilla/5.0 (compatible; VectorClient/2.1; +http://api.example.com/bot)"
+        },
+        "authMethod": {
+          "type": "string",
+          "description": "The method used to authenticate the actor.",
+          "enum": ["API_KEY", "OAUTH2", "JWT", "MTLS", "INTERNAL"],
+          "example": "API_KEY"
+        }
+      }
+    },
+    "resourceContext": {
+      "type": "object",
+      "description": "Information regarding the specific resource environment where the action took place.",
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "description": "The logical namespace or tenant ID.",
+          "example": "tenant-acme-corp"
+        },
+        "collection": {
+          "type": "string",
+          "description": "The specific vector collection or table name.",
+          "example": "embeddings_v2_prod"
+        },
+        "region": {
+          "type": "string",
+          "description": "The cloud region where the node is located.",
+          "example": "us-east-1"
+        }
+      }
+    },
+    "systemMetadata": {
+      "type": "object",
+      "description": "Low-level system metrics associated with the event processing.",
+      "properties": {
+        "nodeId": {
+          "type": "string",
+          "description": "The cluster node identifier that processed the request.",
+          "example": "node-7-eu-worker"
+        },
+        "processingTimeMs": {
+          "type": "number",
+          "format": "float",
+          "description": "Time taken to process the request in milliseconds.",
+          "example": 45.2
+        },
+        "memoryUsageBytes": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Memory consumed by the operation.",
+          "example": 1048576
+        },
+        "traceId": {
+          "type": "string",
+          "description": "Distributed tracing identifier for correlating logs across microservices.",
+          "example": "0af7651916cd43dd8448eb211c80319c"
+        }
+      }
+    },
+    "stateChange": {
+      "type": "object",
+      "description": "Differential data showing state before and after the operation, if applicable.",
+      "properties": {
+        "previousStateHash": {
+          "type": "string",
+          "description": "SHA-256 hash of the object state before modification.",
+          "example": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"
+        },
+        "newStateHash": {
+          "type": "string",
+          "description": "SHA-256 hash of the object state after modification.",
+          "example": "z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4"
+        },
+        "fieldDiffs": {
+          "type": "array",
+          "description": "List of fields that were modified.",
+          "items": {
+            "type": "string"
+          },
+          "example": ["embedding_vector", "metadata.tags"]
+        }
+      }
+    }
+  }
+}
