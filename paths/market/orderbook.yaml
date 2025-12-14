@@ -1,0 +1,311 @@
+/market/orderbook:
+  get:
+    summary: Retrieve current order book snapshot
+    operationId: getOrderBookSnapshot
+    tags:
+      - Market Data
+      - Order Book
+    description: |
+      Fetches the current order book snapshot for a specified trading pair.
+      The order book displays a list of buy (bids) and sell (asks) orders
+      for a particular asset, sorted by price. This endpoint provides a
+      real-time view of market depth and liquidity.
+      
+      **Key Features:**
+      - **Real-time Data:** Provides the most up-to-date snapshot of market bids and asks.
+      - **Configurable Depth:** Allows specifying the number of price levels to retrieve,
+        enabling tailored data consumption based on application needs.
+      - **High Scalability:** Designed to handle frequent requests for market data,
+        though rate limits apply to ensure fair usage.
+      
+      **Use Cases:**
+      - Displaying market depth on a trading interface or charting tools.
+      - Powering algorithmic trading strategies that require real-time price discovery and liquidity analysis.
+      - Analyzing market sentiment, potential price movements, and identifying support/resistance levels.
+      - Backtesting trading strategies with current market conditions (though historical data would be needed for full backtesting).
+      
+      **Rate Limits:**
+      This endpoint is subject to strict rate limits to ensure fair usage and system stability.
+      Exceeding these limits will result in a `429 Too Many Requests` response.
+      The `Retry-After` header in a 429 response indicates when to retry.
+      For continuous, low-latency updates, consider utilizing WebSocket streams which are
+      more efficient for real-time data consumption and typically have higher throughput.
+      
+      **Data Consistency:**
+      The `lastUpdateId` field can be used to ensure data consistency when combining
+      snapshots with WebSocket updates or other data sources, allowing clients to
+      detect missing updates or out-of-order data.
+    parameters:
+      - name: symbol
+        in: query
+        description: |
+          The trading pair symbol for which to retrieve the order book.
+          Symbols are typically uppercase and follow a `BASEASSETQUOTEASSET` format.
+          Examples include `BTCUSDT` (Bitcoin to Tether USD), `ETHBTC` (Ethereum to Bitcoin),
+          `XRPUSDT` (Ripple to Tether USD), `BNBBTC` (Binance Coin to Bitcoin).
+        required: true
+        schema:
+          type: string
+          pattern: "^[A-Z0-9]{4,12}$" # Example: BTCUSDT, ETHBTC. Min 4 (e.g., ETHB), Max 12 (e.g., BTCUSDTUSDT)
+          minLength: 4
+          maxLength: 12
+        examples:
+          BTCUSDT:
+            summary: Bitcoin to Tether USD pair
+            value: BTCUSDT
+          ETHBTC:
+            summary: Ethereum to Bitcoin pair
+            value: ETHBTC
+          XRPUSDT:
+            summary: Ripple to Tether USD pair
+            value: XRPUSDT
+      - name: limit
+        in: query
+        description: |
+          Number of levels to return for bids and asks.
+          A higher limit provides more market depth but increases response size and processing time.
+          Commonly supported limits are 5, 10, 20, 50, 100, 500, 1000.
+          The server may enforce a maximum limit to prevent excessive resource consumption.
+          If not specified, a default limit (e.g., 100) will be applied.
+        required: false
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5000 # A generous upper limit for a snapshot
+          default: 100
+        examples:
+          defaultLimit:
+            summary: Default limit of 100 levels
+            value: 100
+          highLimit:
+            summary: High limit of 500 levels
+            value: 500
+          lowLimit:
+            summary: Low limit of 10 levels
+            value: 10
+    responses:
+      '200':
+        description: |
+          Successful retrieval of the order book snapshot.
+          The response contains the `lastUpdateId` and two arrays: `bids` and `asks`.
+          Each entry in `bids` and `asks` is an array of `[price, quantity]`,
+          where `price` is the order price and `quantity` is the amount available at that price level.
+          Bids are sorted in descending order by price (highest bid first), and asks are sorted in
+          ascending order by price (lowest ask first).
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderBookSnapshot'
+            examples:
+              BTCUSDT_Snapshot_100_Levels:
+                summary: Example Order Book for BTCUSDT with 100 levels
+                value:
+                  lastUpdateId: 102702489
+                  bids:
+                    - ["29000.00", "0.50000000"]
+                    - ["28999.50", "1.25000000"]
+                    - ["28999.00", "0.80000000"]
+                    - ["28998.50", "2.10000000"]
+                    - ["28998.00", "0.30000000"]
+                    - ["28997.50", "1.70000000"]
+                    - ["28997.00", "0.95000000"]
+                    - ["28996.50", "0.60000000"]
+                    - ["28996.00", "1.10000000"]
+                    - ["28995.50", "0.45000000"]
+                  asks:
+                    - ["29001.00", "0.70000000"]
+                    - ["29001.50", "1.50000000"]
+                    - ["29002.00", "0.90000000"]
+                    - ["29002.50", "0.40000000"]
+                    - ["29003.00", "1.80000000"]
+                    - ["29003.50", "0.65000000"]
+                    - ["29004.00", "1.30000000"]
+                    - ["29004.50", "0.85000000"]
+                    - ["29005.00", "0.55000000"]
+                    - ["29005.50", "1.00000000"]
+              ETHBTC_Snapshot_5_Levels:
+                summary: Example Order Book for ETHBTC with 5 levels
+                value:
+                  lastUpdateId: 50012345
+                  bids:
+                    - ["0.065000", "10.00000000"]
+                    - ["0.064990", "15.50000000"]
+                    - ["0.064980", "8.20000000"]
+                    - ["0.064970", "20.10000000"]
+                    - ["0.064960", "5.00000000"]
+                  asks:
+                    - ["0.065010", "12.30000000"]
+                    - ["0.065020", "8.70000000"]
+                    - ["0.065030", "11.00000000"]
+                    - ["0.065040", "7.50000000"]
+                    - ["0.065050", "14.20000000"]
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '429':
+        $ref: '#/components/responses/TooManyRequests'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    OrderBookSnapshot:
+      type: object
+      description: |
+        Represents a snapshot of the order book for a specific trading pair.
+        It includes the `lastUpdateId`, a list of `bids` (buy orders), and a list of `asks` (sell orders).
+        This structure provides a comprehensive view of market depth at a given moment.
+      properties:
+        lastUpdateId:
+          type: integer
+          format: int64
+          description: |
+            The ID of the last update in the order book.
+            This can be used to synchronize with real-time data streams or to check for data freshness.
+            It's a monotonically increasing identifier.
+          example: 102702489
+        bids:
+          type: array
+          description: |
+            A list of bid orders (buy orders). Each bid is represented as an array
+            where the first element is the price (string) and the second is the quantity (string).
+            Bids are sorted in descending order by price, representing the highest buy offers available.
+            The quantity represents the total amount available at that specific price level.
+          items:
+            $ref: '#/components/schemas/OrderBookEntry'
+          example:
+            - ["29000.00", "0.50000000"]
+            - ["28999.50", "1.25000000"]
+            - ["28999.00", "0.80000000"]
+        asks:
+          type: array
+          description: |
+            A list of ask orders (sell orders). Each ask is represented as an array
+            where the first element is the price (string) and the second is the quantity (string).
+            Asks are sorted in ascending order by price, representing the lowest sell offers available.
+            The quantity represents the total amount available at that specific price level.
+          items:
+            $ref: '#/components/schemas/OrderBookEntry'
+          example:
+            - ["29001.00", "0.70000000"]
+            - ["29001.50", "1.50000000"]
+            - ["29002.00", "0.90000000"]
+      required:
+        - lastUpdateId
+        - bids
+        - asks
+
+    OrderBookEntry:
+      type: array
+      description: |
+        Represents a single price level in the order book, consisting of a price and a quantity.
+        Both values are represented as strings to maintain precision for financial calculations
+        and avoid floating-point inaccuracies.
+      items:
+        type: string
+        format: decimal # Indicates that this string represents a decimal number
+        description: Price or Quantity as a string to preserve precision.
+      minItems: 2
+      maxItems: 2
+      example: ["29000.00", "0.50000000"]
+
+    ErrorResponse:
+      type: object
+      description: |
+        Standard error response structure for API calls.
+        Provides a clear error code and a descriptive message to help clients understand the issue.
+        This consistent format aids in error handling across different API endpoints.
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: A unique error code identifying the type of error.
+            These codes are typically specific to the API provider.
+          example: -1100
+        msg:
+          type: string
+          description: A human-readable error message providing details about the error.
+          example: "Invalid symbol parameter. Please check the symbol format."
+      required:
+        - code
+        - msg
+
+  responses:
+    BadRequest:
+      description: |
+        Bad Request. The request was malformed or contained invalid parameters.
+        This typically occurs due to incorrect `symbol` format, `limit` out of range,
+        missing required parameters, or other client-side validation failures.
+        The `ErrorResponse` body provides specific details.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            InvalidSymbol:
+              summary: Invalid Symbol Error
+              value:
+                code: -1100
+                msg: "Invalid symbol parameter. Expected format like BTCUSDT."
+            InvalidLimit:
+              summary: Invalid Limit Error
+              value:
+                code: -1003
+                msg: "Parameter 'limit' sent with an invalid value. Max 5000 allowed."
+            MissingParameter:
+              summary: Missing Required Parameter
+              value:
+                code: -1002
+                msg: "Mandatory parameter 'symbol' was not sent, was empty/null, or malformed."
+    TooManyRequests:
+      description: |
+        Too Many Requests. The client has sent too many requests in a given amount of time,
+        exceeding the defined rate limits for this endpoint or the overall API.
+        Clients should back off and retry after the duration specified in the `Retry-After` header.
+        Repeatedly ignoring rate limits may lead to temporary or permanent IP bans.
+      headers:
+        Retry-After:
+          description: |
+            The number of seconds after which the client can safely retry their request.
+            This header is typically present when a 429 response is returned, guiding
+            clients on how to manage their request frequency.
+          schema:
+            type: integer
+            format: int32
+            example: 60
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            RateLimitExceeded:
+              summary: Rate Limit Exceeded
+              value:
+                code: -1003
+                msg: "You are sending too many requests. Please adjust your request frequency."
+            IPRateLimitExceeded:
+              summary: IP Rate Limit Exceeded
+              value:
+                code: -1004
+                msg: "Your IP address has sent too many requests. Please slow down."
+    InternalServerError:
+      description: |
+        Internal Server Error. An unexpected error occurred on the server while processing the request.
+        This indicates a problem on the API provider's side and is not due to client input.
+        Clients should typically log this error and potentially retry the request after a delay.
+        If persistent, this issue should be reported to the API provider.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            GenericError:
+              summary: Generic Internal Server Error
+              value:
+                code: -1000
+                msg: "An unknown error occurred while processing your request. Please try again later."
+            DatabaseError:
+              summary: Database Connectivity Error
+              value:
+                code: -1001
+                msg: "Failed to connect to the market data database. Service temporarily unavailable."
