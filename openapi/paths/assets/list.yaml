@@ -1,0 +1,260 @@
+get:
+  tags:
+    - Assets
+  summary: List and Search Assets
+  description: |
+    Retrieves a paginated list of assets, allowing for extensive filtering, sorting, and searching capabilities. This endpoint is the primary method for discovering and browsing assets within the system.
+
+    **Filtering:**
+    You can filter assets by a variety of attributes, including status, type, MIME type, tags, creation/update timestamps, file size, and custom metadata. For range-based filters like dates or sizes, use bracket notation (e.g., `createdAt[gte]=2023-01-01T00:00:00Z`).
+
+    **Searching:**
+    A full-text search can be performed using the `query` parameter. The search engine indexes asset names, descriptions, tags, and extracted text content.
+
+    **Sorting:**
+    Results can be sorted by fields like `createdAt`, `updatedAt`, `name`, and `size`. Specify the sort order with the `order` parameter.
+
+    **Pagination:**
+    The endpoint uses offset-based pagination by default (`limit` and `offset`). For large datasets, cursor-based pagination is recommended for better performance and is enabled by providing a `cursor` value from a previous response.
+
+    **Embedding Related Resources:**
+    Use the `include` parameter to embed related resources like `tags`, `creator`, or `customMetadata` directly in the response to reduce the number of subsequent API calls.
+  operationId: listAssets
+  parameters:
+    - name: query
+      in: query
+      description: A free-text search string to find assets by name, description, tags, or content.
+      required: false
+      schema:
+        type: string
+      example: "annual report"
+    - name: ids
+      in: query
+      description: A comma-separated list of asset UUIDs to retrieve. If provided, other filters are ignored.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+          format: uuid
+      example: "f47ac10b-58cc-4372-a567-0e02b2c3d479,c47ac10b-58cc-4372-a567-0e02b2c3d480"
+    - name: status
+      in: query
+      description: Filter assets by their current status.
+      required: false
+      schema:
+        type: string
+        enum: [active, archived, processing, failed, pending_review]
+      example: "active"
+    - name: type
+      in: query
+      description: Filter assets by their general type.
+      required: false
+      schema:
+        type: string
+        enum: [image, video, audio, document, archive, presentation, spreadsheet, other]
+      example: "image"
+    - name: mimeType
+      in: query
+      description: Filter assets by a specific MIME type.
+      required: false
+      schema:
+        type: string
+      example: "image/jpeg"
+    - name: tags
+      in: query
+      description: A comma-separated list of tags to filter assets by. Assets must have all specified tags.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+      example: "marketing,q4-2024,logo"
+    - name: createdBy
+      in: query
+      description: Filter assets by the UUID of the user who created them.
+      required: false
+      schema:
+        type: string
+        format: uuid
+      example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+    - name: createdAt[gte]
+      in: query
+      description: "Filter for assets created on or after this timestamp (ISO 8601 format)."
+      required: false
+      schema:
+        type: string
+        format: date-time
+      example: "2024-01-01T00:00:00Z"
+    - name: createdAt[lte]
+      in: query
+      description: "Filter for assets created on or before this timestamp (ISO 8601 format)."
+      required: false
+      schema:
+        type: string
+        format: date-time
+      example: "2024-12-31T23:59:59Z"
+    - name: size[gt]
+      in: query
+      description: "Filter for assets with a file size greater than this value (in bytes)."
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+      example: 1048576
+    - name: size[lte]
+      in: query
+      description: "Filter for assets with a file size less than or equal to this value (in bytes)."
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+      example: 10485760
+    - name: sort
+      in: query
+      description: The field to sort the results by.
+      required: false
+      schema:
+        type: string
+        enum: [createdAt, updatedAt, name, size]
+        default: createdAt
+      example: "updatedAt"
+    - name: order
+      in: query
+      description: The order to sort the results in.
+      required: false
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+      example: "desc"
+    - name: limit
+      in: query
+      description: The maximum number of assets to return in a single response.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 25
+      example: 50
+    - name: offset
+      in: query
+      description: The number of assets to skip before starting to collect the result set. Used for offset-based pagination.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        default: 0
+      example: 100
+    - name: cursor
+      in: query
+      description: A pagination cursor returned from a previous request. Used for cursor-based pagination, which is more efficient for large datasets. If provided, `offset` is ignored.
+      required: false
+      schema:
+        type: string
+      example: "eyJpZCI6ImM0N2FjMTBiLTU4Y2MtNDM3Mi1hNTY3LTBlMDJiMmMzZDQ4MCIsInRzIjoxNzA0MDY3MjAwfQ=="
+    - name: include
+      in: query
+      description: A comma-separated list of related resources to include in the response.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum: [tags, creator, customMetadata, versions]
+      example: "tags,creator"
+  responses:
+    '200':
+      description: A paginated list of assets matching the query criteria.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '../../components/schemas/Asset.yaml'
+              meta:
+                $ref: '../../components/schemas/PaginationMeta.yaml'
+              links:
+                $ref: '../../components/schemas/PaginationLinks.yaml'
+          example:
+            data:
+              - id: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                name: "Q4-Marketing-Campaign-Banner.jpg"
+                description: "Primary banner image for the Q4 2024 marketing campaign."
+                type: "image"
+                mimeType: "image/jpeg"
+                size: 2097152
+                status: "active"
+                storageUrl: "https://storage.example.com/assets/f47ac10b-58cc-4372-a567-0e02b2c3d479/Q4-Marketing-Campaign-Banner.jpg"
+                accessUrl: "https://cdn.example.com/assets/f47ac10b-58cc-4372-a567-0e02b2c3d479/Q4-Marketing-Campaign-Banner.jpg"
+                version: 3
+                tags: ["marketing", "q4-2024", "banner"]
+                customMetadata:
+                  campaignId: "CMP-2024-Q4"
+                  approvedBy: "user-abc-123"
+                dimensions:
+                  width: 1920
+                  height: 1080
+                createdAt: "2024-10-01T10:00:00Z"
+                updatedAt: "2024-10-15T14:30:00Z"
+                createdBy: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                updatedBy: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+              - id: "c47ac10b-58cc-4372-a567-0e02b2c3d480"
+                name: "Product-Launch-Video-Final.mp4"
+                description: "Final cut of the product launch video."
+                type: "video"
+                mimeType: "video/mp4"
+                size: 52428800
+                status: "active"
+                storageUrl: "https://storage.example.com/assets/c47ac10b-58cc-4372-a567-0e02b2c3d480/Product-Launch-Video-Final.mp4"
+                accessUrl: "https://cdn.example.com/assets/c47ac10b-58cc-4372-a567-0e02b2c3d480/Product-Launch-Video-Final.mp4"
+                version: 1
+                tags: ["product", "launch", "video"]
+                customMetadata:
+                  projectId: "PROJ-XYZ-789"
+                  durationSeconds: 125
+                dimensions:
+                  width: 3840
+                  height: 2160
+                createdAt: "2024-09-20T09:00:00Z"
+                updatedAt: "2024-09-20T09:00:00Z"
+                createdBy: "f0e9d8c7-b6a5-4321-fedc-ba9876543210"
+                updatedBy: "f0e9d8c7-b6a5-4321-fedc-ba9876543210"
+            meta:
+              totalItems: 1234
+              itemCount: 2
+              itemsPerPage: 2
+              totalPages: 617
+              currentPage: 1
+              nextCursor: "eyJpZCI6ImM0N2FjMTBiLTU4Y2MtNDM3Mi1hNTY3LTBlMDJiMmMzZDQ4MCIsInRzIjoxNzA0MDY3MjAwfQ=="
+            links:
+              self: "/assets?limit=2"
+              first: "/assets?limit=2"
+              next: "/assets?limit=2&cursor=eyJpZCI6ImM0N2FjMTBiLTU4Y2MtNDM3Mi1hNTY3LTBlMDJiMmMzZDQ4MCIsInRzIjoxNzA0MDY3MjAwfQ=="
+              last: "/assets?limit=2&offset=1232"
+    '400':
+      $ref: '../../components/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../components/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../components/responses/Forbidden.yaml'
+    '500':
+      $ref: '../../components/responses/InternalServerError.yaml'
+  security:
+    - OAuth2:
+        - assets:read
+    - ApiKey: []
