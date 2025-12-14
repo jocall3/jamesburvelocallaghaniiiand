@@ -1,0 +1,92 @@
+- url: '{protocol}://{host}.example.com/{basePath}'
+  description: |
+    The primary production environment for the live application. 
+    All client-facing traffic is directed here. This environment is highly available, 
+    monitored 24/7, and scaled for performance. Use this server for all production integrations.
+  variables:
+    protocol:
+      description: The network protocol to use for API requests. Production strongly recommends 'https'.
+      enum:
+        - https
+        - http
+      default: https
+    host:
+      description: The hostname for the production API. This should not be changed for production clients.
+      default: api
+    basePath:
+      description: The base path for the API, which typically includes the version number.
+      default: v1
+
+- url: '{protocol}://{host}.example.com/{basePath}'
+  description: |
+    The staging environment for pre-production testing and quality assurance. 
+    This environment is a mirror of production and is used to test new features, 
+    bug fixes, and integrations before they are deployed to the live environment. 
+    Data in this environment may be reset periodically.
+  variables:
+    protocol:
+      description: The network protocol to use.
+      enum:
+        - https
+        - http
+      default: https
+    host:
+      description: The hostname for the staging API.
+      default: staging-api
+    basePath:
+      description: The base path for the API, which should match the version being tested.
+      default: v1
+
+- url: '{protocol}://{host}:{port}/{basePath}'
+  description: |
+    The shared development environment for internal engineering teams. 
+    This server hosts the latest builds from the main development branch and is used for 
+    integration testing and feature development. This environment is not guaranteed to be stable.
+  variables:
+    protocol:
+      description: The network protocol to use. 'http' is common for internal development.
+      enum:
+        - http
+        - https
+      default: http
+    host:
+      description: The hostname for the shared development server.
+      default: dev.internal.example.com
+    port:
+      description: The port number for the development API server.
+      default: '8080'
+    basePath:
+      description: The base path for the API, reflecting the current development version.
+      default: v1
+
+- url: '{protocol}://localhost:{port}/{basePath}'
+  description: |
+    A local development server running on a developer's machine. 
+    Use this for local development, debugging, and running unit/integration tests. 
+    The configuration may vary between developer machines.
+  variables:
+    protocol:
+      description: The network protocol for local development.
+      enum:
+        - http
+        - https
+      default: http
+    port:
+      description: The port number for the local API server.
+      default: '3000'
+    basePath:
+      description: The base path for the local API.
+      default: v1
+
+- url: 'https://{mockServerHost}/api/{version}'
+  description: |
+    A stable mock server that returns example data based on the OpenAPI specification. 
+    This server is ideal for frontend development, mobile app development, and contract testing 
+    without needing a live backend. It provides predictable, static responses for all endpoints.
+  variables:
+    mockServerHost:
+      description: The host for the mock API service.
+      default: 'api.mock.example.com'
+    version:
+      description: The API version to be mocked.
+      default: v1
