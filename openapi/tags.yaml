@@ -1,0 +1,45 @@
+- name: Assets
+  description: |
+    Endpoints for creating, retrieving, updating, and deleting assets within the system. Assets represent the core resources managed by the platform, such as files, documents, or any other digital content. This includes operations for managing asset metadata, versions, and lifecycle.
+- name: Secrets
+  description: |
+    Operations related to the secure management of secrets. This includes creating, retrieving, updating, and deleting sensitive information like API keys, database credentials, and encryption keys. Endpoints in this group are highly secured and subject to strict access controls and audit logging.
+- name: Audit
+  description: |
+    Provides access to the audit trail of all activities within the system. These endpoints allow for querying and retrieving detailed logs of user actions, system events, and API calls. This is crucial for security analysis, compliance, and troubleshooting.
+- name: Users
+  description: |
+    Endpoints for managing user accounts. This includes user creation, retrieval of user profiles, updating user information, and deactivating or deleting users. It also covers management of user-specific settings and preferences.
+- name: Groups & Permissions
+  description: |
+    Manages user groups and the permissions associated with them. These endpoints allow for the creation of groups, assignment of users to groups, and the definition of fine-grained access control policies (RBAC/ABAC) that govern what actions users can perform on various resources.
+- name: Authentication
+  description: |
+    Handles all aspects of user and application authentication. This includes endpoints for logging in (e.g., password, SSO, MFA), obtaining access tokens (JWT, OAuth2), refreshing tokens, and logging out.
+- name: API Keys
+  description: |
+    Endpoints dedicated to the management of API keys for programmatic access to the system. This allows users and applications to create, list, revoke, and manage the scopes and permissions of API keys used for automation and integration.
+- name: Workflows & Automation
+  description: |
+    Operations for defining, triggering, and monitoring automated workflows. These endpoints allow users to orchestrate complex sequences of actions based on system events or schedules, enabling powerful automation capabilities.
+- name: Webhooks
+  description: |
+    Manages webhook subscriptions for real-time event notifications. These endpoints allow external systems to subscribe to specific events (e.g., asset created, user logged in) and receive notifications via HTTP callbacks.
+- name: Integrations
+  description: |
+    Endpoints for configuring and managing integrations with third-party services and platforms. This includes setting up credentials, mapping data, and enabling or disabling specific integrations.
+- name: System & Health
+  description: |
+    Provides endpoints for monitoring the health, status, and configuration of the API and its underlying infrastructure. This includes health checks, performance metrics, and access to system-level settings.
+- name: Reporting & Analytics
+  description: |
+    Endpoints for generating and retrieving reports and analytical data. This allows users to gain insights into system usage, asset distribution, user activity, and other key performance indicators.
+- name: Search
+  description: |
+    Provides powerful, cross-resource search capabilities. These endpoints allow for complex queries across all manageable entities like assets, users, and audit logs, with support for filtering, sorting, and pagination.
+- name: Billing & Subscriptions
+  description: |
+    Manages billing, subscription plans, and payment information. These endpoints are used for upgrading or downgrading plans, viewing invoices, and managing payment methods.
+- name: Notifications
+  description: |
+    Endpoints for managing user notifications. This includes retrieving a user's notifications, marking them as read, and managing notification preferences and delivery channels (e.g., email, in-app).
