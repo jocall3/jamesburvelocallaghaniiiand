@@ -1,0 +1,133 @@
+get:
+  summary: Get Real-Time Market Quotes
+  description: |
+    Retrieves real-time or delayed market quotes for a list of specified financial symbols.
+    This endpoint supports a wide range of asset classes including stocks, cryptocurrencies, forex, and commodities.
+    Provide a comma-separated list or an array of symbols to fetch multiple quotes in a single request.
+    The data returned is sourced from multiple global exchanges to provide a comprehensive market view.
+  operationId: getMarketQuotes
+  tags:
+    - Market Data
+  parameters:
+    - name: symbols
+      in: query
+      description: |
+        A comma-separated list or an array of market symbols to retrieve quotes for.
+        Symbols should be in a recognizable format (e.g., 'BTC-USD', 'AAPL', 'EUR/USD').
+        A maximum of 100 symbols can be requested at once.
+      required: true
+      schema:
+        type: array
+        items:
+          type: string
+          description: A single market symbol.
+          example: "BTC-USD"
+        minItems: 1
+        maxItems: 100
+      style: form
+      explode: false # Renders as symbols=BTC-USD,ETH-USD,XRP-USD
+      example: ["BTC-USD", "ETH-USD", "AAPL"]
+    - name: exchange
+      in: query
+      description: |
+        Specify a particular exchange to source the quote from (e.g., 'NASDAQ', 'BINANCE').
+        If omitted, the API will return a consolidated quote from the most relevant exchanges.
+      required: false
+      schema:
+        type: string
+      example: "NASDAQ"
+    - name: fields
+      in: query
+      description: |
+        A comma-separated list of fields to include in the response.
+        If omitted, all default fields will be returned.
+        Use this to reduce response size and latency.
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum: [symbol, price, bid, ask, volume, timestamp, high, low, open, close, change, changePercent]
+      style: form
+      explode: false
+      example: ["symbol", "price", "timestamp", "changePercent"]
+  security:
+    - ApiKeyAuth: []
+    - OAuth2: [market:read]
+  responses:
+    '200':
+      description: A successful response returning an array of market quotes. The array may be empty if no valid symbols were found, but the request itself was valid.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/X-Request-ID'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        Date:
+          $ref: '#/components/headers/Date'
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/MarketQuote'
+            description: An array of quote objects, one for each valid symbol requested.
+          examples:
+            multiSymbolResponse:
+              summary: Example response for multiple symbols
+              value:
+                - symbol: "BTC-USD"
+                  exchange: "COINBASE"
+                  price: 68543.21
+                  bid: 68543.20
+                  bidSize: 0.5
+                  ask: 68543.22
+                  askSize: 0.75
+                  volume: 25034.5
+                  open: 67100.00
+                  high: 69123.45
+                  low: 67050.90
+                  close: 67099.80
+                  change: 1443.41
+                  changePercent: 2.15
+                  timestamp: "2023-10-27T10:00:00Z"
+                  marketCap: 1350000000000
+                  currency: "USD"
+                - symbol: "AAPL"
+                  exchange: "NASDAQ"
+                  price: 170.15
+                  bid: 170.14
+                  bidSize: 500
+                  ask: 170.16
+                  askSize: 450
+                  volume: 55000000
+                  open: 169.50
+                  high: 171.20
+                  low: 169.00
+                  close: 169.45
+                  change: 0.70
+                  changePercent: 0.41
+                  timestamp: "2023-10-27T10:00:05Z"
+                  marketCap: 2670000000000
+                  currency: "USD"
+    '400':
+      $ref: '#/components/responses/BadRequest'
+    '401':
+      $ref: '#/components/responses/Unauthorized'
+    '403':
+      $ref: '#/components/responses/Forbidden'
+    '404':
+      description: Not Found. Returned when none of the requested symbols could be found. If some symbols are found and others are not, a 200 OK is returned with data only for the found symbols.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "NOT_FOUND"
+            message: "No data could be found for the specified symbols: [INVALID1, INVALID2]."
+            requestId: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+    '429':
+      $ref: '#/components/responses/TooManyRequests'
+    '500':
+      $ref: '#/components/responses/InternalServerError'
