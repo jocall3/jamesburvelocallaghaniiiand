@@ -1,0 +1,321 @@
+{
+  "patch": {
+    "tags": [
+      "Account Management",
+      "Institutional Configuration",
+      "Vector Control"
+    ],
+    "summary": "Update Account Designation and Institutional Vectors",
+    "description": "Initiates a partial update to the configuration settings of a specific account identified by `accountId`. This endpoint is critical for maintaining organizational alignment and allows for the modification of the account's `designation` (role, title, clearance) and `institutionalVectors` (strategic alignment metrics).\n\n**Behavioral Notes:**\n- **Partial Update:** Only fields present in the request body will be updated. Missing fields remain unchanged.\n- **Vector Calculation:** Updates to `institutionalVectors` trigger a recalculation of the account's global compliance score.\n- **Audit Trail:** All changes to designation or vectors are immutably logged in the security audit ledger.\n\n**Permissions:** Requires `admin:account:write` or `system:vector:manage` scope.",
+    "operationId": "updateAccountSettings",
+    "security": [
+      {
+        "oAuth2": [
+          "admin:account:write",
+          "system:vector:manage"
+        ]
+      },
+      {
+        "apiKey": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "accountId",
+        "in": "path",
+        "description": "The unique UUID v4 identifier of the account to update.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "c56a4180-65aa-42ec-a945-5fd21dec0538"
+        }
+      },
+      {
+        "name": "X-Correlation-ID",
+        "in": "header",
+        "description": "A unique identifier for tracing the request through the distributed system.",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+        }
+      },
+      {
+        "name": "If-Match",
+        "in": "header",
+        "description": "ETag value for optimistic concurrency control. Prevents overwriting changes made by other processes.",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "example": "\"686897696a7c876b7e\""
+        }
+      }
+    ],
+    "requestBody": {
+      "description": "JSON payload containing the fields to update. Supports nested configuration for designation hierarchies and vector arrays.",
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "title": "UpdateAccountSettingsRequest",
+            "properties": {
+              "designation": {
+                "type": "object",
+                "description": "Object defining the professional and security classification of the account.",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "The official job title or role name.",
+                    "example": "Senior Systems Architect",
+                    "maxLength": 100
+                  },
+                  "departmentId": {
+                    "type": "string",
+                    "description": "Reference ID to the department the account belongs to.",
+                    "example": "dept_eng_core_01"
+                  },
+                  "clearanceLevel": {
+                    "type": "integer",
+                    "description": "Security clearance level (1-10).",
+                    "minimum": 1,
+                    "maximum": 10,
+                    "example": 5
+                  },
+                  "classificationType": {
+                    "type": "string",
+                    "enum": [
+                      "PERMANENT",
+                      "CONTRACTOR",
+                      "SYSTEM_DAEMON",
+                      "TEMPORARY_ACCESS"
+                    ],
+                    "description": "The employment or functional classification of the account.",
+                    "example": "PERMANENT"
+                  },
+                  "effectiveDate": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "The date when this designation becomes active.",
+                    "example": "2023-11-01"
+                  }
+                }
+              },
+              "institutionalVectors": {
+                "type": "array",
+                "description": "A list of vectors defining the account's strategic and operational alignment.",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "vectorId",
+                    "magnitude"
+                  ],
+                  "properties": {
+                    "vectorId": {
+                      "type": "string",
+                      "description": "Unique identifier for the institutional vector definition.",
+                      "example": "vec_innovation_velocity"
+                    },
+                    "magnitude": {
+                      "type": "number",
+                      "format": "double",
+                      "description": "The scalar value representing the strength of the vector (0.0 to 1.0).",
+                      "minimum": 0.0,
+                      "maximum": 1.0,
+                      "example": 0.87
+                    },
+                    "direction": {
+                      "type": "string",
+                      "enum": [
+                        "ASCENDING",
+                        "DESCENDING",
+                        "STABILIZED",
+                        "FLUCTUATING"
+                      ],
+                      "description": "The trend direction of the vector relative to the previous period.",
+                      "default": "STABILIZED"
+                    },
+                    "weightingFactor": {
+                      "type": "number",
+                      "description": "Multiplier applied to this vector during aggregate scoring.",
+                      "default": 1.0,
+                      "example": 1.5
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "Arbitrary key-value pairs for vector-specific context.",
+                      "example": {
+                        "source": "Q3_Review",
+                        "auditor": "J.Doe"
+                      }
+                    }
+                  }
+                }
+              },
+              "settingsContext": {
+                "type": "object",
+                "description": "Meta-information regarding the update operation.",
+                "properties": {
+                  "justification": {
+                    "type": "string",
+                    "description": "Reason for the settings change.",
+                    "example": "Annual role realignment"
+                  },
+                  "approvedBy": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "UUID of the administrator who authorized the change.",
+                    "example": "b234-5678-9012-3456"
+                  }
+                }
+              }
+            }
+          },
+          "examples": {
+            "FullUpdate": {
+              "summary": "Full Designation and Vector Update",
+              "value": {
+                "designation": {
+                  "title": "Principal Engineer",
+                  "departmentId": "dept_eng_core_01",
+                  "clearanceLevel": 6,
+                  "classificationType": "PERMANENT"
+                },
+                "institutionalVectors": [
+                  {
+                    "vectorId": "vec_risk_tolerance",
+                    "magnitude": 0.4,
+                    "direction": "STABILIZED"
+                  },
+                  {
+                    "vectorId": "vec_productivity_index",
+                    "magnitude": 0.95,
+                    "direction": "ASCENDING",
+                    "weightingFactor": 1.2
+                  }
+                ],
+                "settingsContext": {
+                  "justification": "Promotion cycle Q4",
+                  "approvedBy": "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+                }
+              }
+            },
+            "VectorOnlyUpdate": {
+              "summary": "Vector Adjustment Only",
+              "value": {
+                "institutionalVectors": [
+                  {
+                    "vectorId": "vec_compliance_adherence",
+                    "magnitude": 1.0,
+                    "metadata": {
+                      "note": "Mandatory correction"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Settings updated successfully. Returns the updated account configuration.",
+        "headers": {
+          "ETag": {
+            "description": "The new entity tag for the updated resource.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "X-Vector-Score": {
+            "description": "The newly calculated aggregate vector score for the account.",
+            "schema": {
+              "type": "number"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AccountSettingsResponse"
+            },
+            "examples": {
+              "Success": {
+                "value": {
+                  "accountId": "c56a4180-65aa-42ec-a945-5fd21dec0538",
+                  "designation": {
+                    "title": "Principal Engineer",
+                    "departmentId": "dept_eng_core_01",
+                    "clearanceLevel": 6,
+                    "classificationType": "PERMANENT",
+                    "lastModified": "2023-10-27T10:00:00Z"
+                  },
+                  "institutionalVectors": [
+                    {
+                      "vectorId": "vec_risk_tolerance",
+                      "magnitude": 0.4,
+                      "calculatedScore": 40.0
+                    },
+                    {
+                      "vectorId": "vec_productivity_index",
+                      "magnitude": 0.95,
+                      "calculatedScore": 114.0
+                    }
+                  ],
+                  "updatedAt": "2023-10-27T10:00:00Z",
+                  "status": "ACTIVE"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request. Validation failed for designation rules or vector constraints.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "VectorConstraintViolation": {
+                "value": {
+                  "code": "VECTOR_LIMIT_EXCEEDED",
+                  "message": "Magnitude for 'vec_risk_tolerance' cannot exceed 0.3 for this clearance level.",
+                  "traceId": "abc-123-xyz"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized. Authentication token is missing or invalid."
+      },
+      "403": {
+        "description": "Forbidden. User lacks the necessary scopes to modify institutional vectors."
+      },
+      "404": {
+        "description": "Account not found."
+      },
+      "409": {
+        "description": "Conflict. The resource has been modified by another process (ETag mismatch)."
+      },
+      "422": {
+        "description": "Unprocessable Entity. The request is well-formed but semantically incorrect (e.g., assigning a department that does not exist)."
+      },
+      "429": {
+        "description": "Too Many Requests. Rate limit exceeded."
+      },
+      "500": {
+        "description": "Internal Server Error."
+      }
+    }
+  }
+}
