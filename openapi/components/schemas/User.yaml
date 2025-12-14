@@ -1,0 +1,219 @@
+type: object
+description: |-
+  Represents a user account within the system. This object contains all public and private information associated with a user, including identification, profile details, status, and preferences.
+required:
+  - id
+  - username
+  - email
+  - status
+  - created_at
+  - updated_at
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The unique identifier for the user. This is a system-generated UUID.
+    example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+    readOnly: true
+  username:
+    type: string
+    description: The user's unique username, used for logging in. Must be between 3 and 30 characters and can only contain alphanumeric characters and underscores.
+    minLength: 3
+    maxLength: 30
+    pattern: "^[a-zA-Z0-9_]+$"
+    example: "jane_doe"
+  email:
+    type: string
+    format: email
+    description: The user's primary email address. Must be unique across the system.
+    example: "jane.doe@example.com"
+  email_verified:
+    type: boolean
+    description: Indicates whether the user has verified their email address.
+    example: true
+    readOnly: true
+  first_name:
+    type: string
+    description: The user's first name.
+    maxLength: 50
+    example: "Jane"
+  last_name:
+    type: string
+    description: The user's last name.
+    maxLength: 50
+    example: "Doe"
+  full_name:
+    type: string
+    description: The user's full name, typically a combination of first and last name. This is a read-only, derived field.
+    example: "Jane Doe"
+    readOnly: true
+  avatar_url:
+    type: string
+    format: uri
+    description: A URL pointing to the user's profile picture.
+    example: "https://example.com/avatars/a1b2c3d4.png"
+  status:
+    type: string
+    description: The current status of the user's account.
+    enum:
+      - active
+      - pending_verification
+      - suspended
+      - deleted
+    example: "active"
+  roles:
+    type: array
+    description: A list of roles assigned to the user, which determine their permissions within the system.
+    items:
+      type: string
+      description: A specific role identifier.
+      example: "administrator"
+    example:
+      - "content_editor"
+      - "viewer"
+  organization_id:
+    type: string
+    format: uuid
+    description: The unique identifier of the organization this user belongs to. Null if the user is not part of an organization.
+    example: "f0e9d8c7-b6a5-4321-fedc-ba9876543210"
+    nullable: true
+  mfa_enabled:
+    type: boolean
+    description: Indicates whether Multi-Factor Authentication (MFA) is enabled for this user's account.
+    example: false
+    default: false
+  profile:
+    type: object
+    description: Contains extended, user-editable profile information.
+    properties:
+      bio:
+        type: string
+        description: A short biography or description about the user.
+        maxLength: 500
+        example: "Expert in cloud infrastructure and API design."
+      location:
+        type: string
+        description: The user's geographical location.
+        maxLength: 100
+        example: "San Francisco, CA"
+      website:
+        type: string
+        format: uri
+        description: A URL to the user's personal or professional website.
+        example: "https://jane-doe-portfolio.com"
+      social_links:
+        type: object
+        description: A collection of links to the user's social media profiles.
+        properties:
+          linkedin:
+            type: string
+            format: uri
+            description: URL to the user's LinkedIn profile.
+            example: "https://www.linkedin.com/in/janedoe"
+          twitter:
+            type: string
+            format: uri
+            description: URL to the user's Twitter (X) profile.
+            example: "https://twitter.com/janedoe"
+          github:
+            type: string
+            format: uri
+            description: URL to the user's GitHub profile.
+            example: "https://github.com/janedoe"
+  preferences:
+    type: object
+    description: User-specific settings and preferences for the application interface and notifications.
+    properties:
+      theme:
+        type: string
+        description: The preferred UI theme for the user.
+        enum:
+          - light
+          - dark
+          - system
+        default: "system"
+        example: "dark"
+      language:
+        type: string
+        description: The user's preferred language, specified as an ISO 639-1 code.
+        example: "en-US"
+        default: "en-US"
+      notifications:
+        type: object
+        description: Configuration for how the user receives notifications.
+        properties:
+          email:
+            type: boolean
+            description: Enable or disable email notifications.
+            default: true
+          sms:
+            type: boolean
+            description: Enable or disable SMS notifications.
+            default: false
+          push:
+            type: boolean
+            description: Enable or disable push notifications to mobile/desktop clients.
+            default: true
+  metadata:
+    type: object
+    description: A flexible key-value store for additional, unstructured user data. Can be used by integrations or for custom application logic.
+    additionalProperties: true
+    example:
+      internal_employee_id: "E789123"
+      subscription_tier: "premium"
+      last_seen_feature: "new-dashboard-v2"
+  created_at:
+    type: string
+    format: date-time
+    description: The timestamp indicating when the user account was created, in ISO 8601 format.
+    example: "2023-01-15T10:30:00Z"
+    readOnly: true
+  updated_at:
+    type: string
+    format: date-time
+    description: The timestamp indicating when the user account was last updated, in ISO 8601 format.
+    example: "2023-10-28T14:45:12Z"
+    readOnly: true
+  last_login_at:
+    type: string
+    format: date-time
+    description: The timestamp of the user's last successful login, in ISO 8601 format.
+    example: "2023-11-01T09:00:05Z"
+    readOnly: true
+    nullable: true
+example:
+  id: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+  username: "jane_doe"
+  email: "jane.doe@example.com"
+  email_verified: true
+  first_name: "Jane"
+  last_name: "Doe"
+  full_name: "Jane Doe"
+  avatar_url: "https://example.com/avatars/a1b2c3d4.png"
+  status: "active"
+  roles:
+    - "content_editor"
+    - "viewer"
+  organization_id: "f0e9d8c7-b6a5-4321-fedc-ba9876543210"
+  mfa_enabled: true
+  profile:
+    bio: "Expert in cloud infrastructure and API design."
+    location: "San Francisco, CA"
+    website: "https://jane-doe-portfolio.com"
+    social_links:
+      linkedin: "https://www.linkedin.com/in/janedoe"
+      twitter: "https://twitter.com/janedoe"
+      github: "https://github.com/janedoe"
+  preferences:
+    theme: "dark"
+    language: "en-US"
+    notifications:
+      email: true
+      sms: false
+      push: true
+  metadata:
+    internal_employee_id: "E789123"
+    subscription_tier: "premium"
+  created_at: "2023-01-15T10:30:00Z"
+  updated_at: "2023-10-28T14:45:12Z"
+  last_login_at: "2023-11-01T09:00:05Z"
