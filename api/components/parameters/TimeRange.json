@@ -1,0 +1,87 @@
+{
+  "startTime": {
+    "name": "startTime",
+    "in": "query",
+    "description": "The specific point in time to start filtering records. This parameter ensures that only data entries timestamped on or after this value are returned. The value must be a valid ISO 8601 date-time string (e.g., '2023-01-01T00:00:00Z'). This is crucial for pagination, historical data analysis, and synchronization logic.",
+    "required": false,
+    "style": "form",
+    "explode": true,
+    "schema": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Start Timestamp",
+      "description": "An ISO 8601 UTC date-time string representing the inclusive start bound of the time range.",
+      "example": "2023-09-15T08:00:00Z",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$"
+    },
+    "examples": {
+      "startOfFiscalYear": {
+        "summary": "Start of Fiscal Year",
+        "description": "Example timestamp representing the beginning of a fiscal year.",
+        "value": "2023-10-01T00:00:00Z"
+      },
+      "oneWeekAgo": {
+        "summary": "One Week Ago",
+        "description": "Example timestamp for a relative lookback period.",
+        "value": "2023-11-20T14:30:00Z"
+      }
+    }
+  },
+  "endTime": {
+    "name": "endTime",
+    "in": "query",
+    "description": "The specific point in time to stop filtering records. This parameter ensures that only data entries timestamped before or at this value are returned. The value must be a valid ISO 8601 date-time string. If omitted, the server typically defaults to the current timestamp.",
+    "required": false,
+    "style": "form",
+    "explode": true,
+    "schema": {
+      "type": "string",
+      "format": "date-time",
+      "title": "End Timestamp",
+      "description": "An ISO 8601 UTC date-time string representing the inclusive end bound of the time range.",
+      "example": "2023-09-15T17:00:00Z",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$"
+    },
+    "examples": {
+      "endOfFiscalYear": {
+        "summary": "End of Fiscal Year",
+        "description": "Example timestamp representing the end of a fiscal year.",
+        "value": "2024-09-30T23:59:59Z"
+      },
+      "now": {
+        "summary": "Current Time",
+        "description": "Example timestamp representing the current moment.",
+        "value": "2023-11-27T14:30:00Z"
+      }
+    }
+  },
+  "timeZone": {
+    "name": "timeZone",
+    "in": "query",
+    "description": "The IANA time zone identifier to apply when interpreting the 'startTime' and 'endTime' parameters if they are provided without explicit offset information, or for aggregating data by day/month boundaries. Defaults to UTC if not specified.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "title": "Time Zone",
+      "description": "IANA Time Zone Database string.",
+      "example": "America/New_York",
+      "default": "UTC",
+      "minLength": 2,
+      "maxLength": 50
+    },
+    "examples": {
+      "utc": {
+        "summary": "Coordinated Universal Time",
+        "value": "UTC"
+      },
+      "pst": {
+        "summary": "Pacific Standard Time",
+        "value": "America/Los_Angeles"
+      },
+      "est": {
+        "summary": "Eastern Standard Time",
+        "value": "America/New_York"
+      }
+    }
+  }
+}
