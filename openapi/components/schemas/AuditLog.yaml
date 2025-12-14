@@ -1,0 +1,197 @@
+type: object
+description: |
+  Represents a single, immutable entry in the system's audit trail.
+  Audit logs are critical for security, compliance, and operational debugging, capturing detailed information about significant events, particularly those involving access to sensitive assets like secrets.
+title: AuditLog
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "The unique, immutable identifier for this audit log entry. Prefixed with 'log_'."
+    example: "log_a1b2c3d4-e5f6-7890-1234-567890abcdef"
+    readOnly: true
+  timestamp:
+    type: string
+    format: date-time
+    description: "The precise UTC timestamp of when the event occurred, in ISO 8601 format."
+    example: "2023-10-27T10:00:00Z"
+    readOnly: true
+  event_type:
+    type: string
+    description: "A high-level categorization of the event. This helps in filtering and creating alerts for specific classes of actions."
+    enum:
+      - SECRET_REVEALED
+      - ASSET_ACCESSED
+      - ASSET_CREATED
+      - ASSET_UPDATED
+      - ASSET_DELETED
+      - PERMISSION_GRANTED
+      - PERMISSION_REVOKED
+      - USER_LOGIN_SUCCESS
+      - USER_LOGIN_FAILURE
+      - API_KEY_CREATED
+      - API_KEY_REVOKED
+      - SYSTEM_CONFIGURATION_CHANGED
+    example: "SECRET_REVEALED"
+  actor:
+    $ref: '#/$defs/AuditLogActor'
+  resource:
+    $ref: '#/$defs/AuditLogResource'
+  action:
+    type: string
+    description: "The specific, granular action that was performed by the actor on the resource."
+    enum:
+      - READ
+      - WRITE
+      - CREATE
+      - UPDATE
+      - DELETE
+      - REVEAL
+      - EXECUTE
+      - GRANT
+      - REVOKE
+      - LOGIN
+      - LOGOUT
+    example: "REVEAL"
+  outcome:
+    $ref: '#/$defs/AuditLogOutcome'
+  context:
+    $ref: '#/$defs/AuditLogContext'
+  details:
+    type: object
+    description: "A flexible object containing additional, event-specific metadata. The structure of this object depends on the `event_type`."
+    additionalProperties: true
+    example:
+      field_accessed: "database.password"
+      access_duration_ms: 15
+      client_library: "sdk-python-v2.1.0"
+required:
+  - id
+  - timestamp
+  - event_type
+  - actor
+  - resource
+  - action
+  - outcome
+  - context
+
+$defs:
+  AuditLogActor:
+    type: object
+    title: AuditLogActor
+    description: "Represents the entity (user, service account, or system process) that initiated the audited event."
+    properties:
+      type:
+        type: string
+        description: "The type of the actor."
+        enum:
+          - USER
+          - SERVICE_ACCOUNT
+          - SYSTEM
+          - ANONYMOUS
+        example: "USER"
+      id:
+        type: string
+        format: uuid
+        description: "The unique identifier for the actor. May be null for anonymous or system actors."
+        example: "usr_f47ac10b-58cc-4372-a567-0e02b2c3d479"
+      identifier:
+        type: string
+        description: "A human-readable identifier for the actor, such as a username, email address, or service account name."
+        example: "jane.doe@example.com"
+    required:
+      - type
+      - identifier
+
+  AuditLogResource:
+    type: object
+    title: AuditLogResource
+    description: "Represents the resource or asset that was the target of the audited event."
+    properties:
+      type:
+        type: string
+        description: "The type of the resource being acted upon."
+        example: "SECRET"
+      id:
+        type: string
+        format: uuid
+        description: "The unique identifier for the resource."
+        example: "sec_11223344-5566-7788-99aa-bbccddeeff00"
+      name:
+        type: string
+        description: "A human-readable name or path for the resource, providing context."
+        example: "/production/database/credentials"
+    required:
+      - type
+      - id
+
+  AuditLogOutcome:
+    type: object
+    title: AuditLogOutcome
+    description: "Describes the result of the audited event."
+    properties:
+      status:
+        type: string
+        description: "The final status of the action."
+        enum:
+          - SUCCESS
+          - FAILURE
+        example: "SUCCESS"
+      reason:
+        type: string
+        description: "A machine-readable code or message providing more detail about the outcome, especially in case of failure."
+        example: "PERMISSION_DENIED"
+    required:
+      - status
+
+  AuditLogContext:
+    type: object
+    title: AuditLogContext
+    description: "Provides contextual information about the environment in which the event occurred."
+    properties:
+      source_ip:
+        type: string
+        format: ip
+        description: "The source IP address from which the request originated. Can be IPv4 or IPv6."
+        example: "203.0.113.42"
+      user_agent:
+        type: string
+        description: "The User-Agent string of the client that initiated the request."
+        example: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"
+      request_id:
+        type: string
+        format: uuid
+        description: "A unique identifier for the request, used to correlate logs across different services and systems (e.g., a trace ID)."
+        example: "req_98765432-10fe-dcba-9876-543210fedcba"
+      authentication:
+        $ref: '#/$defs/AuditLogAuthentication'
+    required:
+      - source_ip
+      - request_id
+
+  AuditLogAuthentication:
+    type: object
+    title: AuditLogAuthentication
+    description: "Details about the authentication method used by the actor for this event."
+    properties:
+      method:
+        type: string
+        description: "The authentication method used."
+        enum:
+          - PASSWORD
+          - OAUTH2_TOKEN
+          - API_KEY
+          - SAML_ASSERTION
+          - JWT
+          - SESSION_COOKIE
+        example: "API_KEY"
+      provider:
+        type: string
+        description: "The identity provider (IdP) or authentication source, if applicable."
+        example: "Okta"
+      api_key_id:
+        type: string
+        description: "The unique identifier (or prefix) of the API key used for authentication, if the method was API_KEY. The full key is never logged."
+        example: "pak_123abc..."
+    required:
+      - method
