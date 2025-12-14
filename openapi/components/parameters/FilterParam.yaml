@@ -1,0 +1,142 @@
+name: filter
+in: query
+description: |
+  A powerful, structured filter parameter to refine the results. The filter is a URL-encoded JSON object that allows for complex, nested logical conditions.
+
+  **Structure:**
+  A filter object can be either a **Condition** or a **Condition Group**.
+
+  *   **Condition:** A simple comparison with `field`, `op`, and `value`.
+  *   **Condition Group:** A logical grouping using `and`, `or`, or `not`.
+
+  **Supported Operators (`op`):**
+  - `eq`: Equal
+  - `neq`: Not Equal
+  - `gt`: Greater Than
+  - `gte`: Greater Than or Equal
+  - `lt`: Less Than
+  - `lte`: Less Than or Equal
+  - `in`: Value is in the provided array.
+  - `nin`: Value is not in the provided array.
+  - `like`: String pattern matching (case-sensitive). Use '%' as a wildcard.
+  - `ilike`: String pattern matching (case-insensitive). Use '%' as a wildcard.
+  - `isnull`: Field is null. The `value` should be `true` or `false`.
+
+  **Example:**
+  To find all high-priority (`>=4`) tickets that are either `open` or assigned to specific users, but are not tagged as `archived` or `spam`, you would construct this JSON object:
+  ```json
+  {
+    "and": [
+      { "field": "priority", "op": "gte", "value": 4 },
+      {
+        "or": [
+          { "field": "status", "op": "eq", "value": "open" },
+          { "field": "assignee.id", "op": "in", "value": ["user-123", "user-456"] }
+        ]
+      },
+      {
+        "not": {
+          "field": "tags",
+          "op": "in",
+          "value": ["archived", "spam"]
+        }
+      }
+    ]
+  }
+  ```
+  This object must be JSON-stringified and then URL-encoded to be used as the value for the `filter` query parameter.
+required: false
+style: form
+explode: false
+content:
+  application/json:
+    schema:
+      description: The root of a filter query. Can be a single condition or a nested group of conditions.
+      oneOf:
+        - $ref: '#/content/application~1json/schema/$defs/Condition'
+        - $ref: '#/content/application~1json/schema/$defs/ConditionGroup'
+      $defs:
+        Condition:
+          type: object
+          description: A single comparison condition that evaluates a field against a value.
+          properties:
+            field:
+              type: string
+              description: The name of the resource field to apply the filter to. Can use dot-notation for nested fields (e.g., `author.name`).
+              example: "status"
+            op:
+              type: string
+              description: The comparison operator.
+              enum:
+                - eq
+                - neq
+                - gt
+                - gte
+                - lt
+                - lte
+                - in
+                - nin
+                - like
+                - ilike
+                - isnull
+              example: "eq"
+            value:
+              description: >
+                The value to compare the field against. The type depends on the operator.
+                For `in` and `nin`, this must be an array. For `isnull`, this should be a boolean.
+                For others, it's typically a string, number, or boolean.
+              oneOf:
+                - type: string
+                  example: "active"
+                - type: number
+                  example: 123.45
+                - type: boolean
+                  example: true
+                - type: array
+                  items:
+                    oneOf:
+                      - type: string
+                      - type: number
+                  example: ["item1", "item2"]
+          required:
+            - field
+            - op
+            - value
+          additionalProperties: false
+        ConditionGroup:
+          type: object
+          description: A logical grouping of one or more filter conditions. Must contain exactly one of `and`, `or`, or `not`.
+          properties:
+            and:
+              type: array
+              description: A list of filters, all of which must evaluate to true.
+              items:
+                $ref: '#/content/application~1json/schema'
+              minItems: 1
+            or:
+              type: array
+              description: A list of filters, at least one of which must evaluate to true.
+              items:
+                $ref: '#/content/application~1json/schema'
+              minItems: 1
+            not:
+              description: A single filter to be negated.
+              $ref: '#/content/application~1json/schema'
+          minProperties: 1
+          maxProperties: 1
+    example:
+      and:
+        - field: "priority"
+          op: "gte"
+          value: 4
+        - or:
+          - field: "status"
+            op: "eq"
+            value: "open"
+          - field: "assignee.id"
+            op: "in"
+            value: ["user-123", "user-456"]
+        - not:
+            field: "tags"
+            op: "in"
+            value: ["archived", "spam"]
