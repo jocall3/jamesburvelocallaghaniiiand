@@ -1,0 +1,88 @@
+{
+  "title": "TransactionDelta",
+  "type": "object",
+  "description": "Represents the quantitative change (delta) applied to a transaction ledger or account balance. This schema incorporates the 'C03 Safety Clamp' protocol, which strictly validates that no single transaction delta exceeds a magnitude of 1 Trillion (1T) units. This prevents integer overflow exploits and catastrophic logic errors in high-frequency trading environments.",
+  "required": [
+    "deltaId",
+    "changeAmount",
+    "currency",
+    "timestamp",
+    "integrityHash"
+  ],
+  "properties": {
+    "deltaId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique version 4 UUID identifying this specific delta calculation event.",
+      "example": "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+    },
+    "changeAmount": {
+      "type": "number",
+      "format": "double",
+      "description": "The net numerical change to be applied. This value is strictly validated against the C03 Safety Clamp limits. It must be greater than or equal to -1,000,000,000,000 and less than or equal to 1,000,000,000,000.",
+      "minimum": -1000000000000,
+      "maximum": 1000000000000,
+      "example": 9500.50
+    },
+    "currency": {
+      "type": "string",
+      "description": "The ISO 4217 currency code representing the unit of account for this delta.",
+      "pattern": "^[A-Z]{3}$",
+      "example": "USD"
+    },
+    "precision": {
+      "type": "integer",
+      "description": "The number of decimal places considered significant in the changeAmount.",
+      "minimum": 0,
+      "maximum": 18,
+      "default": 2,
+      "example": 2
+    },
+    "isClamped": {
+      "type": "boolean",
+      "description": "A flag indicating if the original requested delta exceeded the C03 safety limits and was automatically clamped to the maximum allowable magnitude. If true, an audit log entry is required.",
+      "default": false,
+      "example": false
+    },
+    "clampReason": {
+      "type": "string",
+      "description": "If isClamped is true, this field provides the specific reason code (e.g., 'C03_MAX_EXCEEDED', 'C03_MIN_EXCEEDED').",
+      "enum": [
+        "NONE",
+        "C03_MAX_EXCEEDED",
+        "C03_MIN_EXCEEDED",
+        "MANUAL_OVERRIDE"
+      ],
+      "default": "NONE"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp indicating when the delta was calculated.",
+      "example": "2023-10-27T10:00:00Z"
+    },
+    "sourceTransactionId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to the parent transaction that generated this delta.",
+      "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+    },
+    "integrityHash": {
+      "type": "string",
+      "description": "SHA-256 hash of the deltaId, changeAmount, and timestamp to ensure immutability during transit.",
+      "pattern": "^[a-fA-F0-9]{64}$",
+      "example": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Arbitrary key-value pairs for additional context regarding the delta calculation.",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "example": {
+        "riskLevel": "low",
+        "initiator": "system_process_A"
+      }
+    }
+  }
+}
