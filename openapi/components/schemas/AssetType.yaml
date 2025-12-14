@@ -1,0 +1,31 @@
+type: string
+description: |
+  The specific category or type of the asset. This is a critical field for categorizing, managing, and applying policies to assets within the system. The asset type determines the expected schema for its properties and the lifecycle management rules that apply.
+enum:
+  - server
+  - virtual_machine
+  - container
+  - kubernetes_cluster
+  - database
+  - data_warehouse
+  - storage
+  - network_device
+  - load_balancer
+  - security_appliance
+  - endpoint
+  - iot_device
+  - saas
+  - application
+  - service
+  - api_endpoint
+  - cloud_resource
+  - serverless_function
+  - user_account
+  - data_pipeline
+  - machine_learning_model
+  - code_repository
+  - ci_cd_pipeline
+  - certificate
+  - domain
+  - other
+example: virtual_machine
