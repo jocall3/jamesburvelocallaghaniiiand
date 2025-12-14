@@ -1,4 +1,3 @@
-```typescript
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import Card from './Card';
 import { GoogleGenAI } from "@google/genai";
@@ -13,9 +12,9 @@ Example: Citibankdemobusinessinc.viewit.movieplayform
 
 For each business model, you will architect a self-contained, completely dependency-free, fully runnable application that is:
 
-â¢ self-hosted â¢ standalone â¢ complete within its own file â¢ internally wired with no external calls â¢ free of all mock data â¢ populated using internal generative-data functions only â¢ fully integrated with all other generated branches â¢ engineered for billion-dollar potential
+* self-hosted * standalone * complete within its own file * internally wired with no external calls * free of all mock data * populated using internal generative-data functions only * fully integrated with all other generated branches * engineered for billion-dollar potential
 
-Your task is to produce all business models, all branches, all namespaces, all files, all apps, all functions, and all linkage layers based on the following 100-point instruction set. You will obey every point and implement all outputs inside this promptâs structure.
+Your task is to produce all business models, all branches, all namespaces, all files, all apps, all functions, and all linkage layers based on the following 100-point instruction set. You will obey every point and implement all outputs inside this prompt's structure.
 
 
 THE 100-POINT INSTRUCTION FRAMEWORK
@@ -223,7 +222,7 @@ Produce a master orchestration layer binding all 10 business models into a unifi
 FINAL TASK
 Using the above structure:
 
-â¢ Generate 10 dot-notation business branches under Citibankdemobusinessinc. â¢ Generate 10 full billion-dollar business models. â¢ Generate 10 self-contained apps. â¢ Link them through a unified orchestration layer. â¢ Output everything cleanly and completely.`;
+* Generate 10 dot-notation business branches under Citibankdemobusinessinc. * Generate 10 full billion-dollar business models. * Generate 10 self-contained apps. * Link them through a unified orchestration layer. * Output everything cleanly and completely.`;
 
 const AIAdvisorView: React.FC = () => {
     const A_context = useContext(DataContext);
@@ -312,4 +311,3 @@ const AIAdvisorView: React.FC = () => {
 };
 
 export default AIAdvisorView;
-```
