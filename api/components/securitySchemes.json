@@ -1,0 +1,50 @@
+{
+  "SessionToken": {
+    "type": "apiKey",
+    "name": "X-Session-Token",
+    "in": "header",
+    "description": "A high-entropy, opaque session identifier issued immediately upon successful primary authentication. This token serves as the primary mechanism for maintaining stateful interactions across the distributed system. It must be included in the 'X-Session-Token' HTTP header for all protected endpoints. The token is rotated every 15 minutes and has a hard expiry of 4 hours. It maps internally to a Redis-backed session object containing the user's security context, role-based access control (RBAC) claims, and ephemeral workflow state."
+  },
+  "O_Callaghan_Auth_V9": {
+    "type": "oauth2",
+    "description": "The proprietary 'O_Callaghan_Auth_V9' protocol, a strict implementation of OAuth 2.1 standards designed for high-security enterprise environments. This scheme governs authorization for third-party integrations, mobile applications, and service-to-service communication. It enforces strict PKCE (Proof Key for Code Exchange) for public clients and requires mutual TLS (mTLS) for confidential client token exchanges.",
+    "flows": {
+      "authorizationCode": {
+        "authorizationUrl": "https://identity.global.api.system/v9/auth/authorize",
+        "tokenUrl": "https://identity.global.api.system/v9/auth/token",
+        "refreshUrl": "https://identity.global.api.system/v9/auth/refresh",
+        "scopes": {
+          "read:global": "Grants read-only access to all global resources and datasets.",
+          "write:global": "Grants write access to modify global resources, subject to fine-grained policy checks.",
+          "admin:super": "Elevated privilege level for system-wide configuration and user management.",
+          "audit:read": "Access to immutable audit logs and security tracing data.",
+          "audit:write": "Permission to append entries to the audit log (system use only).",
+          "finance:execute": "Authority to execute financial transactions and ledger updates.",
+          "pii:view": "Permission to decrypt and view Personally Identifiable Information.",
+          "system:health": "Access to system health metrics, heartbeats, and diagnostic endpoints."
+        }
+      },
+      "clientCredentials": {
+        "tokenUrl": "https://identity.global.api.system/v9/auth/token",
+        "scopes": {
+          "machine:sync": "Scope designated for background synchronization daemons.",
+          "machine:analytics": "Scope for automated analytics ingestion pipelines.",
+          "machine:backup": "Scope for automated backup and archival services."
+        }
+      },
+      "implicit": {
+        "authorizationUrl": "https://identity.global.api.system/v9/auth/authorize",
+        "scopes": {
+          "ui:dashboard": "Limited scope for legacy dashboard widgets.",
+          "ui:public": "Publicly accessible data scope for unauthenticated frontend components."
+        }
+      }
+    }
+  },
+  "AuditSignature": {
+    "type": "apiKey",
+    "name": "Signature",
+    "in": "header",
+    "description": "A mandatory HTTP Message Signature (compliant with IETF RFC 9421) required for all critical mutation operations (POST, PUT, DELETE, PATCH). The client must generate a cryptographic signature over the HTTP method, path, query parameters, and specific headers (Date, Digest, Content-Type). The signature is generated using the client's private key (RSA-4096 or EC-P521) and verified against the registered public key in the Key Management Service (KMS). This ensures non-repudiation and request integrity. The format of the header value should follow: 'keyId=\"...\",algorithm=\"hs2019\",headers=\"(request-target) date digest\",signature=\"...\"'."
+  }
+}
