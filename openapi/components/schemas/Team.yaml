@@ -1,0 +1,95 @@
+title: Team
+type: object
+description: Represents a team or group within the organization. Teams can own resources, have members with specific roles, and be organized hierarchically.
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The unique identifier for the team.
+    example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+    readOnly: true
+  name:
+    type: string
+    description: The human-readable name of the team. Must be unique within the organization.
+    minLength: 2
+    maxLength: 100
+    example: "Frontend Engineering"
+  slug:
+    type: string
+    description: A URL-friendly slug for the team name. Automatically generated from the name but can be customized. Must be unique within the organization.
+    pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+    example: "frontend-engineering"
+  description:
+    type: string
+    description: A detailed description of the team's purpose, goals, and responsibilities. Supports Markdown.
+    maxLength: 2000
+    example: "The Frontend Engineering team is responsible for building and maintaining the user interface of all our web applications, ensuring a consistent and high-quality user experience."
+  avatar_url:
+    type: string
+    format: uri
+    description: A URL pointing to the team's avatar or logo image.
+    example: "https://cdn.example.com/avatars/teams/frontend-engineering.png"
+    nullable: true
+  visibility:
+    type: string
+    description: |-
+      The visibility level of the team, which controls who can see the team and its members.
+      * `public` - Anyone in the organization can see the team and its members.
+      * `private` - Only members of the team can see it.
+      * `secret` - Only members of the team can see it, and it won't appear in search results for non-members.
+    enum:
+      - public
+      - private
+      - secret
+    default: private
+    example: "private"
+  member_count:
+    type: integer
+    format: int32
+    description: The total number of members currently in the team.
+    example: 15
+    readOnly: true
+    minimum: 0
+  owner:
+    $ref: './UserSummary.yaml'
+    description: The user who is the designated owner or primary administrator of the team.
+  parent_team:
+    $ref: './TeamSummary.yaml'
+    description: A reference to the parent team in a hierarchical structure. Null if this is a top-level team.
+    nullable: true
+  created_at:
+    type: string
+    format: date-time
+    description: The timestamp when the team was created, in ISO 8601 format UTC.
+    example: "2023-04-12T14:30:00Z"
+    readOnly: true
+  updated_at:
+    type: string
+    format: date-time
+    description: The timestamp when the team's properties were last updated, in ISO 8601 format UTC.
+    example: "2023-10-26T10:00:00Z"
+    readOnly: true
+  metadata:
+    type: object
+    description: A key-value map for storing arbitrary custom metadata associated with the team. Keys are strings, and values can be strings, numbers, or booleans.
+    additionalProperties:
+      oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: 'null'
+    example:
+      project_code: "FE-ALPHA"
+      slack_channel_id: "C021F4QH39S"
+      jira_board_url: "https://acme.atlassian.net/browse/FE"
+      on-call-rotation: "primary-frontend"
+required:
+  - id
+  - name
+  - slug
+  - visibility
+  - member_count
+  - created_at
+  - updated_at
+x-tags:
+  - Teams
