@@ -1,0 +1,13 @@
+{
+  "title": "JurisdictionEnum",
+  "type": "string",
+  "description": "A strict enumeration of supported sovereign jurisdictions and major financial hubs where the API is legally authorized to operate, settle contracts, and process financial data. These values determine the applicable regulatory framework (e.g., SEC, FCA, MAS, FINMA, JFSA) and time zone logic for transaction timestamps.",
+  "enum": [
+    "New York",
+    "London",
+    "Singapore",
+    "Zurich",
+    "Tokyo"
+  ],
+  "example": "New York"
+}
