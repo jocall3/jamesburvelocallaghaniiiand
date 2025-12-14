@@ -1,0 +1,408 @@
+{
+  "type": "object",
+  "description": "The master registry schema containing the complete collection of O'Callaghan Entities. This schema defines the structure for the entire corporate database, including metadata, aggregation statistics, and the list of 100+ distinct legal entities with their full operational, financial, and legal hierarchies.",
+  "required": [
+    "registryId",
+    "timestamp",
+    "version",
+    "integrityChecksum",
+    "pagination",
+    "summary",
+    "entities"
+  ],
+  "properties": {
+    "registryId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this specific snapshot of the corporate registry.",
+      "example": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp indicating when this registry snapshot was generated.",
+      "example": "2023-10-27T14:30:00Z"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic versioning of the registry data schema.",
+      "example": "4.2.0"
+    },
+    "integrityChecksum": {
+      "type": "string",
+      "description": "SHA-256 checksum of the entities array for data integrity verification.",
+      "example": "a1b2c3d4e5f6..."
+    },
+    "pagination": {
+      "type": "object",
+      "description": "Pagination metadata for traversing the massive registry dataset.",
+      "properties": {
+        "totalRecords": {
+          "type": "integer",
+          "description": "Total number of entities in the full database.",
+          "example": 150
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "Number of entities returned in this specific payload.",
+          "example": 50
+        },
+        "currentPage": {
+          "type": "integer",
+          "description": "Current page number.",
+          "example": 1
+        },
+        "totalPages": {
+          "type": "integer",
+          "description": "Total calculated pages based on page size.",
+          "example": 3
+        },
+        "nextCursor": {
+          "type": "string",
+          "nullable": true,
+          "description": "Opaque cursor string for fetching the next set of results."
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "description": "High-level statistical summary of the entities contained in the registry.",
+      "properties": {
+        "activeEntities": {
+          "type": "integer",
+          "description": "Count of entities with 'Active' status."
+        },
+        "dormantEntities": {
+          "type": "integer",
+          "description": "Count of entities with 'Dormant' status."
+        },
+        "totalAssetsUnderManagement": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "format": "double"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD",
+                "EUR",
+                "GBP",
+                "JPY",
+                "CHF"
+              ]
+            }
+          }
+        },
+        "jurisdictionsRepresented": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of unique ISO 3166-1 alpha-3 country codes present in the registry."
+        }
+      }
+    },
+    "entities": {
+      "type": "array",
+      "description": "The core list of O'Callaghan corporate entities.",
+      "items": {
+        "type": "object",
+        "description": "A detailed representation of a single O'Callaghan legal entity.",
+        "required": [
+          "entityId",
+          "legalName",
+          "entityType",
+          "incorporationDate",
+          "status",
+          "jurisdiction"
+        ],
+        "properties": {
+          "entityId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Internal unique identifier for the entity."
+          },
+          "legalName": {
+            "type": "string",
+            "description": "Full registered legal name of the entity.",
+            "example": "O'Callaghan Global Holdings Ltd."
+          },
+          "tradeNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of 'Doing Business As' (DBA) names."
+          },
+          "entityType": {
+            "type": "string",
+            "enum": [
+              "LLC",
+              "Corporation",
+              "Trust",
+              "Foundation",
+              "Partnership",
+              "Sole Proprietorship",
+              "Holding Company",
+              "SPV"
+            ],
+            "description": "Legal structure type."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Active",
+              "Inactive",
+              "Dissolved",
+              "Liquidation",
+              "Merged",
+              "Suspended"
+            ],
+            "description": "Current operational status."
+          },
+          "incorporationDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Date of legal formation."
+          },
+          "identifiers": {
+            "type": "object",
+            "description": "External registration identifiers.",
+            "properties": {
+              "lei": {
+                "type": "string",
+                "pattern": "^[0-9A-Z]{20}$",
+                "description": "Legal Entity Identifier (ISO 17442)."
+              },
+              "taxId": {
+                "type": "string",
+                "description": "Primary tax identification number (EIN, VAT, etc.)."
+              },
+              "registrationNumber": {
+                "type": "string",
+                "description": "Company registry number issued by the jurisdiction."
+              },
+              "duns": {
+                "type": "string",
+                "pattern": "^\\d{9}$",
+                "description": "Data Universal Numbering System number."
+              }
+            }
+          },
+          "jurisdiction": {
+            "type": "object",
+            "description": "Legal jurisdiction details.",
+            "properties": {
+              "countryCode": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 3,
+                "description": "ISO 3166-1 alpha-3 code."
+              },
+              "countryName": {
+                "type": "string"
+              },
+              "region": {
+                "type": "string",
+                "description": "State, Province, or Canton."
+              },
+              "governingLaw": {
+                "type": "string",
+                "description": "Primary legal framework governing the entity."
+              }
+            }
+          },
+          "contactDetails": {
+            "type": "object",
+            "properties": {
+              "registeredAddress": {
+                "$ref": "#/components/schemas/Address"
+              },
+              "mailingAddress": {
+                "$ref": "#/components/schemas/Address"
+              },
+              "headquartersAddress": {
+                "$ref": "#/components/schemas/Address"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "website": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          },
+          "financials": {
+            "type": "object",
+            "description": "Financial overview and capital structure.",
+            "properties": {
+              "fiscalYearEnd": {
+                "type": "string",
+                "pattern": "^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$",
+                "description": "Month and Day of fiscal year end (MM-DD)."
+              },
+              "currency": {
+                "type": "string",
+                "description": "Functional currency."
+              },
+              "authorizedCapital": {
+                "type": "number",
+                "description": "Total authorized share capital."
+              },
+              "issuedCapital": {
+                "type": "number",
+                "description": "Total issued share capital."
+              },
+              "lastAuditDate": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          },
+          "officers": {
+            "type": "array",
+            "description": "Directors, Secretaries, and key management personnel.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "Director",
+                    "Secretary",
+                    "CEO",
+                    "CFO",
+                    "Trustee",
+                    "Beneficiary"
+                  ]
+                },
+                "appointedDate": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "nationality": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "relationships": {
+            "type": "object",
+            "description": "Corporate hierarchy and related entities.",
+            "properties": {
+              "parentEntityId": {
+                "type": "string",
+                "format": "uuid",
+                "description": "ID of the immediate parent company."
+              },
+              "ultimateParentEntityId": {
+                "type": "string",
+                "format": "uuid",
+                "description": "ID of the ultimate holding company."
+              },
+              "subsidiaries": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "entityId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "ownershipPercentage": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "compliance": {
+            "type": "object",
+            "properties": {
+              "riskLevel": {
+                "type": "string",
+                "enum": [
+                  "Low",
+                  "Medium",
+                  "High",
+                  "Critical"
+                ]
+              },
+              "kycStatus": {
+                "type": "string",
+                "enum": [
+                  "Verified",
+                  "Pending",
+                  "Expired",
+                  "Incomplete"
+                ]
+              },
+              "lastReviewDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "restrictions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Address": {
+        "type": "object",
+        "properties": {
+          "street": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "object",
+            "properties": {
+              "latitude": {
+                "type": "number"
+              },
+              "longitude": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
