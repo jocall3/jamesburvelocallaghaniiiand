@@ -1,0 +1,413 @@
+{
+  "get": {
+    "tags": [
+      "Account Audit",
+      "Compliance",
+      "Security"
+    ],
+    "summary": "Retrieve Account Audit Trail and Trace Vectors",
+    "description": "Retrieves the comprehensive internal audit trail for a specific account identified by `accountId`. This endpoint returns a deep-trace log including internal trace vectors, manifest string fragments, and immutable ledger references. It is designed for high-fidelity compliance auditing, forensic analysis, and system debugging. The response includes reconstructed state manifests and cryptographic proofs of log integrity.",
+    "operationId": "getAccountAuditTrail",
+    "parameters": [
+      {
+        "name": "accountId",
+        "in": "path",
+        "description": "The unique UUID of the account to retrieve the audit trail for.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        }
+      },
+      {
+        "name": "startDate",
+        "in": "query",
+        "description": "ISO 8601 start timestamp for the audit range (inclusive).",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-01-01T00:00:00Z"
+        }
+      },
+      {
+        "name": "endDate",
+        "in": "query",
+        "description": "ISO 8601 end timestamp for the audit range (exclusive).",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-01-31T23:59:59Z"
+        }
+      },
+      {
+        "name": "includeRawVectors",
+        "in": "query",
+        "description": "If set to true, includes the raw binary trace vectors used for low-level system debugging.",
+        "schema": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      {
+        "name": "fragmentDepth",
+        "in": "query",
+        "description": "Determines the granularity of the manifest string fragments returned.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "summary",
+            "partial",
+            "full",
+            "byte-level"
+          ],
+          "default": "partial"
+        }
+      },
+      {
+        "name": "correlationId",
+        "in": "header",
+        "description": "Client-provided correlation ID for tracking this specific audit request across distributed systems.",
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Successfully retrieved the audit trail and trace vectors.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "description": "Metadata regarding the audit retrieval operation.",
+                  "properties": {
+                    "retrievalId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Unique identifier for this specific retrieval operation."
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Time when the report was generated."
+                    },
+                    "recordCount": {
+                      "type": "integer",
+                      "description": "Total number of audit records found in the requested range."
+                    },
+                    "integrityHash": {
+                      "type": "string",
+                      "description": "SHA-256 hash of the entire result set to verify transmission integrity.",
+                      "example": "a1b2c3d4e5f6..."
+                    },
+                    "processingTimeMs": {
+                      "type": "number",
+                      "format": "float",
+                      "description": "Server-side processing time in milliseconds."
+                    }
+                  }
+                },
+                "auditLog": {
+                  "type": "array",
+                  "description": "List of audit entries.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "entryId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Unique ID of the audit entry."
+                      },
+                      "occurredAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Timestamp of the actual event."
+                      },
+                      "eventType": {
+                        "type": "string",
+                        "enum": [
+                          "LOGIN_ATTEMPT",
+                          "PASSWORD_CHANGE",
+                          "API_KEY_ROTATION",
+                          "DATA_EXPORT",
+                          "PERMISSION_ELEVATION",
+                          "SYSTEM_ERROR"
+                        ],
+                        "description": "Categorization of the event."
+                      },
+                      "severity": {
+                        "type": "string",
+                        "enum": [
+                          "INFO",
+                          "WARN",
+                          "CRITICAL",
+                          "FATAL"
+                        ]
+                      },
+                      "actor": {
+                        "type": "object",
+                        "description": "Entity that initiated the event.",
+                        "properties": {
+                          "userId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "ipAddress": {
+                            "type": "string",
+                            "format": "ipv4"
+                          },
+                          "userAgent": {
+                            "type": "string"
+                          },
+                          "geoLocation": {
+                            "type": "object",
+                            "properties": {
+                              "country": {
+                                "type": "string"
+                              },
+                              "city": {
+                                "type": "string"
+                              },
+                              "coordinates": {
+                                "type": "array",
+                                "items": {
+                                  "type": "number"
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "traceVector": {
+                        "type": "object",
+                        "description": "Internal system trace vector data.",
+                        "properties": {
+                          "vectorId": {
+                            "type": "string",
+                            "description": "Hex-encoded vector identifier."
+                          },
+                          "nodeSequence": {
+                            "type": "array",
+                            "description": "Sequence of internal nodes traversed during the event.",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "nodeId": {
+                                  "type": "string"
+                                },
+                                "ingressTimestamp": {
+                                  "type": "number",
+                                  "description": "Unix timestamp with microsecond precision."
+                                },
+                                "egressTimestamp": {
+                                  "type": "number",
+                                  "description": "Unix timestamp with microsecond precision."
+                                },
+                                "latencyNs": {
+                                  "type": "integer",
+                                  "description": "Processing latency in nanoseconds."
+                                }
+                              }
+                            }
+                          },
+                          "rawPayloadSignature": {
+                            "type": "string",
+                            "description": "Cryptographic signature of the raw payload at the time of processing."
+                          }
+                        }
+                      },
+                      "manifestFragments": {
+                        "type": "array",
+                        "description": "Reconstructed string fragments from the distributed ledger manifest.",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "fragmentIndex": {
+                              "type": "integer"
+                            },
+                            "content": {
+                              "type": "string",
+                              "description": "The actual text content of the fragment."
+                            },
+                            "encoding": {
+                              "type": "string",
+                              "enum": [
+                                "UTF-8",
+                                "BASE64",
+                                "HEX"
+                              ]
+                            },
+                            "checksum": {
+                              "type": "string",
+                              "description": "CRC32 checksum of the fragment content."
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "examples": {
+              "standard_audit": {
+                "summary": "Standard Audit Response",
+                "value": {
+                  "meta": {
+                    "retrievalId": "7829a0b1-4d33-4f22-99a1-2c3d4e5f6a7b",
+                    "timestamp": "2023-10-27T14:30:00Z",
+                    "recordCount": 1,
+                    "integrityHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                    "processingTimeMs": 45.2
+                  },
+                  "auditLog": [
+                    {
+                      "entryId": "11223344-5566-7788-9900-aabbccddeeff",
+                      "occurredAt": "2023-10-27T14:25:10Z",
+                      "eventType": "PERMISSION_ELEVATION",
+                      "severity": "CRITICAL",
+                      "actor": {
+                        "userId": "user_12345",
+                        "ipAddress": "192.168.1.105",
+                        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+                        "geoLocation": {
+                          "country": "US",
+                          "city": "San Francisco",
+                          "coordinates": [
+                            37.7749,
+                            -122.4194
+                          ]
+                        }
+                      },
+                      "traceVector": {
+                        "vectorId": "0x8F2A...",
+                        "nodeSequence": [
+                          {
+                            "nodeId": "auth-service-01",
+                            "ingressTimestamp": 1698416710.001,
+                            "egressTimestamp": 1698416710.005,
+                            "latencyNs": 4000000
+                          },
+                          {
+                            "nodeId": "policy-engine-04",
+                            "ingressTimestamp": 1698416710.006,
+                            "egressTimestamp": 1698416710.012,
+                            "latencyNs": 6000000
+                          }
+                        ],
+                        "rawPayloadSignature": "sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+                      },
+                      "manifestFragments": [
+                        {
+                          "fragmentIndex": 0,
+                          "content": "User requested admin access",
+                          "encoding": "UTF-8",
+                          "checksum": "a1b2c3d4"
+                        },
+                        {
+                          "fragmentIndex": 1,
+                          "content": "Policy check passed: strict_mode=true",
+                          "encoding": "UTF-8",
+                          "checksum": "e5f6g7h8"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request. The parameters provided are invalid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized. The request lacks valid authentication credentials.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden. The authenticated user does not have permission to view audit logs for this account.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Account not found.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "429": {
+        "description": "Too Many Requests. Rate limit exceeded for audit retrieval.",
+        "headers": {
+          "Retry-After": {
+            "description": "The number of seconds to wait before making a new request.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal Server Error. Failed to reconstruct trace vectors or access the ledger.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "security": [
+      {
+        "bearerAuth": [
+          "audit:read",
+          "account:read"
+        ]
+      },
+      {
+        "apiKeyAuth": []
+      }
+    ]
+  }
+}
