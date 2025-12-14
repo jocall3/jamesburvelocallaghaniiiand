@@ -1,0 +1,106 @@
+get:
+  summary: Check the health status of the API service
+  operationId: getHealthStatus
+  tags:
+    - Monitoring
+    - System
+  description: |
+    This endpoint provides a simple mechanism to check the operational status of the API service.
+    It's typically used by load balancers, container orchestrators, and monitoring systems
+    to determine if the service is running and capable of handling requests.
+
+    A successful response (HTTP 200 OK) indicates that the core components of the service
+    are functioning correctly. The response body provides detailed status information,
+    which can include the overall status, uptime, and potentially statuses of critical
+    dependencies (e.g., database connections, external services).
+
+    This endpoint does not require any authentication and should be publicly accessible
+    for infrastructure monitoring purposes.
+  responses:
+    '200':
+      description: |
+        The API service is healthy and operational.
+        All critical internal components and dependencies are reported as functional.
+        This response indicates that the service is ready to accept and process requests.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/HealthStatus'
+          examples:
+            healthyStatus:
+              summary: Example of a healthy service status
+              value:
+                status: "UP"
+                timestamp: "2023-10-27T10:30:00Z"
+                uptime: "1d 5h 23m 45s"
+                version: "1.0.0-RELEASE"
+                details:
+                  database:
+                    status: "UP"
+                    connection: "PostgreSQL"
+                  cache:
+                    status: "UP"
+                    type: "Redis"
+                  externalServiceA:
+                    status: "UP"
+                    latency_ms: 50
+    '503':
+      description: |
+        The API service is unhealthy or experiencing critical issues.
+        One or more essential internal components or dependencies are reported as down or degraded.
+        This response indicates that the service might not be able to process requests reliably
+        or at all. Load balancers should typically remove this instance from rotation.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/HealthStatus'
+          examples:
+            unhealthyStatus:
+              summary: Example of an unhealthy service status
+              value:
+                status: "DOWN"
+                timestamp: "2023-10-27T10:30:05Z"
+                uptime: "1d 5h 23m 50s"
+                version: "1.0.0-RELEASE"
+                details:
+                  database:
+                    status: "DOWN"
+                    error: "Connection refused"
+                  cache:
+                    status: "UP"
+                    type: "Redis"
+                  externalServiceA:
+                    status: "DEGRADED"
+                    error: "High latency"
+    '500':
+      description: |
+        An unexpected internal server error occurred while trying to determine the health status.
+        This typically indicates a problem within the health check mechanism itself,
+        rather than a specific dependency failure.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/ErrorResponse'
+          examples:
+            internalError:
+              summary: Example of an internal server error during health check
+              value:
+                code: "HEALTH_CHECK_ERROR"
+                message: "Failed to retrieve health status due to an internal system error."
+                details: "Exception in health check module: NullPointerException at com.example.HealthChecker.check(HealthChecker.java:45)"
+                timestamp: "2023-10-27T10:30:10Z"
+  x-code-samples:
+    - lang: curl
+      source: |
+        curl -X GET "https://api.example.com/v1/health"
+    - lang: Python
+      source: |
+        import requests
+        response = requests.get("https://api.example.com/v1/health")
+        print(response.json())
+    - lang: JavaScript
+      source: |
+        fetch('https://api.example.com/v1/health')
+          .then(response => response.json())
+          .then(data => console.log(data))
+          .catch(error => console.error('Error:', error));
