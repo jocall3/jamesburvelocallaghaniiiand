@@ -1,0 +1,74 @@
+title: Algorithm Parameter
+description: Defines a single tunable parameter for a computational algorithm, including its name, type, value, and constraints. This object is used to configure and validate algorithm execution settings.
+type: object
+required:
+  - name
+  - type
+  - value
+  - description
+properties:
+  name:
+    type: string
+    description: "The unique identifier for the parameter within the algorithm's scope. This name is used to reference the parameter during configuration and execution. It should be a machine-readable string, typically in snake_case or camelCase."
+    example: "learning_rate"
+  type:
+    type: string
+    description: "The data type of the parameter. This determines the kind of value it can hold and the validation rules that apply (e.g., 'range' for numbers, 'validationRegex' for strings)."
+    enum:
+      - number
+      - string
+      - boolean
+    example: "number"
+  value:
+    description: "The current value of the parameter. The type of this field must correspond to the value specified in the 'type' property."
+    oneOf:
+      - type: number
+        format: double
+        description: "A floating-point or integer value for a numeric parameter."
+        example: 0.001
+      - type: string
+        description: "A string value for a categorical or text-based parameter."
+        example: "adam"
+      - type: boolean
+        description: "A true/false value for a boolean flag or switch."
+        example: true
+  range:
+    type: array
+    items:
+      type: number
+      format: double
+    minItems: 2
+    maxItems: 2
+    description: "An inclusive numerical range `[min, max]` applicable only when the parameter `type` is 'number'. This defines the permissible bounds for the parameter's value during validation and hyperparameter tuning."
+    example: [0.0001, 1.0]
+  description:
+    type: string
+    description: "A comprehensive, human-readable explanation of the parameter's purpose, its effect on the algorithm, and any guidance on its tuning. This should be detailed enough for a user to understand how to set the parameter effectively."
+    example: "Controls the step size at each iteration while moving toward a minimum of a loss function. A smaller value may lead to more accurate results but slower convergence, while a larger value can speed up training but risk overshooting the optimal solution."
+  validationRegex:
+    type: string
+    format: regex
+    description: "A regular expression string used for validating the parameter's value. This is applicable only when the `type` is 'string' and is used to enforce a specific format or a set of allowed values."
+    example: "^(adam|sgd|rmsprop)$"
+  defaultValue:
+    description: "The default value for the parameter, used if no value is explicitly provided during configuration. The type of this field must correspond to the value specified in the 'type' property."
+    oneOf:
+      - type: number
+        format: double
+        description: "The default numeric value."
+        example: 0.01
+      - type: string
+        description: "The default string value."
+        example: "sgd"
+      - type: boolean
+        description: "The default boolean value."
+        example: false
+  isTunable:
+    type: boolean
+    description: "A flag indicating whether this parameter is intended to be adjusted during hyperparameter optimization processes. If false, the parameter is typically considered a static configuration setting."
+    default: true
+    example: true
+  units:
+    type: string
+    description: "The unit of measurement for a numeric parameter, if applicable (e.g., 'seconds', 'megabytes', 'iterations')."
+    example: "none"
