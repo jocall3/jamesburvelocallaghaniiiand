@@ -1,0 +1,38 @@
+type: object
+description: |
+  A flexible key-value map for storing detailed, asset-specific attributes. 
+  The keys are arbitrary strings representing the attribute name (e.g., 'serial_number', 'location', 'purchase_date'), 
+  and the values can be of various primitive types. 
+  This structure allows for extending asset information without changing the core API schema, 
+  providing a high degree of flexibility for different asset types. For instance, a server asset might have 'cpu_cores' and 'ram_gb', while a vehicle asset might have 'vin' and 'license_plate'.
+additionalProperties:
+  description: "The value of a specific asset attribute. Can be a string, number, boolean, or null."
+  oneOf:
+    - type: string
+      description: "A string value for the attribute."
+      example: "Building A, Room 101"
+    - type: number
+      description: "A numeric value for the attribute, which can be an integer or a float."
+      example: 1024.5
+    - type: boolean
+      description: "A boolean (true/false) value for the attribute."
+      example: true
+    - type: "null"
+      description: "A null value, indicating the absence of a value for the attribute."
+      example: null
+example:
+  serial_number: "SN-987654321"
+  purchase_date: "2023-05-15T09:30:00Z"
+  warranty_expires: "2025-05-14T23:59:59Z"
+  location: "Data Center 3, Rack 42, U-15"
+  ip_address: "192.168.1.105"
+  mac_address: "00:1B:44:11:3A:B7"
+  cpu_cores: 8
+  ram_gb: 64
+  storage_gb: 1024
+  is_virtual: false
+  last_maintenance_check: null
+  os_version: "Ubuntu 22.04.3 LTS"
+  custom_tag: "High-Priority"
+  power_consumption_watts: 250.75
+  is_active: true
