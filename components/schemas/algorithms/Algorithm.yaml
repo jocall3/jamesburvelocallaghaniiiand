@@ -1,0 +1,125 @@
+type: object
+description: A complete definition of a trading algorithm, including its unique identifier, metadata, source code, configuration parameters, and associated performance metrics. This object serves as the central representation of a trading strategy within the system.
+required:
+  - id
+  - name
+  - code
+  - language
+  - status
+  - version
+  - riskLevel
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The unique, immutable identifier for the trading algorithm.
+    example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+  name:
+    type: string
+    description: A human-readable, descriptive name for the algorithm.
+    example: "Quantum Momentum Scalper v4"
+  description:
+    type: string
+    description: A detailed explanation of the algorithm's strategy, its intended market conditions, underlying principles, and any notable characteristics.
+    example: "This algorithm uses quantum-inspired principles to identify and exploit short-term momentum shifts in volatile assets. It is optimized for high-frequency trading on major forex pairs like EUR/USD and GBP/JPY during periods of high liquidity."
+  tags:
+    type: array
+    items:
+      type: string
+    description: A list of keywords or labels used for categorizing, searching, and filtering algorithms.
+    example: ["scalping", "forex", "high-frequency", "momentum", "quantum", "eur-usd"]
+  code:
+    type: string
+    description: The source code or declarative representation of the algorithm's logic. For 'nocode', this is a structured JSON object. For 'python' or 'rust', this would be the raw source code, potentially Base64 encoded for transport.
+    example: "{\"nodes\":[{\"id\":\"start\",\"type\":\"trigger\",\"params\":{\"symbol\":\"EUR/USD\"}},{\"id\":\"rsi\",\"type\":\"indicator\",\"params\":{\"period\":14}},{\"id\":\"buy_cond\",\"type\":\"condition\",\"params\":{\"value\":\"rsi.value < 30\"}},{\"id\":\"buy\",\"type\":\"action\",\"params\":{\"action\":\"buy\",\"amount\":1000}}]}"
+  language:
+    type: string
+    enum: ["nocode", "python", "rust"]
+    description: The programming language or environment the algorithm is written in. 'nocode' refers to a visual or declarative editor.
+    example: "nocode"
+  status:
+    type: string
+    enum: ["draft", "backtesting", "live", "error", "optimizing", "archived"]
+    description: The current operational lifecycle stage of the algorithm.
+    example: "live"
+  version:
+    type: integer
+    description: The version number of the algorithm, incremented with each significant change to its logic or parameters.
+    example: 4
+  lastModified:
+    type: string
+    format: date-time
+    description: The timestamp of the last modification to the algorithm's definition or code, in UTC.
+    example: "2023-10-27T10:00:00Z"
+  author:
+    type: string
+    description: The name or ID of the user who created or last modified the algorithm.
+    example: "user_jane_doe"
+  riskLevel:
+    type: string
+    enum: ["low", "medium", "high", "extreme"]
+    description: A classification of the algorithm's inherent financial risk, determining exposure limits and operational constraints.
+    example: "high"
+  aiScore:
+    type: number
+    format: float
+    minimum: 0
+    maximum: 100
+    description: An AI-generated score indicating the predicted viability and robustness of the algorithm, based on historical data, market simulations, and code analysis.
+    example: 88.5
+  parameters:
+    type: array
+    description: A list of configurable parameters that control the algorithm's behavior, allowing for tuning and optimization without changing the source code.
+    items:
+      $ref: './AlgorithmParameter.yaml'
+  deploymentTarget:
+    type: string
+    enum: ["cloud-cluster-a", "edge-node-tokyo", "quantum-fabric-1"]
+    description: The specific compute infrastructure where this algorithm is intended to run, influencing latency and execution capabilities.
+    example: "cloud-cluster-a"
+  performanceMetrics:
+    description: A snapshot of the algorithm's key performance indicators, such as Sharpe ratio, max drawdown, and total P/L.
+    $ref: './PerformanceMetrics.yaml'
+  geinFactor:
+    type: number
+    format: double
+    description: "Global Execution Intelligence Network (GEIN) factor. A proprietary score from 0.0 to 1.0 indicating how well this algorithm's strategy aligns with the current global market sentiment and order flow, as analyzed by the GEIN."
+    example: 0.92
+  interactionMatrix:
+    type: array
+    items:
+      type: array
+      items:
+        type: number
+        format: float
+    description: "A 2D matrix representing neural network weights, correlation coefficients between assets, or other complex relational data used by the algorithm. The structure and size are specific to the algorithm's logic."
+    example:
+      - [1.0, 0.5, -0.2]
+      - [0.5, 1.0, 0.8]
+      - [-0.2, 0.8, 1.0]
+  dataPointSensitivity:
+    type: object
+    additionalProperties:
+      type: number
+      format: float
+    description: "A map where keys are names of input data points (e.g., 'RSI', 'MACD', 'Volume') and values are their sensitivity scores, indicating how much a change in that data point affects the algorithm's decisions."
+    example:
+      RSI_14: 0.85
+      MACD_12_26_9: 0.65
+      Volume: 0.4
+  executionPriority:
+    type: string
+    enum: ["low", "normal", "high", "critical", "quantum"]
+    description: "The priority level for order execution. 'Quantum' priority attempts to use specialized hardware for near-instantaneous execution."
+    example: "critical"
+  computeProfile:
+    type: string
+    enum: ["cpu-bound", "memory-bound", "io-bound", "gpu-accelerated"]
+    description: "Describes the primary computational resource requirement for the algorithm, used by the scheduler to allocate appropriate hardware."
+    example: "gpu-accelerated"
+  permissions:
+    type: array
+    items:
+      type: string
+    description: A list of user or group IDs that have permission to view, edit, or operate this algorithm.
+    example: ["group:admins", "user:jane_doe"]
