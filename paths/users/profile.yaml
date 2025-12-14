@@ -1,0 +1,188 @@
+get:
+  summary: Get Current User Profile
+  operationId: getCurrentUserProfile
+  tags:
+    - Users
+  description: |
+    Retrieves the complete profile information for the currently authenticated user.
+    This endpoint provides access to all user-specific data, including personal details, preferences, and account status.
+    The user is identified via the authentication token provided in the request headers (e.g., a Bearer token or session cookie).
+  security:
+    - bearerAuth: []
+    - cookieAuth: []
+  responses:
+    '200':
+      description: Successfully retrieved the user profile. The response contains the full user profile object.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/users/UserProfile.yaml'
+          example:
+            id: "user-a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            username: "jane.doe"
+            email: "jane.doe@example.com"
+            emailVerified: true
+            displayName: "Jane Doe"
+            avatarUrl: "https://example.com/avatars/jane_doe.png"
+            bio: "Software Engineer specializing in distributed systems and API design."
+            location: "San Francisco, CA"
+            timezone: "America/Los_Angeles"
+            locale: "en-US"
+            status: "active"
+            roles:
+              - "user"
+              - "contributor"
+            preferences:
+              theme: "dark"
+              notifications:
+                email:
+                  marketing: true
+                  productUpdates: true
+                  mentions: true
+                push:
+                  mentions: true
+                  directMessages: true
+              privacy:
+                showActivityStatus: true
+                profileVisibility: "public"
+            metadata:
+              lastLoginIp: "203.0.113.42"
+              customField: "some_value"
+            createdAt: "2023-01-15T10:00:00Z"
+            updatedAt: "2023-10-28T14:30:00Z"
+    '401':
+      $ref: '../../components/responses/Unauthorized.yaml'
+    '404':
+      $ref: '../../components/responses/NotFound.yaml'
+    '500':
+      $ref: '../../components/responses/InternalServerError.yaml'
+
+patch:
+  summary: Update Current User Profile
+  operationId: updateCurrentUserProfile
+  tags:
+    - Users
+  description: |
+    Updates one or more fields for the currently authenticated user's profile.
+    This endpoint supports partial updates. Only the fields provided in the request body will be modified.
+    All other fields will remain unchanged. Attempting to update read-only fields like `id`, `emailVerified`, or `createdAt` will be ignored by the server.
+  security:
+    - bearerAuth: []
+    - cookieAuth: []
+  requestBody:
+    description: A JSON object containing the fields to update in the user's profile. At least one field must be provided.
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          description: "Fields to update for the user profile. Only provided fields will be modified."
+          properties:
+            displayName:
+              type: string
+              description: "The user's publicly visible display name."
+              example: "Jane A. Doe"
+            avatarUrl:
+              type: string
+              format: uri
+              description: "A URL pointing to the user's avatar image. Must be a valid and accessible URL."
+              example: "https://example.com/avatars/new_jane_doe.png"
+            bio:
+              type: string
+              description: "A short biography or description about the user."
+              maxLength: 500
+              example: "Lead Software Engineer focused on API architecture and developer experience."
+            location:
+              type: string
+              description: "The user's geographical location, e.g., 'City, Country'."
+              example: "New York, NY"
+            timezone:
+              type: string
+              description: "The user's timezone, in IANA Time Zone Database format (e.g., 'America/New_York')."
+              example: "America/New_York"
+            locale:
+              type: string
+              description: "The user's preferred locale for language and formatting, in BCP 47 format (e.g., 'en-US')."
+              example: "en-US"
+            preferences:
+              $ref: '../../components/schemas/users/UserPreferences.yaml'
+            metadata:
+              type: object
+              description: "A key-value map for storing arbitrary user-specific metadata. Keys are strings, and values can be any JSON type. This object will be merged with the existing metadata; nested objects are not merged."
+              additionalProperties: true
+              example:
+                dashboardLayout: "compact"
+          minProperties: 1
+        examples:
+          updateDisplayNameAndTheme:
+            summary: Update Display Name and Theme
+            description: A common use case to update the user's name and visual theme preference.
+            value:
+              displayName: "Jane A. Doe"
+              preferences:
+                theme: "light"
+          updateNotifications:
+            summary: Update Notification Settings
+            description: An example of updating nested preference objects to change how the user receives notifications.
+            value:
+              preferences:
+                notifications:
+                  email:
+                    marketing: false
+                  push:
+                    directMessages: false
+          updateBioAndLocation:
+            summary: Update Bio and Location
+            description: An example of updating multiple personal information fields at once.
+            value:
+              bio: "Lead Software Engineer focused on API architecture and developer experience."
+              location: "New York, NY"
+              timezone: "America/New_York"
+  responses:
+    '200':
+      description: The user profile was successfully updated. The response contains the complete, updated user profile object.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/users/UserProfile.yaml'
+          example:
+            id: "user-a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            username: "jane.doe"
+            email: "jane.doe@example.com"
+            emailVerified: true
+            displayName: "Jane A. Doe"
+            avatarUrl: "https://example.com/avatars/jane_doe.png"
+            bio: "Lead Software Engineer focused on API architecture and developer experience."
+            location: "New York, NY"
+            timezone: "America/New_York"
+            locale: "en-US"
+            status: "active"
+            roles:
+              - "user"
+              - "contributor"
+            preferences:
+              theme: "light"
+              notifications:
+                email:
+                  marketing: false
+                  productUpdates: true
+                  mentions: true
+                push:
+                  mentions: true
+                  directMessages: false
+              privacy:
+                showActivityStatus: true
+                profileVisibility: "public"
+            metadata:
+              lastLoginIp: "203.0.113.42"
+              customField: "some_value"
+            createdAt: "2023-01-15T10:00:00Z"
+            updatedAt: "2023-10-29T11:00:00Z"
+    '400':
+      $ref: '../../components/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../components/responses/Unauthorized.yaml'
+    '422':
+      $ref: '../../components/responses/UnprocessableEntity.yaml'
+    '500':
+      $ref: '../../components/responses/InternalServerError.yaml'
