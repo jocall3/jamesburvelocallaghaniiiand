@@ -1,0 +1,183 @@
+get:
+  tags:
+    - Asset Types
+  summary: List Asset Types
+  description: |
+    Retrieves a paginated list of all available asset type definitions in the system.
+    Asset types define the schema, properties, and behaviors for different kinds of assets that can be managed.
+    This endpoint supports filtering, sorting, and pagination to allow for efficient browsing of a potentially large number of asset types.
+  operationId: listAssetTypes
+  parameters:
+    - name: limit
+      in: query
+      description: The maximum number of asset types to return in a single response.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
+      example: 50
+    - name: offset
+      in: query
+      description: The number of asset types to skip before starting to collect the result set. Used for pagination.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        default: 0
+      example: 100
+    - name: sort
+      in: query
+      description: |
+        Specifies the sorting order for the results.
+        Use a comma-separated list of field names.
+        Prefix a field name with `-` for descending order.
+        Example: `name,-createdAt`
+      required: false
+      schema:
+        type: string
+        default: "name"
+      example: "-createdAt"
+    - name: filter[name]
+      in: query
+      description: Filter asset types by their name. Supports partial matching.
+      required: false
+      schema:
+        type: string
+      example: "Virtual Machine"
+    - name: filter[category]
+      in: query
+      description: Filter asset types by their category.
+      required: false
+      schema:
+        type: string
+      example: "Compute"
+  responses:
+    '200':
+      description: A paginated list of asset type definitions.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              object:
+                type: string
+                description: The type of object, which is always `list`.
+                example: "list"
+              data:
+                type: array
+                items:
+                  $ref: '../../components/schemas/assets/AssetType.yaml'
+              pagination:
+                $ref: '../../components/schemas/common/Pagination.yaml'
+            required:
+              - object
+              - data
+              - pagination
+          example:
+            object: "list"
+            data:
+              - id: "at_vm_aws_ec2_t3_micro"
+                object: "asset_type"
+                name: "AWS EC2 t3.micro Instance"
+                description: "A general-purpose burstable virtual machine instance provided by Amazon Web Services."
+                icon: "aws-ec2"
+                category: "Compute"
+                version: "1.2.0"
+                is_abstract: false
+                extends:
+                  - "at_vm_aws_ec2"
+                schema:
+                  type: "object"
+                  properties:
+                    instance_id:
+                      type: "string"
+                      description: "The unique identifier for the EC2 instance."
+                      example: "i-0123456789abcdef0"
+                    region:
+                      type: "string"
+                      description: "The AWS region where the instance is located."
+                      example: "us-east-1"
+                    instance_type:
+                      type: "string"
+                      description: "The instance type, e.g., t3.micro."
+                      example: "t3.micro"
+                      enum: ["t3.micro", "t3.small", "t3.medium"]
+                    ami_id:
+                      type: "string"
+                      description: "The Amazon Machine Image ID."
+                      example: "ami-0abcdef1234567890"
+                    state:
+                      type: "string"
+                      description: "The current state of the instance."
+                      example: "running"
+                      enum: ["pending", "running", "shutting-down", "terminated", "stopping", "stopped"]
+                  required: ["instance_id", "region", "instance_type", "ami_id", "state"]
+                created_at: "2023-04-12T10:00:00Z"
+                updated_at: "2023-05-18T14:30:00Z"
+                metadata:
+                  provider: "aws"
+                  service: "ec2"
+              - id: "at_db_postgres_rds"
+                object: "asset_type"
+                name: "AWS RDS PostgreSQL Database"
+                description: "A managed PostgreSQL relational database service provided by Amazon RDS."
+                icon: "aws-rds"
+                category: "Database"
+                version: "2.0.1"
+                is_abstract: false
+                extends:
+                  - "at_db_relational"
+                schema:
+                  type: "object"
+                  properties:
+                    db_instance_identifier:
+                      type: "string"
+                      description: "The user-supplied database instance identifier."
+                      example: "my-prod-database"
+                    engine_version:
+                      type: "string"
+                      description: "The version number of the database engine."
+                      example: "14.5"
+                    db_instance_class:
+                      type: "string"
+                      description: "The compute and memory capacity of the DB instance."
+                      example: "db.t3.medium"
+                    storage_type:
+                      type: "string"
+                      description: "The storage type for the DB instance."
+                      example: "gp2"
+                      enum: ["gp2", "gp3", "io1", "standard"]
+                    multi_az:
+                      type: "boolean"
+                      description: "Specifies if the DB instance is a Multi-AZ deployment."
+                      example: true
+                  required: ["db_instance_identifier", "engine_version", "db_instance_class"]
+                created_at: "2023-03-10T09:00:00Z"
+                updated_at: "2023-06-01T11:20:00Z"
+                metadata:
+                  provider: "aws"
+                  service: "rds"
+            pagination:
+              total: 2
+              limit: 20
+              offset: 0
+              has_more: false
+              next_url: null
+              prev_url: null
+    '400':
+      $ref: '../../components/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../components/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../components/responses/Forbidden.yaml'
+    '500':
+      $ref: '../../components/responses/InternalServerError.yaml'
+  security:
+    - OAuth2:
+        - "assets:read"
+        - "asset-types:read"
+    - ApiKeyAuth: []
