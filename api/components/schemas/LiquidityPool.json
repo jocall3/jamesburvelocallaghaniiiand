@@ -1,0 +1,169 @@
+{
+  "title": "LiquidityPool",
+  "type": "object",
+  "description": "Detailed schema representing a Liquidity Pool within the financial ecosystem. This schema enforces strict validation for monetary precision (4 decimal places) and integrates C03 safety clamp protocols to manage risk and volatility limits.",
+  "required": [
+    "poolId",
+    "name",
+    "assetPair",
+    "totalValueLocked",
+    "availableLiquidity",
+    "reservedLiquidity",
+    "precision",
+    "c03SafetyClamp",
+    "status",
+    "lastUpdated"
+  ],
+  "properties": {
+    "poolId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique immutable identifier for the liquidity pool.",
+      "example": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name of the liquidity pool.",
+      "example": "Global High-Yield USDC/ETH Pool",
+      "minLength": 3,
+      "maxLength": 100
+    },
+    "assetPair": {
+      "type": "object",
+      "description": "The asset pair managed by this pool.",
+      "required": [
+        "baseAsset",
+        "quoteAsset"
+      ],
+      "properties": {
+        "baseAsset": {
+          "type": "string",
+          "description": "The base asset symbol (e.g., BTC, ETH).",
+          "example": "ETH"
+        },
+        "quoteAsset": {
+          "type": "string",
+          "description": "The quote asset symbol (e.g., USDC, USDT).",
+          "example": "USDC"
+        }
+      }
+    },
+    "totalValueLocked": {
+      "type": "number",
+      "format": "double",
+      "description": "The total value of assets currently locked in the pool. Validated to 4 decimal places.",
+      "minimum": 0.0000,
+      "multipleOf": 0.0001,
+      "example": 1542000.5521
+    },
+    "availableLiquidity": {
+      "type": "number",
+      "format": "double",
+      "description": "The portion of liquidity available for immediate trading or lending. Validated to 4 decimal places.",
+      "minimum": 0.0000,
+      "multipleOf": 0.0001,
+      "example": 1200000.0000
+    },
+    "reservedLiquidity": {
+      "type": "number",
+      "format": "double",
+      "description": "Liquidity reserved for pending transactions or safety margins. Validated to 4 decimal places.",
+      "minimum": 0.0000,
+      "multipleOf": 0.0001,
+      "example": 342000.5521
+    },
+    "precision": {
+      "type": "integer",
+      "description": "The fixed decimal precision for this pool's values.",
+      "const": 4,
+      "example": 4
+    },
+    "c03SafetyClamp": {
+      "type": "object",
+      "description": "Configuration and status of the C03 safety clamp protocol, designed to halt operations during extreme volatility or anomaly detection.",
+      "required": [
+        "isEnabled",
+        "upperBoundLimit",
+        "lowerBoundLimit",
+        "volatilityThreshold",
+        "currentClampState"
+      ],
+      "properties": {
+        "isEnabled": {
+          "type": "boolean",
+          "description": "Indicates if the C03 safety protocols are currently active on this pool.",
+          "example": true
+        },
+        "upperBoundLimit": {
+          "type": "number",
+          "format": "double",
+          "description": "The maximum allowable value for single transactions defined by C03.",
+          "multipleOf": 0.0001,
+          "example": 50000.0000
+        },
+        "lowerBoundLimit": {
+          "type": "number",
+          "format": "double",
+          "description": "The minimum allowable value for single transactions defined by C03.",
+          "multipleOf": 0.0001,
+          "example": 10.0000
+        },
+        "volatilityThreshold": {
+          "type": "number",
+          "format": "float",
+          "description": "Percentage change within 1 hour that triggers a clamp.",
+          "example": 0.05
+        },
+        "currentClampState": {
+          "type": "string",
+          "description": "Current operational state regarding the safety clamp.",
+          "enum": [
+            "NORMAL",
+            "WARNING",
+            "CLAMPED_VOLATILITY",
+            "CLAMPED_MANUAL",
+            "CLAMPED_AUDIT"
+          ],
+          "example": "NORMAL"
+        }
+      }
+    },
+    "fees": {
+      "type": "object",
+      "description": "Fee structure for the liquidity pool.",
+      "properties": {
+        "swapFeeRate": {
+          "type": "number",
+          "description": "Fee rate charged on swaps (decimal representation, e.g., 0.003 for 0.3%).",
+          "minimum": 0,
+          "maximum": 1,
+          "example": 0.0030
+        },
+        "withdrawalFee": {
+          "type": "number",
+          "description": "Flat fee for liquidity withdrawal.",
+          "multipleOf": 0.0001,
+          "example": 5.0000
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "description": "The lifecycle status of the liquidity pool.",
+      "enum": [
+        "active",
+        "paused",
+        "deprecated",
+        "maintenance",
+        "draining"
+      ],
+      "example": "active"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the last state change.",
+      "example": "2023-10-27T10:00:00Z"
+    }
+  }
+}
