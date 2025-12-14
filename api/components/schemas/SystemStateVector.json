@@ -1,0 +1,222 @@
+{
+  "type": "object",
+  "title": "I_System_State_Vector",
+  "description": "A comprehensive data structure representing the instantaneous state of the system. This vector captures the operational context, current system load metrics, a graph-based representation of traceability data, a registry of active entities, and the associated session security token. It is utilized for high-frequency telemetry, state synchronization, and audit trail generation.",
+  "required": [
+    "activeContext",
+    "systemLoad",
+    "traceabilityGraph",
+    "registeredEntities",
+    "sessionToken"
+  ],
+  "properties": {
+    "activeContext": {
+      "type": "string",
+      "description": "The current operational mode of the system execution environment. This dictates the logging verbosity, security constraints, and performance optimization strategies applied to the current session.",
+      "enum": [
+        "PRODUCTION_GRADE_A",
+        "AUDIT_MODE",
+        "DIAGNOSTIC_SAFE_MODE",
+        "RECOVERY_SEQUENCE"
+      ],
+      "example": "PRODUCTION_GRADE_A"
+    },
+    "systemLoad": {
+      "type": "object",
+      "description": "Real-time metrics regarding the computational and networking load of the host system processing the state vector.",
+      "required": [
+        "cpuUsagePercentage",
+        "memoryUsageBytes",
+        "activeThreadCount",
+        "networkThroughputMbps"
+      ],
+      "properties": {
+        "cpuUsagePercentage": {
+          "type": "number",
+          "format": "float",
+          "minimum": 0.0,
+          "maximum": 100.0,
+          "description": "The aggregate CPU usage percentage across all available cores.",
+          "example": 45.2
+        },
+        "memoryUsageBytes": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The total amount of RAM currently allocated to the process in bytes.",
+          "example": 2147483648
+        },
+        "activeThreadCount": {
+          "type": "integer",
+          "description": "The number of active threads currently managed by the application runtime.",
+          "example": 128
+        },
+        "networkThroughputMbps": {
+          "type": "number",
+          "format": "float",
+          "description": "Current network throughput measured in Megabits per second.",
+          "example": 850.5
+        },
+        "ioWaitTimeMs": {
+          "type": "integer",
+          "description": "Average I/O wait time in milliseconds over the last sampling interval.",
+          "example": 12
+        }
+      }
+    },
+    "traceabilityGraph": {
+      "type": "object",
+      "description": "A directed graph structure representing the flow of data and control between system components leading up to the current state. Used for root cause analysis and lineage tracking.",
+      "required": [
+        "graphId",
+        "nodes",
+        "edges",
+        "timestamp"
+      ],
+      "properties": {
+        "graphId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier for this specific snapshot of the traceability graph.",
+          "example": "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp indicating when the graph snapshot was finalized.",
+          "example": "2023-10-27T14:30:00Z"
+        },
+        "nodes": {
+          "type": "array",
+          "description": "List of nodes in the traceability graph, representing system components or data entities.",
+          "items": {
+            "type": "object",
+            "required": [
+              "nodeId",
+              "label",
+              "type"
+            ],
+            "properties": {
+              "nodeId": {
+                "type": "string",
+                "description": "Unique identifier for the node.",
+                "example": "node-svc-payment-01"
+              },
+              "label": {
+                "type": "string",
+                "description": "Human-readable label for the node.",
+                "example": "PaymentService"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "SERVICE",
+                  "DATABASE",
+                  "QUEUE",
+                  "USER_ACTOR"
+                ],
+                "description": "The classification of the node within the system architecture.",
+                "example": "SERVICE"
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Arbitrary metadata associated with the node state."
+              }
+            }
+          }
+        },
+        "edges": {
+          "type": "array",
+          "description": "List of directed edges representing interactions or data flow between nodes.",
+          "items": {
+            "type": "object",
+            "required": [
+              "sourceNodeId",
+              "targetNodeId",
+              "interactionType"
+            ],
+            "properties": {
+              "sourceNodeId": {
+                "type": "string",
+                "description": "ID of the originating node.",
+                "example": "node-svc-payment-01"
+              },
+              "targetNodeId": {
+                "type": "string",
+                "description": "ID of the destination node.",
+                "example": "node-db-transactions-01"
+              },
+              "interactionType": {
+                "type": "string",
+                "description": "Description of the interaction (e.g., RPC, SQL_QUERY, MESSAGE_PUBLISH).",
+                "example": "SQL_QUERY"
+              },
+              "latencyMs": {
+                "type": "number",
+                "description": "Latency of the interaction in milliseconds.",
+                "example": 4.5
+              }
+            }
+          }
+        }
+      }
+    },
+    "registeredEntities": {
+      "type": "array",
+      "description": "A registry of all entities (users, devices, or microservices) currently participating in the session or context scope.",
+      "items": {
+        "type": "object",
+        "required": [
+          "entityId",
+          "entityType",
+          "status"
+        ],
+        "properties": {
+          "entityId": {
+            "type": "string",
+            "description": "Unique identifier for the entity.",
+            "example": "usr_8829301"
+          },
+          "entityType": {
+            "type": "string",
+            "description": "The class of the entity.",
+            "example": "ADMIN_USER"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "IDLE",
+              "DISCONNECTED",
+              "SUSPENDED"
+            ],
+            "description": "Current connectivity or operational status of the entity.",
+            "example": "ACTIVE"
+          },
+          "lastSeen": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the last verified activity from this entity.",
+            "example": "2023-10-27T14:29:55Z"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of permission scopes granted to this entity within the current state vector.",
+            "example": [
+              "read:system",
+              "write:logs"
+            ]
+          }
+        }
+      }
+    },
+    "sessionToken": {
+      "type": "string",
+      "description": "The cryptographic session token (e.g., JWT, Opaque Token) validating the authority to access or modify this system state.",
+      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+    }
+  }
+}
