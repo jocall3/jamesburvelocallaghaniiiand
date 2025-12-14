@@ -1958,7 +1958,7 @@ const AccountsDashboardView: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {state.transactions.map(tx => (
                 <div key={tx.id} style={{ fontSize: '11px', padding: '4px', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '4px' }}>
-                  <div style={{ color: '#8b949e' }}>{tx.from} ➔ {tx.to}</div>
+                  <div style={{ color: '#8b949e' }}>{tx.from} , {tx.to}</div>
                   <div style={{ color: Theme.colors.success, fontWeight: 'bold' }}>+ {Utils.formatCurrency(tx.amount, tx.currency)}</div>
                 </div>
               ))}
