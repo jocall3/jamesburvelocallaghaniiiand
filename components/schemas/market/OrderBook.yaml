@@ -1,0 +1,326 @@
+OrderBook:
+  type: object
+  description: |
+    Represents a comprehensive snapshot of the market's order book for a specific trading pair.
+    This schema is designed to be highly flexible, capable of representing both
+    Level 2 (aggregated price levels) and Level 3 (individual orders) data,
+    or a hybrid approach, providing a granular and extensive view of market depth.
+    It includes essential metadata for tracking and reconciliation across updates.
+  required:
+    - symbol
+    - timestamp
+    - sequenceId
+    - bids
+    - asks
+  properties:
+    symbol:
+      type: string
+      description: |
+        The trading pair or instrument identifier for which the order book is provided
+        (e.g., "BTC/USD", "ETH-USDT", "AAPL"). This uniquely identifies the asset pair
+        and is crucial for filtering and routing market data.
+      example: "BTC/USD"
+    timestamp:
+      type: integer
+      format: int64
+      description: |
+        The timestamp when this order book snapshot was generated or last updated,
+        represented as Unix milliseconds. This timestamp reflects the precise moment
+        the data was compiled or observed by the data source, providing a temporal
+        reference for the market state.
+      example: 1678886400000
+    sequenceId:
+      type: integer
+      format: int64
+      description: |
+        A unique, monotonically increasing sequence identifier for this order book update.
+        This ID is crucial for consumers to ensure proper ordering of updates in a
+        streaming context and to detect any missing data points, guaranteeing data integrity
+        and preventing stale or out-of-order processing.
+      example: 1234567890
+    bids:
+      type: array
+      description: |
+        A list of bid entries, representing demand in the market. These entries are
+        typically sorted from the highest price to the lowest price, reflecting the
+        best available bids at the top of the book. Each entry can be an aggregated
+        level (Level 2) or an individual order (Level 3), as defined by `OrderBookEntry`,
+        allowing for flexible data representation.
+      items:
+        $ref: '#/components/schemas/market/OrderBookEntry'
+      example:
+        - type: LEVEL_2
+          price: "25000.50"
+          quantity: "1.25"
+          numOrders: 5
+        - type: LEVEL_2
+          price: "25000.00"
+          quantity: "2.00"
+          numOrders: 3
+    asks:
+      type: array
+      description: |
+        A list of ask entries, representing supply in the market. These entries are
+        typically sorted from the lowest price to the highest price, reflecting the
+        best available asks at the top of the book. Each entry can be an aggregated
+        level (Level 2) or an individual order (Level 3), as defined by `OrderBookEntry`,
+        providing a comprehensive view of available sell-side liquidity.
+      items:
+        $ref: '#/components/schemas/market/OrderBookEntry'
+      example:
+        - type: LEVEL_2
+          price: "25001.00"
+          quantity: "0.75"
+          numOrders: 2
+        - type: LEVEL_2
+          price: "25001.50"
+          quantity: "1.50"
+          numOrders: 4
+    lastUpdateId:
+      type: integer
+      format: int64
+      description: |
+        The ID of the last individual update or event that contributed to this
+        order book snapshot. This is particularly useful for reconciliation in
+        delta update streams, allowing clients to verify they have processed all
+        intermediate updates and maintain a consistent view of the order book.
+      example: 1234567891
+    version:
+      type: string
+      description: |
+        An optional version identifier for the order book schema or data format.
+        This can be used for API evolution, indicating specific data models, or
+        for compatibility checks with client applications, ensuring proper parsing.
+      example: "1.0.0"
+    exchange:
+      type: string
+      description: |
+        The name of the exchange or trading venue from which this order book data
+        originates. This is essential for multi-exchange data aggregation and
+        disambiguation of market data sources, especially in a fragmented market.
+      example: "Binance"
+    dataType:
+      type: string
+      description: |
+        Indicates the primary type of data contained within the `bids` and `asks` arrays.
+        This helps consumers quickly interpret whether they are receiving Level 2 (aggregated),
+        Level 3 (individual), or a HYBRID (mixed or L3 nested within L2) order data,
+        guiding their parsing logic.
+      enum:
+        - LEVEL_2
+        - LEVEL_3
+        - HYBRID
+      example: "LEVEL_2"
+
+OrderBookEntry:
+  type: object
+  description: |
+    A polymorphic schema representing a single entry in an order book. This entry
+    can be either an aggregated Level 2 price level or an individual Level 3 order.
+    The specific structure is determined by the `type` field within the object,
+    which acts as a discriminator, enabling flexible and extensible order book representations.
+  oneOf:
+    - $ref: '#/components/schemas/market/OrderBookLevel'
+    - $ref: '#/components/schemas/market/IndividualOrder'
+  discriminator:
+    propertyName: type
+    mapping:
+      LEVEL_2: '#/components/schemas/market/OrderBookLevel'
+      LEVEL_3: '#/components/schemas/market/IndividualOrder'
+
+OrderBookLevel:
+  type: object
+  description: |
+    Represents an aggregated price level in an order book (Level 2 data).
+    At this level, multiple individual orders are consolidated and presented
+    as a single entry with a total quantity, providing a summary of liquidity
+    at a specific price point without revealing individual order details.
+  required:
+    - type
+    - price
+    - quantity
+  properties:
+    type:
+      type: string
+      enum: [LEVEL_2]
+      description: |
+        Discriminator field indicating that this object represents a Level 2
+        aggregated order book entry. This field is crucial for correctly
+        interpreting the structure of the `OrderBookEntry`.
+      example: LEVEL_2
+    price:
+      type: string
+      format: decimal
+      description: |
+        The price point of this aggregated order book level. Represented as a string
+        to preserve full decimal precision, which is critical for accurate financial
+        calculations and avoiding floating-point inaccuracies.
+      example: "25000.50"
+    quantity:
+      type: string
+      format: decimal
+      description: |
+        The total aggregated quantity (volume) available at this price level.
+        Represented as a string for full decimal precision, reflecting the sum
+        of all individual orders at this price. This indicates the total depth of
+        liquidity at this specific price.
+      example: "1.25"
+    numOrders:
+      type: integer
+      format: int32
+      description: |
+        The number of individual orders that contribute to this aggregated price level.
+        This field provides insight into the fragmentation of liquidity at this price point;
+        a higher number might indicate more diverse participants. It is optional but commonly
+        included in Level 2 data.
+      example: 5
+    individualOrders:
+      type: array
+      description: |
+        (Optional) A list of individual orders that comprise this aggregated Level 2 price.
+        This field would only be present in a hybrid L2/L3 data model where Level 2 levels
+        can be expanded to show their underlying Level 3 components, offering deeper insight
+        into the composition of liquidity.
+      items:
+        $ref: '#/components/schemas/market/IndividualOrder'
+      example:
+        - type: LEVEL_3
+          orderId: "order_xyz789"
+          clientOrderId: "client_order_456"
+          price: "25000.50"
+          quantity: "0.75"
+          side: "BID"
+          timestamp: 1678886399000
+        - type: LEVEL_3
+          orderId: "order_abc101"
+          clientOrderId: "client_order_789"
+          price: "25000.50"
+          quantity: "0.50"
+          side: "BID"
+          timestamp: 1678886399100
+
+IndividualOrder:
+  type: object
+  description: |
+    Represents a single, individual order within an order book (Level 3 data).
+    This provides the highest level of granularity for market depth, detailing
+    each specific order placed on the exchange with its unique attributes.
+  required:
+    - type
+    - orderId
+    - price
+    - quantity
+    - side
+  properties:
+    type:
+      type: string
+      enum: [LEVEL_3]
+      description: |
+        Discriminator field indicating that this object represents a Level 3
+        individual order. This field is essential for correctly interpreting
+        the structure of the `OrderBookEntry`.
+      example: LEVEL_3
+    orderId:
+      type: string
+      description: |
+        A unique identifier assigned to this individual order by the exchange.
+        This ID is essential for tracking, managing, and referencing specific orders
+        throughout their lifecycle.
+      example: "order_abc123xyz"
+    clientOrderId:
+      type: string
+      description: |
+        An optional client-provided order ID. This ID is typically generated by the
+        client system when placing the order and can be used for internal tracking,
+        reconciliation, and linking orders to specific user actions or strategies.
+      example: "my_client_order_123"
+    price:
+      type: string
+      format: decimal
+      description: |
+        The price at which this individual order is placed. Represented as a string
+        to preserve full decimal precision, which is crucial for accurate financial
+        calculations and avoiding floating-point inaccuracies.
+      example: "25000.75"
+    quantity:
+      type: string
+      format: decimal
+      description: |
+        The quantity (volume) of this individual order. Represented as a string
+        for full decimal precision, indicating the exact amount of the asset being traded.
+        This is the remaining quantity if the order has been partially filled.
+      example: "0.5"
+    side:
+      type: string
+      description: |
+        The side of the order, indicating whether it's a bid (buy order) or an ask (sell order).
+        This determines its placement in the order book and its role in market matching.
+      enum:
+        - BID
+        - ASK
+      example: "BID"
+    timestamp:
+      type: integer
+      format: int64
+      description: |
+        The timestamp when this individual order was placed or last updated,
+        represented as Unix milliseconds. This can differ from the overall
+        order book snapshot timestamp, providing granular timing for each order's
+        entry or modification.
+      example: 1678886399500
+    makerTaker:
+      type: string
+      description: |
+        Indicates whether the order is a 'maker' (adds liquidity to the order book by
+        waiting for a match) or 'taker' (removes liquidity from the order book by
+        matching immediately). This status is often determined at the time of execution
+        but can sometimes be known for resting orders.
+      enum:
+        - MAKER
+        - TAKER
+      example: "MAKER"
+    orderType:
+      type: string
+      description: |
+        The type of order, such as LIMIT, MARKET, STOP_LIMIT, etc. This specifies
+        the execution rules and conditions for the order, influencing how it interacts
+        with the market.
+      enum:
+        - LIMIT # An order to buy or sell at a specific price or better.
+        - MARKET # An order to buy or sell immediately at the best available current price.
+        - STOP_LIMIT # An order that becomes a limit order when a specified stop price is reached.
+        - STOP_MARKET # An order that becomes a market order when a specified stop price is reached.
+        - IOC # Immediate-Or-Cancel: Any portion of the order that cannot be filled immediately is cancelled.
+        - FOK # Fill-Or-Kill: The entire order must be filled immediately, or it is cancelled.
+        - POST_ONLY # Ensures the order only adds liquidity (maker) and is cancelled if it would immediately match.
+      example: "LIMIT"
+    accountId:
+      type: string
+      description: |
+        An optional identifier for the account that placed this order. This is
+        particularly useful in multi-account management systems or brokerage scenarios
+        to attribute orders to specific clients or sub-accounts for reporting and auditing.
+      example: "ACC12345"
+    # Additional fields for even more extensive L3 data:
+    # feeTier:
+    #   type: string
+    #   description: The trading fee tier applicable to this order (e.g., "VIP_0", "TIER_1").
+    #   example: "VIP_0"
+    # sourceIp:
+    #   type: string
+    #   format: ipv4
+    #   description: The IP address from which the order was placed, for audit and security purposes.
+    #   example: "192.168.1.100"
+    # tags:
+    #   type: array
+    #   items:
+    #     type: string
+    #   description: Custom tags or labels associated with the order for internal management or categorization.
+    #   example: ["algo_trade", "high_frequency"]
+    # exchangeSpecificData:
+    #   type: object
+    #   description: A flexible object to include any vendor-specific fields not covered by the standard schema.
+    #   additionalProperties: true
+    #   example:
+    #     customField1: "value1"
+    #     customField2: 123
