@@ -1,0 +1,13 @@
+{
+  "title": "Fiscal Endpoint Resource Identifier",
+  "type": "string",
+  "description": "A canonical uniform resource identifier string representing a specific fiscal audit stream endpoint within the version 9 procedural entity framework. This string must strictly adhere to the defined path structure, identifying a unique entity by its ID for audit stream retrieval. The format is strictly '/api/v9/proc/entity/{entity_id}/audit_stream', where {entity_id} is a valid alphanumeric identifier, UUID, or system slug. This schema ensures that all fiscal audit operations are routed to the correct versioned processor.",
+  "pattern": "^/api/v9/proc/entity/[a-zA-Z0-9\\-_]+(\\.[a-zA-Z0-9]+)?/audit_stream$",
+  "minLength": 36,
+  "maxLength": 256,
+  "example": "/api/v9/proc/entity/550e8400-e29b-41d4-a716-446655440000/audit_stream",
+  "externalDocs": {
+    "description": "Fiscal Audit Stream Protocol Specification V9",
+    "url": "https://api.system.internal/docs/v9/proc/fiscal-audit"
+  }
+}
