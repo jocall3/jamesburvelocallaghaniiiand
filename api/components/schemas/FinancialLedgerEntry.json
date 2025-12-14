@@ -1,0 +1,81 @@
+{
+  "type": "object",
+  "title": "I_Financial_ledger_Entry",
+  "description": "Represents a single immutable entry in the financial ledger system. This schema defines the structure for recording monetary movements, associated risk metrics, and compliance status flags. It is critical for audit trails, regulatory reporting, and real-time balance calculations.",
+  "required": [
+    "transactionId",
+    "counterpartyEntity",
+    "deltaAmount",
+    "postProcessingTimestamp",
+    "riskScore",
+    "complianceFlags",
+    "runningBalance"
+  ],
+  "properties": {
+    "transactionId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique Universally Unique Identifier (UUID) representing this specific ledger entry. This ID is immutable once assigned and serves as the primary key for the transaction record.",
+      "example": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+    },
+    "counterpartyEntity": {
+      "type": "string",
+      "description": "The legal name, internal identifier, or reference code of the external entity (individual, corporation, or internal account) involved in this transaction.",
+      "minLength": 1,
+      "maxLength": 255,
+      "example": "Acme International Holdings"
+    },
+    "deltaAmount": {
+      "type": "number",
+      "format": "double",
+      "description": "The monetary value change applied to the ledger. Positive values indicate credits (deposits/receivables); negative values indicate debits (withdrawals/payables). Precision is handled via standard double-precision floating point.",
+      "example": 12500.55
+    },
+    "postProcessingTimestamp": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Epoch timestamp (in milliseconds) indicating exactly when the transaction was finalized, validated, and persisted in the ledger system.",
+      "minimum": 0,
+      "example": 1699982400000
+    },
+    "riskScore": {
+      "type": "number",
+      "format": "float",
+      "description": "A normalized floating-point value between 0.0 (completely safe) and 1.0 (extremely high risk) representing the AI-calculated risk assessment for this transaction based on historical patterns and heuristics.",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "example": 0.12
+    },
+    "complianceFlags": {
+      "type": "array",
+      "description": "A set of enumerated flags indicating specific compliance checks triggered, passed, or failed during the transaction processing lifecycle. Used for automated reporting and manual review queues.",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "AML_WARNING",
+          "KYC_PENDING",
+          "KYC_VERIFIED",
+          "SANCTION_CHECK_PASSED",
+          "SANCTION_CHECK_FAILED",
+          "LARGE_TRANSACTION",
+          "CROSS_BORDER",
+          "SUSPICIOUS_ACTIVITY",
+          "PEP_INTERACTION",
+          "STRUCTURING_DETECTED",
+          "VELOCITY_LIMIT_EXCEEDED"
+        ]
+      },
+      "example": [
+        "LARGE_TRANSACTION",
+        "CROSS_BORDER"
+      ]
+    },
+    "runningBalance": {
+      "type": "number",
+      "format": "double",
+      "description": "The resulting account balance immediately after the application of the deltaAmount. Used for rapid balance retrieval, integrity checks, and reconciliation processes.",
+      "example": 145020.00
+    }
+  }
+}
