@@ -1,10 +1,9 @@
-```typescript
 import React, { useContext, useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Card from './Card';
 import { DataContext } from '../context/DataContext';
 
-// The James Burvel O’Callaghan III Code - Company: Alpha Financial Analytics - Feature: Comprehensive Balance Summary with Deep Historical Analysis
+// The James Burvel O'Callaghan III Code - Company: Alpha Financial Analytics - Feature: Comprehensive Balance Summary with Deep Historical Analysis
 const A_BalanceSummary: React.FC = () => {
     // A1. Context Access and Error Handling
     const contextA1 = useContext(DataContext);
@@ -198,4 +197,3 @@ const A_BalanceSummary: React.FC = () => {
 };
 
 export default A_BalanceSummary;
-```
