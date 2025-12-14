@@ -1,0 +1,426 @@
+{
+  "get": {
+    "tags": [
+      "Entity Fiscal Compliance",
+      "Financial Reporting",
+      "Taxation"
+    ],
+    "summary": "Retrieve Fiscal Compliance and Tax Vector Data",
+    "description": "Retrieves a comprehensive fiscal snapshot for a specific legal entity. This endpoint aggregates data from multiple sub-ledgers, tax engines, and compliance registries to provide a unified view of the entity's fiscal standing. \n\nThe response includes:\n- **Tax Vectors**: Detailed breakdown of applicable tax regimes (VAT, GST, Sales Tax, Withholding) based on the entity's nexus and operational jurisdictions.\n- **Compliance Status**: Real-time validation against local filing requirements, including deadlines, filing frequency, and current standing (e.g., Good Standing, Delinquent).\n- **Fiscal Ledger**: A summarized view of fiscal-specific general ledger entries, adjusted for local GAAP or IFRS reporting standards.\n- **Risk Assessment**: Automated calculated risk scores based on transaction volume, cross-border complexity, and historical audit findings.\n\nThis endpoint is computationally intensive and results are cached for 15 minutes unless `forceRefresh` is set to true.",
+    "operationId": "getEntityFiscalData",
+    "parameters": [
+      {
+        "name": "entityId",
+        "in": "path",
+        "description": "The unique UUID identifier of the legal entity. This must correspond to a valid record in the Global Entity Registry.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+        }
+      },
+      {
+        "name": "fiscalYear",
+        "in": "query",
+        "description": "The fiscal year for which data is requested. Defaults to the current fiscal year of the entity if not specified.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1900,
+          "maximum": 2100,
+          "example": 2023
+        }
+      },
+      {
+        "name": "reportingPeriod",
+        "in": "query",
+        "description": "Specific reporting period (e.g., Q1, M10) to filter the fiscal data. If omitted, returns full year-to-date data.",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "pattern": "^(Q[1-4]|M(0[1-9]|1[0-2]))$",
+          "example": "Q3"
+        }
+      },
+      {
+        "name": "jurisdictionCode",
+        "in": "query",
+        "description": "ISO 3166-1 alpha-2 country code optionally followed by a region code (e.g., US-CA) to filter tax vectors and compliance data specific to a jurisdiction.",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 10,
+          "example": "US-NY"
+        }
+      },
+      {
+        "name": "includeAuditLogs",
+        "in": "query",
+        "description": "If set to true, includes a detailed trail of automated fiscal audits and reconciliation checks performed on the data.",
+        "required": false,
+        "schema": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      {
+        "name": "currency",
+        "in": "query",
+        "description": "The target currency for monetary values. If different from the entity's functional currency, values will be converted using the spot rate at the end of the requested period.",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "iso-currency-code",
+          "minLength": 3,
+          "maxLength": 3,
+          "example": "USD"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Successful retrieval of fiscal data. The response contains a highly structured object detailing tax liabilities, compliance metrics, and ledger summaries.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "meta",
+                "entityProfile",
+                "fiscalSummary",
+                "taxVectors"
+              ],
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "description": "Metadata regarding the request execution and data freshness.",
+                  "properties": {
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Time when the response was generated."
+                    },
+                    "requestId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Unique trace ID for the request."
+                    },
+                    "processingTimeMs": {
+                      "type": "integer",
+                      "description": "Time taken to process the request in milliseconds."
+                    },
+                    "dataVersion": {
+                      "type": "string",
+                      "description": "Version hash of the underlying fiscal data snapshot."
+                    }
+                  }
+                },
+                "entityProfile": {
+                  "type": "object",
+                  "description": "Basic profile information of the entity relevant to fiscal reporting.",
+                  "properties": {
+                    "legalName": {
+                      "type": "string",
+                      "example": "Acme Corp International Ltd."
+                    },
+                    "taxId": {
+                      "type": "string",
+                      "description": "Primary Tax Identification Number (TIN, VAT ID, EIN).",
+                      "example": "US-98-7654321"
+                    },
+                    "functionalCurrency": {
+                      "type": "string",
+                      "example": "EUR"
+                    },
+                    "fiscalYearEnd": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "The date on which the entity's fiscal year ends (MM-DD format usually, but returned as full date of current FY).",
+                      "example": "2023-12-31"
+                    },
+                    "incorporationJurisdiction": {
+                      "type": "string",
+                      "example": "IE"
+                    }
+                  }
+                },
+                "fiscalSummary": {
+                  "type": "object",
+                  "description": "High-level financial summary for the requested period.",
+                  "properties": {
+                    "totalRevenue": {
+                      "$ref": "#/components/schemas/MonetaryValue"
+                    },
+                    "taxableIncome": {
+                      "$ref": "#/components/schemas/MonetaryValue"
+                    },
+                    "totalTaxLiability": {
+                      "$ref": "#/components/schemas/MonetaryValue"
+                    },
+                    "effectiveTaxRate": {
+                      "type": "number",
+                      "format": "float",
+                      "description": "Calculated effective tax rate as a percentage.",
+                      "example": 21.5
+                    },
+                    "retainedEarnings": {
+                      "$ref": "#/components/schemas/MonetaryValue"
+                    }
+                  }
+                },
+                "taxVectors": {
+                  "type": "array",
+                  "description": "List of specific tax obligations and vectors identified for the entity.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "vectorId": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "jurisdiction": {
+                        "type": "string",
+                        "description": "The jurisdiction imposing the tax.",
+                        "example": "US-CA"
+                      },
+                      "taxType": {
+                        "type": "string",
+                        "enum": [
+                          "CIT",
+                          "VAT",
+                          "GST",
+                          "SALES_TAX",
+                          "WITHHOLDING",
+                          "PAYROLL",
+                          "DIGITAL_SERVICES"
+                        ]
+                      },
+                      "registrationStatus": {
+                        "type": "string",
+                        "enum": [
+                          "ACTIVE",
+                          "PENDING",
+                          "SUSPENDED",
+                          "EXEMPT"
+                        ]
+                      },
+                      "filingFrequency": {
+                        "type": "string",
+                        "enum": [
+                          "MONTHLY",
+                          "QUARTERLY",
+                          "ANNUAL"
+                        ]
+                      },
+                      "currentLiability": {
+                        "$ref": "#/components/schemas/MonetaryValue"
+                      },
+                      "nextFilingDeadline": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "accruals": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "period": {
+                              "type": "string"
+                            },
+                            "amount": {
+                              "$ref": "#/components/schemas/MonetaryValue"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "complianceHealth": {
+                  "type": "object",
+                  "properties": {
+                    "overallStatus": {
+                      "type": "string",
+                      "enum": [
+                        "COMPLIANT",
+                        "AT_RISK",
+                        "NON_COMPLIANT",
+                        "UNDER_AUDIT"
+                      ]
+                    },
+                    "riskScore": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100,
+                      "description": "0 is low risk, 100 is critical risk."
+                    },
+                    "openIssues": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "issueId": {
+                            "type": "string"
+                          },
+                          "severity": {
+                            "type": "string",
+                            "enum": [
+                              "LOW",
+                              "MEDIUM",
+                              "HIGH",
+                              "CRITICAL"
+                            ]
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "detectedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "examples": {
+              "standard_response": {
+                "summary": "Standard Fiscal Data Response",
+                "value": {
+                  "meta": {
+                    "timestamp": "2023-10-27T14:30:00Z",
+                    "requestId": "req_123456789",
+                    "processingTimeMs": 145,
+                    "dataVersion": "v1.2023.10.27"
+                  },
+                  "entityProfile": {
+                    "legalName": "Global Tech Solutions Inc.",
+                    "taxId": "US-12-3456789",
+                    "functionalCurrency": "USD",
+                    "fiscalYearEnd": "2023-12-31",
+                    "incorporationJurisdiction": "US-DE"
+                  },
+                  "fiscalSummary": {
+                    "totalRevenue": {
+                      "amount": 5000000.00,
+                      "currency": "USD"
+                    },
+                    "taxableIncome": {
+                      "amount": 1200000.00,
+                      "currency": "USD"
+                    },
+                    "totalTaxLiability": {
+                      "amount": 252000.00,
+                      "currency": "USD"
+                    },
+                    "effectiveTaxRate": 21.0,
+                    "retainedEarnings": {
+                      "amount": 3500000.00,
+                      "currency": "USD"
+                    }
+                  },
+                  "taxVectors": [
+                    {
+                      "vectorId": "vec_987",
+                      "jurisdiction": "US-NY",
+                      "taxType": "SALES_TAX",
+                      "registrationStatus": "ACTIVE",
+                      "filingFrequency": "QUARTERLY",
+                      "currentLiability": {
+                        "amount": 15000.50,
+                        "currency": "USD"
+                      },
+                      "nextFilingDeadline": "2023-11-20",
+                      "accruals": []
+                    }
+                  ],
+                  "complianceHealth": {
+                    "overallStatus": "COMPLIANT",
+                    "riskScore": 12,
+                    "openIssues": []
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request. The request parameters were invalid, such as an unsupported currency code or malformed date format.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized. The request lacks valid authentication credentials.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden. The authenticated user does not have permission to access fiscal data for this specific entity.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not Found. The specified entityId does not exist in the system.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "429": {
+        "description": "Too Many Requests. Rate limit exceeded for fiscal data computation.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal Server Error. An unexpected error occurred within the fiscal calculation engine.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "security": [
+      {
+        "bearerAuth": [
+          "fiscal:read",
+          "entity:read"
+        ]
+      },
+      {
+        "apiKeyAuth": []
+      }
+    ]
+  }
+}
