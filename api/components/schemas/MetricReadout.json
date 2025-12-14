@@ -1,0 +1,99 @@
+{
+  "type": "object",
+  "description": "Represents a UI metric readout component (D04), typically used in dashboards to display key performance indicators (KPIs) with trend analysis, status indicators, and historical context.",
+  "title": "Metric Readout",
+  "required": [
+    "id",
+    "label",
+    "value",
+    "trend"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for the metric readout component instance.",
+      "example": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    "label": {
+      "type": "string",
+      "description": "The display label for the metric, usually shown above or beside the value.",
+      "example": "Active Users"
+    },
+    "value": {
+      "type": "string",
+      "description": "The formatted string representation of the metric value to be displayed in the UI. May include currency symbols, separators, or unit suffixes.",
+      "example": "14,205"
+    },
+    "rawValue": {
+      "type": "number",
+      "description": "The raw numeric value of the metric, useful for client-side graphing or conditional logic.",
+      "example": 14205.0
+    },
+    "unit": {
+      "type": "string",
+      "description": "The unit of measurement associated with the value (e.g., 'USD', 'kg', 'users', '%').",
+      "example": "users"
+    },
+    "trend": {
+      "type": "string",
+      "description": "The direction of the trend compared to the previous comparison period. Used to render directional arrows or indicators.",
+      "enum": [
+        "UP",
+        "DOWN",
+        "STABLE"
+      ],
+      "example": "UP"
+    },
+    "changePercentage": {
+      "type": "number",
+      "format": "float",
+      "description": "The percentage change relative to the previous period. Positive values indicate growth, negative values indicate decline.",
+      "example": 5.4
+    },
+    "changeAbsolute": {
+      "type": "number",
+      "description": "The absolute numerical difference compared to the previous period.",
+      "example": 720
+    },
+    "status": {
+      "type": "string",
+      "description": "The semantic status or severity level associated with the metric, often used to determine the color of the readout (e.g., Green for SUCCESS, Red for DANGER).",
+      "enum": [
+        "SUCCESS",
+        "WARNING",
+        "DANGER",
+        "NEUTRAL",
+        "INFO"
+      ],
+      "default": "NEUTRAL",
+      "example": "SUCCESS"
+    },
+    "description": {
+      "type": "string",
+      "description": "A verbose description or tooltip text explaining the context or calculation method of the metric.",
+      "example": "The total number of unique users who have logged in within the last 24 hours."
+    },
+    "icon": {
+      "type": "string",
+      "description": "A reference identifier for an icon to display alongside the metric (e.g., FontAwesome class or SVG ID).",
+      "example": "fa-users"
+    },
+    "comparisonLabel": {
+      "type": "string",
+      "description": "Text describing the period or baseline the current value is being compared against.",
+      "example": "vs. last week"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The exact timestamp when this metric was calculated or last updated.",
+      "example": "2023-11-15T08:30:00Z"
+    },
+    "meta": {
+      "type": "object",
+      "description": "Arbitrary metadata for extensibility.",
+      "additionalProperties": true
+    }
+  }
+}
