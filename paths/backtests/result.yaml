@@ -1,0 +1,107 @@
+get:
+  summary: Get Backtest Result
+  description: |
+    Retrieves the detailed results of a specific backtesting run, identified by its unique `runId`.
+    This endpoint provides comprehensive data including summary performance metrics, a complete list of executed trades, and the equity curve over the backtest period.
+    The results are crucial for analyzing the performance of a trading strategy under historical market conditions.
+    Access to this endpoint requires authentication and authorization to view the specific backtest result.
+  operationId: getBacktestResult
+  tags:
+    - Backtesting
+  parameters:
+    - name: runId
+      in: path
+      description: The unique identifier (UUID) for the backtest run whose results are to be retrieved.
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+  security:
+    - oAuth2: [read:backtests]
+    - apiKey: []
+  responses:
+    '200':
+      description: Successfully retrieved the detailed backtest results. The response body contains the full result set for the specified run.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/backtests/BacktestResult.yaml'
+          example:
+            runId: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            strategyId: "strat-rsi-macd-001"
+            strategyVersion: 3
+            status: "COMPLETED"
+            createdAt: "2023-10-27T10:00:00Z"
+            startedAt: "2023-10-27T10:01:00Z"
+            completedAt: "2023-10-27T11:30:00Z"
+            configuration:
+              timeframe: "1h"
+              symbol: "BTC/USD"
+              startDate: "2023-01-01T00:00:00Z"
+              endDate: "2023-06-30T23:59:59Z"
+              initialCapital: 100000
+              parameters:
+                rsiPeriod: 14
+                macdFast: 12
+                macdSlow: 26
+                macdSignal: 9
+            summaryMetrics:
+              totalReturn: 25.5
+              annualizedReturn: 51.0
+              sharpeRatio: 1.85
+              sortinoRatio: 2.5
+              maxDrawdown: -15.2
+              winRate: 62.5
+              profitFactor: 2.1
+              totalTrades: 128
+              averageTradeReturn: 0.2
+              cagr: 45.8
+            trades:
+              - tradeId: "trade-001"
+                symbol: "BTC/USD"
+                side: "LONG"
+                quantity: 0.5
+                entryTime: "2023-01-15T14:00:00Z"
+                entryPrice: 21000.50
+                exitTime: "2023-01-16T18:00:00Z"
+                exitPrice: 21500.75
+                pnl: 250.125
+                pnlPercentage: 2.38
+                durationSeconds: 100800
+              - tradeId: "trade-002"
+                symbol: "BTC/USD"
+                side: "SHORT"
+                quantity: 0.5
+                entryTime: "2023-01-20T09:00:00Z"
+                entryPrice: 22500.00
+                exitTime: "2023-01-20T15:00:00Z"
+                exitPrice: 22300.00
+                pnl: 100.00
+                pnlPercentage: 0.88
+                durationSeconds: 21600
+            equityCurve:
+              - timestamp: "2023-01-01T00:00:00Z"
+                equity: 100000.00
+              - timestamp: "2023-01-16T18:00:00Z"
+                equity: 100250.13
+              - timestamp: "2023-01-20T15:00:00Z"
+                equity: 100350.13
+    '400':
+      $ref: '../../components/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../components/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../components/responses/Forbidden.yaml'
+    '404':
+      description: Backtest run not found. The provided `runId` does not correspond to any existing backtest result.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/Error.yaml'
+          example:
+            code: "NOT_FOUND"
+            message: "Backtest run with ID 'a1b2c3d4-e5f6-7890-1234-ffffffffffff' not found."
+            requestId: "req_123456789"
+    '500':
+      $ref: '../../components/responses/InternalServerError.yaml'
