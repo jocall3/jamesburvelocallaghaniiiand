@@ -1,0 +1,124 @@
+post:
+  summary: Run a New Backtest Simulation
+  description: |
+    Initiates a new backtesting simulation for a specified trading algorithm.
+
+    This is an asynchronous operation. Upon successful submission, the backtest is queued for execution, and a job ID is returned. You can use the job ID to poll the status of the backtest using the `/backtests/jobs/{jobId}` endpoint.
+
+    The simulation runs the algorithm against historical market data between the provided start and end dates, using the specified initial capital. Algorithm parameters can be overridden for this specific run, allowing for sensitivity analysis and optimization without altering the base algorithm configuration.
+  operationId: runBacktest
+  tags:
+    - Backtesting
+  security:
+    - OAuth2: [backtests:write]
+    - ApiKeyAuth: []
+  requestBody:
+    description: Configuration for the backtest simulation to be executed.
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - algorithmId
+            - startDate
+            - endDate
+            - initialCapital
+          properties:
+            algorithmId:
+              type: string
+              format: uuid
+              description: The unique identifier of the trading algorithm to be backtested.
+              example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            startDate:
+              type: string
+              format: date
+              description: The start date for the backtest period (inclusive), in YYYY-MM-DD format.
+              example: "2022-01-01"
+            endDate:
+              type: string
+              format: date
+              description: The end date for the backtest period (inclusive), in YYYY-MM-DD format.
+              example: "2023-01-01"
+            initialCapital:
+              type: number
+              format: double
+              description: The amount of virtual capital to allocate to the algorithm at the start of the simulation. Must be a positive value.
+              example: 100000.00
+              minimum: 0.01
+            parametersOverride:
+              type: array
+              description: An optional array of algorithm parameters to override for this specific backtest run. This is useful for testing different parameter configurations without creating new algorithm versions. If a parameter is not provided here, the algorithm's default value will be used.
+              items:
+                $ref: '../../components/schemas/algorithms/AlgorithmParameter.yaml'
+              example:
+                - name: "moving_average_period"
+                  value: 50
+                - name: "risk_per_trade"
+                  value: 0.02
+        example:
+          algorithmId: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          startDate: "2022-01-01"
+          endDate: "2023-01-01"
+          initialCapital: 100000.00
+          parametersOverride:
+            - name: "moving_average_period"
+              value: 50
+            - name: "stop_loss_percentage"
+              value: 0.05
+  responses:
+    '202':
+      description: |
+        The backtest simulation request has been accepted and queued for processing.
+        The response body contains the unique job ID for this backtest, which can be used to track its status and retrieve results once completed.
+      headers:
+        Location:
+          description: The URL to poll for the status of the backtest job.
+          schema:
+            type: string
+            format: uri
+            example: "/api/v1/backtests/jobs/f47ac10b-58cc-4372-a567-0e02b2c3d479"
+        X-RateLimit-Limit:
+          $ref: '../../components/headers/X-RateLimit-Limit.yaml'
+        X-RateLimit-Remaining:
+          $ref: '../../components/headers/X-RateLimit-Remaining.yaml'
+        X-RateLimit-Reset:
+          $ref: '../../components/headers/X-RateLimit-Reset.yaml'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              jobId:
+                type: string
+                format: uuid
+                description: A unique identifier for the queued backtest job. Use this ID to check the status and retrieve results.
+                example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+              status:
+                type: string
+                description: The initial status of the job upon acceptance.
+                example: "QUEUED"
+                enum: [QUEUED, PENDING]
+              queuePosition:
+                type: integer
+                format: int32
+                description: The estimated position of the job in the execution queue. A value of 0 means it is next to be processed. This is an estimate and may change.
+                example: 5
+          example:
+            jobId: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+            status: "QUEUED"
+            queuePosition: 5
+    '400':
+      $ref: '../../components/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../components/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../components/responses/Forbidden.yaml'
+    '404':
+      $ref: '../../components/responses/NotFound.yaml'
+    '422':
+      $ref: '../../components/responses/UnprocessableEntity.yaml'
+    '429':
+      $ref: '../../components/responses/TooManyRequests.yaml'
+    '500':
+      $ref: '../../components/responses/InternalServerError.yaml'
