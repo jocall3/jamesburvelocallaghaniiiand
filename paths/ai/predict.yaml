@@ -1,0 +1,162 @@
+post:
+  summary: Request AI Prediction
+  operationId: requestAIPrediction
+  description: |
+    Submits a request for a predictive analysis from a specified AI model. This endpoint is the primary interface for leveraging the platform's machine learning capabilities to forecast future values, classify data, or generate insights.
+
+    The endpoint can operate in two modes:
+    1.  **Synchronous:** For quick predictions, the result is returned directly in the response body with a `200 OK` status. This is suitable for models with inference times under a few seconds.
+    2.  **Asynchronous:** For long-running or computationally intensive models, the server immediately responds with a `202 Accepted` status and a job identifier. The final result can be retrieved later using the `/ai/jobs/{jobId}` endpoint or delivered via a webhook if a callback URL is provided in the request.
+
+    Clients should be prepared to handle standard HTTP error codes for issues like invalid input, authentication failures, or rate limiting.
+  tags:
+    - AI
+    - Predictions
+  parameters:
+    - name: Idempotency-Key
+      in: header
+      description: |
+        A unique key for the request that the server uses to prevent duplicate processing of the same request.
+        This is useful for safely retrying requests without accidentally performing the same operation twice.
+        It's recommended to use a UUID (Universally Unique Identifier).
+      required: false
+      schema:
+        type: string
+        format: uuid
+        example: "a8b6c4d2-e0f8-11eb-ba80-0242ac130004"
+  requestBody:
+    description: The configuration for the prediction request, including the target entity, the forecast horizon, and the model to use.
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/ai/PredictionRequest.yaml'
+        examples:
+          stock_price_prediction:
+            summary: Example for predicting stock price
+            description: A request to predict the stock price of 'AAPL' for the next 7 days using the 'timeseries-forecast-v2' model.
+            value:
+              target:
+                type: "stock_ticker"
+                identifier: "AAPL"
+              horizon: "7d"
+              model: "timeseries-forecast-v2"
+              parameters:
+                confidence_level: 0.95
+                include_seasonality: true
+          customer_churn_prediction:
+            summary: Example for predicting customer churn
+            description: A request to predict the churn probability for a specific customer using the 'customer-churn-classifier-v3' model.
+            value:
+              target:
+                type: "customer_id"
+                identifier: "cust-a9b8c7d6"
+              horizon: "30d"
+              model: "customer-churn-classifier-v3"
+              parameters:
+                feature_set: "full"
+  responses:
+    '200':
+      description: The prediction was successful and is returned synchronously in the response body.
+      headers:
+        X-Request-ID:
+          $ref: '../../components/headers/X-Request-ID.yaml'
+        RateLimit-Limit:
+          $ref: '../../components/headers/RateLimit-Limit.yaml'
+        RateLimit-Remaining:
+          $ref: '../../components/headers/RateLimit-Remaining.yaml'
+        RateLimit-Reset:
+          $ref: '../../components/headers/RateLimit-Reset.yaml'
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/ai/PredictionResponse.yaml'
+          examples:
+            high_confidence_forecast:
+              summary: High Confidence Forecast
+              value:
+                predictionId: "pred_f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                model: "timeseries-forecast-v2"
+                target:
+                  type: "stock_ticker"
+                  identifier: "AAPL"
+                createdAt: "2023-10-27T10:00:00Z"
+                prediction: 175.50
+                confidence: 0.98
+                confidenceInterval:
+                  lowerBound: 172.30
+                  upperBound: 178.70
+                factors:
+                  - factorId: "market_sentiment"
+                    description: "Positive market sentiment based on recent news."
+                    impactScore: 0.85
+                    direction: "positive"
+                  - factorId: "historical_volatility"
+                    description: "Low historical volatility in the past 30 days."
+                    impactScore: 0.65
+                    direction: "positive"
+            low_confidence_classification:
+              summary: Low Confidence Classification
+              value:
+                predictionId: "pred_a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                model: "customer-churn-classifier-v3"
+                target:
+                  type: "customer_id"
+                  identifier: "cust-a9b8c7d6"
+                createdAt: "2023-10-27T10:05:00Z"
+                prediction: 1 # Represents 'churn'
+                confidence: 0.55
+                confidenceInterval:
+                  lowerBound: 0.45
+                  upperBound: 0.65
+                factors:
+                  - factorId: "low_product_usage"
+                    description: "Customer has low engagement with the product."
+                    impactScore: 0.70
+                    direction: "positive" # Positive impact on churn
+                  - factorId: "recent_support_ticket"
+                    description: "Customer recently filed a support ticket with negative sentiment."
+                    impactScore: 0.60
+                    direction: "positive" # Positive impact on churn
+                  - factorId: "long_term_customer"
+                    description: "Customer has a long history with the company."
+                    impactScore: 0.40
+                    direction: "negative" # Negative impact on churn
+    '202':
+      description: |
+        The prediction request was accepted for asynchronous processing.
+        The response body contains a job ID which can be used to poll the status and retrieve the result from the `/ai/jobs/{jobId}` endpoint.
+      headers:
+        X-Request-ID:
+          $ref: '../../components/headers/X-Request-ID.yaml'
+        Location:
+          description: The URL to poll for the status of the prediction job.
+          schema:
+            type: string
+            format: uri
+            example: "/api/v1/ai/jobs/job_1234567890"
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/ai/AsyncJob.yaml'
+          example:
+            jobId: "job_1234567890"
+            status: "pending"
+            createdAt: "2023-10-27T11:00:00Z"
+            estimatedCompletionTime: "2023-10-27T11:05:00Z"
+            _links:
+              self:
+                href: "/api/v1/ai/jobs/job_1234567890"
+    '400':
+      $ref: '../../components/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../components/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../components/responses/Forbidden.yaml'
+    '429':
+      $ref: '../../components/responses/TooManyRequests.yaml'
+    '500':
+      $ref: '../../components/responses/InternalServerError.yaml'
+  security:
+    - OAuth2: [predictions:write]
+    - ApiKeyAuth: []
