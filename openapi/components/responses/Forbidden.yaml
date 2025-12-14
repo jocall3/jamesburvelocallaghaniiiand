@@ -1,0 +1,27 @@
+description: |
+  Forbidden. The client does not have the necessary permissions to access the requested resource.
+  Unlike a 401 Unauthorized response, the server knows the identity of the client but is explicitly refusing access.
+  This could be due to insufficient roles, lack of ownership, or other access control list (ACL) restrictions.
+  Retrying the request with the same credentials will result in the same response.
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/Error.yaml
+    example:
+      error:
+        code: "FORBIDDEN"
+        message: "The authenticated user does not have permission to perform this action."
+        target: "user.permissions"
+        details:
+          - code: "INSUFFICIENT_SCOPE"
+            message: "The 'write:resource' scope is required to perform this operation."
+            target: "scope"
+headers:
+  X-Request-ID:
+    $ref: ../headers/X-Request-ID.yaml
+  RateLimit-Limit:
+    $ref: ../headers/RateLimit-Limit.yaml
+  RateLimit-Remaining:
+    $ref: ../headers/RateLimit-Remaining.yaml
+  RateLimit-Reset:
+    $ref: ../headers/RateLimit-Reset.yaml
