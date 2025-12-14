@@ -1,0 +1,36 @@
+description: The requested resource was not found. This response is typically returned when a client attempts to access a resource (e.g., a specific user, product, or document) that does not exist on the server, or when the client does not have permission to view a specific resource and the server chooses to respond with a 404 instead of a 403 for security reasons (to avoid revealing the existence of the resource).
+content:
+  application/json:
+    schema:
+      $ref: '../schemas/Error.yaml' # References a common error schema for consistency
+    examples:
+      resourceNotFoundGeneric:
+        summary: Generic resource not found error
+        value:
+          code: "RESOURCE_NOT_FOUND"
+          message: "The requested resource could not be found."
+          details: "No resource matching the provided identifier or criteria exists in the system. Please verify the ID or parameters and try again."
+      specificItemNotFound:
+        summary: Specific item not found (e.g., a product, user, or order)
+        value:
+          code: "ITEM_NOT_FOUND"
+          message: "Product with ID 'P12345' not found."
+          details: "The product identifier 'P12345' does not correspond to any known product in our catalog. It might have been deleted, moved, or never existed."
+      endpointNotFound:
+        summary: Invalid API endpoint or path
+        value:
+          code: "ENDPOINT_NOT_FOUND"
+          message: "The requested API endpoint does not exist."
+          details: "The path '/api/v1/nonexistent-resource' is not a valid API endpoint. Please refer to the API documentation for available paths and resource structures."
+      userNotFound:
+        summary: User not found
+        value:
+          code: "USER_NOT_FOUND"
+          message: "User with ID 'USR789' not found."
+          details: "The user account associated with ID 'USR789' could not be located. This user may not exist or has been deactivated."
+      documentNotFound:
+        summary: Document or file not found
+        value:
+          code: "DOCUMENT_NOT_FOUND"
+          message: "Document 'report_q3_2023.pdf' not found."
+          details: "The specified document 'report_q3_2023.pdf' does not exist on the server or in the specified directory. Check the file name and path."
