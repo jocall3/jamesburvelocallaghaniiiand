@@ -1,0 +1,9 @@
+type: apiKey
+description: |
+  API Key-based authentication to access the API.
+  To authenticate, you must provide your unique API key in the `X-API-Key` HTTP header for all requests to protected endpoints.
+  You can generate and manage your API keys from your account dashboard on the developer portal.
+  Keep your API key secure and do not share it in publicly accessible areas such as GitHub, client-side code, etc.
+  Example Header: `X-API-Key: abc123def456ghi789jkl`
+in: header
+name: X-API-Key
