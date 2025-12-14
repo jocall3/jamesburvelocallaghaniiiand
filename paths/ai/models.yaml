@@ -1,0 +1,358 @@
+/ai/models:
+  get:
+    summary: List available AI models
+    operationId: listAIModels
+    tags:
+      - AI Models
+    description: |
+      Retrieves a paginated and filterable list of all available AI models that can be used for various prediction tasks.
+      This endpoint is designed for clients to discover, evaluate, and select appropriate models based on their specific
+      requirements, such as model type, operational status, supported capabilities, and performance metrics.
+      Each model entry provides detailed information including its unique identifier, version, description,
+      input/output schemas, and extensive metadata, enabling robust integration and dynamic client-side validation.
+      The response includes pagination details to facilitate efficient browsing of a large catalog of models.
+    parameters:
+      - $ref: '#/components/parameters/LimitParam'
+      - $ref: '#/components/parameters/OffsetParam'
+      - name: status
+        in: query
+        description: |
+          Filter models by their current operational status.
+          - `active`: Model is fully operational and ready for inference.
+          - `inactive`: Model is temporarily offline or not yet deployed.
+          - `training`: Model is currently undergoing training or fine-tuning.
+          - `deprecated`: Model is no longer recommended for new integrations but might still be available for existing ones.
+          - `experimental`: Model is in an early stage, potentially unstable, and subject to change.
+        required: false
+        schema:
+          type: string
+          enum: [active, inactive, training, deprecated, experimental]
+        example: active
+      - name: type
+        in: query
+        description: |
+          Filter models by their primary domain or type of task they perform.
+          Examples include 'nlp' (Natural Language Processing), 'computer_vision', 'time_series', 'recommendation', 'generative_ai', 'audio_processing'.
+        required: false
+        schema:
+          type: string
+        example: nlp
+      - name: capabilities
+        in: query
+        description: |
+          Filter models by one or more specific capabilities they possess.
+          This parameter accepts a comma-separated list of capabilities.
+          Examples:
+          - `realtime_inference`: Supports low-latency predictions.
+          - `batch_processing`: Optimized for high-throughput batch predictions.
+          - `fine_tuning_support`: Can be fine-tuned with custom data.
+          - `explainable_ai`: Provides explanations or interpretability for its predictions.
+          - `multimodal`: Can process multiple types of input data (e.g., text and image).
+          - `on_device_deployment`: Suitable for deployment on edge devices.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+        style: form
+        explode: false
+        example: realtime_inference,explainable_ai
+      - name: owner
+        in: query
+        description: Filter models by the team or individual responsible for their maintenance and development.
+        required: false
+        schema:
+          type: string
+        example: team_nlp
+      - name: min_performance_score
+        in: query
+        description: |
+          Filter models that have a performance score greater than or equal to the specified value.
+          Performance scores typically range from 0.0 to 1.0, representing accuracy, F1-score, or similar metrics relevant to the model's task.
+        required: false
+        schema:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+        example: 0.85
+      - name: sort_by
+        in: query
+        description: |
+          Field to sort the results by.
+          Common fields include `id`, `name`, `created_at`, `updated_at`, `version`, `performance_score`, `type`.
+        required: false
+        schema:
+          type: string
+          enum: [id, name, created_at, updated_at, version, performance_score, type]
+        example: created_at
+      - name: sort_order
+        in: query
+        description: Order of sorting. `asc` for ascending (A-Z, 0-9), `desc` for descending (Z-A, 9-0).
+        required: false
+        schema:
+          type: string
+          enum: [asc, desc]
+        example: desc
+    security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+    responses:
+      '200':
+        description: A paginated list of AI models.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIModelListResponse'
+            examples:
+              successfulResponse:
+                summary: Example of a successful response with multiple diverse AI models.
+                value:
+                  total: 3
+                  limit: 10
+                  offset: 0
+                  data:
+                    - id: "model_nlp_sentiment_v1"
+                      name: "Sentiment Analyzer v1"
+                      version: "1.0.0"
+                      type: "nlp"
+                      description: "A robust natural language processing model designed for fine-grained sentiment analysis across various text inputs. Ideal for customer feedback, social media monitoring, and review analysis. Supports multiple languages."
+                      status: "active"
+                      created_at: "2023-01-15T10:00:00Z"
+                      updated_at: "2023-01-15T10:00:00Z"
+                      owner: "team_nlp"
+                      performance_score: 0.925
+                      input_schema:
+                        type: object
+                        description: "Schema for the input data required by the Sentiment Analyzer v1 model."
+                        properties:
+                          text:
+                            type: string
+                            description: "The input text string for sentiment analysis. Maximum length 5000 characters."
+                            maxLength: 5000
+                            example: "This product is absolutely fantastic! I love its features and ease of use, though the price is a bit high."
+                          language:
+                            type: string
+                            description: "Optional. ISO 639-1 language code of the input text (e.g., 'en', 'es'). Defaults to auto-detection."
+                            pattern: "^[a-z]{2}$"
+                            example: "en"
+                        required:
+                          - text
+                      output_schema:
+                        type: object
+                        description: "Schema for the output data produced by the Sentiment Analyzer v1 model."
+                        properties:
+                          sentiment:
+                            type: string
+                            enum: [positive, negative, neutral, mixed]
+                            description: "The predicted sentiment category of the input text."
+                          score:
+                            type: number
+                            format: float
+                            description: "Overall confidence score of the predicted sentiment, ranging from 0.0 to 1.0."
+                            minimum: 0.0
+                            maximum: 1.0
+                          sentiment_breakdown:
+                            type: object
+                            description: "Detailed scores for each sentiment category."
+                            properties:
+                              positive:
+                                type: number
+                                format: float
+                                description: "Score for positive sentiment."
+                              negative:
+                                type: number
+                                format: float
+                                description: "Score for negative sentiment."
+                              neutral:
+                                type: number
+                                format: float
+                                description: "Score for neutral sentiment."
+                              mixed:
+                                type: number
+                                format: float
+                                description: "Score for mixed sentiment."
+                        required:
+                          - sentiment
+                          - score
+                          - sentiment_breakdown
+                      capabilities:
+                        - "realtime_inference"
+                        - "text_classification"
+                        - "multilingual_support"
+                      metadata:
+                        framework: "PyTorch"
+                        license: "Apache 2.0"
+                        training_data_size_gb: 150
+                        last_trained_date: "2023-12-01T08:00:00Z"
+                        supported_languages: ["en", "es", "fr", "de"]
+                    - id: "model_cv_object_detection_yolo_v3"
+                      name: "Object Detector YOLOv3"
+                      version: "3.1.0"
+                      type: "computer_vision"
+                      description: "YOLOv3 model for real-time object detection in images and video frames. Optimized for speed and accuracy in identifying common objects across various environments."
+                      status: "active"
+                      created_at: "2023-02-01T11:30:00Z"
+                      updated_at: "2023-03-01T14:00:00Z"
+                      owner: "team_cv"
+                      performance_score: 0.887
+                      input_schema:
+                        type: object
+                        description: "Schema for the input data required by the Object Detector YOLOv3 model."
+                        properties:
+                          image_url:
+                            type: string
+                            format: uri
+                            description: "URL of the image to analyze. Must be publicly accessible."
+                            example: "https://example.com/images/traffic_scene.jpg"
+                          confidence_threshold:
+                            type: number
+                            format: float
+                            default: 0.5
+                            minimum: 0.0
+                            maximum: 1.0
+                            description: "Minimum confidence score for detected objects to be included in the output."
+                          iou_threshold:
+                            type: number
+                            format: float
+                            default: 0.4
+                            minimum: 0.0
+                            maximum: 1.0
+                            description: "Intersection Over Union (IOU) threshold for non-maximum suppression, used to filter overlapping bounding boxes."
+                        required:
+                          - image_url
+                      output_schema:
+                        type: object
+                        description: "Schema for the output data produced by the Object Detector YOLOv3 model."
+                        properties:
+                          detections:
+                            type: array
+                            description: "A list of detected objects in the image, each with its label, confidence, and bounding box."
+                            items:
+                              type: object
+                              properties:
+                                label:
+                                  type: string
+                                  description: "The class label of the detected object (e.g., 'car', 'person', 'bicycle')."
+                                confidence:
+                                  type: number
+                                  format: float
+                                  description: "Confidence score of the detection, ranging from 0.0 to 1.0."
+                                bbox:
+                                  type: array
+                                  items:
+                                    type: number
+                                    format: float
+                                  minItems: 4
+                                  maxItems: 4
+                                  description: "[x_min, y_min, x_max, y_max] bounding box coordinates, normalized to image dimensions (0-1)."
+                                  example: [0.1, 0.2, 0.3, 0.4]
+                                metadata:
+                                  type: object
+                                  description: "Optional additional metadata for the detection, such as dominant color or size."
+                                  properties:
+                                    color:
+                                      type: string
+                                      description: "Dominant color of the detected object."
+                                      example: "red"
+                                    area:
+                                      type: number
+                                      format: float
+                                      description: "Normalized area of the bounding box."
+                              required:
+                                - label
+                                - confidence
+                                - bbox
+                        required:
+                          - detections
+                      capabilities:
+                        - "realtime_inference"
+                        - "image_analysis"
+                        - "object_localization"
+                        - "video_processing"
+                      metadata:
+                        framework: "TensorFlow"
+                        license: "MIT"
+                        supported_object_classes: ["person", "car", "bus", "truck", "traffic light", "stop sign", "dog", "cat", "bicycle", "motorcycle"]
+                        model_size_mb: 250
+                        training_dataset: "COCO"
+                    - id: "model_gen_text_summarizer_v2"
+                      name: "Text Summarizer v2"
+                      version: "2.0.1"
+                      type: "generative_ai"
+                      description: "An advanced generative AI model for abstractive text summarization. Capable of condensing long documents into concise, coherent summaries while retaining key information and context."
+                      status: "active"
+                      created_at: "2023-05-20T09:15:00Z"
+                      updated_at: "2023-06-10T16:30:00Z"
+                      owner: "team_generative_ai"
+                      performance_score: 0.910
+                      input_schema:
+                        type: object
+                        description: "Schema for the input data required by the Text Summarizer v2 model."
+                        properties:
+                          document:
+                            type: string
+                            description: "The long text document to be summarized. Maximum length 100,000 characters."
+                            maxLength: 100000
+                            example: "The quick brown fox jumps over the lazy dog. This is a classic pangram often used to display typefaces and test keyboards. It contains all letters of the English alphabet. The dog, being lazy, did not react much to the fox's athletic feat. This sentence is a good example for testing text processing algorithms."
+                          summary_length_words:
+                            type: integer
+                            description: "Desired length of the summary in words. If not provided, the model determines an optimal length based on content."
+                            minimum: 10
+                            maximum: 500
+                            example: 50
+                          style:
+                            type: string
+                            enum: [concise, detailed, bullet_points]
+                            default: concise
+                            description: "The desired style of the summary output."
+                          tone:
+                            type: string
+                            enum: [neutral, formal, informal, journalistic]
+                            default: neutral
+                            description: "The desired tone of the generated summary."
+                        required:
+                          - document
+                      output_schema:
+                        type: object
+                        description: "Schema for the output data produced by the Text Summarizer v2 model."
+                        properties:
+                          summary:
+                            type: string
+                            description: "The generated abstractive summary of the document."
+                            example: "The quick brown fox, a classic pangram, jumps over the lazy dog. This sentence is used to test typefaces and keyboards as it contains all English alphabet letters. The dog remained largely unresponsive, making it a good example for text processing tests."
+                          keywords:
+                            type: array
+                            items:
+                              type: string
+                            description: "A list of key terms or phrases extracted from the document, relevant to the summary."
+                            example: ["fox", "dog", "pangram", "alphabet", "text processing"]
+                          readability_score:
+                            type: number
+                            format: float
+                            description: "A Flesch-Kincaid readability score for the generated summary, indicating its ease of understanding."
+                          sentiment_of_summary:
+                            type: string
+                            enum: [positive, negative, neutral, mixed]
+                            description: "The overall sentiment detected in the generated summary."
+                        required:
+                          - summary
+                      capabilities:
+                        - "generative_text"
+                        - "abstractive_summarization"
+                        - "nlp"
+                        - "content_generation"
+                      metadata:
+                        framework: "HuggingFace Transformers"
+                        license: "MIT"
+                        model_architecture: "T5-large"
+                        fine_tuned_datasets: ["CNN/DailyMail", "XSum", "Reddit TIFU"]
+                        max_input_tokens: 1024
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
