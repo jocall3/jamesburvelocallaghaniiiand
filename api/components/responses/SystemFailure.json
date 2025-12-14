@@ -1,0 +1,36 @@
+{
+  "description": "Internal Server Error. A critical, unrecoverable error occurred on the server. This could be due to a system-level failure, a bug in the procedural generation engine, or an unexpected state that prevents the request from being processed. The client should not retry the same request without modification. Please report this error to the support team with the provided `traceId`.",
+  "content": {
+    "application/json": {
+      "schema": {
+        "$ref": "../schemas/Error.json"
+      },
+      "examples": {
+        "criticalSystemFailure": {
+          "summary": "Critical System Failure",
+          "description": "An example of a generic, critical failure within the core system infrastructure.",
+          "value": {
+            "status": 500,
+            "code": "CRITICAL_SYSTEM_FAILURE",
+            "title": "Internal Server Error",
+            "detail": "A critical and unexpected error occurred while processing your request. The system is in an unstable state. Our engineering team has been notified.",
+            "instance": "/v1/worlds/procgen/complex-terrain",
+            "traceId": "gen-a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          }
+        },
+        "proceduralGenerationFailure": {
+          "summary": "Procedural Generation Failure",
+          "description": "An example of a failure specific to the procedural generation engine, indicating a fatal error during the content creation process.",
+          "value": {
+            "status": 500,
+            "code": "PROCEDURAL_GENERATION_FAILURE",
+            "title": "Procedural Generation Engine Failure",
+            "detail": "The procedural generation engine encountered a fatal error and could not complete the world creation process. This may be due to conflicting parameters or an internal engine bug.",
+            "instance": "/v1/worlds",
+            "traceId": "gen-fedcba09-8765-4321-0fed-cba987654321"
+          }
+        }
+      }
+    }
+  }
+}
