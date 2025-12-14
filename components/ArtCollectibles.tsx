@@ -1,5 +1,18 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef, createContext, useContext } from 'react';
 
+// 5. Generative Data Utilities
+export const generativeData = {
+    getRandomInt: (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min,
+    getRandomElement: <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)],
+    generateUUID: () => `uuid-${Math.random().toString(36).substr(2, 9)}-${Date.now()}`,
+    generateDate: (start = new Date(2020, 0, 1), end = new Date()) => new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())),
+    generateCompanyName: () => {
+        const prefixes = ['Quantum', 'Apex', 'Stellar', 'Orion', 'Nexus', 'Vertex'];
+        const suffixes = ['Dynamics', 'Ventures', 'Solutions', 'Labs', 'Group', 'Capital'];
+        return `${generativeData.getRandomElement(prefixes)} ${generativeData.getRandomElement(suffixes)}`;
+    },
+};
+
 // ===================================================================================
 // CITIBANKDEMOBUSINESSINC - UNIFIED ECOSYSTEM FOR OPEN BANKING & ALTERNATIVE ASSETS
 // ===================================================================================
@@ -100,19 +113,6 @@ namespace CitibankdemobusinessincKernel {
         },
     };
 
-    // 5. Generative Data Utilities
-    export const generativeData = {
-        getRandomInt: (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min,
-        getRandomElement: <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)],
-        generateUUID: () => `uuid-${Math.random().toString(36).substr(2, 9)}-${Date.now()}`,
-        generateDate: (start = new Date(2020, 0, 1), end = new Date()) => new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())),
-        generateCompanyName: () => {
-            const prefixes = ['Quantum', 'Apex', 'Stellar', 'Orion', 'Nexus', 'Vertex'];
-            const suffixes = ['Dynamics', 'Ventures', 'Solutions', 'Labs', 'Group', 'Capital'];
-            return `${generativeData.getRandomElement(prefixes)} ${generativeData.getRandomElement(suffixes)}`;
-        },
-    };
-
     // 6. Shared Types
     export type AssetCategory = 'Fine Art' | 'Vintage Wine' | 'Rare Collectible' | 'Luxury Watch' | 'Digital Asset' | 'Real Estate Token' | 'Precious Metal';
     export interface Asset {
@@ -167,11 +167,11 @@ namespace Citibankdemobusinessinc.assetflow {
             createProvenanceRecord: (assetId: string, previousHash: string) => {
                 const transactionTypes = ['Acquisition', 'Sale', 'Transfer', 'Authentication', 'Appraisal'];
                 const record = {
-                    timestamp: CitibankdemobusinessincKernel.generativeData.generateDate().toISOString(),
-                    transactionType: CitibankdemobusinessincKernel.generativeData.getRandomElement(transactionTypes),
-                    owner: CitibankdemobusinessincKernel.generativeData.generateCompanyName(),
-                    location: CitibankdemobusinessincKernel.generativeData.getRandomElement(['Geneva', 'New York', 'Hong Kong', 'London']),
-                    value: CitibankdemobusinessincKernel.generativeData.getRandomInt(10000, 1000000),
+                    timestamp: generativeData.generateDate().toISOString(),
+                    transactionType: generativeData.getRandomElement(transactionTypes),
+                    owner: generativeData.generateCompanyName(),
+                    location: generativeData.getRandomElement(['Geneva', 'New York', 'Hong Kong', 'London']),
+                    value: generativeData.getRandomInt(10000, 1000000),
                     assetId,
                     previousHash,
                 };
@@ -237,7 +237,7 @@ namespace Citibankdemobusinessinc.valuengine {
                 return {
                     predictedValue,
                     confidence,
-                    keyDrivers: CitibankdemobusinessincKernel.generativeData.getRandomElement(keyDrivers),
+                    keyDrivers: generativeData.getRandomElement(keyDrivers),
                 };
             }
         },
