@@ -296,7 +296,7 @@ const SAppLayout = () => {
     return <div>Error: DataContext not found.</div>;
   }
 
-  const { isLoading, error, activeView, setActiveView } = dataContext;
+  const { isLoading, error } = dataContext;
 
   if (isLoading) {
     return (
@@ -333,13 +333,6 @@ const SAppLayout = () => {
         </div>
       );
   }
-  
-  if (!isAuthenticated) {
-      return <Navigate to="/login" replace />;
-  }
-
-  const { Component, props } = getComponentForView(activeView);
-  const finalProps = { setActiveView, ...props };
 
   return (
     <div className="flex h-screen bg-gray-900 text-white overflow-hidden font-sans">
@@ -358,17 +351,7 @@ const SAppLayout = () => {
         <Header onMenuClick={() => setIsSidebarOpen(true)} />
         
         <main className="w-full flex-grow p-6">
-            {Component ? (
-                (typeof activeView === 'string' && activeView.startsWith('Citibank')) ? (
-                    <CitiAuthGate>
-                        <Component {...finalProps} />
-                    </CitiAuthGate>
-                ) : (
-                    <Component {...finalProps} />
-                )
-            ) : (
-                <UnderConstructionView />
-            )}
+            <Outlet />
         </main>
       </div>
     </div>
