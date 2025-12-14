@@ -16,16 +16,17 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: self-hosted  # <--- changed from ubuntu-latest
+    runs-on: self-hosted
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+      # Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Install Node.js (if needed)
+      # Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -35,20 +36,22 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Build the project (adjust if needed)
+      # Build project
       - name: Build
         run: npm run build
 
-      # Deploy to GitHub Pages
-      - name: Deploy
+      # Configure Pages deployment
+      - name: Configure Pages
         id: deployment
         uses: actions/configure-pages@v3
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+      # Upload the build folder as artifact (v4)
+      - name: Upload Pages artifact
+        uses: actions/upload-artifact@v4
         with:
-          path: ./build  # adjust to your build output folder
+          name: pages-build
+          path: ./build
 
+      # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v1
-
