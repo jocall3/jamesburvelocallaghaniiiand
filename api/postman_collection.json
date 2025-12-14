@@ -1,0 +1,1319 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+		"name": "File Analysis and Transformation API",
+		"description": "A comprehensive Postman collection for interacting with the File Analysis and Transformation API. This API allows for deep analysis, manipulation, and management of uploaded files. It's designed for scalability and provides a rich set of features for developers building content-heavy applications.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "File Management",
+			"description": "Endpoints for basic file lifecycle operations: uploading, retrieving, updating, and deleting files.",
+			"item": [
+				{
+					"name": "Upload a new file",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/path/to/your/document.pdf"
+								},
+								{
+									"key": "metadata",
+									"value": "{\"description\": \"Annual financial report for Q4.\", \"tags\": [\"finance\", \"report\", \"annual\"]}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/files",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files"
+							]
+						},
+						"description": "Uploads a new file to the system. You can include optional metadata as a JSON string in the 'metadata' field."
+					},
+					"response": [
+						{
+							"name": "File Uploaded Successfully",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{baseUrl}}/files",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"fileId\": \"file-abc-123-xyz-789\",\n    \"fileName\": \"document.pdf\",\n    \"fileType\": \"application/pdf\",\n    \"sizeBytes\": 1048576,\n    \"uploadTimestamp\": \"2023-10-27T10:00:00Z\",\n    \"status\": \"processing\",\n    \"metadata\": {\n        \"description\": \"Annual financial report for Q4.\",\n        \"tags\": [\n            \"finance\",\n            \"report\",\n            \"annual\"\n        ]\n    },\n    \"_links\": {\n        \"self\": {\n            \"href\": \"/v1/files/file-abc-123-xyz-789\"\n        },\n        \"analysis\": {\n            \"href\": \"/v1/files/file-abc-123-xyz-789/analysis\"\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "List all files",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/files?limit=20&offset=0&sortBy=uploadTimestamp&order=desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "sortBy",
+									"value": "uploadTimestamp"
+								},
+								{
+									"key": "order",
+									"value": "desc"
+								}
+							]
+						},
+						"description": "Retrieves a paginated list of all files accessible by the user. Supports sorting and filtering."
+					},
+					"response": [
+						{
+							"name": "List of Files",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/files",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"pagination\": {\n        \"totalItems\": 150,\n        \"limit\": 20,\n        \"offset\": 0,\n        \"totalPages\": 8,\n        \"currentPage\": 1\n    },\n    \"data\": [\n        {\n            \"fileId\": \"file-abc-123-xyz-789\",\n            \"fileName\": \"document.pdf\",\n            \"fileType\": \"application/pdf\",\n            \"sizeBytes\": 1048576,\n            \"uploadTimestamp\": \"2023-10-27T10:00:00Z\",\n            \"status\": \"available\"\n        },\n        {\n            \"fileId\": \"file-def-456-uvw-123\",\n            \"fileName\": \"image.jpg\",\n            \"fileType\": \"image/jpeg\",\n            \"sizeBytes\": 524288,\n            \"uploadTimestamp\": \"2023-10-27T09:30:00Z\",\n            \"status\": \"available\"\n        }\n    ],\n    \"_links\": {\n        \"self\": {\n            \"href\": \"/v1/files?limit=20&offset=0\"\n        },\n        \"next\": {\n            \"href\": \"/v1/files?limit=20&offset=20\"\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get file details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}"
+							]
+						},
+						"description": "Retrieves detailed information about a specific file by its unique ID."
+					},
+					"response": [
+						{
+							"name": "File Details",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"fileId\": \"file-abc-123-xyz-789\",\n    \"fileName\": \"document.pdf\",\n    \"fileType\": \"application/pdf\",\n    \"sizeBytes\": 1048576,\n    \"uploadTimestamp\": \"2023-10-27T10:00:00Z\",\n    \"lastModified\": \"2023-10-27T10:05:00Z\",\n    \"status\": \"available\",\n    \"checksums\": {\n        \"md5\": \"d41d8cd98f00b204e9800998ecf8427e\",\n        \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    \"metadata\": {\n        \"description\": \"Annual financial report for Q4.\",\n        \"tags\": [\n            \"finance\",\n            \"report\",\n            \"annual\"\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update file details",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fileName\": \"Q4_Financial_Report_Final.pdf\",\n    \"metadata\": {\n        \"description\": \"The final, approved annual financial report for Q4.\",\n        \"tags\": [\"finance\", \"report\", \"annual\", \"final\"],\n        \"reviewStatus\": \"approved\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}"
+							]
+						},
+						"description": "Updates the mutable properties of a file, such as its name or custom metadata."
+					},
+					"response": [
+						{
+							"name": "File Updated",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"fileId\": \"file-abc-123-xyz-789\",\n    \"fileName\": \"Q4_Financial_Report_Final.pdf\",\n    \"fileType\": \"application/pdf\",\n    \"sizeBytes\": 1048576,\n    \"uploadTimestamp\": \"2023-10-27T10:00:00Z\",\n    \"lastModified\": \"2023-10-27T11:30:00Z\",\n    \"status\": \"available\",\n    \"metadata\": {\n        \"description\": \"The final, approved annual financial report for Q4.\",\n        \"tags\": [\n            \"finance\",\n            \"report\",\n            \"annual\",\n            \"final\"\n        ],\n        \"reviewStatus\": \"approved\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete a file",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}"
+							]
+						},
+						"description": "Permanently deletes a file from the system. This action is irreversible."
+					},
+					"response": [
+						{
+							"name": "File Deleted",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}"
+									]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Download a file",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}/download",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}",
+								"download"
+							]
+						},
+						"description": "Downloads the raw binary content of the specified file."
+					},
+					"response": [
+						{
+							"name": "File Content",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}/download",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}",
+										"download"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/pdf"
+								},
+								{
+									"key": "Content-Disposition",
+									"value": "attachment; filename=\"document.pdf\""
+								}
+							],
+							"cookie": [],
+							"body": "[Raw file binary data]"
+						}
+					]
+				},
+				{
+					"name": "Copy a file",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"newFileName\": \"Copy of Q4_Financial_Report.pdf\",\n    \"copyMetadata\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}/copy",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}",
+								"copy"
+							]
+						},
+						"description": "Creates a duplicate of an existing file. A new file ID will be generated for the copy."
+					},
+					"response": [
+						{
+							"name": "File Copied",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}/copy",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}",
+										"copy"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"fileId\": \"file-ghi-789-rst-456\",\n    \"fileName\": \"Copy of Q4_Financial_Report.pdf\",\n    \"fileType\": \"application/pdf\",\n    \"sizeBytes\": 1048576,\n    \"uploadTimestamp\": \"2023-10-27T12:00:00Z\",\n    \"status\": \"available\",\n    \"sourceFileId\": \"file-abc-123-xyz-789\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Content Analysis",
+			"description": "Endpoints for analyzing the content of a file, such as extracting text, identifying keywords, and performing sentiment analysis.",
+			"item": [
+				{
+					"name": "Get content summary",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}/analysis/summary",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}",
+								"analysis",
+								"summary"
+							]
+						},
+						"description": "Provides a high-level summary of the file's content, including word counts, language, and key topics."
+					},
+					"response": [
+						{
+							"name": "Content Summary",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}/analysis/summary",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}",
+										"analysis",
+										"summary"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"fileId\": \"file-abc-123-xyz-789\",\n    \"analysisTimestamp\": \"2023-10-27T10:15:00Z\",\n    \"summary\": {\n        \"language\": {\n            \"code\": \"en\",\n            \"name\": \"English\",\n            \"confidence\": 0.98\n        },\n        \"counts\": {\n            \"words\": 15230,\n            \"characters\": 91380,\n            \"sentences\": 750,\n            \"paragraphs\": 120\n        },\n        \"keywords\": [\n            \"revenue\",\n            \"profit\",\n            \"q4\",\n            \"growth\",\n            \"market\"\n        ],\n        \"sentiment\": {\n            \"score\": 0.65,\n            \"label\": \"positive\"\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Extract plain text",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}/analysis/text",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}",
+								"analysis",
+								"text"
+							]
+						},
+						"description": "Extracts and returns the full plain text content from the file, stripping any formatting."
+					},
+					"response": [
+						{
+							"name": "Plain Text Content",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}/analysis/text",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}",
+										"analysis",
+										"text"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"fileId\": \"file-abc-123-xyz-789\",\n    \"textContent\": \"This is the extracted plain text from the document. It includes all paragraphs and sentences without any of the original formatting...\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Identify keywords",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}/analysis/keywords?limit=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}",
+								"analysis",
+								"keywords"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Identifies and ranks the most relevant keywords or key phrases from the file's content."
+					},
+					"response": [
+						{
+							"name": "Keywords",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}/analysis/keywords",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}",
+										"analysis",
+										"keywords"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"fileId\": \"file-abc-123-xyz-789\",\n    \"keywords\": [\n        {\n            \"text\": \"revenue growth\",\n            \"relevance\": 0.95,\n            \"count\": 42\n        },\n        {\n            \"text\": \"market share\",\n            \"relevance\": 0.88,\n            \"count\": 35\n        },\n        {\n            \"text\": \"net profit\",\n            \"relevance\": 0.85,\n            \"count\": 31\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Entity Recognition (NER)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}/analysis/entities?types=PERSON,ORG,LOCATION",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}",
+								"analysis",
+								"entities"
+							],
+							"query": [
+								{
+									"key": "types",
+									"value": "PERSON,ORG,LOCATION"
+								}
+							]
+						},
+						"description": "Performs Named Entity Recognition (NER) to identify and categorize entities like people, organizations, locations, dates, etc."
+					},
+					"response": [
+						{
+							"name": "Named Entities",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}/analysis/entities",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}",
+										"analysis",
+										"entities"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"fileId\": \"file-abc-123-xyz-789\",\n    \"entities\": {\n        \"PERSON\": [\n            {\n                \"text\": \"Jane Doe\",\n                \"count\": 5,\n                \"context\": [\"...as stated by CEO Jane Doe...\"]\n            }\n        ],\n        \"ORG\": [\n            {\n                \"text\": \"Acme Corporation\",\n                \"count\": 25,\n                \"context\": [\"Acme Corporation reported record profits...\"]\n            }\n        ],\n        \"LOCATION\": [\n            {\n                \"text\": \"New York\",\n                \"count\": 12,\n                \"context\": [\"...our headquarters in New York...\"]\n            }\n        ]\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Data Transformation",
+			"description": "Endpoints for converting files from one format to another, such as PDF to text or Word to HTML.",
+			"item": [
+				{
+					"name": "Convert to PDF",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"options\": {\n        \"pageSize\": \"A4\",\n        \"orientation\": \"portrait\",\n        \"margins\": {\n            \"top\": \"20mm\",\n            \"bottom\": \"20mm\"\n        }\n    },\n    \"destinationFileName\": \"converted_report.pdf\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}/transform/pdf",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}",
+								"transform",
+								"pdf"
+							]
+						},
+						"description": "Converts the source file into a PDF document. This is an asynchronous operation that returns a job ID."
+					},
+					"response": [
+						{
+							"name": "Conversion Job Started",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}/transform/pdf",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}",
+										"transform",
+										"pdf"
+									]
+								}
+							},
+							"status": "Accepted",
+							"code": 202,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"jobId\": \"job-transform-pdf-98765\",\n    \"status\": \"queued\",\n    \"sourceFileId\": \"file-abc-123-xyz-789\",\n    \"targetFormat\": \"pdf\",\n    \"estimatedCompletionTime\": \"2023-10-27T12:05:00Z\",\n    \"_links\": {\n        \"status\": {\n            \"href\": \"/v1/jobs/job-transform-pdf-98765\"\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Compress file (e.g., to ZIP)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"format\": \"zip\",\n    \"compressionLevel\": 9,\n    \"password\": \"supersecret\",\n    \"destinationFileName\": \"archive.zip\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}/transform/compress",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}",
+								"transform",
+								"compress"
+							]
+						},
+						"description": "Compresses the file into an archive format like ZIP or GZ. This is an asynchronous operation."
+					},
+					"response": [
+						{
+							"name": "Compression Job Started",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}/transform/compress",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}",
+										"transform",
+										"compress"
+									]
+								}
+							},
+							"status": "Accepted",
+							"code": 202,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"jobId\": \"job-compress-zip-54321\",\n    \"status\": \"queued\",\n    \"sourceFileId\": \"file-abc-123-xyz-789\",\n    \"targetFormat\": \"zip\",\n    \"_links\": {\n        \"status\": {\n            \"href\": \"/v1/jobs/job-compress-zip-54321\"\n        }\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Image Processing",
+			"description": "Endpoints specifically for manipulating and analyzing image files.",
+			"item": [
+				{
+					"name": "Generate thumbnail",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"width\": 200,\n    \"height\": 200,\n    \"format\": \"png\",\n    \"fit\": \"cover\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}/image/thumbnail",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}",
+								"image",
+								"thumbnail"
+							]
+						},
+						"description": "Generates a thumbnail for an image file. Returns the new thumbnail image directly."
+					},
+					"response": [
+						{
+							"name": "Thumbnail Image",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}/image/thumbnail",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}",
+										"image",
+										"thumbnail"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "image/png"
+								}
+							],
+							"cookie": [],
+							"body": "[Raw thumbnail image binary data]"
+						}
+					]
+				},
+				{
+					"name": "Extract text (OCR)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}/image/ocr?language=eng",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}",
+								"image",
+								"ocr"
+							],
+							"query": [
+								{
+									"key": "language",
+									"value": "eng"
+								}
+							]
+						},
+						"description": "Performs Optical Character Recognition (OCR) on an image to extract any text it contains."
+					},
+					"response": [
+						{
+							"name": "OCR Results",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}/image/ocr",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}",
+										"image",
+										"ocr"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"fileId\": \"file-def-456-uvw-123\",\n    \"language\": \"eng\",\n    \"confidence\": 0.92,\n    \"text\": \"This is the text extracted from the image.\",\n    \"blocks\": [\n        {\n            \"text\": \"This is the text\",\n            \"confidence\": 0.95,\n            \"boundingBox\": {\n                \"x\": 50,\n                \"y\": 100,\n                \"width\": 300,\n                \"height\": 40\n            }\n        }\n    ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Security & Compliance",
+			"description": "Endpoints for security scanning, data redaction, and compliance checks.",
+			"item": [
+				{
+					"name": "Scan for viruses",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}/security/scan",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}",
+								"security",
+								"scan"
+							]
+						},
+						"description": "Initiates a virus scan on the specified file. This is an asynchronous operation."
+					},
+					"response": [
+						{
+							"name": "Scan Job Started",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}/security/scan",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}",
+										"security",
+										"scan"
+									]
+								}
+							},
+							"status": "Accepted",
+							"code": 202,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"jobId\": \"job-scan-virus-11223\",\n    \"status\": \"queued\",\n    \"fileId\": \"file-abc-123-xyz-789\",\n    \"_links\": {\n        \"status\": {\n            \"href\": \"/v1/jobs/job-scan-virus-11223\"\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Redact sensitive data (PII)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"redactionRules\": [\n        \"EMAIL_ADDRESS\",\n        \"PHONE_NUMBER\",\n        \"CREDIT_CARD_NUMBER\"\n    ],\n    \"redactionCharacter\": \"*\",\n    \"createNewVersion\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}/security/redact",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}",
+								"security",
+								"redact"
+							]
+						},
+						"description": "Scans the file for Personally Identifiable Information (PII) and redacts it, creating a new version of the file."
+					},
+					"response": [
+						{
+							"name": "Redaction Job Started",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}/security/redact",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}",
+										"security",
+										"redact"
+									]
+								}
+							},
+							"status": "Accepted",
+							"code": 202,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"jobId\": \"job-redact-pii-44556\",\n    \"status\": \"queued\",\n    \"fileId\": \"file-abc-123-xyz-789\",\n    \"_links\": {\n        \"status\": {\n            \"href\": \"/v1/jobs/job-redact-pii-44556\"\n        }\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Versioning & History",
+			"description": "Endpoints for managing file versions and viewing audit trails.",
+			"item": [
+				{
+					"name": "List file versions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}/versions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}",
+								"versions"
+							]
+						},
+						"description": "Retrieves a list of all available versions for a specific file."
+					},
+					"response": [
+						{
+							"name": "File Versions",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}/versions",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}",
+										"versions"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"fileId\": \"file-abc-123-xyz-789\",\n    \"versions\": [\n        {\n            \"versionId\": \"ver-2\",\n            \"timestamp\": \"2023-10-27T11:30:00Z\",\n            \"sizeBytes\": 1048580,\n            \"author\": \"user-123\",\n            \"comment\": \"Updated file name and metadata.\"\n        },\n        {\n            \"versionId\": \"ver-1\",\n            \"timestamp\": \"2023-10-27T10:00:00Z\",\n            \"sizeBytes\": 1048576,\n            \"author\": \"user-123\",\n            \"comment\": \"Initial upload.\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Revert to a version",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/files/{{fileId}}/versions/ver-1/revert",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"files",
+								"{{fileId}}",
+								"versions",
+								"ver-1",
+								"revert"
+							]
+						},
+						"description": "Reverts the file to a previous version, creating a new version that is a copy of the old one."
+					},
+					"response": [
+						{
+							"name": "Revert Successful",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/files/{{fileId}}/versions/ver-1/revert",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"files",
+										"{{fileId}}",
+										"versions",
+										"ver-1",
+										"revert"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"fileId\": \"file-abc-123-xyz-789\",\n    \"newVersionId\": \"ver-3\",\n    \"revertedFromVersionId\": \"ver-1\",\n    \"timestamp\": \"2023-10-27T14:00:00Z\",\n    \"comment\": \"Reverted to version ver-1.\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Webhooks",
+			"description": "Manage webhooks to receive real-time notifications about events in the system.",
+			"item": [
+				{
+					"name": "Create a webhook",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"targetUrl\": \"https://myapp.com/webhooks/file-events\",\n    \"events\": [\n        \"file.uploaded\",\n        \"file.analysis.completed\",\n        \"file.deleted\"\n    ],\n    \"secret\": \"a-very-strong-secret-for-signature\",\n    \"isActive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/webhooks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"webhooks"
+							]
+						},
+						"description": "Registers a new webhook to receive notifications for specific events."
+					},
+					"response": [
+						{
+							"name": "Webhook Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/webhooks",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"webhooks"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"webhookId\": \"wh-a1b2c3d4e5\",\n    \"targetUrl\": \"https://myapp.com/webhooks/file-events\",\n    \"events\": [\n        \"file.uploaded\",\n        \"file.analysis.completed\",\n        \"file.deleted\"\n    ],\n    \"isActive\": true,\n    \"createdTimestamp\": \"2023-10-27T15:00:00Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "List webhooks",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/webhooks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"webhooks"
+							]
+						},
+						"description": "Retrieves a list of all configured webhooks for the account."
+					},
+					"response": [
+						{
+							"name": "List of Webhooks",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/webhooks",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"webhooks"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"webhookId\": \"wh-a1b2c3d4e5\",\n            \"targetUrl\": \"https://myapp.com/webhooks/file-events\",\n            \"events\": [\n                \"file.uploaded\",\n                \"file.analysis.completed\",\n                \"file.deleted\"\n            ],\n            \"isActive\": true\n        }\n    ]\n}"
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{apiKey}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://api.example.com/v1",
+			"type": "string",
+			"description": "The base URL for all API requests."
+		},
+		{
+			"key": "apiKey",
+			"value": "YOUR_API_KEY_HERE",
+			"type": "string",
+			"description": "Your personal API key for authentication."
+		},
+		{
+			"key": "fileId",
+			"value": "file-abc-123-xyz-789",
+			"type": "string",
+			"description": "A sample file ID to use in path parameters."
+		}
+	]
+}
