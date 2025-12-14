@@ -1,0 +1,123 @@
+openapi: 3.1.0
+info:
+  title: Comprehensive File Analysis and Data Extraction API
+  version: 1.0.0
+  description: |
+    An advanced, large-scale API for the automated analysis, parsing, and conversion of complex files into structured data. This API is designed for high-throughput, enterprise-grade workflows, enabling developers to programmatically upload files, initiate analysis jobs, and retrieve detailed, nested data structures in a standardized format.
+
+    Key Features:
+    - **Asynchronous Job Processing**: Submit large files and track analysis progress via job IDs and webhooks.
+    - **Rich Data Extraction**: Extracts a wide range of entities, relationships, and metadata from various file types.
+    - **Extensive Schema Generation**: Automatically generates and exposes detailed schemas for the extracted data.
+    - **Scalable & Secure**: Built for massive scale with robust authentication and authorization mechanisms.
+    - **Developer-Friendly**: Fully documented with comprehensive examples, ready for SDK and client generation.
+  contact:
+    name: API Support Team
+    url: https://api.example.com/support
+    email: support@example.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  x-logo:
+    url: 'https://api.example.com/logo.png'
+    altText: 'Project Logo'
+servers:
+  - url: https://api.example.com/v1
+    description: Production server for the File Analysis API.
+  - url: https://staging-api.example.com/v1
+    description: Staging server for testing and development.
+  - url: http://localhost:8080/v1
+    description: Local development server for internal testing.
+tags:
+  - name: File Management
+    description: Endpoints for uploading, managing, and retrieving raw files.
+  - name: Analysis Jobs
+    description: Operations to create, monitor, and manage file analysis jobs.
+  - name: Results & Data Extraction
+    description: Endpoints for fetching the structured data results from completed analysis jobs.
+  - name: Schema Management
+    description: Operations for retrieving and managing the schemas of extracted data.
+  - name: User & Access Management
+    description: Endpoints related to user accounts, permissions, and API keys.
+  - name: Webhooks
+    description: Operations for managing webhook subscriptions for asynchronous event notifications.
+externalDocs:
+  description: Find more detailed documentation, tutorials, and guides here.
+  url: https://docs.example.com
+paths:
+  # References to modular path files for scalability
+  /files:
+    $ref: './paths/files.yaml'
+  /files/{fileId}:
+    $ref: './paths/file_by_id.yaml'
+  /analysis-jobs:
+    $ref: './paths/analysis_jobs.yaml'
+  /analysis-jobs/{jobId}:
+    $ref: './paths/analysis_job_by_id.yaml'
+  /analysis-jobs/{jobId}/results:
+    $ref: './paths/analysis_job_results.yaml'
+  /schemas:
+    $ref: './paths/schemas.yaml'
+  /schemas/{schemaId}:
+    $ref: './paths/schema_by_id.yaml'
+  /users/me:
+    $ref: './paths/user_me.yaml'
+  /webhooks:
+    $ref: './paths/webhooks.yaml'
+  /webhooks/{webhookId}:
+    $ref: './paths/webhook_by_id.yaml'
+webhooks:
+  analysis.completed:
+    $ref: './webhooks/analysis_completed.yaml'
+  analysis.failed:
+    $ref: './webhooks/analysis_failed.yaml'
+components:
+  schemas:
+    $ref: './components/schemas/index.yaml'
+  responses:
+    $ref: './components/responses.yaml'
+  parameters:
+    $ref: './components/parameters.yaml'
+  examples:
+    $ref: './components/examples.yaml'
+  requestBodies:
+    $ref: './components/request_bodies.yaml'
+  headers:
+    $ref: './components/headers.yaml'
+  securitySchemes:
+    # OAuth2 for user-delegated and application-level access
+    OAuth2:
+      type: oauth2
+      description: |
+        Standard OAuth2 authentication for secure access. Supports both client credentials for M2M communication and authorization code flow for user-facing applications.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.example.com/oauth/token
+          scopes:
+            'analysis:jobs:write': Create and manage analysis jobs.
+            'analysis:jobs:read': Read analysis job status and results.
+            'files:write': Upload and manage files.
+            'files:read': Download and list files.
+        authorizationCode:
+          authorizationUrl: https://auth.example.com/oauth/authorize
+          tokenUrl: https://auth.example.com/oauth/token
+          scopes:
+            'analysis:jobs:write': Create and manage analysis jobs.
+            'analysis:jobs:read': Read analysis job status and results.
+            'files:write': Upload and manage files.
+            'files:read': Download and list files.
+            'profile': Read user profile information.
+    # API Key for simple, programmatic server-to-server authentication
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: |
+        API Key for simple, programmatic authentication. The key should be provided in the `X-API-Key` HTTP header on all requests.
+security:
+  # By default, endpoints can be accessed using either OAuth2 or an API Key.
+  # This can be overridden at the operation level.
+  - OAuth2:
+      - 'analysis:jobs:read'
+      - 'files:read'
+  - ApiKeyAuth: []
