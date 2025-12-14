@@ -1,0 +1,886 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "James Burvel O'Callaghan III Financial OS API",
+    "version": "9.0.0-ALPHA-OMEGA",
+    "description": "The definitive, high-performance interface for the James Burvel O'Callaghan III Financial Operating System. This specification defines the contract for a global, multi-currency, high-frequency financial engine. It encompasses ledger management, real-time trading, regulatory compliance (KYC/AML), and immutable audit logging. Designed for massive concurrency and fault tolerance.",
+    "termsOfService": "https://jboc3-financial.com/legal/terms",
+    "contact": {
+      "name": "JBOC3 API Engineering Team",
+      "url": "https://developer.jboc3-financial.com",
+      "email": "noc@jboc3-financial.com"
+    },
+    "license": {
+      "name": "JBOC3 Enterprise Proprietary License",
+      "url": "https://jboc3-financial.com/legal/license"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.jboc3-financial.com/v9",
+      "description": "Production - Primary High-Frequency Cluster"
+    },
+    {
+      "url": "https://audit-core.jboc3-financial.com/v9",
+      "description": "Audit - Immutable Ledger Read-Only Access"
+    },
+    {
+      "url": "https://failsafe-dr.jboc3-financial.com/v9",
+      "description": "Failsafe - Disaster Recovery & Continuity Node"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Accounts",
+      "description": "Management of sovereign and sub-ledger accounts."
+    },
+    {
+      "name": "Transactions",
+      "description": "Real-time payment processing and settlement."
+    },
+    {
+      "name": "Ledger",
+      "description": "Immutable core banking ledger operations."
+    },
+    {
+      "name": "Compliance",
+      "description": "KYC, AML, and regulatory reporting endpoints."
+    },
+    {
+      "name": "Trading",
+      "description": "High-frequency market order execution."
+    }
+  ],
+  "paths": {
+    "/accounts": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "summary": "List all accounts",
+        "description": "Retrieves a paginated list of all financial accounts within the authorized scope. Supports complex filtering by currency, status, and risk profile.",
+        "operationId": "listAccounts",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination.",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of items per page.",
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 1000
+            }
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "description": "Filter by ISO 4217 currency code.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$",
+              "example": "USD"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of account list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "security": [
+          {
+            "OAuth2": [
+              "accounts:read"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "summary": "Create a new account",
+        "description": "Provisions a new financial account. Triggers asynchronous KYC verification processes.",
+        "operationId": "createAccount",
+        "requestBody": {
+          "description": "Account creation payload.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAccountRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        },
+        "security": [
+          {
+            "OAuth2": [
+              "accounts:write"
+            ]
+          }
+        ]
+      }
+    },
+    "/accounts/{accountId}": {
+      "get": {
+        "tags": [
+          "Accounts"
+        ],
+        "summary": "Get account details",
+        "description": "Retrieves detailed information for a specific account, including current balance and status.",
+        "operationId": "getAccountById",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the account.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account details retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        },
+        "security": [
+          {
+            "OAuth2": [
+              "accounts:read"
+            ]
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Accounts"
+        ],
+        "summary": "Update account status",
+        "description": "Updates mutable fields of an account, such as status (freeze/unfreeze) or metadata.",
+        "operationId": "updateAccount",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Account updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2": [
+              "accounts:admin"
+            ]
+          }
+        ]
+      }
+    },
+    "/transactions/transfer": {
+      "post": {
+        "tags": [
+          "Transactions"
+        ],
+        "summary": "Execute fund transfer",
+        "description": "Initiates a synchronous fund transfer between two accounts within the system or to an external gateway.",
+        "operationId": "executeTransfer",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transfer executed successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionReceipt"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Insufficient funds.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2": [
+              "transactions:execute"
+            ],
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/ledger/entries": {
+      "get": {
+        "tags": [
+          "Ledger"
+        ],
+        "summary": "Query ledger entries",
+        "description": "Low-level query interface for the immutable ledger. Used primarily by audit systems.",
+        "operationId": "queryLedger",
+        "parameters": [
+          {
+            "name": "startTime",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endTime",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "accountId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ledger entries retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LedgerEntryList"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2": [
+              "ledger:read"
+            ]
+          }
+        ]
+      }
+    },
+    "/trading/orders": {
+      "post": {
+        "tags": [
+          "Trading"
+        ],
+        "summary": "Place market order",
+        "description": "Submits a high-frequency trading order to the matching engine.",
+        "operationId": "placeOrder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarketOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order accepted and queued.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderConfirmation"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2": [
+              "trading:execute"
+            ]
+          }
+        ]
+      }
+    },
+    "/compliance/kyc/verify": {
+      "post": {
+        "tags": [
+          "Compliance"
+        ],
+        "summary": "Submit KYC documents",
+        "description": "Uploads identity documents for automated verification against global watchlists.",
+        "operationId": "submitKYC",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "documentType": {
+                    "type": "string",
+                    "enum": [
+                      "PASSPORT",
+                      "DRIVERS_LICENSE",
+                      "NATIONAL_ID"
+                    ]
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "userId",
+                  "documentType",
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Documents accepted for processing.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "verificationId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "PENDING"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2": [
+              "compliance:write"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Account": {
+        "type": "object",
+        "description": "Represents a financial account within the OS.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Reference to the Identity owning this account."
+          },
+          "accountNumber": {
+            "type": "string",
+            "example": "9876543210"
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$",
+            "example": "USD"
+          },
+          "balance": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "FROZEN",
+              "CLOSED",
+              "PENDING_KYC"
+            ],
+            "default": "PENDING_KYC"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "id",
+          "ownerId",
+          "currency",
+          "balance",
+          "status"
+        ]
+      },
+      "CreateAccountRequest": {
+        "type": "object",
+        "properties": {
+          "ownerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "currency": {
+            "type": "string",
+            "default": "USD"
+          },
+          "initialDeposit": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "accountType": {
+            "type": "string",
+            "enum": [
+              "CHECKING",
+              "SAVINGS",
+              "INVESTMENT",
+              "ESCROW"
+            ]
+          }
+        },
+        "required": [
+          "ownerId",
+          "accountType"
+        ]
+      },
+      "UpdateAccountRequest": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "FROZEN",
+              "CLOSED"
+            ]
+          },
+          "metadata": {
+            "type": "object"
+          }
+        }
+      },
+      "AccountListResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Account"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        }
+      },
+      "Money": {
+        "type": "object",
+        "description": "Monetary value representation to avoid floating point errors.",
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "description": "Amount in minor units (e.g., cents).",
+            "example": 10000
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 Currency Code",
+            "example": "USD"
+          },
+          "scale": {
+            "type": "integer",
+            "description": "Number of decimal places.",
+            "default": 2
+          }
+        },
+        "required": [
+          "amount",
+          "currency"
+        ]
+      },
+      "TransferRequest": {
+        "type": "object",
+        "properties": {
+          "sourceAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "destinationAccountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "reference": {
+            "type": "string",
+            "maxLength": 140
+          },
+          "scheduledDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Optional future date for execution."
+          }
+        },
+        "required": [
+          "sourceAccountId",
+          "destinationAccountId",
+          "amount"
+        ]
+      },
+      "TransactionReceipt": {
+        "type": "object",
+        "properties": {
+          "transactionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "COMPLETED",
+              "PENDING",
+              "FAILED"
+            ]
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fees": {
+            "$ref": "#/components/schemas/Money"
+          }
+        }
+      },
+      "LedgerEntryList": {
+        "type": "object",
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LedgerEntry"
+            }
+          }
+        }
+      },
+      "LedgerEntry": {
+        "type": "object",
+        "properties": {
+          "entryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "DEBIT",
+              "CREDIT"
+            ]
+          },
+          "balanceAfter": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "hash": {
+            "type": "string",
+            "description": "Cryptographic hash of the entry for immutability verification."
+          }
+        }
+      },
+      "MarketOrderRequest": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "symbol": {
+            "type": "string",
+            "example": "AAPL"
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "BUY",
+              "SELL"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "MARKET",
+              "LIMIT",
+              "STOP_LOSS"
+            ]
+          },
+          "quantity": {
+            "type": "number",
+            "format": "double"
+          },
+          "price": {
+            "type": "number",
+            "format": "double",
+            "description": "Required for LIMIT orders."
+          }
+        },
+        "required": [
+          "accountId",
+          "symbol",
+          "side",
+          "type",
+          "quantity"
+        ]
+      },
+      "OrderConfirmation": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "example": "QUEUED"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PaginationMeta": {
+        "type": "object",
+        "properties": {
+          "currentPage": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "totalItems": {
+            "type": "integer"
+          },
+          "itemsPerPage": {
+            "type": "integer"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "ERR_INSUFFICIENT_FUNDS"
+          },
+          "message": {
+            "type": "string",
+            "example": "The account does not have enough balance to cover this transaction."
+          },
+          "traceId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      }
+    },
+    "responses": {
+      "UnauthorizedError": {
+        "description": "Authentication token is missing or invalid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "ForbiddenError": {
+        "description": "User does not have permission to access this resource.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "NotFoundError": {
+        "description": "The requested resource was not found.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "The request payload failed validation.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "OAuth2": {
+        "type": "oauth2",
+        "description": "Standard OAuth 2.0 authorization code flow.",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.jboc3-financial.com/oauth/authorize",
+            "tokenUrl": "https://auth.jboc3-financial.com/oauth/token",
+            "scopes": {
+              "accounts:read": "Read access to account details",
+              "accounts:write": "Create new accounts",
+              "accounts:admin": "Administrative access to accounts",
+              "transactions:execute": "Execute fund transfers",
+              "ledger:read": "Read-only access to the ledger",
+              "trading:execute": "Execute market orders",
+              "compliance:write": "Submit compliance documents"
+            }
+          }
+        }
+      },
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "API Key for server-to-server communication."
+      },
+      "MutualTLS": {
+        "type": "mutualTLS",
+        "description": "Mutual TLS authentication for high-security endpoints."
+      }
+    }
+  }
+}
