@@ -1,0 +1,193 @@
+{
+  "get": {
+    "tags": [
+      "Account Management",
+      "Data Retrieval"
+    ],
+    "summary": "Retrieve Detailed Account Information",
+    "description": "Executes a comprehensive retrieval of the account entity identified by the provided `accountId`. This endpoint returns the `AccountDeepModel`, which includes nested structures for user profile data, associated preferences, security settings, and historical activity logs. Access to this resource is strictly controlled via the `X-Session-Token` header. Additionally, the `X-Audit-Mode` header can be utilized to trigger verbose logging of this read operation for compliance and security auditing purposes.",
+    "operationId": "getAccountDetails",
+    "parameters": [
+      {
+        "name": "accountId",
+        "in": "path",
+        "description": "The unique, immutable Universally Unique Identifier (UUID) of the account to be retrieved. This ID must correspond to an existing record in the primary database.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "example": "123e4567-e89b-12d3-a456-426614174000"
+        }
+      },
+      {
+        "name": "X-Session-Token",
+        "in": "header",
+        "description": "A valid, active session token issued by the authentication service. This token is required to validate the identity of the requester and ensure they possess the necessary `account:read` permissions.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 512,
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        }
+      },
+      {
+        "name": "X-Audit-Mode",
+        "in": "header",
+        "description": "Optional boolean flag. When set to `true`, the system records a high-fidelity audit log entry for this specific read operation, including IP address, timestamp, and full request headers. Useful for compliance checks.",
+        "required": false,
+        "schema": {
+          "type": "boolean",
+          "default": false,
+          "example": true
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Operation successful. Returns the full `AccountDeepModel` containing all available data points for the requested account.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AccountDeepModel"
+            },
+            "examples": {
+              "standardAccount": {
+                "summary": "Standard Active Account",
+                "description": "Example of a fully populated account response for an active user.",
+                "value": {
+                  "accountId": "123e4567-e89b-12d3-a456-426614174000",
+                  "metadata": {
+                    "createdAt": "2023-01-15T08:30:00.000Z",
+                    "updatedAt": "2023-10-01T14:20:00.000Z",
+                    "version": 42,
+                    "status": "ACTIVE"
+                  },
+                  "profile": {
+                    "firstName": "Jane",
+                    "lastName": "Doe",
+                    "displayName": "JaneD",
+                    "email": "jane.doe@enterprise.com",
+                    "phone": "+1-555-010-9988",
+                    "avatarUrl": "https://assets.example.com/avatars/jane_d.png"
+                  },
+                  "preferences": {
+                    "language": "en-US",
+                    "timezone": "America/New_York",
+                    "currency": "USD",
+                    "marketingOptIn": true,
+                    "theme": "system"
+                  },
+                  "security": {
+                    "mfaEnabled": true,
+                    "lastLogin": "2023-10-05T09:00:00Z",
+                    "passwordLastChanged": "2023-08-01T00:00:00Z"
+                  },
+                  "roles": [
+                    "USER",
+                    "BILLING_ADMIN"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request. The `accountId` format is invalid or headers are malformed.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorModel"
+            },
+            "examples": {
+              "invalidUuid": {
+                "summary": "Invalid UUID Format",
+                "value": {
+                  "code": "INVALID_PARAMETER",
+                  "message": "The provided accountId is not a valid UUID.",
+                  "traceId": "req-123-abc"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized. The `X-Session-Token` is missing, expired, or invalid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorModel"
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden. The session is valid, but the user lacks permission to view this specific account.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorModel"
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not Found. No account exists with the provided `accountId`.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorModel"
+            },
+            "examples": {
+              "notFound": {
+                "summary": "Account Not Found",
+                "value": {
+                  "code": "RESOURCE_NOT_FOUND",
+                  "message": "Account with ID 123e4567-e89b-12d3-a456-426614174000 does not exist.",
+                  "traceId": "req-999-xyz"
+                }
+              }
+            }
+          }
+        }
+      },
+      "429": {
+        "description": "Too Many Requests. Rate limit exceeded for account retrieval operations.",
+        "headers": {
+          "Retry-After": {
+            "description": "The number of seconds to wait before making a new request.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorModel"
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal Server Error. An unexpected condition was encountered.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorModel"
+            }
+          }
+        }
+      }
+    },
+    "security": [
+      {
+        "ApiKeyAuth": [],
+        "BearerAuth": []
+      }
+    ]
+  }
+}
