@@ -1,0 +1,139 @@
+get:
+  tags:
+    - Assets
+  summary: Retrieve a Specific Asset
+  description: |
+    Fetches the complete details of a single asset by its unique identifier (UUID).
+    This endpoint provides access to the core metadata, technical specifications, and current status of an asset.
+    Use the `include` query parameter to request additional related data, such as its full metadata block, version history, or available renditions, to enrich the response and reduce the need for subsequent API calls.
+  operationId: getAssetById
+  parameters:
+    - name: id
+      in: path
+      description: The unique identifier (UUID) of the asset to retrieve.
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef'
+    - name: include
+      in: query
+      description: |
+        A comma-separated list of related entities to include in the response.
+        This allows for expanding the asset object with additional details without making separate API calls.
+      required: false
+      schema:
+        type: string
+        enum:
+          - metadata
+          - history
+          - renditions
+          - collections
+          - tags
+      style: form
+      explode: false
+      example: 'metadata,renditions'
+  responses:
+    '200':
+      description: Asset details retrieved successfully. The full asset object is returned.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/Asset.yaml'
+          example:
+            id: 'a1b2c3d4-e5f6-7890-1234-567890abcdef'
+            type: 'image'
+            filename: 'corporate_headshot_2023.jpg'
+            mime_type: 'image/jpeg'
+            size_bytes: 5242880
+            status: 'active'
+            storage_location: 's3://production-assets/a1/b2/c3/a1b2c3d4-e5f6-7890-1234-567890abcdef.jpg'
+            checksums:
+              md5: 'd41d8cd98f00b204e9800998ecf8427e'
+              sha256: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+            dimensions:
+              width: 4000
+              height: 6000
+            created_at: '2023-10-27T10:00:00Z'
+            updated_at: '2023-10-27T11:30:00Z'
+            created_by: 'user-auth0-12345'
+            updated_by: 'user-auth0-67890'
+            version: 3
+            tags:
+              - 'headshot'
+              - 'corporate'
+              - '2023'
+              - 'marketing'
+            metadata:
+              iptc:
+                title: 'CEO John Doe'
+                keywords: ['ceo', 'executive', 'portrait']
+                copyright: '© 2023 Acme Corporation'
+              exif:
+                camera_model: 'Canon EOS R5'
+                f_number: 'f/2.8'
+                exposure_time: '1/200'
+                iso: 100
+              custom:
+                project_id: 'proj-q4-marketing-campaign'
+                usage_rights: 'Internal and external marketing, perpetual.'
+                approved: true
+            renditions:
+              - id: 'rend-thumb-a1b2c3d4'
+                name: 'thumbnail'
+                url: 'https://cdn.example.com/a1b2c3d4-e5f6-7890-1234-567890abcdef/thumb.jpg'
+                width: 200
+                height: 300
+                mime_type: 'image/jpeg'
+                size_bytes: 15360
+              - id: 'rend-web-a1b2c3d4'
+                name: 'web_large'
+                url: 'https://cdn.example.com/a1b2c3d4-e5f6-7890-1234-567890abcdef/web_large.jpg'
+                width: 1200
+                height: 1800
+                mime_type: 'image/jpeg'
+                size_bytes: 307200
+            _links:
+              self:
+                href: '/api/v1/assets/a1b2c3d4-e5f6-7890-1234-567890abcdef'
+              download:
+                href: '/api/v1/assets/a1b2c3d4-e5f6-7890-1234-567890abcdef/download'
+              renditions:
+                href: '/api/v1/assets/a1b2c3d4-e5f6-7890-1234-567890abcdef/renditions'
+    '400':
+      description: Bad Request. The provided asset ID is not in a valid UUID format.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/Error.yaml'
+          example:
+            error:
+              code: 400
+              message: 'Invalid asset ID format. Please provide a valid UUID.'
+              details: 'id parameter "invalid-id" is not a valid UUID.'
+    '404':
+      description: Not Found. The asset with the specified ID does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/Error.yaml'
+          example:
+            error:
+              code: 404
+              message: 'Asset not found.'
+              details: 'No asset exists with the ID a1b2c3d4-e5f6-7890-1234-000000000000.'
+    '500':
+      description: Internal Server Error. An unexpected error occurred on the server.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/Error.yaml'
+          example:
+            error:
+              code: 500
+              message: 'Internal Server Error'
+              details: 'An unexpected error occurred while processing the request. Please try again later.'
+              request_id: 'req-xyz789'
+  security:
+    - OAuth2Security: [assets:read]
+    - ApiKeyAuth: []
