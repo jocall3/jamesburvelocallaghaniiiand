@@ -1,0 +1,39 @@
+{
+  "type": "array",
+  "description": "A comprehensive set of feature flags or identifiers associated with an entity (e.g., a user, organization, tenant, or API key). These features dictate access to specific functionalities, beta programs, or customized system behaviors. The presence of a feature string in this array indicates that the corresponding capability is enabled for the entity.",
+  "items": {
+    "type": "string",
+    "description": "A unique, machine-readable string identifying a specific system feature. These are typically used as flags to enable or disable functionality on a per-entity basis. The format is usually kebab-case for consistency and programmatic ease of use.",
+    "enum": [
+      "adaptive-rate-limiting",
+      "recursive-ledger-verification",
+      "quantum-entropy-injection",
+      "decentralized-identity-management",
+      "zero-knowledge-proof-audits",
+      "ai-driven-threat-detection",
+      "multi-region-failover",
+      "real-time-data-streaming",
+      "custom-analytics-dashboard",
+      "api-key-scoping-v2",
+      "immutable-audit-log",
+      "beta-access-program",
+      "enterprise-sso",
+      "advanced-data-encryption",
+      "geofenced-access-control",
+      "dynamic-schema-validation",
+      "event-sourcing-integration",
+      "wasm-plugin-support",
+      "high-availability-tier",
+      "priority-support-queue"
+    ],
+    "example": "adaptive-rate-limiting"
+  },
+  "example": [
+    "adaptive-rate-limiting",
+    "recursive-ledger-verification",
+    "quantum-entropy-injection",
+    "enterprise-sso"
+  ],
+  "minItems": 0,
+  "uniqueItems": true
+}
