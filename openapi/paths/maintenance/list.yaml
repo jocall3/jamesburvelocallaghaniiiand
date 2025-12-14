@@ -1,0 +1,151 @@
+get:
+  tags:
+    - Maintenance
+    - Assets
+  summary: List Maintenance History for an Asset
+  description: |
+    Retrieves a paginated list of all maintenance records associated with a specific asset, identified by its unique ID.
+    This endpoint provides a comprehensive history of all work performed, including preventive, corrective, and emergency maintenance.
+
+    Results can be filtered by status, type, and scheduled date range. Sorting is also supported to organize the history as needed.
+    Appropriate permissions are required to access an asset's maintenance history.
+  operationId: listAssetMaintenance
+  parameters:
+    - $ref: '../../components/parameters/path/asset_id.yaml'
+    - $ref: '../../components/parameters/query/page.yaml'
+    - $ref: '../../components/parameters/query/limit.yaml'
+    - $ref: '../../components/parameters/query/sort.yaml'
+    - name: status
+      in: query
+      description: Filter maintenance records by their current status. Multiple statuses can be provided as a comma-separated list.
+      required: false
+      schema:
+        type: string
+        enum:
+          - scheduled
+          - in_progress
+          - completed
+          - cancelled
+          - on_hold
+        example: completed,in_progress
+    - name: type
+      in: query
+      description: Filter maintenance records by their type. Multiple types can be provided as a comma-separated list.
+      required: false
+      schema:
+        type: string
+        enum:
+          - preventive
+          - corrective
+          - inspection
+          - upgrade
+          - emergency
+        example: preventive,inspection
+    - name: scheduled_after
+      in: query
+      description: "Filter for maintenance records scheduled on or after this date and time (ISO 8601 format)."
+      required: false
+      schema:
+        type: string
+        format: date-time
+        example: "2023-01-01T00:00:00Z"
+    - name: scheduled_before
+      in: query
+      description: "Filter for maintenance records scheduled on or before this date and time (ISO 8601 format)."
+      required: false
+      schema:
+        type: string
+        format: date-time
+        example: "2024-01-01T00:00:00Z"
+  responses:
+    '200':
+      description: A paginated list of maintenance records for the specified asset was successfully retrieved.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '../../components/schemas/maintenance/MaintenanceRecord.yaml'
+              pagination:
+                $ref: '../../components/schemas/common/Pagination.yaml'
+            required:
+              - data
+              - pagination
+          example:
+            data:
+              - id: "maint-a4b3c2d1-e0f9-8765-4321-fedcba987654"
+                asset_id: "asset-123e4567-e89b-12d3-a456-426614174000"
+                work_order_id: "wo-98765432-10fe-dcba-9876-543210fedcba"
+                title: "Quarterly HVAC Filter Replacement"
+                description: "Replaced all primary and secondary air filters in the main HVAC unit as part of scheduled preventive maintenance."
+                status: "completed"
+                type: "preventive"
+                priority: "medium"
+                scheduled_at: "2023-09-15T10:00:00Z"
+                started_at: "2023-09-15T10:05:00Z"
+                completed_at: "2023-09-15T11:30:00Z"
+                technician:
+                  id: "user-b3c2d1a4-f9e0-7658-3214-edcba9876543"
+                  name: "Alice Johnson"
+                cost: 250.75
+                notes: "Filters were dirtier than expected. Recommend increasing frequency to bimonthly."
+                created_at: "2023-09-01T14:20:10Z"
+                updated_at: "2023-09-15T11:30:05Z"
+              - id: "maint-f9e8d7c6-b5a4-3210-fedc-ba9876543210"
+                asset_id: "asset-123e4567-e89b-12d3-a456-426614174000"
+                work_order_id: "wo-54321098-fedc-ba98-7654-3210fedcba98"
+                title: "Emergency Compressor Repair"
+                description: "The primary compressor failed, causing a system shutdown. Replaced the faulty motor and recalibrated the unit."
+                status: "completed"
+                type: "emergency"
+                priority: "high"
+                scheduled_at: null
+                started_at: "2023-08-20T14:15:00Z"
+                completed_at: "2023-08-20T18:45:00Z"
+                technician:
+                  id: "user-c2d1b3a4-e0f9-6587-2143-dcba98765432"
+                  name: "Bob Williams"
+                cost: 1275.50
+                notes: "Motor failure due to overheating. Investigating root cause of cooling system malfunction."
+                created_at: "2023-08-20T14:00:00Z"
+                updated_at: "2023-08-20T18:45:10Z"
+              - id: "maint-1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d"
+                asset_id: "asset-123e4567-e89b-12d3-a456-426614174000"
+                work_order_id: "wo-1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d"
+                title: "Annual Safety Inspection"
+                description: "Performed annual safety inspection of all electrical and mechanical components."
+                status: "completed"
+                type: "inspection"
+                priority: "low"
+                scheduled_at: "2023-07-01T09:00:00Z"
+                started_at: "2023-07-01T09:10:00Z"
+                completed_at: "2023-07-01T12:00:00Z"
+                technician:
+                  id: "user-b3c2d1a4-f9e0-7658-3214-edcba9876543"
+                  name: "Alice Johnson"
+                cost: 450.00
+                notes: "All systems are nominal. No issues found. Next inspection due in one year."
+                created_at: "2023-06-15T10:00:00Z"
+                updated_at: "2023-07-01T12:00:15Z"
+            pagination:
+              total_items: 3
+              total_pages: 1
+              current_page: 1
+              limit: 20
+    '400':
+      $ref: '../../components/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../components/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../components/responses/Forbidden.yaml'
+    '404':
+      $ref: '../../components/responses/NotFound.yaml'
+    '500':
+      $ref: '../../components/responses/InternalServerError.yaml'
+  security:
+    - OAuth2:
+        - assets.maintenance.read
+    - BearerAuth: []
