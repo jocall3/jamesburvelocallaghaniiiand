@@ -1,0 +1,451 @@
+/admin/audit_logs:
+  get:
+    summary: Retrieve a comprehensive list of system audit logs
+    operationId: getAuditLogs
+    tags:
+      - Admin
+      - Audit Logs
+    description: |
+      This endpoint allows administrators to retrieve a paginated and filterable list of all system audit logs.
+      Audit logs provide a detailed, immutable history of actions performed within the system, including who performed the action,
+      what resource was affected, when it happened, and any relevant contextual information.
+      It is crucial for security monitoring, compliance, incident response, and debugging purposes in a large-scale production environment.
+      The endpoint supports extensive filtering capabilities to pinpoint specific events or trends.
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          default: 1
+        description: The page number to retrieve for paginated results. Each page contains a subset of the total audit logs.
+        example: 1
+      - in: query
+        name: pageSize
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          default: 25
+        description: The number of audit log entries to return per page. A higher page size retrieves more data per request, up to a maximum of 100.
+        example: 50
+      - in: query
+        name: sortBy
+        schema:
+          type: string
+          enum:
+            - timestamp
+            - actor.id
+            - eventType
+            - resource.type
+            - severity
+            - status
+        description: |
+          Field to sort the audit logs by.
+          - `timestamp`: Sorts by the time the event occurred (default).
+          - `actor.id`: Sorts by the unique identifier of the actor.
+          - `eventType`: Sorts by the type of event.
+          - `resource.type`: Sorts by the type of resource affected.
+          - `severity`: Sorts by the severity level of the log.
+          - `status`: Sorts by the outcome status of the action.
+        example: timestamp
+      - in: query
+        name: sortOrder
+        schema:
+          type: string
+          enum:
+            - asc
+            - desc
+          default: desc
+        description: The order to sort the results (ascending or descending). `desc` (descending) is typically used for audit logs to show the most recent events first.
+        example: desc
+      - in: query
+        name: actorId
+        schema:
+          type: string
+          format: uuid
+        description: Filter logs by the unique identifier of the actor (user, system, or API key) who performed the action. This allows tracing all actions by a specific entity.
+        example: d290f1ee-6c54-4b01-90e6-d701748f0851
+      - in: query
+        name: eventType
+        schema:
+          type: string
+          enum:
+            - USER_LOGIN
+            - USER_LOGOUT
+            - USER_CREATED
+            - USER_UPDATED
+            - USER_DELETED
+            - RESOURCE_CREATED
+            - RESOURCE_UPDATED
+            - RESOURCE_DELETED
+            - SETTINGS_UPDATED
+            - PERMISSION_GRANTED
+            - PERMISSION_REVOKED
+            - API_KEY_CREATED
+            - API_KEY_DELETED
+            - SYSTEM_ERROR
+            - DATA_EXPORTED
+            - DATA_IMPORTED
+            - CONFIGURATION_CHANGE
+            - SECURITY_ALERT
+            - PAYMENT_PROCESSED
+            - REFUND_ISSUED
+        description: |
+          Filter logs by the specific type of event that occurred. This is useful for focusing on particular categories of actions,
+          such as all user logins or all resource creation events.
+        example: USER_LOGIN
+      - in: query
+        name: resourceType
+        schema:
+          type: string
+          enum:
+            - User
+            - Product
+            - Order
+            - Settings
+            - Role
+            - Permission
+            - ApiKey
+            - Report
+            - Database
+            - Server
+            - Service
+        description: |
+          Filter logs by the type of resource that was affected by the action.
+          For example, filtering by `User` will show all actions related to user accounts.
+        example: User
+      - in: query
+        name: resourceId
+        schema:
+          type: string
+          format: uuid
+        description: Filter logs by the unique identifier of the specific resource that was affected. This allows deep dives into the history of a single entity.
+        example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+      - in: query
+        name: startDate
+        schema:
+          type: string
+          format: date-time
+        description: Filter logs to include only those that occurred on or after this ISO 8601 date-time (e.g., `2023-01-01T00:00:00Z`). Useful for time-based analysis.
+        example: '2023-01-01T00:00:00Z'
+      - in: query
+        name: endDate
+        schema:
+          type: string
+          format: date-time
+        description: Filter logs to include only those that occurred on or before this ISO 8601 date-time (e.g., `2023-12-31T23:59:59Z`). Useful for defining a specific time window.
+        example: '2023-12-31T23:59:59Z'
+      - in: query
+        name: ipAddress
+        schema:
+          type: string
+          format: ipv4
+        description: Filter logs by the IPv4 address from which the action originated. Essential for security investigations to identify suspicious access patterns.
+        example: 192.168.1.100
+      - in: query
+        name: userAgent
+        schema:
+          type: string
+        description: Filter logs by the user agent string of the client that performed the action. Helps in understanding the client environment (browser, OS, API client).
+        example: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+            - SUCCESS
+            - FAILURE
+            - PENDING
+        description: Filter logs by the outcome status of the action. Useful for quickly identifying failed operations or pending tasks.
+        example: FAILURE
+      - in: query
+        name: severity
+        schema:
+          type: string
+          enum:
+            - INFO
+            - WARNING
+            - ERROR
+            - CRITICAL
+        description: Filter logs by their severity level. Allows administrators to prioritize review of critical issues.
+        example: CRITICAL
+      - in: header
+        name: X-Request-ID
+        schema:
+          type: string
+          format: uuid
+        description: |
+          Unique identifier for the request, useful for tracing and correlating logs across different services
+          in a distributed system architecture. This ID should be generated by the client and passed with the request.
+        example: 8e2a4b7c-1d3e-4f5a-6b7c-8d9e0f1a2b3c
+      - in: header
+        name: Accept-Language
+        schema:
+          type: string
+          default: en-US
+        description: |
+          Preferred language for the response content, specified as an IETF language tag (e.g., `en-US`, `fr-FR`).
+          This header influences the localization of human-readable fields in the response.
+        example: en-US
+    responses:
+      '200':
+        description: Successfully retrieved a paginated list of audit logs. The response includes detailed log entries and pagination metadata.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaginatedAuditLogs'
+            examples:
+              successfulResponsePage1:
+                summary: Example of a successful audit log retrieval (Page 1)
+                value:
+                  data:
+                    - id: log_001
+                      timestamp: '2023-10-26T10:00:00Z'
+                      actor:
+                        id: user_123
+                        type: User
+                        name: John Doe
+                        email: john.doe@example.com
+                      eventType: USER_LOGIN
+                      resource:
+                        type: User
+                        id: user_123
+                        name: John Doe
+                      context:
+                        ipAddress: 192.168.1.1
+                        userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+                        location: New York, USA
+                        sessionId: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
+                      details:
+                        loginMethod: Password
+                        isSuccess: true
+                        authenticationType: Local
+                      status: SUCCESS
+                      severity: INFO
+                    - id: log_002
+                      timestamp: '2023-10-26T10:05:30Z'
+                      actor:
+                        id: user_456
+                        type: User
+                        name: Jane Smith
+                        email: jane.smith@example.com
+                      eventType: RESOURCE_CREATED
+                      resource:
+                        type: Product
+                        id: prod_abc
+                        name: Premium Widget
+                      context:
+                        ipAddress: 203.0.113.45
+                        userAgent: PostmanRuntime/7.32.2
+                        location: London, UK
+                        correlationId: req_xyz_789
+                      details:
+                        productCategory: Electronics
+                        initialPrice: 99.99
+                        currency: USD
+                        createdBy: user_456
+                      status: SUCCESS
+                      severity: INFO
+                    - id: log_003
+                      timestamp: '2023-10-26T10:15:00Z'
+                      actor:
+                        id: system_cron_001
+                        type: System
+                        name: Daily Backup Job
+                      eventType: DATA_EXPORTED
+                      resource:
+                        type: Database
+                        id: main_db
+                        name: Production Database
+                      context:
+                        ipAddress: 10.0.0.5
+                        userAgent: CronJob/1.0
+                        location: Data Center West
+                      details:
+                        exportedTables: ["users", "products", "orders"]
+                        exportFormat: CSV
+                        exportSizeMB: 1024
+                        backupLocation: s3://my-backup-bucket/daily/
+                      status: SUCCESS
+                      severity: INFO
+                    - id: log_004
+                      timestamp: '2023-10-26T10:20:00Z'
+                      actor:
+                        id: user_123
+                        type: User
+                        name: John Doe
+                        email: john.doe@example.com
+                      eventType: USER_UPDATED
+                      resource:
+                        type: User
+                        id: user_123
+                        name: John Doe
+                      context:
+                        ipAddress: 192.168.1.1
+                        userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+                        location: New York, USA
+                      details:
+                        fieldChanged: email
+                        oldValue: john.doe@example.com
+                        newValue: john.doe.new@example.com
+                        updateReason: User request
+                      status: SUCCESS
+                      severity: INFO
+                    - id: log_005
+                      timestamp: '2023-10-26T10:30:00Z'
+                      actor:
+                        id: user_789
+                        type: User
+                        name: Admin User
+                        email: admin@example.com
+                      eventType: PERMISSION_GRANTED
+                      resource:
+                        type: User
+                        id: user_456
+                        name: Jane Smith
+                      context:
+                        ipAddress: 172.16.0.10
+                        userAgent: AdminPanel/1.0
+                        location: Seattle, USA
+                      details:
+                        permission: manage_products
+                        grantedBy: admin@example.com
+                        roleAssigned: ProductManager
+                      status: SUCCESS
+                      severity: WARNING
+                  pagination:
+                    totalItems: 125
+                    totalPages: 5
+                    currentPage: 1
+                    pageSize: 25
+              successfulResponsePage2:
+                summary: Example of a successful audit log retrieval (Page 2)
+                value:
+                  data:
+                    - id: log_006
+                      timestamp: '2023-10-26T10:40:00Z'
+                      actor:
+                        id: api_key_001
+                        type: API_Key
+                        name: Marketing Service Key
+                      eventType: RESOURCE_UPDATED
+                      resource:
+                        type: Product
+                        id: prod_xyz
+                        name: Basic Widget
+                      context:
+                        ipAddress: 52.1.2.3
+                        userAgent: Custom-API-Client/1.0
+                        serviceName: MarketingService
+                      details:
+                        fieldChanged: price
+                        oldValue: 19.99
+                        newValue: 17.99
+                        reason: Promotional discount
+                      status: SUCCESS
+                      severity: INFO
+                    - id: log_007
+                      timestamp: '2023-10-26T10:45:00Z'
+                      actor:
+                        id: user_101
+                        type: User
+                        name: Alice Brown
+                        email: alice.brown@example.com
+                      eventType: USER_LOGIN
+                      resource:
+                        type: User
+                        id: user_101
+                        name: Alice Brown
+                      context:
+                        ipAddress: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+                        userAgent: Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Mobile Safari/537.36
+                        location: Berlin, Germany
+                      details:
+                        loginMethod: OAuth2
+                        provider: Google
+                        isSuccess: true
+                      status: SUCCESS
+                      severity: INFO
+                    - id: log_008
+                      timestamp: '2023-10-26T10:50:00Z'
+                      actor:
+                        id: user_123
+                        type: User
+                        name: John Doe
+                        email: john.doe.new@example.com
+                      eventType: USER_LOGIN
+                      resource:
+                        type: User
+                        id: user_123
+                        name: John Doe
+                      context:
+                        ipAddress: 192.168.1.2
+                        userAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/119.0.0.0
+                        location: New York, USA
+                      details:
+                        loginMethod: Password
+                        isSuccess: false
+                        failureReason: Invalid credentials
+                      status: FAILURE
+                      severity: WARNING
+                    - id: log_009
+                      timestamp: '2023-10-26T11:00:00Z'
+                      actor:
+                        id: system_monitor
+                        type: System
+                        name: Health Check Service
+                      eventType: SYSTEM_ERROR
+                      resource:
+                        type: Service
+                        id: payment_gateway
+                        name: Payment Gateway Service
+                      context:
+                        ipAddress: 10.0.0.10
+                        serviceHost: payment-service-01
+                      details:
+                        errorMessage: Database connection failed
+                        errorCode: DB_CONN_001
+                        component: DatabaseConnector
+                      status: FAILURE
+                      severity: ERROR
+                    - id: log_010
+                      timestamp: '2023-10-26T11:05:00Z'
+                      actor:
+                        id: user_789
+                        type: User
+                        name: Admin User
+                        email: admin@example.com
+                      eventType: CONFIGURATION_CHANGE
+                      resource:
+                        type: Settings
+                        id: global_settings
+                        name: Global Application Settings
+                      context:
+                        ipAddress: 172.16.0.10
+                        userAgent: AdminPanel/1.0
+                      details:
+                        settingName: featureFlag_newUI
+                        oldValue: false
+                        newValue: true
+                        changeReason: A/B test rollout
+                      status: SUCCESS
+                      severity: INFO
+                  pagination:
+                    totalItems: 125
+                    totalPages: 5
+                    currentPage: 2
+                    pageSize: 25
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+    security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
