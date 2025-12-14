@@ -1,0 +1,412 @@
+{
+  "summary": "CO2 Velocity and Acceleration Analytics",
+  "description": "Provides access to calculated derivative metrics for Carbon Dioxide (CO2) sensor data. This endpoint computes the first derivative (velocity) and second derivative (acceleration) of CO2 concentration over time, enabling the detection of rapid environmental changes, leaks, or ventilation failures.",
+  "get": {
+    "tags": [
+      "Analytics",
+      "CO2 Metrics",
+      "Time Series Analysis"
+    ],
+    "summary": "Calculate CO2 Velocity Metrics",
+    "description": "Retrieves the rate of change (velocity) and acceleration of CO2 levels for a specific sensor within a defined time window. The system applies smoothing algorithms to raw data before differentiation to ensure metric stability.",
+    "operationId": "getVelocityMetrics",
+    "security": [
+      {
+        "bearerAuth": [],
+        "apiKeyAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "sensor_id",
+        "in": "query",
+        "description": "The unique identifier of the CO2 sensor device.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+        }
+      },
+      {
+        "name": "start_time",
+        "in": "query",
+        "description": "The start timestamp for the analysis window (ISO 8601).",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-11-15T08:00:00Z"
+        }
+      },
+      {
+        "name": "end_time",
+        "in": "query",
+        "description": "The end timestamp for the analysis window (ISO 8601). Defaults to current time if omitted.",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-11-15T12:00:00Z"
+        }
+      },
+      {
+        "name": "resolution",
+        "in": "query",
+        "description": "The temporal resolution for the calculated metrics (e.g., '1m', '5m', '1h').",
+        "schema": {
+          "type": "string",
+          "default": "1m",
+          "enum": [
+            "10s",
+            "30s",
+            "1m",
+            "5m",
+            "15m",
+            "1h"
+          ],
+          "example": "5m"
+        }
+      },
+      {
+        "name": "smoothing_factor",
+        "in": "query",
+        "description": "The window size used for the moving average smoothing algorithm prior to differentiation.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 3,
+          "description": "Number of data points to include in the smoothing window."
+        }
+      },
+      {
+        "name": "unit",
+        "in": "query",
+        "description": "The unit of measurement for the output velocity.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "ppm/s",
+            "ppm/m",
+            "ppm/h"
+          ],
+          "default": "ppm/m"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Successful calculation of velocity and acceleration metrics.",
+        "headers": {
+          "X-Computation-Time": {
+            "description": "Time taken to compute the metrics in milliseconds.",
+            "schema": {
+              "type": "integer",
+              "example": 45
+            }
+          },
+          "X-Data-Points-Processed": {
+            "description": "Total number of raw data points processed.",
+            "schema": {
+              "type": "integer",
+              "example": 1200
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "meta",
+                "metrics",
+                "summary"
+              ],
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "description": "Metadata regarding the request and sensor context.",
+                  "properties": {
+                    "request_id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                    },
+                    "sensor_id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+                    },
+                    "time_range": {
+                      "type": "object",
+                      "properties": {
+                        "start": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "end": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    },
+                    "configuration": {
+                      "type": "object",
+                      "properties": {
+                        "resolution": {
+                          "type": "string"
+                        },
+                        "smoothing_factor": {
+                          "type": "integer"
+                        },
+                        "unit": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "summary": {
+                  "type": "object",
+                  "description": "Aggregated statistics for the requested period.",
+                  "properties": {
+                    "max_velocity": {
+                      "type": "number",
+                      "format": "float",
+                      "description": "Maximum positive rate of change observed.",
+                      "example": 15.5
+                    },
+                    "min_velocity": {
+                      "type": "number",
+                      "format": "float",
+                      "description": "Maximum negative rate of change (drop) observed.",
+                      "example": -5.2
+                    },
+                    "avg_acceleration": {
+                      "type": "number",
+                      "format": "float",
+                      "description": "Average acceleration over the period.",
+                      "example": 0.02
+                    },
+                    "volatility_index": {
+                      "type": "number",
+                      "format": "float",
+                      "description": "A calculated score representing the stability of the CO2 levels (0-100).",
+                      "example": 12.4
+                    },
+                    "trend": {
+                      "type": "string",
+                      "enum": [
+                        "rising",
+                        "falling",
+                        "stable",
+                        "volatile"
+                      ],
+                      "example": "rising"
+                    }
+                  }
+                },
+                "metrics": {
+                  "type": "array",
+                  "description": "Time-series data of calculated metrics.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "timestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-11-15T08:05:00Z"
+                      },
+                      "raw_value": {
+                        "type": "number",
+                        "description": "The smoothed raw CO2 value used for calculation.",
+                        "example": 450.2
+                      },
+                      "velocity": {
+                        "type": "number",
+                        "description": "First derivative: Rate of change.",
+                        "example": 2.1
+                      },
+                      "acceleration": {
+                        "type": "number",
+                        "description": "Second derivative: Rate of change of velocity.",
+                        "example": 0.05
+                      },
+                      "is_anomaly": {
+                        "type": "boolean",
+                        "description": "Flag indicating if this point exceeds standard deviation thresholds.",
+                        "example": false
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "examples": {
+              "standard_response": {
+                "summary": "Typical office environment data",
+                "value": {
+                  "meta": {
+                    "request_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                    "sensor_id": "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
+                    "time_range": {
+                      "start": "2023-11-15T08:00:00Z",
+                      "end": "2023-11-15T09:00:00Z"
+                    },
+                    "configuration": {
+                      "resolution": "5m",
+                      "smoothing_factor": 3,
+                      "unit": "ppm/m"
+                    }
+                  },
+                  "summary": {
+                    "max_velocity": 12.5,
+                    "min_velocity": -3.0,
+                    "avg_acceleration": 0.1,
+                    "volatility_index": 5.5,
+                    "trend": "stable"
+                  },
+                  "metrics": [
+                    {
+                      "timestamp": "2023-11-15T08:00:00Z",
+                      "raw_value": 410.0,
+                      "velocity": 0.0,
+                      "acceleration": 0.0,
+                      "is_anomaly": false
+                    },
+                    {
+                      "timestamp": "2023-11-15T08:05:00Z",
+                      "raw_value": 412.5,
+                      "velocity": 0.5,
+                      "acceleration": 0.1,
+                      "is_anomaly": false
+                    },
+                    {
+                      "timestamp": "2023-11-15T08:10:00Z",
+                      "raw_value": 416.0,
+                      "velocity": 0.7,
+                      "acceleration": 0.04,
+                      "is_anomaly": false
+                    }
+                  ]
+                }
+              },
+              "rapid_leak_event": {
+                "summary": "Data indicating a rapid increase (leak)",
+                "value": {
+                  "meta": {
+                    "request_id": "99887766-5544-3322-1100-aabbccddeeff",
+                    "sensor_id": "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
+                    "time_range": {
+                      "start": "2023-11-15T14:00:00Z",
+                      "end": "2023-11-15T14:15:00Z"
+                    },
+                    "configuration": {
+                      "resolution": "1m",
+                      "smoothing_factor": 1,
+                      "unit": "ppm/m"
+                    }
+                  },
+                  "summary": {
+                    "max_velocity": 150.0,
+                    "min_velocity": 0.0,
+                    "avg_acceleration": 25.0,
+                    "volatility_index": 95.0,
+                    "trend": "rising"
+                  },
+                  "metrics": [
+                    {
+                      "timestamp": "2023-11-15T14:00:00Z",
+                      "raw_value": 420.0,
+                      "velocity": 2.0,
+                      "acceleration": 0.5,
+                      "is_anomaly": false
+                    },
+                    {
+                      "timestamp": "2023-11-15T14:01:00Z",
+                      "raw_value": 570.0,
+                      "velocity": 150.0,
+                      "acceleration": 148.0,
+                      "is_anomaly": true
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request. Invalid parameters provided.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Invalid resolution format. Allowed values: 1m, 5m, 1h."
+                },
+                "code": {
+                  "type": "integer",
+                  "example": 4001
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized. API key or Bearer token is missing or invalid."
+      },
+      "404": {
+        "description": "Sensor not found.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Sensor with ID a1b2c3d4-e5f6-7890-1234-56789abcdef0 not found."
+                }
+              }
+            }
+          }
+        }
+      },
+      "429": {
+        "description": "Too Many Requests. Rate limit exceeded for analytics calculations.",
+        "headers": {
+          "Retry-After": {
+            "description": "Seconds to wait before retrying.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal Server Error. Calculation engine failure.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Numerical instability detected in derivative calculation."
+                },
+                "trace_id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
