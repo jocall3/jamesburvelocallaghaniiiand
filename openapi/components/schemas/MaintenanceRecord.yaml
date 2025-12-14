@@ -1,0 +1,208 @@
+type: object
+description: Detailed record of a maintenance event performed on a specific asset. This includes information about the work done, parts used, costs incurred, and any follow-up actions required.
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "The unique identifier for the maintenance record. This is a system-generated value."
+    example: "maint_rec_4e8b4c2e-0b1a-4b9e-8b0a-0e1b2c3d4e5f"
+    readOnly: true
+  assetId:
+    type: string
+    format: uuid
+    description: "The unique identifier of the asset that underwent maintenance. This links the record to a specific piece of equipment or infrastructure."
+    example: "asset_a1b2c3d4-e5f6-7890-1234-567890abcdef"
+  maintenanceDate:
+    type: string
+    format: date-time
+    description: "The exact date and time when the maintenance work was performed."
+    example: "2024-07-15T14:30:00Z"
+  maintenanceType:
+    type: string
+    description: "The category of maintenance performed, which helps in analyzing maintenance trends and costs."
+    enum:
+      - PREVENTIVE
+      - CORRECTIVE
+      - EMERGENCY
+      - INSPECTION
+      - UPGRADE
+      - CALIBRATION
+      - DECOMMISSIONING
+    example: "PREVENTIVE"
+  description:
+    type: string
+    description: "A comprehensive, human-readable summary of the work performed. This should be detailed enough for future reference and auditing."
+    example: "Completed the 500-hour service interval. Replaced engine oil and filter, checked all fluid levels, inspected hydraulic lines for wear, and lubricated all chassis joints. The asset is operating within normal parameters."
+  status:
+    type: string
+    description: "The current status of the maintenance job. This is crucial for workflow management and tracking."
+    enum:
+      - SCHEDULED
+      - IN_PROGRESS
+      - COMPLETED
+      - CANCELLED
+      - PENDING_PARTS
+      - REQUIRES_FOLLOW_UP
+    example: "COMPLETED"
+  performedBy:
+    type: object
+    description: "Information about the technician or team responsible for performing the maintenance."
+    properties:
+      technicianId:
+        type: string
+        description: "The unique identifier for the technician or service user."
+        example: "tech_8a7b6c5d"
+      name:
+        type: string
+        description: "The full name of the lead technician."
+        example: "Johnathan 'John' Smith"
+      team:
+        type: string
+        description: "The service team or department the technician belongs to."
+        example: "Field Service Unit B"
+    required:
+      - technicianId
+      - name
+  cost:
+    type: object
+    description: "The total cost associated with the maintenance event, broken down into parts and labor."
+    properties:
+      laborCost:
+        type: number
+        format: double
+        description: "The cost of labor for the maintenance work, in the specified currency."
+        example: 150.00
+      partsCost:
+        type: number
+        format: double
+        description: "The total cost of all parts used, in the specified currency."
+        example: 85.50
+      totalCost:
+        type: number
+        format: double
+        description: "The total cost of the maintenance (labor + parts). This may be system-calculated."
+        example: 235.50
+        readOnly: true
+      currency:
+        type: string
+        description: "The ISO 4217 currency code for the costs."
+        example: "USD"
+        default: "USD"
+    required:
+      - laborCost
+      - partsCost
+      - totalCost
+      - currency
+  partsUsed:
+    type: array
+    description: "A detailed list of all parts and materials consumed during the maintenance."
+    items:
+      type: object
+      properties:
+        partId:
+          type: string
+          description: "The unique identifier, SKU, or part number for the item used."
+          example: "SKU-EOF-75W90"
+        name:
+          type: string
+          description: "The descriptive name of the part."
+          example: "Engine Oil Filter, Heavy Duty"
+        quantity:
+          type: integer
+          format: int32
+          description: "The number of units of this part that were used."
+          example: 1
+        unitCost:
+          type: number
+          format: double
+          description: "The cost per single unit of the part."
+          example: 25.50
+      required:
+        - partId
+        - name
+        - quantity
+        - unitCost
+  notes:
+    type: string
+    description: "Any additional notes, observations, or comments from the technician that are not part of the main work description. This can include recommendations or observed issues."
+    example: "Noticed slight corrosion on battery terminal C. Cleaned and applied dielectric grease. Recommend monitoring at next service interval."
+  followUpActions:
+    type: array
+    description: "A list of specific, actionable tasks that need to be performed as a result of this maintenance event."
+    items:
+      type: object
+      properties:
+        actionId:
+          type: string
+          format: uuid
+          description: "Unique identifier for the follow-up action item."
+          example: "fu_act_9f8e7d6c-5b4a-3c2d-1e0f-9a8b7c6d5e4f"
+        description:
+          type: string
+          description: "A clear description of the required follow-up action."
+          example: "Schedule replacement of secondary hydraulic pump."
+        dueDate:
+          type: string
+          format: date
+          description: "The recommended due date for completing the follow-up action."
+          example: "2024-10-15"
+        assignedTo:
+          type: string
+          description: "The ID of the technician or team assigned to this follow-up action."
+          example: "tech_8a7b6c5d"
+        status:
+          type: string
+          enum: [OPEN, IN_PROGRESS, COMPLETED]
+          description: "The status of the follow-up action."
+          example: "OPEN"
+      required:
+        - description
+        - status
+  attachments:
+    type: array
+    description: "A list of files attached to this maintenance record, such as photos of the work, signed work orders, or diagnostic reports."
+    items:
+      type: object
+      properties:
+        fileId:
+          type: string
+          description: "The unique identifier for the attached file."
+          example: "file_1a2b3c4d5e6f7g8h"
+        fileName:
+          type: string
+          description: "The original name of the attached file."
+          example: "signed_work_order_1138.pdf"
+        url:
+          type: string
+          format: uri
+          description: "A secure, time-limited URL to access and download the attachment."
+          example: "https://api.example.com/v1/files/file_1a2b3c4d5e6f7g8h/download?token=..."
+        mimeType:
+          type: string
+          description: "The MIME type of the file, e.g., 'image/jpeg' or 'application/pdf'."
+          example: "application/pdf"
+      required:
+        - fileId
+        - fileName
+        - url
+        - mimeType
+  createdAt:
+    type: string
+    format: date-time
+    description: "The timestamp when this maintenance record was first created in the system."
+    example: "2024-07-15T14:35:10Z"
+    readOnly: true
+  updatedAt:
+    type: string
+    format: date-time
+    description: "The timestamp when this maintenance record was last modified."
+    example: "2024-07-15T14:35:10Z"
+    readOnly: true
+required:
+  - assetId
+  - maintenanceDate
+  - maintenanceType
+  - description
+  - status
+  - performedBy
+  - cost
