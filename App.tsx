@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { HashRouter as Router, Route, Routes, Outlet, Navigate, useNavigate } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes, Outlet, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Cpu, AlertTriangle } from 'lucide-react';
@@ -286,6 +286,20 @@ const UnderConstructionView = () => {
     );
 };
 
+const DynamicView = () => {
+    const { viewName } = useParams<{ viewName: string }>();
+    if (!viewName) {
+        return <UnderConstructionView />;
+    }
+    const { Component, props } = getComponentForView(viewName);
+
+    if (Component) {
+        return <Component {...props} />;
+    }
+
+    return <UnderConstructionView />;
+};
+
 // --- Layout ---
 const SAppLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -359,9 +373,8 @@ const SAppLayout = () => {
 };
 
 // --- Wrapper Components for Props ---
-const Wrapper = (Component: React.FC<any>, props: any = {}) => {
-  const WrappedComponent = () => <Component {...props} />;
-  return <WrappedComponent />;
+const Wrapper = ({ Component, ...props }: { Component: React.FC<any>; [key: string]: any }) => {
+    return <Component {...props} />;
 };
 
 const theme = createTheme({ palette: { mode: 'dark' } });
@@ -392,12 +405,14 @@ function SApp() {
                       <Route path="/dashboard" element={<Dashboard />} />
                       
                       {/* Dynamically Generated Routes */}
-                      <Route path="/account-details" element={Wrapper(AccountDetails, { accountId: '1', customerId: 'c1' })} />
-                      <Route path="/account-list" element={Wrapper(AccountList, { accounts: [] })} />
+                      <Route path="/account-details" element={<Wrapper Component={AccountDetails} accountId='1' customerId='c1' />} />
+                      <Route path="/account-list" element={<Wrapper Component={AccountList} accounts={[]} />} />
                       <Route path="/accounts-dashboard" element={<AccountsDashboardView />} />
                       
                       <Route path="/resource-graph" element={<ResourceGraphView />} />
                       <Route path="/compliance-oracle" element={<ComplianceOracleView />} />
+
+                      <Route path="/view/:viewName" element={<DynamicView />} />
 
                       <Route path="*" element={<Dashboard />} />
                     </Route>
