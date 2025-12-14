@@ -1,0 +1,82 @@
+{
+  "id": "usr_01hng2p3q4r5s6t7u8v9w0x1y2z3a4b5",
+  "username": "johndoe_dev",
+  "email": "john.doe@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "dateOfBirth": "1990-05-15",
+  "gender": "Male",
+  "address": {
+    "street": "123 Main St",
+    "city": "Anytown",
+    "state": "CA",
+    "zipCode": "90210",
+    "country": "USA",
+    "latitude": 34.0522,
+    "longitude": -118.2437
+  },
+  "phoneNumbers": [
+    {
+      "type": "Mobile",
+      "number": "+1-555-123-4567",
+      "isVerified": true
+    },
+    {
+      "type": "Home",
+      "number": "+1-555-987-6543",
+      "isVerified": false
+    }
+  ],
+  "profilePictureUrl": "https://example.com/images/profiles/johndoe_dev.jpg",
+  "bio": "Passionate software engineer with 10+ years of experience in full-stack development. Specializing in cloud-native applications and API design. Always learning and building.",
+  "preferences": {
+    "theme": "dark",
+    "language": "en-US",
+    "notifications": {
+      "email": true,
+      "sms": false,
+      "push": true
+    },
+    "privacySettings": {
+      "profileVisibility": "public",
+      "dataSharing": false
+    }
+  },
+  "roles": [
+    "user",
+    "developer",
+    "admin"
+  ],
+  "socialLinks": [
+    {
+      "platform": "LinkedIn",
+      "url": "https://www.linkedin.com/in/johndoe_dev"
+    },
+    {
+      "platform": "GitHub",
+      "url": "https://github.com/johndoe_dev"
+    }
+  ],
+  "skills": [
+    "JavaScript",
+    "Python",
+    "React",
+    "Node.js",
+    "AWS",
+    "Docker",
+    "Kubernetes",
+    "SQL",
+    "NoSQL"
+  ],
+  "company": {
+    "name": "Acme Corp",
+    "position": "Senior Software Engineer",
+    "startDate": "2018-01-01",
+    "endDate": null
+  },
+  "isActive": true,
+  "isEmailVerified": true,
+  "lastLogin": "2024-07-30T10:30:00Z",
+  "createdAt": "2020-01-01T08:00:00Z",
+  "updatedAt": "2024-07-30T10:00:00Z"
+}
