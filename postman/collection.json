@@ -1,0 +1,30 @@
+{
+	"info": {
+		"_postman_id": "YOUR_COLLECTION_ID_HERE",
+		"name": "Generated API Collection",
+		"description": "This Postman collection is a placeholder for the automatically generated OpenAPI 3.1 specification. It will be populated with all endpoints, methods, parameters, request bodies, and responses derived from the input file, ready for testing and code generation.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": []
+}
