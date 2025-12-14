@@ -1,0 +1,87 @@
+get:
+  summary: Get System Metrics
+  description: Retrieves real-time performance metrics for the Quantum Core and associated subsystems. This endpoint provides a snapshot of the system's health, including CPU load, memory usage, network throughput, and quantum processing unit (QPU) status. The data is crucial for monitoring, alerting, and automated scaling decisions.
+  tags:
+    - System
+  operationId: getSystemMetrics
+  security:
+    - BearerAuth: []
+  parameters:
+    - name: metric_type
+      in: query
+      description: Filter metrics by a specific type, such as 'cpu', 'memory', 'qpu', or 'network'.
+      required: false
+      schema:
+        type: string
+        enum: [cpu, memory, qpu, network, storage, all]
+        example: qpu
+    - name: node_id
+      in: query
+      description: Filter metrics for a specific computational node within the distributed system.
+      required: false
+      schema:
+        type: string
+        format: uuid
+        example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+  responses:
+    '200':
+      description: A list of current system metrics. The response provides a comprehensive overview of the system's operational status.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../../components/schemas/system/SystemMetric.yaml'
+          examples:
+            full_system_overview:
+              summary: Example of a full system metrics overview
+              value:
+                - id: "metric-cpu-load-avg-1m"
+                  label: "CPU Load Average (1 min)"
+                  value: 0.78
+                  unit: "load"
+                  trend: "stable"
+                  change: -0.02
+                  aiPrediction: 0.75
+                  timestamp: "2023-10-27T10:00:00Z"
+                  metadata:
+                    nodeId: "node-main-01"
+                    coreCount: 128
+                - id: "metric-qpu-entanglement-rate"
+                  label: "QPU Entanglement Rate"
+                  value: 98.7
+                  unit: "%"
+                  trend: "up"
+                  change: 1.1
+                  aiPrediction: 99.1
+                  timestamp: "2023-10-27T10:00:00Z"
+                  metadata:
+                    qpuId: "qpu-alpha-7"
+                    qubits: 512
+                - id: "metric-memory-usage"
+                  label: "System Memory Usage"
+                  value: 65.2
+                  unit: "%"
+                  trend: "down"
+                  change: -3.5
+                  aiPrediction: 62.0
+                  timestamp: "2023-10-27T10:00:00Z"
+                  metadata:
+                    nodeId: "node-main-01"
+                    totalMemoryGB: 1024
+                - id: "metric-network-throughput-in"
+                  label: "Network Ingress"
+                  value: 1.2
+                  unit: "Gbps"
+                  trend: "stable"
+                  change: 0.05
+                  aiPrediction: 1.2
+                  timestamp: "2023-10-27T10:00:00Z"
+                  metadata:
+                    interface: "eth0"
+    '401':
+      $ref: '../../components/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../components/responses/Forbidden.yaml'
+    '500':
+      $ref: '../../components/responses/InternalServerError.yaml'
