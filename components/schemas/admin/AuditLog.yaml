@@ -1,0 +1,375 @@
+type: object
+description: |
+  Represents a single entry in the system's audit log, capturing critical events,
+  actions, and changes within the platform. This schema is designed to provide
+  a comprehensive, immutable record of operations performed by users, systems,
+  or automated processes, crucial for security, compliance, and debugging.
+  Each log entry details who did what, when, to what, and with what outcome,
+  along with contextual information. This detailed logging supports forensic
+  analysis, regulatory compliance, and operational monitoring in a large-scale
+  production environment.
+required:
+  - id
+  - timestamp
+  - actor
+  - action
+  - target
+  - status
+properties:
+  id:
+    type: string
+    format: uuid
+    description: |
+      A unique, immutable identifier for this specific audit log entry.
+      Generated upon creation of the log record, ensuring each event has a
+      distinct and traceable reference.
+    example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+  timestamp:
+    type: string
+    format: date-time
+    description: |
+      The exact date and time (in ISO 8601 format, UTC) when the audited event
+      occurred or was recorded. This timestamp is critical for chronological
+      analysis, event ordering, and compliance requirements.
+    example: "2023-10-27T10:30:00Z"
+  actor:
+    type: object
+    description: |
+      Details about the entity that initiated the action. This could be a human user,
+      an automated system, a dedicated service account, or an internal process.
+      Understanding the actor is fundamental for accountability and security.
+    required:
+      - id
+      - type
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: |
+          The unique identifier of the actor. For human users, this would typically
+          be their user ID. For systems or services, it could be a service ID,
+          application ID, or a unique system identifier.
+        example: "usr_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"
+      type:
+        type: string
+        description: |
+          The categorized type of entity that performed the action. This helps
+          distinguish between different classes of actors for filtering and analysis.
+        enum:
+          - User
+          - System
+          - ServiceAccount
+          - APIKey
+          - Anonymous
+        example: "User"
+      name:
+        type: string
+        nullable: true
+        description: |
+          The human-readable name of the actor, if available. For users, this might
+          be their full name. For systems, it could be a descriptive service name
+          (e.g., "Billing Service", "Data Sync Job").
+        example: "Alice Smith"
+      email:
+        type: string
+        format: email
+        nullable: true
+        description: |
+          The email address of the actor, primarily applicable for 'User' type actors.
+          Provides an additional identifiable attribute for human users.
+        example: "alice.smith@example.com"
+      ipAddress:
+        type: string
+        format: ipv4
+        nullable: true
+        description: |
+          The IP address from which the action originated. This is crucial for
+          security monitoring, identifying suspicious access patterns, and
+          geographical analysis.
+        example: "203.0.113.45"
+  action:
+    type: object
+    description: |
+      Details about the specific action that was performed. This section describes
+      what operation took place, providing a clear understanding of the event.
+    required:
+      - type
+      - description
+    properties:
+      type:
+        type: string
+        description: |
+          A categorized type of action performed (e.g., CREATE, UPDATE, DELETE, LOGIN,
+          ACCESS, CONFIGURATION_CHANGE, EXPORT). This allows for easy filtering and
+          analysis of similar actions across the system.
+        enum:
+          - CREATE
+          - READ
+          - UPDATE
+          - DELETE
+          - LOGIN
+          - LOGOUT
+          - ACCESS
+          - CONFIGURATION_CHANGE
+          - EXPORT
+          - IMPORT
+          - INVITE
+          - REVOKE
+          - UPLOAD
+          - DOWNLOAD
+          - APPROVE
+          - REJECT
+          - PUBLISH
+          - ARCHIVE
+          - RESTORE
+          - SHARE
+          - UNSHARE
+        example: "UPDATE"
+      description:
+        type: string
+        description: |
+          A human-readable, concise summary of the action performed.
+          This provides immediate context without needing to parse detailed changes
+          and is useful for quick review in audit dashboards.
+        example: "Updated user profile for 'bob.jones' in the production environment."
+      method:
+        type: string
+        nullable: true
+        description: |
+          The HTTP method used for the action, if the action was initiated via an API call.
+          This helps in correlating audit logs with web server access logs.
+        enum:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - HEAD
+          - OPTIONS
+        example: "PATCH"
+      endpoint:
+        type: string
+        nullable: true
+        description: |
+          The API endpoint or resource path that was accessed or modified.
+          Provides a direct link to the specific API surface involved in the action.
+        example: "/api/v1/users/usr_bob_jones_id"
+  target:
+    type: object
+    description: |
+      Details about the primary resource or entity that was affected by the action.
+      This identifies what object in the system was the subject of the audited event.
+    required:
+      - id
+      - type
+    properties:
+      id:
+        type: string
+        description: |
+          The unique identifier of the target resource. This could be a user ID,
+          project ID, document ID, configuration ID, API key ID, etc.
+          It allows for direct lookup of the affected resource.
+        example: "proj_xyz_789"
+      type:
+        type: string
+        description: |
+          The type of the target resource (e.g., User, Project, Document, Configuration,
+          APIKey, Role, Group, Organization, Environment). This categorization aids
+          in filtering and understanding the scope of the action.
+        example: "Project"
+      name:
+        type: string
+        nullable: true
+        description: |
+          A human-readable name or identifier for the target resource, if applicable.
+          (e.g., "Marketing Campaign Q4" for a project, "Main Configuration" for a config).
+          Provides immediate context without needing to resolve the ID.
+        example: "Marketing Campaign Q4"
+      path:
+        type: string
+        nullable: true
+        description: |
+          A logical path or URL to the target resource, if it's part of a hierarchical
+          structure or accessible via a specific URL within the application.
+          Useful for navigating to the resource directly.
+        example: "/projects/marketing-campaign-q4"
+  context:
+    type: object
+    description: |
+      Additional contextual information surrounding the audited event, providing
+      deeper insights into the environment and circumstances of the action.
+      This data is invaluable for debugging, security investigations, and understanding
+      the full scope of an event.
+    properties:
+      userAgent:
+        type: string
+        nullable: true
+        description: |
+          The User-Agent string from the client that initiated the request.
+          Useful for identifying the browser, operating system, or client application
+          used by the actor.
+        example: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
+      sessionId:
+        type: string
+        format: uuid
+        nullable: true
+        description: |
+          The session ID associated with the actor's activity, if applicable.
+          Useful for tracing a series of actions performed by a single user within
+          a continuous session.
+        example: "sess_abc_123_def_456"
+      requestId:
+        type: string
+        format: uuid
+        nullable: true
+        description: |
+          A unique request ID or correlation ID that can be used to trace the
+          entire lifecycle of the request across multiple microservices or system components.
+          Essential for distributed tracing and debugging.
+        example: "req_xyz_456_uvw_789"
+      location:
+        type: object
+        nullable: true
+        description: |
+          Geographical location details derived from the actor's IP address.
+          Provides insights into the physical origin of the action, important for
+          geofencing, compliance, and anomaly detection.
+        properties:
+          country:
+            type: string
+            nullable: true
+            description: |
+              The ISO 3166-1 alpha-2 country code where the action originated.
+            example: "US"
+          city:
+            type: string
+            nullable: true
+            description: |
+              The city where the action originated.
+            example: "New York"
+          region:
+            type: string
+            nullable: true
+            description: |
+              The region or state where the action originated (e.g., "NY" for New York).
+            example: "NY"
+          latitude:
+            type: number
+            format: float
+            nullable: true
+            description: |
+              Latitude coordinate of the origin, providing precise geographical context.
+            example: 40.7128
+          longitude:
+            type: number
+            format: float
+            nullable: true
+            description: |
+              Longitude coordinate of the origin, providing precise geographical context.
+            example: -74.0060
+      metadata:
+        type: object
+        nullable: true
+        additionalProperties: true
+        description: |
+          A flexible field for storing any additional, unstructured key-value
+          pair data relevant to the audit event that doesn't fit into other
+          defined fields. This can include specific request parameters,
+          feature flags, tenant IDs, or other custom context specific to the
+          application or event.
+        example:
+          organizationId: "org_789_abc"
+          featureToggle: "new-dashboard-enabled"
+          environment: "production"
+  changes:
+    type: array
+    nullable: true
+    description: |
+      An array detailing specific changes made to the target resource,
+      primarily for 'UPDATE' or 'CONFIGURATION_CHANGE' actions. Each entry
+      describes a field that was modified, its old value, and its new value.
+      This provides a granular record of data modifications.
+    items:
+      type: object
+      description: |
+        Represents a single field change within an audit log entry, detailing
+        the modification of an attribute of the target resource.
+      required:
+        - field
+        - oldValue
+        - newValue
+      properties:
+        field:
+          type: string
+          description: |
+            The name or path of the field that was modified (e.g., "status", "user.email",
+            "settings.notifications.enabled").
+          example: "status"
+        oldValue:
+          type: string
+          nullable: true
+          description: |
+            The value of the field *before* the change. Can be null if the field
+            was newly added (e.g., during a CREATE operation or adding a new attribute).
+            Represented as a string for simplicity, but could be any JSON type
+            serialized to string.
+          example: "pending"
+        newValue:
+          type: string
+          nullable: true
+          description: |
+            The value of the field *after* the change. Can be null if the field
+            was removed (e.g., during a DELETE operation or removing an attribute).
+            Represented as a string for simplicity, but could be any JSON type
+            serialized to string.
+          example: "approved"
+  status:
+    type: object
+    description: |
+      The outcome or result of the audited action. This indicates whether the
+      operation was successful, failed, or resulted in a warning, providing
+      immediate feedback on the action's completion.
+    required:
+      - outcome
+    properties:
+      outcome:
+        type: string
+        description: |
+          The overall outcome of the action.
+        enum:
+          - SUCCESS
+          - FAILED
+          - PENDING
+          - WARNING
+          - INFO
+        example: "SUCCESS"
+      code:
+        type: string
+        nullable: true
+        description: |
+          An optional status code related to the outcome (e.g., HTTP status code
+          like "200 OK", "403 Forbidden", or a custom application-specific code
+          like "USER_NOT_FOUND").
+        example: "200 OK"
+      message:
+        type: string
+        nullable: true
+        description: |
+          A detailed message providing more information about the outcome,
+          especially useful for 'FAILED' or 'WARNING' outcomes to explain
+          the reason for the status.
+        example: "User profile updated successfully."
+      errorDetails:
+        type: object
+        nullable: true
+        additionalProperties: true
+        description: |
+          Detailed error information if the action failed, potentially including
+          specific error codes, validation failures, or other diagnostic data.
+          This can be a structured object for machine readability.
+        example:
+          errorCode: "USER_NOT_FOUND"
+          validationErrors:
+            - field: "email"
+              message: "Invalid email format"
+          traceId: "trace_12345"
