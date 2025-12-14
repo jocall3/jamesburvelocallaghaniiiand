@@ -1,0 +1,234 @@
+type: object
+description: |
+  Represents the overall health status of the API service and its critical dependencies.
+  This schema provides a comprehensive view of the system's operational state,
+  useful for monitoring, alerting, and automated system recovery processes.
+  It aggregates information from various internal components and external services
+  to give a holistic picture of the application's health.
+properties:
+  status:
+    type: string
+    description: |
+      The overall health status of the service.
+      - `healthy`: All critical components are operational and performing within expected parameters.
+      - `unhealthy`: One or more critical components are not operational, significantly affecting service availability or core functionality.
+      - `degraded`: Some non-critical components are experiencing issues, or critical components are operating at reduced performance, but the core service remains functional.
+      - `maintenance`: The service is intentionally offline for scheduled maintenance or an emergency intervention.
+    enum:
+      - healthy
+      - unhealthy
+      - degraded
+      - maintenance
+    example: healthy
+  timestamp:
+    type: string
+    format: date-time
+    description: |
+      The UTC timestamp when this health check was performed.
+      Provides a precise moment of the system's state, formatted according to ISO 8601.
+    example: "2023-10-27T10:30:00.123Z"
+  version:
+    type: string
+    description: |
+      The current version of the API service application.
+      This typically follows semantic versioning (e.g., `MAJOR.MINOR.PATCH`) and may include
+      build metadata or pre-release identifiers. Useful for identifying the deployed software build.
+    example: "1.2.3-beta.4+build.20231027"
+  uptime:
+    type: string
+    description: |
+      The duration for which the service has been continuously running since its last restart,
+      formatted as an ISO 8601 duration string (e.g., "P1DT2H30M" for 1 day, 2 hours, 30 minutes).
+    example: "P7DT3H15M30S" # 7 days, 3 hours, 15 minutes, 30 seconds
+  dependencies:
+    type: object
+    description: |
+      A detailed breakdown of the health status for critical external and internal dependencies.
+      Each key represents a specific dependency (e.g., "database", "cache", "auth_service", "payment_gateway").
+      This object can dynamically include statuses for any number of monitored services.
+    properties:
+      database:
+        type: object
+        description: Status of the primary database connection and basic operations.
+        properties:
+          status:
+            type: string
+            enum: [healthy, unhealthy, degraded]
+            example: healthy
+            description: Connection status to the database.
+          response_time_ms:
+            type: integer
+            format: int32
+            minimum: 0
+            example: 15
+            description: Latency of a simple database query (e.g., `SELECT 1`) in milliseconds.
+          details:
+            type: string
+            nullable: true
+            example: "PostgreSQL connection OK, 10 active connections."
+            description: Additional details or error messages if the database is unhealthy or degraded.
+        required:
+          - status
+      cache:
+        type: object
+        description: Status of the distributed caching system (e.g., Redis, Memcached).
+        properties:
+          status:
+            type: string
+            enum: [healthy, unhealthy, degraded]
+            example: healthy
+            description: Connection status to the cache.
+          response_time_ms:
+            type: integer
+            format: int32
+            minimum: 0
+            example: 5
+            description: Latency of a simple cache operation (e.g., GET/SET) in milliseconds.
+          hit_rate_percent:
+            type: number
+            format: float
+            minimum: 0
+            maximum: 100
+            nullable: true
+            example: 92.5
+            description: Current cache hit rate percentage, indicating efficiency.
+          details:
+            type: string
+            nullable: true
+            example: "Redis cluster operational, 3 nodes."
+            description: Additional details or error messages if the cache is unhealthy.
+        required:
+          - status
+      message_queue:
+        type: object
+        description: Status of the message queuing system (e.g., Kafka, RabbitMQ, SQS).
+        properties:
+          status:
+            type: string
+            enum: [healthy, unhealthy, degraded]
+            example: healthy
+            description: Connection status to the message queue brokers.
+          pending_messages:
+            type: integer
+            format: int64
+            minimum: 0
+            example: 0
+            description: Number of messages currently pending in critical queues, indicating backlog.
+          details:
+            type: string
+            nullable: true
+            example: "Kafka brokers reachable, 5 topics monitored."
+            description: Additional details or error messages if the message queue is unhealthy.
+        required:
+          - status
+      external_auth_service:
+        type: object
+        description: Status of a critical external authentication or identity provider service.
+        properties:
+          status:
+            type: string
+            enum: [healthy, unhealthy, degraded]
+            example: healthy
+            description: Reachability and responsiveness of the external authentication API.
+          last_successful_call:
+            type: string
+            format: date-time
+            nullable: true
+            example: "2023-10-27T10:29:55Z"
+            description: Timestamp of the last successful call to this external service.
+          details:
+            type: string
+            nullable: true
+            example: "OAuth2 provider responding normally."
+            description: Additional details or error messages.
+        required:
+          - status
+    additionalProperties:
+      type: object
+      description: Status of an additional, dynamically discovered or configured dependency.
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy, degraded]
+          example: healthy
+          description: The health status of this specific dependency.
+        details:
+          type: string
+          nullable: true
+          example: "Component X is running with 5 active workers."
+          description: Specific details or error messages for this dependency.
+        response_time_ms:
+          type: integer
+          format: int32
+          minimum: 0
+          nullable: true
+          example: 20
+          description: Optional response time for this dependency in milliseconds, if applicable.
+      required:
+        - status
+  system_resources:
+    type: object
+    description: |
+      Current usage statistics for key system resources on the host running the service.
+      Provides insight into the operational load and potential bottlenecks.
+    properties:
+      cpu_usage_percent:
+        type: number
+        format: float
+        minimum: 0
+        maximum: 100
+        example: 25.5
+        description: Current CPU utilization percentage across all cores.
+      memory_usage_mb:
+        type: integer
+        format: int64
+        minimum: 0
+        example: 1024
+        description: Current memory usage by the application process and its dependencies in megabytes.
+      disk_usage_percent:
+        type: number
+        format: float
+        minimum: 0
+        maximum: 100
+        example: 45.2
+        description: Current disk utilization percentage for the primary storage volume where the application resides.
+      network_io_mbps:
+        type: object
+        description: Current network input/output rates.
+        properties:
+          inbound:
+            type: number
+            format: float
+            minimum: 0
+            example: 12.5
+            description: Inbound network traffic rate in megabits per second (Mbps).
+          outbound:
+            type: number
+            format: float
+            minimum: 0
+            example: 8.7
+            description: Outbound network traffic rate in megabits per second (Mbps).
+        required:
+          - inbound
+          - outbound
+    required:
+      - cpu_usage_percent
+      - memory_usage_mb
+      - disk_usage_percent
+  messages:
+    type: array
+    description: |
+      A list of informational, warning, or error messages related to the current health status.
+      Provides human-readable context for the health check, useful for debugging or operational awareness.
+    items:
+      type: string
+      example: "Warning: Cache hit rate is below threshold (85%)."
+    example:
+      - "All systems nominal."
+      - "Info: Database connection pool utilization at 60%."
+      - "Warning: Disk space on /var/log is 90% full."
+required:
+  - status
+  - timestamp
+  - version
+  - uptime
