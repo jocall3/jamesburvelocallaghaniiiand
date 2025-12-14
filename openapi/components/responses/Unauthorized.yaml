@@ -1,0 +1,25 @@
+description: |
+  Unauthorized.
+  The request has not been applied because it lacks valid authentication credentials for the target resource.
+  The server is sending this response to indicate that the client must authenticate itself to get the requested response.
+  This is often accompanied by a `WWW-Authenticate` header containing information on how to authenticate.
+
+content:
+  application/json:
+    schema:
+      $ref: '../schemas/Error.yaml'
+    example:
+      error:
+        code: 401
+        message: "Authentication credentials were not provided or are invalid."
+        details: "Please provide a valid Bearer token in the Authorization header."
+        requestId: "req_123456789abcdef"
+
+headers:
+  WWW-Authenticate:
+    description: |
+      Indicates the authentication method that should be used to access the resource.
+      For example, `Bearer realm="example"`.
+    schema:
+      type: string
+      example: 'Bearer realm="example.com", error="invalid_token", error_description="The access token expired"'
