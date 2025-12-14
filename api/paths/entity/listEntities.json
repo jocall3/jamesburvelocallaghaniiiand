@@ -1,0 +1,318 @@
+{
+  "summary": "List Corporate Entities",
+  "description": "Retrieves a comprehensive, paginated list of corporate entities from the global Corporate Registry. This endpoint serves as the primary interface for discovering entities based on specific criteria such as legal jurisdiction, industry sector, operational status, and financial thresholds. It is designed to handle large datasets and supports high-performance filtering to facilitate regulatory compliance checks, market analysis, and due diligence workflows.",
+  "operationId": "listEntities",
+  "tags": [
+    "Entities",
+    "Registry",
+    "Search"
+  ],
+  "parameters": [
+    {
+      "name": "jurisdiction",
+      "in": "query",
+      "description": "Filters entities by their primary legal jurisdiction. Accepts ISO 3166-1 alpha-2 country codes (e.g., 'US', 'GB', 'SG') or specific state/province codes where applicable (e.g., 'US-DE').",
+      "required": false,
+      "schema": {
+        "type": "string",
+        "example": "US-DE",
+        "pattern": "^[A-Z]{2}(-[A-Z0-9]{1,3})?$"
+      }
+    },
+    {
+      "name": "industry",
+      "in": "query",
+      "description": "Filters entities by their primary industry sector. Supports standard classification codes (NAICS, GICS) or broad sector names.",
+      "required": false,
+      "schema": {
+        "type": "string",
+        "example": "Technology",
+        "enum": [
+          "Technology",
+          "Finance",
+          "Healthcare",
+          "Energy",
+          "Consumer Discretionary",
+          "Industrials",
+          "Utilities",
+          "Real Estate",
+          "Materials",
+          "Telecommunications"
+        ]
+      }
+    },
+    {
+      "name": "status",
+      "in": "query",
+      "description": "The current operational status of the entity within the registry.",
+      "required": false,
+      "schema": {
+        "type": "string",
+        "default": "Active",
+        "enum": [
+          "Active",
+          "Inactive",
+          "Dissolved",
+          "Merged",
+          "Bankrupt",
+          "Suspended",
+          "Liquidation",
+          "Pending"
+        ]
+      }
+    },
+    {
+      "name": "search",
+      "in": "query",
+      "description": "A fuzzy search term to match against entity legal names, trade names, or registration numbers.",
+      "required": false,
+      "schema": {
+        "type": "string",
+        "minLength": 3,
+        "example": "Acme Global"
+      }
+    },
+    {
+      "name": "minRevenue",
+      "in": "query",
+      "description": "Filter for entities with reported annual revenue greater than or equal to this value (USD).",
+      "schema": {
+        "type": "number",
+        "format": "double",
+        "minimum": 0,
+        "example": 1000000.0
+      }
+    },
+    {
+      "name": "maxRevenue",
+      "in": "query",
+      "description": "Filter for entities with reported annual revenue less than or equal to this value (USD).",
+      "schema": {
+        "type": "number",
+        "format": "double",
+        "minimum": 0,
+        "example": 50000000.0
+      }
+    },
+    {
+      "name": "foundedAfter",
+      "in": "query",
+      "description": "Filter for entities incorporated on or after this date (ISO 8601).",
+      "schema": {
+        "type": "string",
+        "format": "date",
+        "example": "2015-01-01"
+      }
+    },
+    {
+      "name": "limit",
+      "in": "query",
+      "description": "The maximum number of entities to return in a single response page.",
+      "schema": {
+        "type": "integer",
+        "default": 50,
+        "minimum": 1,
+        "maximum": 1000
+      }
+    },
+    {
+      "name": "offset",
+      "in": "query",
+      "description": "The number of records to skip before starting to return results. Used for pagination.",
+      "schema": {
+        "type": "integer",
+        "default": 0,
+        "minimum": 0
+      }
+    },
+    {
+      "name": "sort",
+      "in": "query",
+      "description": "Field to sort the results by. Prefix with '-' for descending order.",
+      "schema": {
+        "type": "string",
+        "default": "-incorporationDate",
+        "enum": [
+          "legalName",
+          "-legalName",
+          "incorporationDate",
+          "-incorporationDate",
+          "revenue",
+          "-revenue"
+        ]
+      }
+    }
+  ],
+  "responses": {
+    "200": {
+      "description": "Successful operation. Returns a paginated list of entities wrapped in the CorporateRegistry object.",
+      "headers": {
+        "X-Total-Count": {
+          "description": "The total number of entities matching the query criteria.",
+          "schema": {
+            "type": "integer"
+          }
+        },
+        "X-RateLimit-Limit": {
+          "description": "The number of requests allowed in the current period.",
+          "schema": {
+            "type": "integer"
+          }
+        },
+        "X-RateLimit-Remaining": {
+          "description": "The number of requests remaining in the current period.",
+          "schema": {
+            "type": "integer"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/CorporateRegistry"
+          },
+          "examples": {
+            "standardList": {
+              "summary": "Standard paginated list of active entities",
+              "value": {
+                "meta": {
+                  "version": "1.4.2",
+                  "timestamp": "2023-11-15T14:30:00Z",
+                  "pagination": {
+                    "total": 1250,
+                    "limit": 50,
+                    "offset": 0,
+                    "next": "/entities?limit=50&offset=50"
+                  }
+                },
+                "data": [
+                  {
+                    "entityId": "ent-88293-US",
+                    "legalName": "Apex Dynamics, Inc.",
+                    "jurisdiction": "US-DE",
+                    "industry": "Technology",
+                    "status": "Active",
+                    "incorporationDate": "2018-05-12",
+                    "identifiers": {
+                      "lei": "5493001KJTIIGC8Y1R17",
+                      "taxId": "99-1234567"
+                    },
+                    "financials": {
+                      "currency": "USD",
+                      "lastReportedRevenue": 15000000.0,
+                      "fiscalYearEnd": "2022-12-31"
+                    }
+                  },
+                  {
+                    "entityId": "ent-99102-GB",
+                    "legalName": "Sovereign Wealth Partners Ltd",
+                    "jurisdiction": "GB",
+                    "industry": "Finance",
+                    "status": "Active",
+                    "incorporationDate": "2010-11-20",
+                    "identifiers": {
+                      "lei": "213800A1B2C3D4E5F678",
+                      "taxId": "GB123456789"
+                    },
+                    "financials": {
+                      "currency": "GBP",
+                      "lastReportedRevenue": 45000000.0,
+                      "fiscalYearEnd": "2022-03-31"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "400": {
+      "description": "Bad Request. The request was invalid, likely due to malformed query parameters or invalid filter values.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          },
+          "examples": {
+            "invalidJurisdiction": {
+              "summary": "Invalid Jurisdiction Code",
+              "value": {
+                "code": "INVALID_PARAMETER",
+                "message": "The provided jurisdiction code 'XX' is not a valid ISO 3166-1 alpha-2 code.",
+                "details": [
+                  {
+                    "field": "jurisdiction",
+                    "issue": "Must be a valid 2-letter country code."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "401": {
+      "description": "Unauthorized. The request lacks valid authentication credentials.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        }
+      }
+    },
+    "403": {
+      "description": "Forbidden. The authenticated user does not have permission to access the requested entities or specific fields.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        }
+      }
+    },
+    "429": {
+      "description": "Too Many Requests. The client has exceeded the rate limit for this endpoint.",
+      "headers": {
+        "Retry-After": {
+          "description": "The number of seconds to wait before making a new request.",
+          "schema": {
+            "type": "integer"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        }
+      }
+    },
+    "500": {
+      "description": "Internal Server Error. An unexpected error occurred on the server side.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    },
+    {
+      "ApiKeyAuth": []
+    },
+    {
+      "OAuth2": [
+        "entities:read",
+        "registry:public"
+      ]
+    }
+  ]
+}
