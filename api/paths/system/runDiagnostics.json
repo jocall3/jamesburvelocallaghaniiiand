@@ -1,0 +1,296 @@
+{
+  "post": {
+    "tags": [
+      "System",
+      "Diagnostics",
+      "Maintenance",
+      "Procedural Generation"
+    ],
+    "summary": "Trigger C01 Procedural Load Sequence",
+    "description": "Manually initiates the 'C01_Initiate_Procedural_Load_Sequence' diagnostic protocol. This operation performs a comprehensive deep-scan of the system architecture, verifying integrity across all logic gates, memory banks, and peripheral interfaces. It is designed to simulate high-load environments to detect potential failures before production deployment. \n\nWARNING: This operation consumes significant computational resources and may temporarily degrade performance of concurrent processes.",
+    "operationId": "runSystemDiagnostics",
+    "parameters": [
+      {
+        "name": "trace_id",
+        "in": "header",
+        "description": "A unique UUID for distributed tracing across microservices during the diagnostic run.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+        }
+      },
+      {
+        "name": "dry_run",
+        "in": "query",
+        "description": "If set to true, the system simulates the diagnostic steps without executing the actual hardware interrupts.",
+        "schema": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      {
+        "name": "priority_level",
+        "in": "query",
+        "description": "Determines the scheduler priority for the diagnostic task.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "low",
+            "normal",
+            "critical",
+            "emergency"
+          ],
+          "default": "normal"
+        }
+      }
+    ],
+    "requestBody": {
+      "description": "Configuration payload for the diagnostic sequence, allowing specific subsystem targeting and parameter overrides.",
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "sequence_identifier": {
+                "type": "string",
+                "description": "The specific diagnostic protocol identifier.",
+                "default": "C01_Initiate_Procedural_Load_Sequence",
+                "example": "C01_Initiate_Procedural_Load_Sequence"
+              },
+              "target_modules": {
+                "type": "array",
+                "description": "List of specific modules to include in the diagnostic scan. If empty, all modules are scanned.",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "core_kernel",
+                    "network_interface",
+                    "storage_controller",
+                    "memory_management_unit",
+                    "security_subsystem",
+                    "gpu_compute_cluster"
+                  ]
+                },
+                "example": [
+                  "core_kernel",
+                  "memory_management_unit"
+                ]
+              },
+              "load_parameters": {
+                "type": "object",
+                "description": "Parameters defining the intensity of the synthetic load generated during testing.",
+                "properties": {
+                  "cpu_stress_percentage": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "default": 80,
+                    "description": "Target CPU utilization percentage."
+                  },
+                  "memory_allocation_mb": {
+                    "type": "integer",
+                    "minimum": 128,
+                    "description": "Amount of RAM to reserve for integrity testing."
+                  },
+                  "io_operations_per_second": {
+                    "type": "integer",
+                    "minimum": 100,
+                    "default": 5000,
+                    "description": "Target IOPS for storage controller stress testing."
+                  }
+                }
+              },
+              "notification_webhook": {
+                "type": "string",
+                "format": "uri",
+                "description": "Optional URL to receive a POST callback upon diagnostic completion.",
+                "example": "https://monitor.internal.system/hooks/diagnostics/result"
+              }
+            }
+          },
+          "examples": {
+            "full_system_check": {
+              "summary": "Full System C01 Sequence",
+              "description": "Initiates the standard C01 sequence across all modules with default stress parameters.",
+              "value": {
+                "sequence_identifier": "C01_Initiate_Procedural_Load_Sequence",
+                "target_modules": [],
+                "load_parameters": {
+                  "cpu_stress_percentage": 85,
+                  "memory_allocation_mb": 4096,
+                  "io_operations_per_second": 10000
+                }
+              }
+            },
+            "memory_only_check": {
+              "summary": "Memory Subsystem Check",
+              "description": "Runs the C01 sequence isolated to the MMU.",
+              "value": {
+                "sequence_identifier": "C01_Initiate_Procedural_Load_Sequence",
+                "target_modules": [
+                  "memory_management_unit"
+                ],
+                "load_parameters": {
+                  "cpu_stress_percentage": 20,
+                  "memory_allocation_mb": 16384,
+                  "io_operations_per_second": 100
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "202": {
+        "description": "Accepted. The diagnostic sequence has been queued for execution.",
+        "headers": {
+          "Location": {
+            "description": "URI to poll for the status of the diagnostic job.",
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "X-Job-ID": {
+            "description": "The unique identifier assigned to this diagnostic job.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "job_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Unique reference ID for the queued job."
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "queued",
+                    "initializing",
+                    "pending_resources"
+                  ],
+                  "description": "Current state of the request."
+                },
+                "estimated_completion_time": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Projected timestamp for completion based on current system load."
+                },
+                "queue_position": {
+                  "type": "integer",
+                  "description": "Current position in the execution queue."
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Human-readable confirmation message."
+                }
+              }
+            },
+            "examples": {
+              "job_queued": {
+                "summary": "Job Successfully Queued",
+                "value": {
+                  "job_id": "550e8400-e29b-41d4-a716-446655440000",
+                  "status": "queued",
+                  "estimated_completion_time": "2023-10-27T14:30:00Z",
+                  "queue_position": 1,
+                  "message": "C01_Initiate_Procedural_Load_Sequence queued successfully."
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request. The configuration payload contains invalid parameters or unsupported modules.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "invalid_module": {
+                "value": {
+                  "code": "INVALID_MODULE",
+                  "message": "The module 'quantum_core' is not recognized or not available for diagnostic C01.",
+                  "timestamp": "2023-10-27T14:00:05Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized. The request lacks valid authentication credentials or the user lacks permission to trigger system-level diagnostics.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "409": {
+        "description": "Conflict. A diagnostic sequence is already running and concurrent execution is not permitted.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "lock_conflict": {
+                "value": {
+                  "code": "RESOURCE_LOCKED",
+                  "message": "Diagnostic lock held by job ID 123e4567-e89b-12d3-a456-426614174000.",
+                  "timestamp": "2023-10-27T14:00:10Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "503": {
+        "description": "Service Unavailable. The diagnostic subsystem is currently offline for maintenance.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "security": [
+      {
+        "bearerAuth": [
+          "system:write",
+          "diagnostics:execute"
+        ]
+      },
+      {
+        "apiKeyAuth": []
+      }
+    ],
+    "x-code-samples": [
+      {
+        "lang": "Curl",
+        "source": "curl -X POST 'https://api.system.local/v1/system/diagnostics?priority_level=critical' \\\n  -H 'Authorization: Bearer <token>' \\\n  -H 'trace_id: <uuid>' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"sequence_identifier\": \"C01_Initiate_Procedural_Load_Sequence\",\n    \"target_modules\": [\"core_kernel\"],\n    \"load_parameters\": {\n      \"cpu_stress_percentage\": 90\n    }\n  }'"
+      },
+      {
+        "lang": "Python",
+        "source": "import requests\n\nurl = 'https://api.system.local/v1/system/diagnostics'\nheaders = {\n    'Authorization': 'Bearer <token>',\n    'trace_id': 'a1b2c3d4-e5f6-7890-1234-56789abcdef0',\n    'Content-Type': 'application/json'\n}\npayload = {\n    'sequence_identifier': 'C01_Initiate_Procedural_Load_Sequence',\n    'target_modules': ['core_kernel'],\n    'load_parameters': {\n        'cpu_stress_percentage': 90\n    }\n}\n\nresponse = requests.post(url, headers=headers, json=payload, params={'priority_level': 'critical'})\nprint(response.json())"
+      }
+    ]
+  }
+}
