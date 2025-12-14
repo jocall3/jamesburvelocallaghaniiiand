@@ -1,0 +1,166 @@
+post:
+  tags:
+    - Media
+  summary: Upload a New Media Asset
+  description: |
+    This endpoint facilitates the uploading of new media assets, such as images, videos, or documents, to the system's content delivery network (CDN) or storage backend.
+    The uploaded file is processed, and a unique media asset identifier is returned, which can then be associated with other resources like products, user profiles, or articles.
+    The endpoint supports multipart/form-data for file uploads and includes metadata fields to categorize and describe the asset.
+  operationId: uploadMediaAsset
+  security:
+    - OAuth2:
+        - media:write
+    - ApiKeyAuth: []
+  requestBody:
+    description: The media file and its associated metadata to be uploaded.
+    required: true
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          required:
+            - file
+            - asset_type
+          properties:
+            file:
+              type: string
+              format: binary
+              description: The actual media file to be uploaded. The server will process this file and store it in the designated storage backend.
+            asset_type:
+              type: string
+              description: The type of asset being uploaded. This helps in categorizing the media and applying specific processing rules or storage policies.
+              enum:
+                - product_image
+                - user_avatar
+                - gallery_image
+                - document
+                - video_thumbnail
+                - marketing_banner
+              example: product_image
+            alt_text:
+              type: string
+              description: Alternative text for the media, crucial for accessibility (e.g., for screen readers). Describes the content of the image.
+              example: "A high-resolution photo of a red t-shirt on a white background."
+            tags:
+              type: string
+              description: A comma-separated list of tags for searching and filtering the media asset.
+              example: "apparel,t-shirt,red,summer-collection"
+            related_entity_id:
+              type: string
+              format: uuid
+              description: The unique identifier of the entity this media asset is related to (e.g., a product ID, user ID).
+              example: "prod_1a2b3c4d5e6f7g8h"
+        examples:
+          productImageUpload:
+            summary: Example of a product image upload
+            value:
+              asset_type: "product_image"
+              alt_text: "Front view of a premium cotton t-shirt in navy blue."
+              tags: "clothing,t-shirt,cotton,navy-blue"
+              related_entity_id: "prod_a1b2c3d4e5f6"
+          userAvatarUpload:
+            summary: Example of a user avatar upload
+            value:
+              asset_type: "user_avatar"
+              alt_text: "Profile picture of Jane Doe."
+              related_entity_id: "user_z9y8x7w6v5u4"
+  responses:
+    '201':
+      description: Media asset uploaded and processed successfully. The response contains the details of the newly created media asset.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/MediaAsset.yaml'
+          examples:
+            successfulUpload:
+              summary: Example of a successful media asset creation
+              value:
+                id: "media_a1b2c3d4e5f67890"
+                object: "media_asset"
+                created_at: "2023-10-27T10:00:00Z"
+                asset_type: "product_image"
+                file_name: "red-t-shirt-front.jpg"
+                mime_type: "image/jpeg"
+                size_bytes: 512000
+                url: "https://cdn.example.com/media/a1b2c3d4e5f67890/red-t-shirt-front.jpg"
+                alt_text: "A high-resolution photo of a red t-shirt on a white background."
+                tags:
+                  - "apparel"
+                  - "t-shirt"
+                  - "red"
+                  - "summer-collection"
+                related_entity_id: "prod_1a2b3c4d5e6f7g8h"
+                metadata:
+                  image_width: 1024
+                  image_height: 1024
+                  uploader_user_id: "user_f8g7h6e5d4c3b2a1"
+                thumbnails:
+                  small: "https://cdn.example.com/media/a1b2c3d4e5f67890/thumb_small_red-t-shirt-front.jpg"
+                  medium: "https://cdn.example.com/media/a1b2c3d4e5f67890/thumb_medium_red-t-shirt-front.jpg"
+                  large: "https://cdn.example.com/media/a1b2c3d4e5f67890/thumb_large_red-t-shirt-front.jpg"
+    '400':
+      description: The request was malformed. This could be due to a missing file, an unsupported file type, or invalid metadata.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/ErrorResponse.yaml'
+          examples:
+            unsupportedFileType:
+              summary: Unsupported File Type Error
+              value:
+                error:
+                  type: "invalid_request_error"
+                  code: "parameter_invalid"
+                  message: "The provided file type 'application/zip' is not supported. Please upload a valid image (JPEG, PNG, GIF) or video (MP4, MOV) file."
+                  param: "file"
+            missingRequiredField:
+              summary: Missing Required Field Error
+              value:
+                error:
+                  type: "invalid_request_error"
+                  code: "parameter_missing"
+                  message: "Required parameter 'asset_type' is missing."
+                  param: "asset_type"
+    '401':
+      description: Authentication credentials were not provided or are invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/ErrorResponse.yaml'
+          examples:
+            unauthorized:
+              summary: Unauthorized Access Error
+              value:
+                error:
+                  type: "authentication_error"
+                  code: "token_invalid"
+                  message: "The provided API key or OAuth token is invalid or has expired."
+    '413':
+      description: The uploaded file exceeds the maximum allowed size for this asset type.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/ErrorResponse.yaml'
+          examples:
+            fileTooLarge:
+              summary: File Too Large Error
+              value:
+                error:
+                  type: "invalid_request_error"
+                  code: "file_too_large"
+                  message: "The uploaded file size of 25MB exceeds the maximum limit of 20MB."
+                  param: "file"
+    '500':
+      description: An unexpected error occurred on the server while processing the upload. This could be a storage backend issue or a processing failure.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/ErrorResponse.yaml'
+          examples:
+            serverError:
+              summary: Internal Server Error
+              value:
+                error:
+                  type: "api_error"
+                  code: "internal_server_error"
+                  message: "An internal error occurred while processing the file. Please try again later. If the problem persists, contact support with request ID: req_12345."
