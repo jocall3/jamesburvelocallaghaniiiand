@@ -1,0 +1,104 @@
+get:
+  summary: Get AI Insights
+  description: Fetches a stream of AI-generated insights, anomalies, and optimization suggestions based on various data sources. This endpoint is crucial for proactive system management, security monitoring, and market trend analysis.
+  operationId: getAIInsights
+  tags:
+    - AI
+  parameters:
+    - name: category
+      in: query
+      description: The category of insights to retrieve. Filtering by category helps narrow down the focus to specific areas of interest.
+      required: false
+      schema:
+        type: string
+        enum: [market, system, security, performance, user_behavior]
+        default: system
+        example: market
+    - name: minSeverity
+      in: query
+      description: The minimum severity level for insights to be included in the response. This allows clients to filter out low-priority noise.
+      required: false
+      schema:
+        type: string
+        enum: [low, medium, high, critical]
+        default: medium
+        example: high
+    - name: limit
+      in: query
+      description: The maximum number of insights to return.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 1000
+        default: 100
+        example: 50
+    - name: since
+      in: query
+      description: A timestamp in ISO 8601 format to fetch insights generated after this time.
+      required: false
+      schema:
+        type: string
+        format: date-time
+        example: '2023-10-27T10:00:00Z'
+  responses:
+    '200':
+      description: A successful response returning a list of AI-generated insights. The insights are ordered by timestamp, with the most recent first.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../../components/schemas/ai/AIInsight.yaml'
+          example:
+            - insightId: "ins-a1b2c3d4e5f67890"
+              timestamp: "2023-10-27T12:34:56Z"
+              category: "security"
+              severity: "critical"
+              title: "Anomalous Login Activity Detected"
+              summary: "Multiple failed login attempts from a new IP address (198.51.100.23) targeting admin accounts have been detected in the last 5 minutes."
+              details:
+                type: "brute_force_attack_suspected"
+                sourceIp: "198.51.100.23"
+                targetAccounts: ["admin", "root", "superuser"]
+                attemptCount: 157
+                timeWindow: "300s"
+              recommendations:
+                - actionId: "rec-ip-block-01"
+                  description: "Immediately block the source IP address 198.51.100.23 at the firewall."
+                  priority: "high"
+                - actionId: "rec-acc-lock-02"
+                  description: "Temporarily lock the targeted administrative accounts and force password reset."
+                  priority: "high"
+              relatedEntities:
+                - entityId: "user-admin"
+                  entityType: "user_account"
+                - entityId: "firewall-main"
+                  entityType: "network_device"
+            - insightId: "ins-f0e9d8c7b6a54321"
+              timestamp: "2023-10-27T11:15:00Z"
+              category: "market"
+              severity: "high"
+              title: "Sudden Surge in 'Quantum Computing' Keyword Interest"
+              summary: "Social media and news outlet mentions of 'Quantum Computing' have increased by 350% in the last 24 hours, indicating a potential market shift or major news event."
+              details:
+                type: "trend_detection"
+                keyword: "Quantum Computing"
+                percentageIncrease: 350
+                dataSources: ["Twitter", "TechCrunch", "Bloomberg"]
+              recommendations:
+                - actionId: "rec-content-strat-03"
+                  description: "Task the content team to create and publish an article or blog post about the recent developments in quantum computing to capture search traffic."
+                  priority: "medium"
+              relatedEntities:
+                - entityId: "topic-quantum"
+                  entityType: "market_topic"
+    '400':
+      $ref: '../../components/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../components/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../components/responses/Forbidden.yaml'
+    '500':
+      $ref: '../../components/responses/InternalServerError.yaml'
