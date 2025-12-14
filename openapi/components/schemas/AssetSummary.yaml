@@ -1,0 +1,114 @@
+type: object
+title: Asset Summary
+description: A summarized representation of a digital or physical asset, providing key identifying information without the full detail. This is typically used in list views to optimize performance and reduce payload size.
+properties:
+  id:
+    type: string
+    format: uuid
+    description: The unique identifier for the asset. This is a system-generated UUID.
+    example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+    readOnly: true
+  name:
+    type: string
+    description: A human-readable name for the asset, used for display and identification in user interfaces.
+    example: "Production Web Server 01"
+    minLength: 1
+    maxLength: 255
+  asset_type:
+    type: string
+    description: The category or type of the asset, which dictates its properties and management policies.
+    example: "server"
+    enum:
+      - server
+      - database
+      - network_device
+      - application
+      - service
+      - virtual_machine
+      - container
+      - storage
+      - other
+  status:
+    type: string
+    description: The current operational status of the asset.
+    example: "active"
+    enum:
+      - active
+      - inactive
+      - maintenance
+      - decommissioning
+      - failed
+  criticality:
+    type: string
+    description: The business criticality level of the asset, used for incident prioritization and risk assessment.
+    example: "high"
+    enum:
+      - critical
+      - high
+      - medium
+      - low
+  location_summary:
+    type: object
+    description: A brief summary of the asset's physical or logical location.
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: The unique identifier for the location.
+        example: "loc-a1b2c3d4-e5f6-7890-1234"
+      name:
+        type: string
+        description: The name of the location.
+        example: "Data Center A, Rack 42, Unit 10"
+    required:
+      - id
+      - name
+  owner_summary:
+    type: object
+    description: A brief summary of the asset's owner or responsible team.
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: The unique identifier for the owner (user or team).
+        example: "user-f6e5d4c3-b2a1-0987-6543-210987fedcba"
+      name:
+        type: string
+        description: The name of the owner or team.
+        example: "DevOps Team"
+    required:
+      - id
+      - name
+  tags:
+    type: array
+    description: A list of tags associated with the asset for categorization, searching, and policy application.
+    items:
+      type: string
+      description: A single tag string.
+      example: "production"
+      minLength: 1
+      maxLength: 50
+    example:
+      - "production"
+      - "web-tier"
+      - "pci-compliant"
+    maxItems: 100
+  created_at:
+    type: string
+    format: date-time
+    description: The ISO 8601 timestamp when the asset was created in the system.
+    example: "2023-04-12T10:00:00Z"
+    readOnly: true
+  updated_at:
+    type: string
+    format: date-time
+    description: The ISO 8601 timestamp when the asset was last updated.
+    example: "2023-10-28T15:30:00Z"
+    readOnly: true
+required:
+  - id
+  - name
+  - asset_type
+  - status
+  - created_at
+  - updated_at
