@@ -1,0 +1,356 @@
+type: object
+description: |
+  Comprehensive metadata and configuration details for an Artificial Intelligence (AI) model.
+  This schema provides a standardized way to describe various AI models,
+  including Large Language Models (LLMs), image generation models,
+  embedding models, speech-to-text models, and more. It's designed to support a wide range of
+  model types and their specific characteristics, enabling robust
+  discovery, management, and interaction within an AI ecosystem.
+  Each field is carefully defined to ensure clarity, machine-readability,
+  and compatibility with various tools and platforms.
+properties:
+  id:
+    type: string
+    format: uuid
+    description: |
+      A unique, immutable identifier for the AI model. This ID is typically
+      generated upon model registration and serves as the primary key for
+      referencing the model across the system. It ensures that each model
+      can be distinctly identified, even if names or versions change.
+    example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+  name:
+    type: string
+    description: |
+      A human-readable name for the AI model. This name should be descriptive
+      and easily recognizable, often reflecting its primary function, origin,
+      or a common alias. It's used for display purposes in UIs and documentation.
+    example: "GPT-4 Turbo"
+  version:
+    type: string
+    description: |
+      The specific version identifier of the model. This can be a semantic
+      version (e.g., "1.0.0"), a date-based version (e.g., "2023-10-26"),
+      or any other scheme used by the model provider to denote updates or
+      iterations. It's crucial for tracking model evolution and ensuring
+      compatibility.
+    example: "2023-11-06"
+  provider:
+    type: string
+    description: |
+      The entity or organization that developed, trained, or provides access
+      to this AI model. This helps in attributing the model and understanding
+      its source.
+    example: "OpenAI"
+  description:
+    type: string
+    description: |
+      A detailed, verbose description of the AI model's capabilities,
+      intended use cases, known limitations, ethical considerations,
+      and any other relevant information that helps users understand
+      its function, suitability, and potential biases. This field is
+      critical for informed model selection and responsible AI deployment.
+    example: |
+      A highly advanced large language model capable of understanding and
+      generating human-like text across a wide range of tasks, including
+      complex reasoning, creative writing, and code generation. It excels
+      in multi-turn conversations and follows instructions with high fidelity.
+      Known limitations include occasional factual inaccuracies, potential
+      biases inherited from training data, and a tendency to "hallucinate"
+      information when uncertain. Best used for tasks requiring creativity
+      and complex understanding, with human oversight for critical applications.
+  type:
+    type: string
+    description: |
+      The general category or type of the AI model, indicating its primary
+      domain or function. This helps in broad classification and filtering.
+    enum:
+      - LLM
+      - Image Generation
+      - Embedding
+      - Speech-to-Text
+      - Text-to-Speech
+      - Vision
+      - Code Generation
+      - Recommendation
+      - Translation
+      - Other
+    example: "LLM"
+  status:
+    type: string
+    description: |
+      The current operational status of the model, indicating its availability
+      and lifecycle stage. This helps users understand if a model is ready
+      for production, under development, or being phased out.
+    enum:
+      - active
+      - deprecated
+      - beta
+      - alpha
+      - retired
+      - maintenance
+    example: "active"
+  capabilities:
+    type: array
+    description: |
+      A list of specific functionalities or tasks the model is capable of performing.
+      This provides a granular view of the model's features, allowing for
+      precise matching of model capabilities to application requirements.
+    items:
+      type: string
+      description: A specific capability or skill of the AI model.
+      enum:
+        - text-generation
+        - code-completion
+        - image-generation
+        - image-analysis
+        - text-embedding
+        - speech-recognition
+        - text-to-speech
+        - translation
+        - summarization
+        - sentiment-analysis
+        - object-detection
+        - face-recognition
+        - video-analysis
+        - document-understanding
+        - question-answering
+        - function-calling
+        - tool-use
+        - multimodal-input
+        - multimodal-output
+    example:
+      - text-generation
+      - function-calling
+      - code-completion
+      - multimodal-input
+  input_formats:
+    type: array
+    description: |
+      A list of MIME types or common format identifiers that the model
+      can accept as input. This ensures that client applications send
+      data in a compatible format.
+    items:
+      type: string
+      description: A supported input data format (e.g., "text/plain", "application/json", "image/jpeg").
+      example: "text/plain"
+    example:
+      - "text/plain"
+      - "application/json"
+      - "image/jpeg"
+      - "audio/mpeg"
+  output_formats:
+    type: array
+    description: |
+      A list of MIME types or common format identifiers that the model
+      can produce as output. This helps client applications anticipate
+      and correctly parse the model's responses.
+    items:
+      type: string
+      description: A supported output data format (e.g., "text/plain", "application/json", "image/png").
+      example: "text/plain"
+    example:
+      - "text/plain"
+      - "application/json"
+      - "image/png"
+      - "audio/wav"
+  max_input_tokens:
+    type: integer
+    format: int32
+    minimum: 1
+    description: |
+      For token-based models (e.g., LLMs), the maximum number of tokens
+      the model can process in a single input request. This includes
+      the prompt, any context provided, and potentially system messages.
+      Exceeding this limit will result in an error.
+    example: 128000
+  max_output_tokens:
+    type: integer
+    format: int32
+    minimum: 1
+    description: |
+      For token-based models, the maximum number of tokens the model
+      is capable of generating in a single output response. This helps
+      in managing response length and cost.
+    example: 4096
+  context_window:
+    type: integer
+    format: int32
+    minimum: 1
+    description: |
+      The total context window size for the model, representing the
+      maximum number of tokens (input + output) it can handle in a
+      single interaction or session. This is a critical parameter for
+      long-running conversations or complex tasks.
+    example: 132096
+  training_data_info:
+    type: object
+    description: |
+      Information regarding the dataset(s) used to train the AI model.
+      This can include details about the data source, size, last update,
+      and any specific characteristics of the training corpus.
+    properties:
+      source:
+        type: string
+        description: The primary source or origin of the training data (e.g., "Common Crawl", "Proprietary Dataset").
+        example: "Common Crawl, Wikipedia, Books3, Proprietary Codebase"
+      size_gb:
+        type: number
+        format: float
+        minimum: 0
+        description: The approximate size of the training data in gigabytes.
+        example: 1000.5
+      last_updated:
+        type: string
+        format: date
+        description: The date when the training data was last updated or collected.
+        example: "2023-04-01"
+      description:
+        type: string
+        description: A brief description of the training data characteristics, including any filtering or curation applied.
+        example: "A diverse corpus of text and code, filtered for quality, safety, and removal of personally identifiable information."
+    required:
+      - source
+  performance_metrics:
+    type: object
+    description: |
+      Key performance indicators (KPIs) and benchmarks for the model,
+      providing insights into its efficiency, accuracy, and resource
+      consumption. These metrics are typically derived from standardized
+      evaluation datasets.
+    properties:
+      latency_ms:
+        type: integer
+        format: int32
+        minimum: 0
+        description: Average inference latency in milliseconds for a typical request (e.g., generating 100 tokens).
+        example: 500
+      accuracy:
+        type: number
+        format: float
+        minimum: 0
+        maximum: 1
+        description: Overall accuracy score (e.g., F1, BLEU, ROUGE, exact match) on a relevant benchmark dataset.
+        example: 0.89
+      throughput_tokens_per_sec:
+        type: number
+        format: float
+        minimum: 0
+        description: Average token generation throughput in tokens per second under typical load.
+        example: 150.7
+      memory_usage_gb:
+        type: number
+        format: float
+        minimum: 0
+        description: Approximate memory (RAM/VRAM) usage in gigabytes during inference.
+        example: 80.0
+    required:
+      - latency_ms
+  pricing_model:
+    type: object
+    description: |
+      Details about how the model's usage is priced. This can vary significantly
+      between providers and model types.
+    properties:
+      type:
+        type: string
+        description: The type of pricing model employed for this AI model.
+        enum:
+          - per-token
+          - per-request
+          - subscription
+          - tiered
+          - free
+        example: "per-token"
+      input_cost_per_million_tokens:
+        type: number
+        format: float
+        minimum: 0
+        description: Cost in USD per million input tokens. Applicable for 'per-token' models.
+        example: 10.00
+      output_cost_per_million_tokens:
+        type: number
+        format: float
+        minimum: 0
+        description: Cost in USD per million output tokens. Applicable for 'per-token' models.
+        example: 30.00
+      cost_per_request:
+        type: number
+        format: float
+        minimum: 0
+        description: Cost in USD per single API request. Applicable for 'per-request' models.
+        example: 0.01
+      currency:
+        type: string
+        description: The currency used for pricing (e.g., "USD", "EUR").
+        example: "USD"
+      details_url:
+        type: string
+        format: uri
+        description: A URL pointing to the full pricing details page or documentation.
+        example: "https://example.com/ai-models/pricing/gpt4-turbo"
+    required:
+      - type
+  license:
+    type: object
+    description: |
+      Information about the licensing terms under which the model can be used.
+      This is crucial for legal compliance and understanding usage rights.
+    properties:
+      name:
+        type: string
+        description: The name of the license (e.g., "MIT", "Apache 2.0", "Proprietary", "CreativeML Open RAIL-M").
+        example: "Proprietary"
+      url:
+        type: string
+        format: uri
+        description: A URL pointing to the full text of the license agreement or relevant documentation.
+        example: "https://example.com/licenses/proprietary-model-license.pdf"
+      commercial_use_allowed:
+        type: boolean
+        description: Indicates whether commercial use of the model is permitted under its license.
+        example: true
+    required:
+      - name
+  tags:
+    type: array
+    description: |
+      A list of keywords or tags associated with the model for categorization,
+      search, and filtering purposes. These tags help users discover models
+      based on specific attributes or domains.
+    items:
+      type: string
+      description: A descriptive tag for the AI model.
+    example:
+      - "large-language-model"
+      - "generative-ai"
+      - "chat"
+      - "coding"
+      - "multimodal"
+      - "production-ready"
+  created_at:
+    type: string
+    format: date-time
+    description: |
+      The timestamp (ISO 8601 format) when the model's metadata was first
+      created or registered in the system. This indicates when the model
+      became known to the platform.
+    example: "2023-01-15T10:30:00Z"
+  updated_at:
+    type: string
+    format: date-time
+    description: |
+      The timestamp (ISO 8601 format) when the model's metadata was last
+      updated. This helps track changes and ensure information freshness.
+    example: "2023-11-01T14:45:00Z"
+required:
+  - id
+  - name
+  - version
+  - provider
+  - description
+  - type
+  - status
+  - capabilities
+  - input_formats
+  - output_formats
+  - created_at
