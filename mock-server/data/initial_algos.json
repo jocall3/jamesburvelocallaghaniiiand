@@ -1,0 +1,252 @@
+[
+  {
+    "id": "algo-quicksort-1",
+    "name": "QuickSort",
+    "description": "A highly efficient, in-place, comparison-based sorting algorithm. It uses a divide-and-conquer strategy, partitioning an array around a 'pivot' element and recursively sorting the sub-arrays.",
+    "category": "Sorting",
+    "complexity": {
+      "time": {
+        "best": "O(n log n)",
+        "average": "O(n log n)",
+        "worst": "O(n^2)"
+      },
+      "space": {
+        "worst": "O(log n)"
+      }
+    },
+    "language": "Python",
+    "codeSnippet": "def quicksort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]\n    middle = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n    return quicksort(left) + middle + quicksort(right)",
+    "tags": ["divide-and-conquer", "sorting", "comparison-sort", "in-place"],
+    "references": [
+      "https://en.wikipedia.org/wiki/Quicksort",
+      "https://www.geeksforgeeks.org/quick-sort/"
+    ],
+    "createdAt": "2023-01-15T10:00:00Z",
+    "updatedAt": "2023-01-15T10:00:00Z"
+  },
+  {
+    "id": "algo-dijkstra-2",
+    "name": "Dijkstra's Algorithm",
+    "description": "An algorithm for finding the shortest paths between nodes in a graph, which may represent, for example, road networks. It works for graphs with non-negative edge weights.",
+    "category": "Graph",
+    "complexity": {
+      "time": {
+        "best": "O(E + V log V)",
+        "average": "O(E + V log V)",
+        "worst": "O(E + V log V)"
+      },
+      "space": {
+        "worst": "O(V + E)"
+      }
+    },
+    "language": "Java",
+    "codeSnippet": "// Pseudocode for Dijkstra's Algorithm\nfunction Dijkstra(Graph, source):\n    dist[source] := 0\n    for each vertex v in Graph:\n        if v is not source:\n            dist[v] := infinity\n        add v to Q\n    while Q is not empty:\n        u := vertex in Q with min dist[u]\n        remove u from Q\n        for each neighbor v of u:\n            alt := dist[u] + length(u, v)\n            if alt < dist[v]:\n                dist[v] := alt\n                prev[v] := u\n    return dist[], prev[]",
+    "tags": ["graph", "shortest-path", "greedy", "single-source"],
+    "references": [
+      "https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm",
+      "https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/"
+    ],
+    "createdAt": "2023-02-20T11:30:00Z",
+    "updatedAt": "2023-02-20T11:30:00Z"
+  },
+  {
+    "id": "algo-binarysearch-3",
+    "name": "Binary Search",
+    "description": "An efficient algorithm for finding an item from a sorted list of items. It works by repeatedly dividing in half the portion of the list that could contain the item, until you've narrowed down the possible locations to just one.",
+    "category": "Searching",
+    "complexity": {
+      "time": {
+        "best": "O(1)",
+        "average": "O(log n)",
+        "worst": "O(log n)"
+      },
+      "space": {
+        "worst": "O(1)"
+      }
+    },
+    "language": "C++",
+    "codeSnippet": "int binarySearch(int arr[], int l, int r, int x) {\n    while (l <= r) {\n        int m = l + (r - l) / 2;\n        if (arr[m] == x)\n            return m;\n        if (arr[m] < x)\n            l = m + 1;\n        else\n            r = m - 1;\n    }\n    return -1;\n}",
+    "tags": ["searching", "divide-and-conquer", "sorted-array", "logarithmic"],
+    "references": [
+      "https://en.wikipedia.org/wiki/Binary_search_algorithm",
+      "https://www.geeksforgeeks.org/binary-search/"
+    ],
+    "createdAt": "2023-03-01T09:15:00Z",
+    "updatedAt": "2023-03-01T09:15:00Z"
+  },
+  {
+    "id": "algo-mergesort-4",
+    "name": "Merge Sort",
+    "description": "A stable, comparison-based, divide-and-conquer sorting algorithm. It divides an unsorted list into n sublists, each containing one element, then repeatedly merges sublists to produce new sorted sublists until there is only one sublist remaining.",
+    "category": "Sorting",
+    "complexity": {
+      "time": {
+        "best": "O(n log n)",
+        "average": "O(n log n)",
+        "worst": "O(n log n)"
+      },
+      "space": {
+        "worst": "O(n)"
+      }
+    },
+    "language": "JavaScript",
+    "codeSnippet": "function mergeSort(arr) {\n    if (arr.length <= 1) {\n        return arr;\n    }\n    const mid = Math.floor(arr.length / 2);\n    const left = arr.slice(0, mid);\n    const right = arr.slice(mid);\n\n    return merge(mergeSort(left), mergeSort(right));\n}\n\nfunction merge(left, right) {\n    let result = [];\n    let leftIndex = 0;\n    let rightIndex = 0;\n\n    while (leftIndex < left.length && rightIndex < right.length) {\n        if (left[leftIndex] < right[rightIndex]) {\n            result.push(left[leftIndex]);\n            leftIndex++;\n        } else {\n            result.push(right[rightIndex]);\n            rightIndex++;\n        }\n    }\n    return result.concat(left.slice(leftIndex)).concat(right.slice(rightIndex));\n}",
+    "tags": ["divide-and-conquer", "sorting", "comparison-sort", "stable-sort"],
+    "references": [
+      "https://en.wikipedia.org/wiki/Merge_sort",
+      "https://www.geeksforgeeks.org/merge-sort/"
+    ],
+    "createdAt": "2023-04-10T14:00:00Z",
+    "updatedAt": "2023-04-10T14:00:00Z"
+  },
+  {
+    "id": "algo-bfs-5",
+    "name": "Breadth-First Search (BFS)",
+    "description": "An algorithm for traversing or searching tree or graph data structures. It starts at the tree root (or some arbitrary node of a graph, sometimes referred to as a 'search key') and explores all of the neighbor nodes at the present depth prior to moving on to the nodes at the next depth level.",
+    "category": "Graph",
+    "complexity": {
+      "time": {
+        "best": "O(V + E)",
+        "average": "O(V + E)",
+        "worst": "O(V + E)"
+      },
+      "space": {
+        "worst": "O(V)"
+      }
+    },
+    "language": "Python",
+    "codeSnippet": "from collections import deque\n\ndef bfs(graph, start):\n    visited = set()\n    queue = deque([start])\n    visited.add(start)\n\n    while queue:\n        vertex = queue.popleft()\n        print(vertex, end=' ')\n\n        for neighbor in graph[vertex]:\n            if neighbor not in visited:\n                visited.add(neighbor)\n                queue.append(neighbor)",
+    "tags": ["graph", "traversal", "shortest-path-unweighted", "queue"],
+    "references": [
+      "https://en.wikipedia.org/wiki/Breadth-first_search",
+      "https://www.geeksforgeeks.org/breadth-first-search-or-bfs-for-a-graph/"
+    ],
+    "createdAt": "2023-05-05T08:45:00Z",
+    "updatedAt": "2023-05-05T08:45:00Z"
+  },
+  {
+    "id": "algo-dfs-6",
+    "name": "Depth-First Search (DFS)",
+    "description": "An algorithm for traversing or searching tree or graph data structures. The algorithm starts at the root (or arbitrarily selected node) and explores as far as possible along each branch before backtracking.",
+    "category": "Graph",
+    "complexity": {
+      "time": {
+        "best": "O(V + E)",
+        "average": "O(V + E)",
+        "worst": "O(V + E)"
+      },
+      "space": {
+        "worst": "O(V)"
+      }
+    },
+    "language": "Python",
+    "codeSnippet": "def dfs(graph, start, visited=None):\n    if visited is None:\n        visited = set()\n    visited.add(start)\n    print(start, end=' ')\n\n    for neighbor in graph[start]:\n        if neighbor not in visited:\n            dfs(graph, neighbor, visited)",
+    "tags": ["graph", "traversal", "stack", "recursive"],
+    "references": [
+      "https://en.wikipedia.org/wiki/Depth-first_search",
+      "https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/"
+    ],
+    "createdAt": "2023-05-10T09:00:00Z",
+    "updatedAt": "2023-05-10T09:00:00Z"
+  },
+  {
+    "id": "algo-heapsort-7",
+    "name": "Heap Sort",
+    "description": "A comparison-based sorting technique based on the binary heap data structure. It is similar to selection sort where we first find the maximum element and place it at the end. We repeat the same process for the remaining elements.",
+    "category": "Sorting",
+    "complexity": {
+      "time": {
+        "best": "O(n log n)",
+        "average": "O(n log n)",
+        "worst": "O(n log n)"
+      },
+      "space": {
+        "worst": "O(1)"
+      }
+    },
+    "language": "Java",
+    "codeSnippet": "// Pseudocode for Heap Sort\nfunction heapSort(arr):\n    n = arr.length\n    for i from n/2 - 1 down to 0:\n        heapify(arr, n, i)\n    for i from n-1 down to 0:\n        swap arr[0] and arr[i]\n        heapify(arr, i, 0)\n\nfunction heapify(arr, n, i):\n    largest = i\n    left = 2*i + 1\n    right = 2*i + 2\n    if left < n and arr[left] > arr[largest]:\n        largest = left\n    if right < n and arr[right] > arr[largest]:\n        largest = right\n    if largest != i:\n        swap arr[i] and arr[largest]\n        heapify(arr, n, largest)",
+    "tags": ["sorting", "in-place", "comparison-sort", "heap"],
+    "references": [
+      "https://en.wikipedia.org/wiki/Heapsort",
+      "https://www.geeksforgeeks.org/heap-sort/"
+    ],
+    "createdAt": "2023-06-01T10:30:00Z",
+    "updatedAt": "2023-06-01T10:30:00Z"
+  },
+  {
+    "id": "algo-kruskal-8",
+    "name": "Kruskal's Algorithm",
+    "description": "A greedy algorithm to find a Minimum Spanning Tree (MST) for a connected, undirected graph. It finds a subset of the edges that forms a tree that includes every vertex, where the total weight of all the edges in the tree is minimized.",
+    "category": "Graph",
+    "complexity": {
+      "time": {
+        "best": "O(E log V)",
+        "average": "O(E log V)",
+        "worst": "O(E log V)"
+      },
+      "space": {
+        "worst": "O(V + E)"
+      }
+    },
+    "language": "Python",
+    "codeSnippet": "# Pseudocode for Kruskal's Algorithm\nclass DisjointSet:\n    # ... implementation ...\n\ndef kruskal(graph):\n    edges = []\n    for u in graph:\n        for v, weight in graph[u]:\n            edges.append((weight, u, v))\n    edges.sort()\n\n    mst = []\n    ds = DisjointSet(graph.keys())\n\n    for weight, u, v in edges:\n        if ds.find(u) != ds.find(v):\n            ds.union(u, v)\n            mst.append((u, v, weight))\n    return mst",
+    "tags": ["graph", "minimum-spanning-tree", "greedy", "disjoint-set"],
+    "references": [
+      "https://en.wikipedia.org/wiki/Kruskal%27s_algorithm",
+      "https://www.geeksforgeeks.org/kruskals-minimum-spanning-tree-algorithm-greedy-algo-2/"
+    ],
+    "createdAt": "2023-07-15T11:00:00Z",
+    "updatedAt": "2023-07-15T11:00:00Z"
+  },
+  {
+    "id": "algo-prims-9",
+    "name": "Prim's Algorithm",
+    "description": "A greedy algorithm that finds a Minimum Spanning Tree (MST) for a weighted undirected graph. It starts from an arbitrary vertex and grows the MST by adding the cheapest edge that connects a vertex in the MST to a vertex outside the MST.",
+    "category": "Graph",
+    "complexity": {
+      "time": {
+        "best": "O(E log V)",
+        "average": "O(E log V)",
+        "worst": "O(E log V)"
+      },
+      "space": {
+        "worst": "O(V + E)"
+      }
+    },
+    "language": "Java",
+    "codeSnippet": "// Pseudocode for Prim's Algorithm\nfunction prim(graph):\n    min_heap = PriorityQueue()\n    mst_set = Set()\n    key = Map(vertex -> infinity)\n    parent = Map(vertex -> null)\n\n    start_vertex = any_vertex_in_graph\n    key[start_vertex] = 0\n    min_heap.add((0, start_vertex))\n\n    while not min_heap.isEmpty():\n        weight, u = min_heap.extract_min()\n        mst_set.add(u)\n\n        for v, edge_weight in graph[u]:\n            if v not in mst_set and edge_weight < key[v]:\n                key[v] = edge_weight\n                parent[v] = u\n                min_heap.add((edge_weight, v))\n    return parent",
+    "tags": ["graph", "minimum-spanning-tree", "greedy", "priority-queue"],
+    "references": [
+      "https://en.wikipedia.org/wiki/Prim%27s_algorithm",
+      "https://www.geeksforgeeks.org/prims-minimum-spanning-tree-mst-greedy-algo-5/"
+    ],
+    "createdAt": "2023-08-01T12:00:00Z",
+    "updatedAt": "2023-08-01T12:00:00Z"
+  },
+  {
+    "id": "algo-bellmanford-10",
+    "name": "Bellman-Ford Algorithm",
+    "description": "An algorithm that computes shortest paths from a single source vertex to all other vertices in a weighted digraph. It is slower than Dijkstra's algorithm but can handle graphs with negative edge weights.",
+    "category": "Graph",
+    "complexity": {
+      "time": {
+        "best": "O(V * E)",
+        "average": "O(V * E)",
+        "worst": "O(V * E)"
+      },
+      "space": {
+        "worst": "O(V)"
+      }
+    },
+    "language": "C++",
+    "codeSnippet": "// Pseudocode for Bellman-Ford Algorithm\nfunction bellmanFord(graph, source):\n    dist = Map(vertex -> infinity)\n    dist[source] = 0\n\n    for i from 1 to V-1:\n        for each edge (u, v, weight) in graph:\n            if dist[u] + weight < dist[v]:\n                dist[v] = dist[u] + weight\n\n    for each edge (u, v, weight) in graph:\n        if dist[u] + weight < dist[v]:\n            return 'Graph contains negative cycle'\n\n    return dist",
+    "tags": ["graph", "shortest-path", "negative-weights", "dynamic-programming"],
+    "references": [
+      "https://en.wikipedia.org/wiki/Bellman%E2%80%93Ford_algorithm",
+      "https://www.geeksforgeeks.org/bellman-ford-algorithm-dp-23/"
+    ],
+    "createdAt": "2023-09-01T13:00:00Z",
+    "updatedAt": "2023-09-01T13:00:00Z"
+  }
+]
