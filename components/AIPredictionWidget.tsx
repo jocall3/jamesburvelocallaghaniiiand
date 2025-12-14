@@ -1,9 +1,9 @@
-```typescript
+
 import React, { useState, useEffect } from 'react';
 import Card from './Card';
 import { Brain } from 'lucide-react';
 
-// --- The James Burvel O’Callaghan III Code - AIPredictionWidget.tsx ---
+// --- The James Burvel OâCallaghan III Code - AIPredictionWidget.tsx ---
 
 // 1. Core Data Structures & Type Definitions
 namespace JBOCCode {
@@ -361,7 +361,7 @@ const JBOCCode_AIPredictionWidget: React.FC = () => {
 
     // --- UI Structure ---
     return (
-        <Card title="AI Prediction Engine - The James Burvel O’Callaghan III Code">
+        <Card title="AI Prediction Engine - The James Burvel OâCallaghan III Code">
             {/* Tab Navigation (A-E for Demonstration) */}
             <div className="flex space-x-4 mb-4">
                 <button
@@ -402,7 +402,7 @@ const JBOCCode_AIPredictionWidget: React.FC = () => {
                     <div>
                         <h3 className="text-xl font-bold mb-2">Welcome to the JBOCCode AI Prediction Engine!</h3>
                         <p className="text-gray-700">
-                            This application provides advanced market predictions based on cutting-edge AI models, developed and maintained under the aegis of The James Burvel O’Callaghan III Code.
+                            This application provides advanced market predictions based on cutting-edge AI models, developed and maintained under the aegis of The James Burvel OâCallaghan III Code.
                             Explore the tabs above to access real-time market data, AI-driven predictions, and company-specific insights.
                             The system is designed for expert users seeking detailed analysis and actionable insights.
                         </p>
@@ -475,4 +475,3 @@ const JBOCCode_AIPredictionWidget: React.FC = () => {
 };
 
 export default JBOCCode_AIPredictionWidget;
-```
