@@ -1,0 +1,209 @@
+title: User Profile
+description: Comprehensive representation of a user's identity, permissions, preferences, and activity within the system. This object is central to authentication, authorization, and personalization.
+type: object
+required:
+  - id
+  - name
+  - role
+  - email
+  - createdAt
+  - updatedAt
+properties:
+  id:
+    type: string
+    format: uuid
+    description: "Unique identifier for the user, generated at creation."
+    readOnly: true
+    example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+  name:
+    type: string
+    description: "The user's full name for display purposes."
+    minLength: 2
+    maxLength: 100
+    example: "Alex Johnson"
+  role:
+    type: string
+    description: "The primary role assigned to the user, which dictates their base level of access and permissions across the platform."
+    enum: ["Administrator", "Trader", "Quant", "Observer"]
+    example: "Trader"
+  clearanceLevel:
+    type: integer
+    format: int32
+    description: "A numerical security clearance level, from 1 (lowest) to 10 (highest). This provides a granular control layer on top of the user's role, often used for accessing sensitive data or executing high-impact operations."
+    minimum: 1
+    maximum: 10
+    example: 7
+  email:
+    type: string
+    format: email
+    description: "The user's primary email address, used for login, notifications, and account recovery."
+    example: "alex.j@example-trading.com"
+  createdAt:
+    type: string
+    format: date-time
+    description: "Timestamp indicating when the user account was created."
+    readOnly: true
+    example: "2022-08-15T09:30:00Z"
+  updatedAt:
+    type: string
+    format: date-time
+    description: "Timestamp indicating the last time the user profile was updated."
+    readOnly: true
+    example: "2023-10-26T14:45:10Z"
+  preferences:
+    type: object
+    description: "User-configurable settings that tailor the platform's look, feel, and behavior."
+    properties:
+      theme:
+        type: string
+        description: "The visual theme for the user interface."
+        enum: ["light", "dark", "auto", "matrix"]
+        default: "auto"
+        example: "dark"
+      language:
+        type: string
+        description: "The user's preferred language for the UI, specified as an IETF language tag."
+        default: "en-US"
+        example: "en-US"
+      timezone:
+        type: string
+        description: "The user's preferred timezone for displaying timestamps, following the IANA Time Zone Database format."
+        example: "America/New_York"
+      notifications:
+        type: object
+        description: "Configuration for how the user receives notifications."
+        properties:
+          emailEnabled:
+            type: boolean
+            description: "Enable email notifications for critical alerts, trade confirmations, and reports."
+            default: true
+          smsEnabled:
+            type: boolean
+            description: "Enable SMS notifications for urgent market movements or margin calls."
+            default: false
+          pushEnabled:
+            type: boolean
+            description: "Enable push notifications to mobile or desktop clients."
+            default: true
+          soundAlerts:
+            type: string
+            description: "Audible alerts for events in the UI."
+            enum: ["none", "subtle", "loud"]
+            default: "subtle"
+      aiAssistanceLevel:
+        type: string
+        description: "The level of proactive AI assistance the user desires, from basic suggestions to fully automated actions."
+        enum: ["off", "basic", "advanced", "autonomous"]
+        default: "basic"
+        example: "advanced"
+  apiKeys:
+    type: array
+    description: "A list of API keys associated with the user's account for programmatic access. The full key secret is only available upon creation."
+    items:
+      type: object
+      title: "API Key Metadata"
+      description: "Metadata for an API key. Does not include the secret key itself."
+      required:
+        - id
+        - label
+        - service
+        - keyPrefix
+        - createdAt
+        - scopes
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Unique identifier for the API key."
+          readOnly: true
+          example: "key_1a2b3c4d5e6f7g8h"
+        label:
+          type: string
+          description: "A user-defined label for the key to help identify its purpose."
+          example: "My Algo Bot"
+        service:
+          type: string
+          description: "The service or system this key grants access to."
+          example: "TradingAPI"
+        keyPrefix:
+          type: string
+          description: "The first few characters of the key, for identification purposes. The full key is never returned after creation."
+          readOnly: true
+          example: "sk_live_a1b2c3d4"
+        createdAt:
+          type: string
+          format: date-time
+          description: "Timestamp of when this key was created."
+          readOnly: true
+          example: "2023-01-20T11:00:00Z"
+        lastUsed:
+          type: string
+          format: date-time
+          description: "Timestamp of when this key was last used to authenticate a request."
+          readOnly: true
+          nullable: true
+          example: "2023-10-27T08:15:30Z"
+        expiresAt:
+          type: string
+          format: date-time
+          description: "Timestamp when the key will expire. Null if it never expires."
+          nullable: true
+          example: "2024-01-20T11:00:00Z"
+        scopes:
+          type: array
+          description: "List of permissions (scopes) granted to this key, defining what actions it can perform."
+          items:
+            type: string
+          example: ["read:market_data", "write:orders", "read:positions"]
+  security:
+    type: object
+    description: "Security-related settings and metadata for the user account."
+    properties:
+      twoFactorEnabled:
+        type: boolean
+        description: "Indicates whether Two-Factor Authentication (2FA) is enabled for the account."
+        default: false
+        example: true
+      lastLogin:
+        type: string
+        format: date-time
+        description: "Timestamp of the user's last successful login."
+        readOnly: true
+        example: "2023-10-27T10:00:00Z"
+      lastLoginIp:
+        type: string
+        format: ipv4
+        description: "The IP address from which the last successful login occurred."
+        readOnly: true
+        example: "203.0.113.1"
+      passwordLastChanged:
+        type: string
+        format: date-time
+        description: "Timestamp of the last password change."
+        readOnly: true
+        example: "2023-09-01T12:00:00Z"
+  stats:
+    type: object
+    description: "Read-only statistics and performance metrics associated with the user's activity."
+    readOnly: true
+    properties:
+      loginCount:
+        type: integer
+        format: int64
+        description: "Total number of successful logins for this user."
+        example: 420
+      pnlContribution:
+        type: number
+        format: double
+        description: "The user's total profit and loss contribution to the firm, in the base currency (e.g., USD)."
+        example: 1234567.89
+      tradesExecuted:
+        type: integer
+        format: int64
+        description: "Total number of trades executed by the user."
+        example: 15032
+      accountAgeDays:
+        type: integer
+        format: int32
+        description: "The age of the account in days since creation."
+        example: 365
