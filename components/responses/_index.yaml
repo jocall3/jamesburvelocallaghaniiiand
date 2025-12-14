@@ -1,0 +1,189 @@
+Accepted:
+  description: >-
+    The request has been accepted for processing, but the processing has not
+    been completed. The request might or might not be eventually acted upon, and
+    may be disallowed when processing occurs. This is typically used for
+    asynchronous operations.
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: string
+            description: A status message indicating the request has been accepted.
+            example: Request accepted for processing.
+          trackingId:
+            type: string
+            format: uuid
+            description: A unique identifier to track the status of the asynchronous
+              operation.
+            example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+NoContent:
+  description: >-
+    The server has successfully fulfilled the request and there is no
+    additional content to send in the response payload body. This is typically
+    used for DELETE operations or PUT operations that update a resource without
+    returning its new state.
+BadRequest:
+  description: >-
+    The server cannot or will not process the request due to something that is
+    perceived to be a client error. This can be caused by malformed request
+    syntax, invalid request message framing, or deceptive request routing. The
+    response body will contain details about the specific error(s).
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/common/Error.yaml
+      example:
+        code: INVALID_PARAMETER
+        message: The 'limit' parameter must be a positive integer.
+        target: limit
+        details: []
+Unauthorized:
+  description: >-
+    The request has not been applied because it lacks valid authentication
+    credentials for the target resource. The client should authenticate and
+    retry the request. This response is sent for requests that require
+    authentication but where none was provided, or where the provided
+    credentials were invalid.
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/common/Error.yaml
+      example:
+        code: AUTHENTICATION_FAILED
+        message: Authentication credentials were not provided or are invalid.
+Forbidden:
+  description: >-
+    The server understood the request but refuses to authorize it. Unlike a 401
+    Unauthorized response, authenticating will make no difference. The client
+    is not authorized to perform the requested action on the resource. This may
+    be due to insufficient permissions or other access control policies.
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/common/Error.yaml
+      example:
+        code: PERMISSION_DENIED
+        message: You do not have the required permissions to access this resource.
+NotFound:
+  description: >-
+    The server has not found anything matching the Request-URI. No indication
+    is given of whether the condition is temporary or permanent. This status
+    code is commonly used when the server does not wish to reveal exactly why
+    the request has been refused, or when no other response is applicable.
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/common/Error.yaml
+      example:
+        code: RESOURCE_NOT_FOUND
+        message: The resource with ID '12345' could not be found.
+        target: id
+Conflict:
+  description: >-
+    The request could not be completed due to a conflict with the current state
+    of the target resource. This code is used in situations where the user might
+    be able to resolve the conflict and resubmit the request. For example,
+    creating a resource that already exists.
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/common/Error.yaml
+      example:
+        code: RESOURCE_CONFLICT
+        message: An item with the specified 'email' already exists.
+        target: email
+UnprocessableEntity:
+  description: >-
+    The server understands the content type of the request entity, and the
+    syntax of the request entity is correct, but it was unable to process the
+    contained instructions. This is typically used for validation errors. The
+    response body should contain details about the validation failures.
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/common/Error.yaml
+      example:
+        code: VALIDATION_ERROR
+        message: The request payload is invalid.
+        details:
+          - code: FIELD_REQUIRED
+            message: The 'name' field is required.
+            target: name
+          - code: INVALID_FORMAT
+            message: The 'email' field must be a valid email address.
+            target: email
+TooManyRequests:
+  description: >-
+    The user has sent too many requests in a given amount of time ("rate
+    limiting"). The response representations SHOULD include details explaining
+    the condition, and MAY include a Retry-After header indicating how long to
+    wait before making a new request.
+  headers:
+    Retry-After:
+      description: The date-time after which the request may be retried.
+      schema:
+        type: string
+        example: Wed, 21 Oct 2025 07:28:00 GMT
+    X-RateLimit-Limit:
+      description: The maximum number of requests that the consumer is permitted to
+        make in a window.
+      schema:
+        type: integer
+        example: 1000
+    X-RateLimit-Remaining:
+      description: The number of requests remaining in the current window.
+      schema:
+        type: integer
+        example: 0
+    X-RateLimit-Reset:
+      description: The time at which the current window will reset, in UTC epoch
+        seconds.
+      schema:
+        type: integer
+        example: 1672531200
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/common/Error.yaml
+      example:
+        code: RATE_LIMIT_EXCEEDED
+        message: You have exceeded the rate limit. Please try again later.
+InternalServerError:
+  description: >-
+    The server encountered an unexpected condition that prevented it from
+    fulfilling the request. This error response is a generic "catch-all"
+    response. The server logs should contain more details about the error.
+    Clients should not retry the same request without modification.
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/common/Error.yaml
+      example:
+        code: INTERNAL_SERVER_ERROR
+        message: An unexpected error occurred on the server. Please contact support
+          and provide the request ID.
+        requestId: f1g2h3i4-j5k6-7890-1234-567890lmnopq
+ServiceUnavailable:
+  description: >-
+    The server is currently unable to handle the request due to a temporary
+    overload or scheduled maintenance, which will likely be alleviated after
+    some delay. The server MAY send a Retry-After header to suggest an
+    appropriate amount of time for the client to wait before retrying the
+    request.
+  headers:
+    Retry-After:
+      description: The number of seconds to wait before retrying the request.
+      schema:
+        type: integer
+        example: 60
+  content:
+    application/json:
+      schema:
+        $ref: ../schemas/common/Error.yaml
+      example:
+        code: SERVICE_UNAVAILABLE
+        message: The service is temporarily unavailable due to maintenance. Please
+          try again in a few minutes.
