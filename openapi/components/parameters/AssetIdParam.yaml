@@ -1,0 +1,12 @@
+name: assetId
+in: path
+description: |
+  The unique identifier for a specific digital asset within the system.
+  This ID is used to fetch, update, or delete a particular asset.
+  It is typically a universally unique identifier (UUID) assigned upon asset creation.
+required: true
+schema:
+  type: string
+  format: uuid
+  description: A standard UUID (version 4) representing the asset.
+  example: '123e4567-e89b-12d3-a456-426614174000'
