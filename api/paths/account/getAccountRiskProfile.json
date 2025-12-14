@@ -1,0 +1,616 @@
+{
+  "summary": "Retrieve Account Risk Profile and Exposure Metrics",
+  "description": "Retrieves the comprehensive risk profile for a specific account identified by `accountId`. This endpoint performs real-time or cached calculation of various risk metrics including Value at Risk (VaR), Greeks (Delta, Gamma, Theta, Vega, Rho), portfolio concentration, credit utilization, and margin requirements. \n\nThe response includes a detailed breakdown of exposure across asset classes, sectors, and geographies, as well as historical volatility analysis and stress test scenarios. This data is critical for compliance monitoring, margin call prediction, and strategic portfolio rebalancing.\n\nData is sourced from the central risk engine and may include aggregated data from sub-accounts if the `includeSubAccounts` flag is set to true.",
+  "operationId": "getAccountRiskProfile",
+  "tags": [
+    "Account",
+    "Risk Management",
+    "Analytics"
+  ],
+  "parameters": [
+    {
+      "name": "accountId",
+      "in": "path",
+      "description": "The unique UUID identifier of the account to analyze.",
+      "required": true,
+      "schema": {
+        "type": "string",
+        "format": "uuid",
+        "example": "123e4567-e89b-12d3-a456-426614174000"
+      }
+    },
+    {
+      "name": "calculationMethod",
+      "in": "query",
+      "description": "The methodology used for calculating Value at Risk (VaR) and other statistical metrics.",
+      "required": false,
+      "schema": {
+        "type": "string",
+        "enum": [
+          "historical_simulation",
+          "monte_carlo",
+          "parametric_variance_covariance"
+        ],
+        "default": "historical_simulation"
+      }
+    },
+    {
+      "name": "confidenceLevel",
+      "in": "query",
+      "description": "The confidence level for VaR calculations (e.g., 0.95 for 95%, 0.99 for 99%).",
+      "required": false,
+      "schema": {
+        "type": "number",
+        "format": "double",
+        "minimum": 0.90,
+        "maximum": 0.999,
+        "default": 0.99
+      }
+    },
+    {
+      "name": "lookbackPeriodDays",
+      "in": "query",
+      "description": "The number of historical days to include in volatility and correlation calculations.",
+      "required": false,
+      "schema": {
+        "type": "integer",
+        "minimum": 30,
+        "maximum": 3650,
+        "default": 252
+      }
+    },
+    {
+      "name": "includeSubAccounts",
+      "in": "query",
+      "description": "If true, aggregates risk metrics from all linked sub-accounts into the parent profile.",
+      "required": false,
+      "schema": {
+        "type": "boolean",
+        "default": false
+      }
+    }
+  ],
+  "responses": {
+    "200": {
+      "description": "Successfully retrieved the account risk profile.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "title": "RiskProfile",
+            "description": "A comprehensive object containing all risk metrics, limits, and exposure details for the account.",
+            "required": [
+              "accountId",
+              "generatedAt",
+              "overallRiskScore",
+              "complianceStatus",
+              "metrics"
+            ],
+            "properties": {
+              "accountId": {
+                "type": "string",
+                "format": "uuid",
+                "description": "The account ID associated with this profile."
+              },
+              "generatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the risk profile was calculated."
+              },
+              "overallRiskScore": {
+                "type": "number",
+                "format": "double",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "A normalized score from 0 (Safe) to 100 (Extremely Risky) representing the aggregate portfolio risk."
+              },
+              "riskCategory": {
+                "type": "string",
+                "enum": [
+                  "CONSERVATIVE",
+                  "MODERATE",
+                  "AGGRESSIVE",
+                  "SPECULATIVE"
+                ],
+                "description": "Categorical classification of the account's risk posture."
+              },
+              "complianceStatus": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "PASS",
+                      "WARNING",
+                      "BREACH",
+                      "CRITICAL"
+                    ]
+                  },
+                  "violations": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "ruleId": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "severity": {
+                          "type": "string",
+                          "enum": [
+                            "LOW",
+                            "MEDIUM",
+                            "HIGH"
+                          ]
+                        },
+                        "detectedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  },
+                  "kycRefreshDate": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              },
+              "metrics": {
+                "type": "object",
+                "description": "Quantitative risk measurements.",
+                "properties": {
+                  "valueAtRisk": {
+                    "type": "object",
+                    "properties": {
+                      "amount": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 3
+                      },
+                      "percentageOfEquity": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "confidenceLevel": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "horizonDays": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "volatility": {
+                    "type": "object",
+                    "properties": {
+                      "daily": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "annualized": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "sharpeRatio": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "sortinoRatio": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "beta": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "alpha": {
+                        "type": "number",
+                        "format": "double"
+                      }
+                    }
+                  },
+                  "greeks": {
+                    "type": "object",
+                    "description": "Aggregated portfolio Greeks for options and derivatives.",
+                    "properties": {
+                      "delta": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "gamma": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "theta": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "vega": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "rho": {
+                        "type": "number",
+                        "format": "double"
+                      }
+                    }
+                  },
+                  "drawdown": {
+                    "type": "object",
+                    "properties": {
+                      "currentDrawdown": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "maxDrawdown": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "peakDate": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "recoveryTimeDays": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              },
+              "exposure": {
+                "type": "object",
+                "description": "Breakdown of portfolio exposure.",
+                "properties": {
+                  "byAssetClass": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "assetClass": {
+                          "type": "string"
+                        },
+                        "allocationPercentage": {
+                          "type": "number",
+                          "format": "double"
+                        },
+                        "marketValue": {
+                          "type": "number",
+                          "format": "double"
+                        },
+                        "riskContribution": {
+                          "type": "number",
+                          "format": "double",
+                          "description": "Marginal contribution to total portfolio risk."
+                        }
+                      }
+                    }
+                  },
+                  "bySector": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "sector": {
+                          "type": "string"
+                        },
+                        "allocationPercentage": {
+                          "type": "number",
+                          "format": "double"
+                        }
+                      }
+                    }
+                  },
+                  "byRegion": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "region": {
+                          "type": "string"
+                        },
+                        "countryCode": {
+                          "type": "string"
+                        },
+                        "allocationPercentage": {
+                          "type": "number",
+                          "format": "double"
+                        }
+                      }
+                    }
+                  },
+                  "currencyExposure": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "currency": {
+                          "type": "string"
+                        },
+                        "netPosition": {
+                          "type": "number",
+                          "format": "double"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "stressTests": {
+                "type": "array",
+                "description": "Results of hypothetical market scenarios.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "scenarioName": {
+                      "type": "string",
+                      "example": "2008 Financial Crisis"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "projectedLoss": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "projectedLossPercentage": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "marginImpact": {
+                      "type": "number",
+                      "format": "double"
+                    }
+                  }
+                }
+              },
+              "marginRequirements": {
+                "type": "object",
+                "properties": {
+                  "initialMargin": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "maintenanceMargin": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "marginUtilization": {
+                    "type": "number",
+                    "format": "double",
+                    "description": "Percentage of available equity used for margin."
+                  },
+                  "marginCallLevel": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "liquidationLevel": {
+                    "type": "number",
+                    "format": "double"
+                  }
+                }
+              }
+            }
+          },
+          "examples": {
+            "standardProfile": {
+              "summary": "Standard Risk Profile",
+              "value": {
+                "accountId": "123e4567-e89b-12d3-a456-426614174000",
+                "generatedAt": "2023-10-27T14:30:00Z",
+                "overallRiskScore": 45.5,
+                "riskCategory": "MODERATE",
+                "complianceStatus": {
+                  "status": "PASS",
+                  "violations": [],
+                  "kycRefreshDate": "2024-01-15"
+                },
+                "metrics": {
+                  "valueAtRisk": {
+                    "amount": 15000.00,
+                    "currency": "USD",
+                    "percentageOfEquity": 1.5,
+                    "confidenceLevel": 0.99,
+                    "horizonDays": 1
+                  },
+                  "volatility": {
+                    "daily": 0.012,
+                    "annualized": 0.19,
+                    "sharpeRatio": 1.2,
+                    "sortinoRatio": 1.5,
+                    "beta": 0.95,
+                    "alpha": 0.02
+                  },
+                  "greeks": {
+                    "delta": 120.5,
+                    "gamma": 0.05,
+                    "theta": -15.2,
+                    "vega": 45.0,
+                    "rho": 1.2
+                  },
+                  "drawdown": {
+                    "currentDrawdown": 0.05,
+                    "maxDrawdown": 0.12,
+                    "peakDate": "2023-08-01",
+                    "recoveryTimeDays": 0
+                  }
+                },
+                "exposure": {
+                  "byAssetClass": [
+                    {
+                      "assetClass": "Equity",
+                      "allocationPercentage": 60.0,
+                      "marketValue": 600000.00,
+                      "riskContribution": 70.0
+                    },
+                    {
+                      "assetClass": "Fixed Income",
+                      "allocationPercentage": 30.0,
+                      "marketValue": 300000.00,
+                      "riskContribution": 10.0
+                    },
+                    {
+                      "assetClass": "Cash",
+                      "allocationPercentage": 10.0,
+                      "marketValue": 100000.00,
+                      "riskContribution": 0.0
+                    }
+                  ],
+                  "bySector": [
+                    {
+                      "sector": "Technology",
+                      "allocationPercentage": 25.0
+                    },
+                    {
+                      "sector": "Healthcare",
+                      "allocationPercentage": 15.0
+                    }
+                  ],
+                  "byRegion": [
+                    {
+                      "region": "North America",
+                      "countryCode": "US",
+                      "allocationPercentage": 70.0
+                    },
+                    {
+                      "region": "Europe",
+                      "countryCode": "DE",
+                      "allocationPercentage": 20.0
+                    }
+                  ],
+                  "currencyExposure": [
+                    {
+                      "currency": "USD",
+                      "netPosition": 800000.00
+                    },
+                    {
+                      "currency": "EUR",
+                      "netPosition": 200000.00
+                    }
+                  ]
+                },
+                "stressTests": [
+                  {
+                    "scenarioName": "Black Monday Repeat",
+                    "description": "Simulation of 1987 crash conditions.",
+                    "projectedLoss": 200000.00,
+                    "projectedLossPercentage": 20.0,
+                    "marginImpact": 50000.00
+                  },
+                  {
+                    "scenarioName": "Interest Rate Hike +200bps",
+                    "description": "Parallel shift in yield curve.",
+                    "projectedLoss": 50000.00,
+                    "projectedLossPercentage": 5.0,
+                    "marginImpact": 10000.00
+                  }
+                ],
+                "marginRequirements": {
+                  "initialMargin": 100000.00,
+                  "maintenanceMargin": 80000.00,
+                  "marginUtilization": 45.0,
+                  "marginCallLevel": 90.0,
+                  "liquidationLevel": 100.0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "400": {
+      "description": "Bad Request. Invalid parameters provided.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Error"
+          },
+          "examples": {
+            "invalidConfidence": {
+              "value": {
+                "code": "INVALID_PARAMETER",
+                "message": "Confidence level must be between 0.90 and 0.999",
+                "field": "confidenceLevel"
+              }
+            }
+          }
+        }
+      }
+    },
+    "401": {
+      "description": "Unauthorized. Access token is missing or invalid.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Error"
+          }
+        }
+      }
+    },
+    "403": {
+      "description": "Forbidden. User does not have permission to view risk data for this account.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Error"
+          }
+        }
+      }
+    },
+    "404": {
+      "description": "Account not found.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Error"
+          }
+        }
+      }
+    },
+    "429": {
+      "description": "Too Many Requests. Rate limit exceeded for risk calculation engine.",
+      "headers": {
+        "Retry-After": {
+          "description": "The number of seconds to wait before making a new request.",
+          "schema": {
+            "type": "integer"
+          }
+        }
+      },
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Error"
+          }
+        }
+      }
+    },
+    "500": {
+      "description": "Internal Server Error. Risk engine calculation failure.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Error"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": [
+        "account:read",
+        "risk:read"
+      ]
+    },
+    {
+      "apiKeyAuth": []
+    }
+  ]
+}
