@@ -1,0 +1,107 @@
+{
+  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  "name": "API Base Environment",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api/v1",
+      "type": "default",
+      "enabled": true,
+      "description": "The base URL for the API. Set to 'http://localhost:8080/api/v1' for Local development, 'https://staging.example.com/api/v1' for Staging, and 'https://api.example.com/api/v1' for Production."
+    },
+    {
+      "key": "apiKey",
+      "value": "YOUR_LOCAL_API_KEY",
+      "type": "secret",
+      "enabled": true,
+      "description": "API Key for authentication. Replace with environment-specific keys (e.g., 'YOUR_STAGING_API_KEY', 'YOUR_PRODUCTION_API_KEY'). This key grants access to the API."
+    },
+    {
+      "key": "username",
+      "value": "local_user",
+      "type": "default",
+      "enabled": true,
+      "description": "Default username for authentication in the current environment. Adjust for Staging/Production environments to use appropriate test or production user credentials."
+    },
+    {
+      "key": "password",
+      "value": "local_password_secure",
+      "type": "secret",
+      "enabled": true,
+      "description": "Default password for authentication in the current environment. Adjust for Staging/Production environments. **Never commit actual production passwords.**"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "secret",
+      "enabled": true,
+      "description": "Bearer token obtained after successful login (e.g., via OAuth2 or JWT). This variable should be set dynamically by a login request. It will differ across environments and user sessions and typically has a short expiry."
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "secret",
+      "enabled": true,
+      "description": "Refresh token obtained after successful login, used to get new access tokens when the current one expires. Set dynamically by a login request. Longer lived than access tokens."
+    },
+    {
+      "key": "clientId",
+      "value": "local_oauth_client_id",
+      "type": "default",
+      "enabled": true,
+      "description": "OAuth2 Client ID. Use environment-specific values (e.g., 'staging_oauth_client_id', 'prod_oauth_client_id') for different application registrations."
+    },
+    {
+      "key": "clientSecret",
+      "value": "local_oauth_client_secret",
+      "type": "secret",
+      "enabled": true,
+      "description": "OAuth2 Client Secret. Use environment-specific values (e.g., 'staging_oauth_client_secret', 'prod_oauth_client_secret'). **Keep this secret and do not expose it publicly.**"
+    },
+    {
+      "key": "scope",
+      "value": "openid profile email read:data write:data",
+      "type": "default",
+      "enabled": true,
+      "description": "OAuth2 scopes required for the application. These define the permissions granted to the client. May vary slightly by environment or client configuration."
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@local.example.com",
+      "type": "default",
+      "enabled": true,
+      "description": "Email for an administrative user in the current environment. Useful for testing admin-specific endpoints. Adjust for Staging/Production."
+    },
+    {
+      "key": "adminPassword",
+      "value": "admin_local_secure_password",
+      "type": "secret",
+      "enabled": true,
+      "description": "Password for an administrative user in the current environment. Adjust for Staging/Production. **Handle with care.**"
+    },
+    {
+      "key": "userId",
+      "value": "user-123",
+      "type": "default",
+      "enabled": true,
+      "description": "A sample user ID for testing specific endpoints that require a user context. Adjust as needed for different environments or test cases."
+    },
+    {
+      "key": "productId",
+      "value": "prod-abc-456",
+      "type": "default",
+      "enabled": true,
+      "description": "A sample product ID for testing specific product-related endpoints. Adjust as needed for different environments or test cases."
+    },
+    {
+      "key": "orderId",
+      "value": "order-xyz-789",
+      "type": "default",
+      "enabled": true,
+      "description": "A sample order ID for testing specific order-related endpoints. Adjust as needed for different environments or test cases."
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2023-10-27T10:00:00.000Z",
+  "_postman_exported_using": "Postman/10.19.10"
+}
