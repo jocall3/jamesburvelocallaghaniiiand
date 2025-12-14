@@ -1,0 +1,39 @@
+BearerAuth:
+  type: http
+  scheme: bearer
+  bearerFormat: JWT
+  description: |
+    JWT-based authentication for user-centric operations.
+    The token should be included in the `Authorization` header as a Bearer token.
+    Example: `Authorization: Bearer <your_jwt_token>`
+    Tokens can be obtained via the `/auth/login` endpoint. They have a limited lifetime and need to be refreshed.
+
+ApiKeyAuth:
+  type: apiKey
+  in: header
+  name: X-API-KEY
+  description: |
+    API Key for server-to-server or automated client authentication.
+    This key is typically used for services that need to interact with the API programmatically without a user context.
+    The key should be included in the `X-API-KEY` header of the request.
+    API Keys can be generated and managed in the user's account settings dashboard.
+
+OAuth2:
+  type: oauth2
+  description: |
+    Standard OAuth2 authentication flow for third-party application integrations.
+    This allows external applications to access API resources on behalf of a user.
+  flows:
+    authorizationCode:
+      authorizationUrl: https://api.example.com/oauth/authorize
+      tokenUrl: https://api.example.com/oauth/token
+      refreshUrl: https://api.example.com/oauth/refresh
+      scopes:
+        read:items: Grants read access to item data.
+        write:items: Grants write access to item data.
+        read:profile: Grants read access to the user's profile.
+    clientCredentials:
+      tokenUrl: https://api.example.com/oauth/token
+      scopes:
+        read:analytics: Grants read access to aggregated analytics data.
+        write:webhooks: Grants permission to create and manage webhooks.
