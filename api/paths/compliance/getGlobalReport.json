@@ -1,0 +1,514 @@
+{
+  "summary": "Global Compliance Report Operations",
+  "description": "Operations related to the generation and retrieval of global compliance reports, focusing on Anti-Money Laundering (AML) and transaction threshold breaches.",
+  "get": {
+    "tags": [
+      "Compliance",
+      "Reporting",
+      "Risk Analysis"
+    ],
+    "summary": "Retrieve Aggregated Global Compliance Report",
+    "description": "Generates a synchronous, comprehensive compliance report aggregating all 'AML_WARNING' and 'THRESHOLD_BREACH' events. This endpoint queries the immutable audit log and risk engine to compile a detailed analysis of financial activities across specified regions and timeframes. The response includes statistical summaries, risk heatmaps, and a paginated list of specific compliance events with full context.",
+    "operationId": "getGlobalComplianceReport",
+    "security": [
+      {
+        "bearerAuth": [
+          "compliance:reports:read",
+          "risk:analytics:read"
+        ]
+      },
+      {
+        "apiKeyAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "startDate",
+        "in": "query",
+        "description": "The ISO 8601 start date-time for the reporting period. Transactions and events occurring before this timestamp are excluded.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-01-01T00:00:00Z"
+        }
+      },
+      {
+        "name": "endDate",
+        "in": "query",
+        "description": "The ISO 8601 end date-time for the reporting period. Transactions and events occurring after this timestamp are excluded.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-01-31T23:59:59Z"
+        }
+      },
+      {
+        "name": "regions",
+        "in": "query",
+        "description": "A comma-separated list of ISO 3166-1 alpha-2 country codes to filter the report. If omitted, the report includes data from all global operating regions.",
+        "style": "form",
+        "explode": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$",
+            "example": "US"
+          }
+        },
+        "example": ["US", "GB", "SG"]
+      },
+      {
+        "name": "eventTypes",
+        "in": "query",
+        "description": "Filter the report to include only specific types of compliance events.",
+        "style": "form",
+        "explode": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "AML_WARNING",
+              "THRESHOLD_BREACH",
+              "KYC_MISMATCH",
+              "SANCTION_SCREENING_HIT",
+              "VELOCITY_CHECK_FAILURE"
+            ]
+          },
+          "default": [
+            "AML_WARNING",
+            "THRESHOLD_BREACH"
+          ]
+        }
+      },
+      {
+        "name": "minRiskScore",
+        "in": "query",
+        "description": "The minimum calculated risk score (0-100) required for an event to be included in the report.",
+        "schema": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 50
+        }
+      },
+      {
+        "name": "limit",
+        "in": "query",
+        "description": "The maximum number of event records to return in the detailed list.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "default": 100
+        }
+      },
+      {
+        "name": "cursor",
+        "in": "query",
+        "description": "Opaque cursor string for pagination, obtained from the `nextCursor` field of a previous response.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Compliance report generated successfully. Contains aggregated metrics and a list of compliance events.",
+        "headers": {
+          "X-Report-ID": {
+            "description": "Unique identifier for the generated report context.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "X-Processing-Time-Ms": {
+            "description": "Time taken to generate the report in milliseconds.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "meta",
+                "summary",
+                "data"
+              ],
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "description": "Metadata regarding the report generation context.",
+                  "properties": {
+                    "reportId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Unique UUID for this report instance."
+                    },
+                    "generatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Timestamp of report generation."
+                    },
+                    "apiVersion": {
+                      "type": "string",
+                      "example": "v2.4.1"
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "totalRecords": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "returnedRecords": {
+                          "type": "integer"
+                        },
+                        "nextCursor": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Cursor for the next page of results."
+                        },
+                        "hasMore": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                },
+                "summary": {
+                  "type": "object",
+                  "description": "High-level statistical aggregation of the compliance data.",
+                  "properties": {
+                    "totalEventsProcessed": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "riskScoreAverage": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "highestRiskScore": {
+                      "type": "integer"
+                    },
+                    "breakdownByType": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "integer"
+                      },
+                      "description": "Map of event types to their occurrence counts.",
+                      "example": {
+                        "AML_WARNING": 45,
+                        "THRESHOLD_BREACH": 120
+                      }
+                    },
+                    "breakdownByRegion": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "integer"
+                      },
+                      "description": "Map of region codes to event counts.",
+                      "example": {
+                        "US": 100,
+                        "EU": 65
+                      }
+                    },
+                    "totalVolumeFlagged": {
+                      "type": "object",
+                      "description": "Total monetary volume associated with flagged events, grouped by currency.",
+                      "additionalProperties": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "example": {
+                        "USD": 1500000.50,
+                        "EUR": 450000.00
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "array",
+                  "description": "List of individual compliance events.",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "eventId",
+                      "eventType",
+                      "severity",
+                      "timestamp",
+                      "entityId"
+                    ],
+                    "properties": {
+                      "eventId": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "eventType": {
+                        "type": "string",
+                        "enum": [
+                          "AML_WARNING",
+                          "THRESHOLD_BREACH",
+                          "KYC_MISMATCH",
+                          "SANCTION_SCREENING_HIT"
+                        ]
+                      },
+                      "severity": {
+                        "type": "string",
+                        "enum": [
+                          "LOW",
+                          "MEDIUM",
+                          "HIGH",
+                          "CRITICAL"
+                        ]
+                      },
+                      "riskScore": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100
+                      },
+                      "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "entityId": {
+                        "type": "string",
+                        "description": "ID of the user or business entity associated with the event."
+                      },
+                      "region": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{2}$"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "OPEN",
+                          "INVESTIGATING",
+                          "RESOLVED",
+                          "FALSE_POSITIVE"
+                        ]
+                      },
+                      "details": {
+                        "type": "object",
+                        "description": "Polymorphic details object based on eventType.",
+                        "properties": {
+                          "transactionId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "amount": {
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "currency": {
+                            "type": "string",
+                            "pattern": "^[A-Z]{3}$"
+                          },
+                          "counterparty": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "accountNumber": {
+                                "type": "string"
+                              },
+                              "bankCode": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "ruleTriggered": {
+                            "type": "string",
+                            "description": "The specific compliance rule ID that triggered this event."
+                          },
+                          "narrative": {
+                            "type": "string",
+                            "description": "Auto-generated explanation of the risk factor."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "examples": {
+              "standardReport": {
+                "summary": "A standard report containing mixed AML and Threshold events.",
+                "value": {
+                  "meta": {
+                    "reportId": "c0a80121-7f8c-4b32-8e1a-2b3c4d5e6f7g",
+                    "generatedAt": "2023-10-27T14:00:00Z",
+                    "apiVersion": "v2.4.1",
+                    "pagination": {
+                      "totalRecords": 1542,
+                      "returnedRecords": 2,
+                      "nextCursor": "eyJvZmZzZXQiOjEwMH0=",
+                      "hasMore": true
+                    }
+                  },
+                  "summary": {
+                    "totalEventsProcessed": 1542,
+                    "riskScoreAverage": 72.5,
+                    "highestRiskScore": 98,
+                    "breakdownByType": {
+                      "AML_WARNING": 400,
+                      "THRESHOLD_BREACH": 1142
+                    },
+                    "breakdownByRegion": {
+                      "US": 1200,
+                      "GB": 342
+                    },
+                    "totalVolumeFlagged": {
+                      "USD": 12500000.00,
+                      "GBP": 450000.00
+                    }
+                  },
+                  "data": [
+                    {
+                      "eventId": "evt_99887766",
+                      "eventType": "AML_WARNING",
+                      "severity": "CRITICAL",
+                      "riskScore": 95,
+                      "timestamp": "2023-10-26T09:15:00Z",
+                      "entityId": "usr_555123",
+                      "region": "US",
+                      "status": "OPEN",
+                      "details": {
+                        "transactionId": "tx_11223344",
+                        "amount": 9900.00,
+                        "currency": "USD",
+                        "ruleTriggered": "AML_STRUCTURING_BELOW_10K",
+                        "narrative": "Multiple transactions detected just below reporting threshold within 24 hours."
+                      }
+                    },
+                    {
+                      "eventId": "evt_55443322",
+                      "eventType": "THRESHOLD_BREACH",
+                      "severity": "MEDIUM",
+                      "riskScore": 60,
+                      "timestamp": "2023-10-26T10:00:00Z",
+                      "entityId": "biz_999888",
+                      "region": "GB",
+                      "status": "INVESTIGATING",
+                      "details": {
+                        "transactionId": "tx_99887766",
+                        "amount": 50000.00,
+                        "currency": "GBP",
+                        "ruleTriggered": "HIGH_VALUE_TRANSACTION_CORP",
+                        "narrative": "Single transaction exceeds standard corporate daily limit."
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request. Invalid parameters, such as an end date before the start date or invalid region codes.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "example": "INVALID_DATE_RANGE"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "startDate must be before endDate"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized. The request lacks valid authentication credentials.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "example": "UNAUTHORIZED"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Bearer token missing or expired."
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden. The authenticated user does not have the required scopes ('compliance:reports:read').",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "example": "INSUFFICIENT_PERMISSIONS"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "User lacks compliance:reports:read scope."
+                }
+              }
+            }
+          }
+        }
+      },
+      "429": {
+        "description": "Too Many Requests. The client has exceeded the rate limit for report generation.",
+        "headers": {
+          "Retry-After": {
+            "description": "The number of seconds to wait before making a new request.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal Server Error. The aggregation engine failed to process the request.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "example": "INTERNAL_ERROR"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "An unexpected error occurred while querying the data warehouse."
+                },
+                "traceId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
