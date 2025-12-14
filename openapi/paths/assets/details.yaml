@@ -1,0 +1,330 @@
+get:
+  summary: Retrieve dynamic details for a specific asset
+  operationId: getAssetDynamicDetails
+  tags:
+    - Assets
+    - Details
+  description: |
+    Fetches a comprehensive, dynamically generated details object for a specific asset identified by its unique ID.
+    This endpoint provides a flexible structure to accommodate various types of asset details,
+    which can include technical specifications, operational metrics, financial data, historical logs,
+    and custom attributes, depending on the asset's type and configuration.
+    The response schema is designed to be highly extensible, allowing for a wide range of data
+    to be returned without requiring frequent API version changes.
+    It is crucial for systems requiring deep insights into individual asset characteristics
+    for analytics, maintenance scheduling, compliance reporting, and strategic planning.
+    The level of detail returned can be controlled via query parameters to optimize payload size
+    and processing time for different use cases.
+  parameters:
+    - in: path
+      name: id
+      schema:
+        type: string
+        format: uuid
+        description: |
+          The globally unique identifier (UUID v4) of the asset for which to retrieve its dynamic details.
+          This ID is immutable and serves as the primary key for asset identification across the system.
+      required: true
+      example: 123e4567-e89b-12d3-a456-426614174000
+    - in: header
+      name: X-Request-ID
+      schema:
+        type: string
+        format: uuid
+        description: |
+          A unique identifier for the request, useful for tracing and debugging purposes across distributed systems.
+          If not provided by the client, the server will generate one and include it in the response headers.
+      required: false
+      example: a1b2c3d4-e5f6-7890-1234-567890abcdef
+    - in: query
+      name: includeHistoricalData
+      schema:
+        type: boolean
+        default: false
+        description: |
+          Set to `true` to include extensive historical data, event logs, and detailed audit trails
+          within the asset details. This can significantly increase response size and processing time.
+          Defaults to `false` to provide a lighter, current state view.
+      required: false
+      example: true
+    - in: query
+      name: fields
+      schema:
+        type: array
+        items:
+          type: string
+        collectionFormat: csv
+        description: |
+          A comma-separated list of top-level fields or nested properties to include in the response.
+          If specified, only these fields and their nested properties will be returned, optimizing payload size.
+          If omitted, all available fields are returned.
+          Example: `name,technicalSpecifications.modelNumber,financialData.currentValuation`
+      required: false
+      example: "name,status,operationalMetrics.uptimeHours,customFields"
+    - in: query
+      name: version
+      schema:
+        type: string
+        description: |
+          Specifies a particular version of the asset's details to retrieve, if versioning is supported.
+          This could be a timestamp, a commit hash, or a semantic version string.
+          If not provided, the latest available version is returned.
+      required: false
+      example: "2024-07-15T10:00:00Z"
+  responses:
+    200:
+      description: Successfully retrieved the dynamic details for the specified asset.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AssetDynamicDetails'
+          examples:
+            detailedAssetExample:
+              summary: Example of a comprehensive asset details object
+              value:
+                id: 123e4567-e89b-12d3-a456-426614174000
+                name: "Manufacturing Robot Arm X-2000"
+                type: "Industrial Robot"
+                status: "Operational"
+                location:
+                  latitude: 34.0522
+                  longitude: -118.2437
+                  address: "123 Industrial Way, Los Angeles, CA 90012"
+                  zone: "Factory Floor 1, Zone B"
+                metadata:
+                  createdAt: "2023-01-15T10:00:00Z"
+                  lastUpdated: "2024-07-20T14:30:00Z"
+                  sourceSystem: "ERP_System_V2"
+                  ownerDepartment: "Production Line A"
+                  tags:
+                    - "robotics"
+                    - "automation"
+                    - "production"
+                    - "critical"
+                  assetLifecycleStage: "Production"
+                technicalSpecifications:
+                  modelNumber: "RX-2000"
+                  manufacturer: "RoboTech Inc."
+                  serialNumber: "SN-RX2000-001234"
+                  firmwareVersion: "v3.1.2"
+                  hardwareVersion: "HW-A-2023"
+                  dimensions:
+                    lengthCm: 250.5
+                    widthCm: 120.0
+                    heightCm: 300.2
+                    weightKg: 1500.75
+                    unit: "cm"
+                    volumeM3: 9.018
+                  powerRequirements:
+                    voltage: "480V AC"
+                    phase: "3-Phase"
+                    current: "50A"
+                    frequency: "60Hz"
+                    powerConsumptionKw: 24.0
+                  payloadCapacityKg: 250.0
+                  reachMeters: 3.5
+                  materialComposition:
+                    - type: "Steel Alloy"
+                      percentage: 70.0
+                      details: "High-strength structural steel, corrosion-resistant"
+                    - type: "Aluminum"
+                      percentage: 20.0
+                      details: "Lightweight aerospace-grade aluminum for moving parts"
+                    - type: "Polymer Composites"
+                      percentage: 10.0
+                      details: "Durable, impact-resistant polymers for casing and non-load-bearing components"
+                  sensors:
+                    - name: "Temperature Sensor"
+                      type: "PT100"
+                      location: "Motor Housing"
+                      status: "Active"
+                      lastReading: 45.2
+                      unit: "Celsius"
+                      calibrationDate: "2024-05-01T00:00:00Z"
+                    - name: "Proximity Sensor"
+                      type: "Infrared"
+                      location: "End Effector"
+                      status: "Active"
+                      rangeCm: 100
+                      accuracyCm: 1.0
+                    - name: "Vibration Sensor"
+                      type: "Accelerometer"
+                      location: "Joint 3"
+                      status: "Active"
+                      lastReadingG: 0.05
+                      thresholdG: 0.1
+                operationalMetrics:
+                  uptimeHours: 8760.5
+                  lastMaintenanceDate: "2024-06-01T09:00:00Z"
+                  nextScheduledMaintenance: "2024-12-01T09:00:00Z"
+                  maintenanceIntervalDays: 180
+                  cyclesCompleted: 1500000
+                  errorRatePercentage: 0.01
+                  averageCycleTimeSeconds: 15.3
+                  lastCalibrationDate: "2024-05-10T11:00:00Z"
+                  performanceLogs:
+                    - timestamp: "2024-07-20T14:25:00Z"
+                      eventType: "CycleCompletion"
+                      details: "Cycle #1500000 completed successfully. Duration: 15.1s"
+                      severity: "info"
+                      data:
+                        cycleId: 1500000
+                        durationSeconds: 15.1
+                        energyConsumptionKwh: 0.1
+                    - timestamp: "2024-07-20T14:00:00Z"
+                      eventType: "SensorReading"
+                      details: "Motor temperature within normal limits (45.2°C)."
+                      severity: "info"
+                      data:
+                        sensor: "MotorTemp"
+                        value: 45.2
+                        unit: "Celsius"
+                    - timestamp: "2024-07-19T23:59:00Z"
+                      eventType: "Warning"
+                      details: "Minor vibration anomaly detected in joint 3. Scheduled for inspection."
+                      severity: "warning"
+                      data:
+                        joint: 3
+                        vibrationLevel: "elevated"
+                        recommendation: "Schedule diagnostic check"
+                financialData:
+                  acquisitionCost:
+                    amount: 150000.00
+                    currency: "USD"
+                    acquisitionDate: "2023-01-10T00:00:00Z"
+                    vendor: "RoboTech Sales"
+                  currentValuation:
+                    amount: 120000.00
+                    currency: "USD"
+                    valuationDate: "2024-07-01T00:00:00Z"
+                    valuationMethod: "Market Comparison"
+                  depreciationSchedule:
+                    method: "Straight-line"
+                    usefulLifeYears: 10
+                    salvageValue:
+                      amount: 15000.00
+                      currency: "USD"
+                    annualDepreciation:
+                      amount: 13500.00
+                      currency: "USD"
+                    accumulatedDepreciation:
+                      amount: 20250.00
+                      currency: "USD"
+                  lastAppraisalDate: "2024-01-01T00:00:00Z"
+                  insurancePolicy:
+                    provider: "GlobalSure Inc."
+                    policyNumber: "GS-ASSET-7890"
+                    coverageAmount:
+                      amount: 130000.00
+                      currency: "USD"
+                    renewalDate: "2025-01-01T00:00:00Z"
+                    contactPerson: "insurance@example.com"
+                customFields:
+                  - name: "ResponsibleEngineer"
+                    value: "Jane Doe"
+                    type: "string"
+                    description: "Primary engineer responsible for this asset's maintenance and operation."
+                  - name: "IsCriticalAsset"
+                    value: true
+                    type: "boolean"
+                    description: "Indicates if this asset is critical for core production operations."
+                  - name: "LastSoftwareUpdate"
+                    value: "2024-06-15T10:00:00Z"
+                    type: "datetime"
+                    description: "Date and time of the last major software update."
+                  - name: "ProjectCode"
+                    value: "PROD-ALPHA-2023"
+                    type: "string"
+                    description: "Internal project code associated with this asset."
+                relatedAssets:
+                  - assetId: "987f6543-e21c-4d5b-a678-1234567890ab"
+                    relationshipType: "Part of assembly"
+                    description: "Controller Unit for Robot Arm"
+                    link: "/assets/987f6543-e21c-4d5b-a678-1234567890ab/details"
+                  - assetId: "abcdef12-3456-7890-abcd-ef1234567890"
+                    relationshipType: "Feeds into"
+                    description: "Conveyor Belt System for Product Output"
+                    link: "/assets/abcdef12-3456-7890-abcd-ef1234567890/details"
+                  - assetId: "f0e1d2c3-b4a5-6789-0123-456789abcdef"
+                    relationshipType: "Consumes from"
+                    description: "Raw Material Feeder System"
+                    link: "/assets/f0e1d2c3-b4a5-6789-0123-456789abcdef/details"
+                securityAudit:
+                  lastAuditDate: "2024-03-10T10:00:00Z"
+                  auditStatus: "Compliant with minor findings"
+                  findings:
+                    - id: "SEC-001"
+                      severity: "low"
+                      description: "Outdated antivirus definitions on embedded controller."
+                      status: "Resolved"
+                      resolutionDate: "2024-03-15T14:00:00Z"
+                      responsibleTeam: "IT Security"
+                    - id: "SEC-002"
+                      severity: "medium"
+                      description: "Default administrative password not changed on auxiliary interface."
+                      status: "Open"
+                      dueDate: "2024-08-01T00:00:00Z"
+                      responsibleTeam: "Operations"
+                  nextAuditDate: "2025-03-10T10:00:00Z"
+                  auditFrequencyMonths: 12
+                environmentalImpact:
+                  energyConsumptionKwhPerYear: 15000.0
+                  carbonFootprintKgCo2ePerYear: 7500.0
+                  recyclabilityPercentage: 95.0
+                  lastAssessmentDate: "2024-01-01T00:00:00Z"
+                  certifications:
+                    - "Energy Star"
+                    - "RoHS Compliant"
+                compliance:
+                  - standard: "ISO 9001:2015"
+                    status: "Certified"
+                    certificationDate: "2023-06-01T00:00:00Z"
+                    expiryDate: "2026-06-01T00:00:00Z"
+                    auditingBody: "Global Certifications Ltd."
+                  - standard: "CE Marking"
+                    status: "Compliant"
+                    declarationDate: "2022-11-01T00:00:00Z"
+                    applicableDirectives:
+                      - "Machinery Directive 2006/42/EC"
+                      - "EMC Directive 2014/30/EU"
+                maintenanceSchedule:
+                  - type: "Preventive"
+                    description: "Monthly lubrication and inspection of moving parts."
+                    frequency: "P1M" # ISO 8601 duration
+                    lastPerformed: "2024-07-01T08:00:00Z"
+                    nextDue: "2024-08-01T08:00:00Z"
+                    assignedTechnician: "John Smith"
+                  - type: "Calibration"
+                    description: "Annual sensor calibration for accuracy."
+                    frequency: "P1Y"
+                    lastPerformed: "2024-05-10T11:00:00Z"
+                    nextDue: "2025-05-10T11:00:00Z"
+                    assignedTechnician: "Calibration Team"
+                documentation:
+                  - type: "User Manual"
+                    url: "https://docs.example.com/robot-arm-x2000/manual.pdf"
+                    version: "1.5"
+                  - type: "Service Guide"
+                    url: "https://docs.example.com/robot-arm-x2000/service.pdf"
+                    version: "2.1"
+                healthStatus:
+                  overallStatus: "Healthy"
+                  lastCheck: "2024-07-20T14:30:00Z"
+                  issues: []
+                  metrics:
+                    cpuUsagePercent: 15.2
+                    memoryUsagePercent: 30.5
+                    diskUsagePercent: 45.1
+    400:
+      $ref: '#/components/responses/BadRequest'
+    401:
+      $ref: '#/components/responses/Unauthorized'
+    404:
+      $ref: '#/components/responses/NotFound'
+    500:
+      $ref: '#/components/responses/InternalServerError'
+  security:
+    - ApiKeyAuth: []
+    - OAuth2:
+        - 'read:assets'
+        - 'read:asset_details'
