@@ -1,0 +1,138 @@
+type: object
+title: Asset Creation Request
+description: |-
+  Schema for the request body when creating a new digital asset.
+  This includes all the necessary information to ingest, categorize, and store a new asset in the system. It supports creation via direct upload or by providing a source URL for the system to fetch.
+properties:
+  name:
+    type: string
+    description: "A user-defined name for the asset. This is used for display and identification purposes within the system. It should be a human-readable identifier."
+    example: "Marketing Campaign Banner - Q3 2024"
+    minLength: 1
+    maxLength: 255
+  asset_type:
+    type: string
+    description: "The general type of the asset. This helps in categorizing and processing the asset appropriately, for example, by generating different types of thumbnails or previews."
+    enum:
+      - image
+      - video
+      - audio
+      - document
+      - archive
+      - 3d_model
+      - code
+      - other
+    example: "image"
+  source_url:
+    type: string
+    format: uri
+    description: "An optional URL from which the asset can be fetched. If provided, the system will attempt to download the asset from this location. If not provided, a direct upload is expected via a multipart/form-data request."
+    example: "https://example.com/images/q3-banner-final.png"
+  file_name:
+    type: string
+    description: "The original filename of the asset, including its extension. This is useful for reference and for when the asset is downloaded by users, preserving the original context."
+    example: "q3-banner-final.png"
+    maxLength: 255
+  mime_type:
+    type: string
+    description: "The MIME type of the asset file (e.g., 'image/png', 'application/pdf'). If not provided, the system will attempt to detect it from the file's content or extension. Providing it can improve processing speed and accuracy."
+    example: "image/png"
+  size_bytes:
+    type: integer
+    format: int64
+    description: "The size of the asset in bytes. This can be used for pre-upload validation, quota management, and progress indication."
+    example: 1048576
+    minimum: 0
+  metadata:
+    type: object
+    description: "A flexible key-value store for custom metadata associated with the asset. This can be used to store application-specific information, such as product SKUs, author information, or technical details. Keys are strings, and values can be strings, numbers, booleans, or null."
+    additionalProperties:
+      oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: 'null'
+    example:
+      project_id: "prj-12345"
+      campaign: "Summer Sale 2024"
+      photographer: "Jane Doe"
+      resolution: "1920x1080"
+      approved: true
+      review_date: null
+  tags:
+    type: array
+    description: "An array of tags for categorizing and searching for the asset. Tags are short, descriptive keywords."
+    items:
+      type: string
+      minLength: 1
+      maxLength: 50
+      pattern: "^[a-z0-9-]+$"
+    example:
+      - "marketing"
+      - "banner"
+      - "q3-2024"
+      - "sale"
+    maxItems: 50
+  collection_id:
+    type: string
+    format: uuid
+    description: "The unique identifier of the collection to which this asset should be added. If omitted, the asset will be placed in a default or root collection for the user's account."
+    example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  access_control:
+    type: object
+    description: "Defines the access control policy for the asset, determining who can view or modify it."
+    properties:
+      level:
+        type: string
+        description: "The high-level access policy for the asset."
+        enum:
+          - public
+          - private
+          - restricted
+        default: "private"
+        example: "private"
+      allowed_users:
+        type: array
+        description: "A list of user IDs that are explicitly allowed access. This is only applicable when the access level is 'restricted'."
+        items:
+          type: string
+          format: uuid
+          description: "The unique identifier for a user."
+        example:
+          - "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          - "b2c3d4e5-f6a7-8901-2345-67890abcdef1"
+      allowed_groups:
+        type: array
+        description: "A list of group IDs that are explicitly allowed access. This is only applicable when the access level is 'restricted'."
+        items:
+          type: string
+          format: uuid
+          description: "The unique identifier for a user group."
+        example:
+          - "g1-marketing-team-uuid"
+          - "g2-design-reviewers-uuid"
+    required:
+      - level
+required:
+  - name
+  - asset_type
+example:
+  name: "Product Shot - Red Shoes"
+  asset_type: "image"
+  source_url: "https://cdn.example.com/products/red-shoes-high-res.jpg"
+  file_name: "red-shoes-high-res.jpg"
+  mime_type: "image/jpeg"
+  size_bytes: 2097152
+  metadata:
+    product_sku: "SHOE-RED-42"
+    color_profile: "sRGB"
+    shot_type: "studio"
+    camera_model: "Canon EOS R5"
+  tags:
+    - "product"
+    - "footwear"
+    - "ecommerce"
+    - "red"
+  collection_id: "c0l1ec71-0d5a-4b1e-8c1a-2b3c4d5e6f7g"
+  access_control:
+    level: "public"
