@@ -1,0 +1,117 @@
+{
+  "title": "I_O_Callaghan_Entity",
+  "type": "object",
+  "description": "Represents a registered corporate entity within the O'Callaghan ecosystem. This schema defines the structural identity of a subsidiary, partner, or shell corporation, tracking its legal standing, fiscal routing endpoints, and operational feature sets.",
+  "required": [
+    "companyName",
+    "globalIndex",
+    "incorporationDate",
+    "sovereignJurisdiction",
+    "fiscalEndpoint",
+    "useCaseVector",
+    "featureSet"
+  ],
+  "properties": {
+    "companyName": {
+      "type": "string",
+      "description": "The full legal registered name of the corporate entity.",
+      "minLength": 2,
+      "maxLength": 255,
+      "example": "O'Callaghan Heavy Industries & Logistics, Ltd."
+    },
+    "globalIndex": {
+      "type": "string",
+      "description": "The unique immutable identifier for the entity within the global registry. Must adhere to the 'OC-ENT-XXX' format where XXX represents an alphanumeric sequence.",
+      "pattern": "^OC-ENT-[A-Z0-9]{3,}$",
+      "example": "OC-ENT-X92"
+    },
+    "incorporationDate": {
+      "type": "string",
+      "format": "date",
+      "description": "The ISO 8601 date marking the official legal incorporation of the entity.",
+      "example": "2042-08-15"
+    },
+    "sovereignJurisdiction": {
+      "type": "string",
+      "description": "The primary geopolitical or extra-territorial jurisdiction governing the entity's legal compliance and tax obligations.",
+      "example": "Free Trade Zone of Neo-Singapore"
+    },
+    "fiscalEndpoint": {
+      "type": "string",
+      "format": "uri",
+      "description": "The secure HTTPS endpoint used for automated fiscal reporting, tax deduction, and audit trail synchronization.",
+      "example": "https://finance-gateway.ocallaghan.corp/api/v1/fiscal/OC-ENT-X92"
+    },
+    "useCaseVector": {
+      "type": "array",
+      "description": "A collection of operational verticals or strategic vectors that this entity is authorized to pursue.",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "LOGISTICS_ORBITAL",
+          "LOGISTICS_TERRESTRIAL",
+          "MANUFACTURING_HEAVY",
+          "MANUFACTURING_MICRO",
+          "FINANCE_HFT",
+          "FINANCE_ASSET_MGMT",
+          "SECURITY_PHYSICAL",
+          "SECURITY_CYBER",
+          "R_AND_D_BIOTECH",
+          "R_AND_D_AI"
+        ]
+      },
+      "example": [
+        "LOGISTICS_ORBITAL",
+        "SECURITY_CYBER"
+      ]
+    },
+    "featureSet": {
+      "type": "object",
+      "description": "A complex object defining the specific capabilities, limits, and active modules enabled for this entity.",
+      "required": [
+        "maxConcurrentTransactions",
+        "auditLevel",
+        "isActive"
+      ],
+      "properties": {
+        "maxConcurrentTransactions": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The hard limit on parallel financial operations allowed for this entity.",
+          "minimum": 0,
+          "example": 50000
+        },
+        "auditLevel": {
+          "type": "string",
+          "description": "The depth of automated auditing applied to the entity's ledger.",
+          "enum": [
+            "NONE",
+            "BASIC",
+            "FORENSIC",
+            "REALTIME_HEURISTIC"
+          ],
+          "default": "BASIC"
+        },
+        "isActive": {
+          "type": "boolean",
+          "description": "Flag indicating if the entity is currently operational.",
+          "default": true
+        },
+        "customParameters": {
+          "type": "object",
+          "description": "Key-value pairs for jurisdiction-specific configuration.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "example": {
+            "tax_region_override": "sector_7",
+            "compliance_officer": "AI-992"
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
