@@ -1,0 +1,169 @@
+{
+  "type": "object",
+  "description": "Standardized error response schema used across the API for reporting failures, including critical system faults, procedural generation errors, and validation exceptions. This schema ensures consistent error handling for automated clients and SDKs.",
+  "required": [
+    "apiVersion",
+    "transactionId",
+    "timestamp",
+    "error"
+  ],
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "description": "The API version that processed the request.",
+      "example": "v1.4.2"
+    },
+    "transactionId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for the transaction trace, useful for distributed debugging and log correlation.",
+      "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp indicating when the error occurred.",
+      "example": "2023-10-27T14:30:00.123Z"
+    },
+    "error": {
+      "type": "object",
+      "description": "The container for the specific error details.",
+      "required": [
+        "code",
+        "message",
+        "status",
+        "severity"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Machine-readable error code identifying the specific type of failure.",
+          "enum": [
+            "PROCEDURAL_GENERATION_FAILURE",
+            "SYSTEM_CRITICAL_FAULT",
+            "RESOURCE_EXHAUSTED",
+            "VALIDATION_ERROR",
+            "AUTHENTICATION_FAILED",
+            "PERMISSION_DENIED",
+            "RESOURCE_NOT_FOUND",
+            "METHOD_NOT_ALLOWED",
+            "CONFLICT_DETECTED",
+            "PAYLOAD_TOO_LARGE",
+            "UNSUPPORTED_MEDIA_TYPE",
+            "RATE_LIMIT_EXCEEDED",
+            "INTERNAL_SERVER_ERROR",
+            "SERVICE_UNAVAILABLE",
+            "GATEWAY_TIMEOUT",
+            "DEPENDENCY_FAILURE",
+            "DATA_INTEGRITY_VIOLATION"
+          ],
+          "example": "PROCEDURAL_GENERATION_FAILURE"
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable description of the error, suitable for display to end-users or developers.",
+          "example": "The procedural generation engine failed to converge on a valid solution within the allocated iteration limit."
+        },
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The HTTP status code associated with this error.",
+          "minimum": 400,
+          "maximum": 599,
+          "example": 500
+        },
+        "severity": {
+          "type": "string",
+          "description": "The severity level of the error, indicating the impact on system stability.",
+          "enum": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "CRITICAL",
+            "FATAL"
+          ],
+          "example": "CRITICAL"
+        },
+        "target": {
+          "type": "string",
+          "description": "The specific field, resource, or subsystem where the error originated.",
+          "example": "generation_engine_v3"
+        },
+        "retryable": {
+          "type": "boolean",
+          "description": "Indicates whether the client should attempt to retry the request.",
+          "default": false,
+          "example": true
+        },
+        "retryAfterMs": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Recommended delay in milliseconds before retrying the request, if retryable is true.",
+          "example": 5000
+        },
+        "documentationUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Link to the documentation describing this error code and potential remediation steps.",
+          "example": "https://api.system.com/docs/errors/PROCEDURAL_GENERATION_FAILURE"
+        },
+        "details": {
+          "type": "array",
+          "description": "A list of specific sub-errors or validation failures that contributed to the main error.",
+          "items": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Sub-error code.",
+                "example": "CONSTRAINT_VIOLATION"
+              },
+              "message": {
+                "type": "string",
+                "description": "Description of the sub-error.",
+                "example": "Topology constraint 'non-overlapping' was violated at coordinates [12, 45]."
+              },
+              "target": {
+                "type": "string",
+                "description": "Field or parameter causing the sub-error.",
+                "example": "input_matrix"
+              },
+              "value": {
+                "description": "The invalid value that caused the error (can be any type).",
+                "nullable": true
+              }
+            }
+          }
+        },
+        "innerError": {
+          "type": "object",
+          "description": "Technical details about the internal exception (usually omitted in production for security, included here for comprehensive schema definition).",
+          "properties": {
+            "exceptionType": {
+              "type": "string",
+              "example": "TimeoutException"
+            },
+            "stackTrace": {
+              "type": "string",
+              "description": "The stack trace of the exception."
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional arbitrary metadata providing context about the system state when the error occurred.",
+      "additionalProperties": true,
+      "example": {
+        "nodeId": "worker-us-east-1a-045",
+        "loadLevel": "98%",
+        "attemptNumber": 3
+      }
+    }
+  }
+}
