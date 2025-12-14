@@ -1,0 +1,825 @@
+openapi: 3.1.0
+info:
+  title: Admin User Management API
+  version: 1.0.0
+  description: |
+    This API provides comprehensive administrative capabilities for managing user accounts within the system.
+    It allows authorized administrators to perform CRUD operations on user profiles, assign roles,
+    manage account statuses, and retrieve detailed user information.
+    The endpoints are designed for internal administrative tools and require appropriate authentication and authorization.
+  contact:
+    name: API Support
+    url: http://www.example.com/support
+    email: support@example.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: https://api.example.com/v1
+    description: Production server
+  - url: https://staging.example.com/v1
+    description: Staging server
+  - url: http://localhost:8080/v1
+    description: Local development server
+tags:
+  - name: Admin - Users
+    description: |
+      Endpoints for administrative management of user accounts, including listing, creating,
+      retrieving, updating, and deleting user profiles. These operations typically require
+      elevated permissions.
+paths:
+  /admin/users:
+    summary: User Management Endpoints (Admin)
+    description: |
+      These endpoints provide comprehensive administrative capabilities for managing user accounts within the system.
+      Admins can list, create, and search for users, as well as assign roles and manage user statuses.
+    get:
+      tags:
+        - Admin - Users
+      summary: Retrieve a list of all users
+      operationId: listUsers
+      description: |
+        Retrieves a paginated and filterable list of all user accounts registered in the system.
+        This endpoint is intended for administrative use to oversee the user base,
+        allowing for efficient searching and filtering by various criteria such as role, status, username, or email.
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - $ref: '#/components/parameters/SortByParam'
+        - $ref: '#/components/parameters/SortOrderParam'
+        - name: search
+          in: query
+          description: |
+            A keyword to search across user fields like username, email, first name, or last name.
+            Supports partial matching and is case-insensitive.
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 255
+          example: "john.doe"
+        - name: role
+          in: query
+          description: |
+            Filter users by their assigned role. Multiple roles can be specified by repeating the parameter
+            (e.g., `?role=admin&role=editor`) or using comma-separated values if the API supports it.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [admin, editor, viewer, guest, support, billing, developer]
+            uniqueItems: true
+          style: form
+          explode: true
+          example: ["admin", "editor"]
+        - name: status
+          in: query
+          description: |
+            Filter users by their account status.
+          required: false
+          schema:
+            type: string
+            enum: [active, inactive, suspended, pending_verification, locked]
+          example: "active"
+      responses:
+        '200':
+          description: A paginated list of users.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+              examples:
+                successResponse:
+                  summary: Example of a successful user list retrieval
+                  value:
+                    data:
+                      - userId: "usr_123abc456def789ghi"
+                        username: "john.doe"
+                        email: "john.doe@example.com"
+                        firstName: "John"
+                        lastName: "Doe"
+                        roles: ["admin", "editor"]
+                        status: "active"
+                        createdAt: "2023-01-15T10:00:00Z"
+                        updatedAt: "2023-01-15T10:00:00Z"
+                        lastLoginAt: "2024-03-01T09:15:30Z"
+                        metadata:
+                          department: "Engineering"
+                          phone: "+1-555-123-4567"
+                      - userId: "usr_456def789ghi012jkl"
+                        username: "jane.smith"
+                        email: "jane.smith@example.com"
+                        firstName: "Jane"
+                        lastName: "Smith"
+                        roles: ["viewer"]
+                        status: "active"
+                        createdAt: "2023-02-20T11:30:00Z"
+                        updatedAt: "2023-02-20T11:30:00Z"
+                        lastLoginAt: "2024-02-28T14:00:00Z"
+                        metadata:
+                          department: "Marketing"
+                    pagination:
+                      totalItems: 100
+                      currentPage: 1
+                      pageSize: 10
+                      totalPages: 10
+                      nextPage: 2
+                      prevPage: null
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Admin - Users
+      summary: Create a new user account
+      operationId: createUser
+      description: |
+        Creates a new user account with specified details, including initial roles and status.
+        This endpoint is typically used by administrators to onboard new users into the system.
+        A strong password is required, and the system may enforce additional complexity rules.
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: User data for the new account.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+            examples:
+              newUser:
+                summary: Example of creating a new user
+                value:
+                  username: "new.user"
+                  email: "new.user@example.com"
+                  password: "SecurePassword123!"
+                  firstName: "New"
+                  lastName: "User"
+                  roles: ["viewer", "guest"]
+                  status: "pending_verification"
+                  metadata:
+                    onboarding_source: "admin_panel"
+                    initial_project: "Project Alpha"
+      responses:
+        '201':
+          description: User account created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                userCreated:
+                  summary: Example of a successfully created user response
+                  value:
+                    userId: "usr_789ghi012jkl345mno"
+                    username: "new.user"
+                    email: "new.user@example.com"
+                    firstName: "New"
+                    lastName: "User"
+                    roles: ["viewer", "guest"]
+                    status: "pending_verification"
+                    createdAt: "2023-03-01T14:00:00Z"
+                    updatedAt: "2023-03-01T14:00:00Z"
+                    lastLoginAt: null
+                    metadata:
+                      onboarding_source: "admin_panel"
+                      initial_project: "Project Alpha"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Conflict, e.g., user with this email or username already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflictError:
+                  summary: Example of a conflict error (user exists)
+                  value:
+                    code: "USER_ALREADY_EXISTS"
+                    message: "A user with the provided email or username already exists."
+                    details:
+                      field: "email"
+                      value: "new.user@example.com"
+                      issue: "Duplicate entry"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/users/{userId}:
+    summary: Specific User Management Endpoints (Admin)
+    description: |
+      Endpoints for managing a single user account by its unique identifier.
+      Allows administrators to retrieve, update, and delete specific user profiles.
+    parameters:
+      - name: userId
+        in: path
+        description: The unique identifier of the user to manage. This ID is system-generated.
+        required: true
+        schema:
+          type: string
+          pattern: "^usr_[a-zA-Z0-9]{16,32}$" # Example pattern for user IDs (e.g., 20-36 chars)
+          minLength: 20
+          maxLength: 36
+        example: "usr_123abc456def789ghi"
+    get:
+      tags:
+        - Admin - Users
+      summary: Retrieve details of a specific user
+      operationId: getUserById
+      description: |
+        Retrieves the complete profile details for a user identified by their unique `userId`.
+        This includes all associated metadata, roles, status, and timestamps.
+        Only authorized administrators can access this detailed information.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                userFound:
+                  summary: Example of a successful user retrieval
+                  value:
+                    userId: "usr_123abc456def789ghi"
+                    username: "john.doe"
+                    email: "john.doe@example.com"
+                    firstName: "John"
+                    lastName: "Doe"
+                    roles: ["admin", "editor"]
+                    status: "active"
+                    createdAt: "2023-01-15T10:00:00Z"
+                    updatedAt: "2023-01-15T10:00:00Z"
+                    lastLoginAt: "2024-03-01T09:15:30Z"
+                    metadata:
+                      department: "Engineering"
+                      phone: "+1-555-123-4567"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Admin - Users
+      summary: Update an existing user account
+      operationId: updateUser
+      description: |
+        Updates the details of an existing user account identified by `userId`.
+        This allows administrators to modify user roles, status, and other profile information.
+        The request body should contain the full set of fields to be updated.
+        Fields not included in the request body will typically remain unchanged,
+        but some implementations might treat PUT as a full replacement.
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: User data to update. All fields are optional for partial updates.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+            examples:
+              updateUserRoles:
+                summary: Example of updating user roles and name
+                value:
+                  firstName: "Jonathan"
+                  lastName: "Doe-Smith"
+                  roles: ["admin", "support"]
+                  status: "active"
+                  metadata:
+                    department: "Operations"
+              updateUserStatus:
+                summary: Example of suspending a user
+                value:
+                  status: "suspended"
+                  reason: "Policy violation: spamming"
+                  metadata:
+                    suspension_date: "2024-03-05T10:00:00Z"
+      responses:
+        '200':
+          description: User account updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                userUpdated:
+                  summary: Example of a successfully updated user response
+                  value:
+                    userId: "usr_123abc456def789ghi"
+                    username: "john.doe"
+                    email: "john.doe@example.com"
+                    firstName: "Jonathan"
+                    lastName: "Doe-Smith"
+                    roles: ["admin", "support"]
+                    status: "active"
+                    createdAt: "2023-01-15T10:00:00Z"
+                    updatedAt: "2024-03-05T15:30:00Z"
+                    lastLoginAt: "2024-03-01T09:15:30Z"
+                    metadata:
+                      department: "Operations"
+                      phone: "+1-555-123-4567"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Conflict, e.g., trying to change email to one that already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflictError:
+                  summary: Example of a conflict error (email in use)
+                  value:
+                    code: "EMAIL_ALREADY_IN_USE"
+                    message: "The provided email address is already associated with another account."
+                    details:
+                      field: "email"
+                      value: "another@example.example.com"
+                      issue: "Duplicate entry"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Admin - Users
+      summary: Delete a user account
+      operationId: deleteUser
+      description: |
+        Permanently deletes a user account identified by `userId`.
+        This action is irreversible and should be performed with extreme caution.
+        Depending on system policy, this might trigger a soft-delete (marking as deleted)
+        or a hard-delete (removing all data). Associated data might also be purged or anonymized.
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: User account deleted successfully. No content is returned for a successful deletion.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    User:
+      type: object
+      description: Represents a user account in the system with all its associated details.
+      required:
+        - userId
+        - username
+        - email
+        - roles
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        userId:
+          type: string
+          description: The unique, system-generated identifier for the user.
+          pattern: "^usr_[a-zA-Z0-9]{16,32}$"
+          example: "usr_123abc456def789ghi"
+        username:
+          type: string
+          description: A unique username for the user, used for login or display.
+          minLength: 3
+          maxLength: 50
+          example: "john.doe"
+        email:
+          type: string
+          format: email
+          description: The primary email address of the user, must be unique.
+          example: "john.doe@example.com"
+        firstName:
+          type: string
+          description: The user's first name.
+          nullable: true
+          minLength: 1
+          maxLength: 100
+          example: "John"
+        lastName:
+          type: string
+          description: The user's last name.
+          nullable: true
+          minLength: 1
+          maxLength: 100
+          example: "Doe"
+        roles:
+          type: array
+          description: A list of roles assigned to the user, defining their permissions.
+          items:
+            type: string
+            enum: [admin, editor, viewer, guest, support, billing, developer]
+          minItems: 1
+          uniqueItems: true
+          example: ["admin", "editor"]
+        status:
+          type: string
+          description: The current operational status of the user's account.
+          enum: [active, inactive, suspended, pending_verification, locked]
+          example: "active"
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the user account was created (ISO 8601 format).
+          example: "2023-01-15T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: The timestamp when the user account was last updated (ISO 8601 format).
+          example: "2023-01-15T10:00:00Z"
+        lastLoginAt:
+          type: string
+          format: date-time
+          description: The timestamp of the user's last successful login (ISO 8601 format).
+          nullable: true
+          example: "2024-03-01T09:15:30Z"
+        metadata:
+          type: object
+          description: |
+            A flexible object to store additional, unstructured metadata about the user.
+            This can include departmental information, internal notes, or other custom attributes.
+          additionalProperties: true
+          nullable: true
+          example:
+            department: "Engineering"
+            phone: "+1-555-123-4567"
+            internal_id: "EMP-001"
+
+    UserCreateRequest:
+      type: object
+      description: Data required to create a new user account.
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          description: A unique username for the new user.
+          minLength: 3
+          maxLength: 50
+          pattern: "^[a-zA-Z0-9._-]+$"
+          example: "new.user"
+        email:
+          type: string
+          format: email
+          description: The primary email address for the new user, must be unique.
+          example: "new.user@example.com"
+        password:
+          type: string
+          format: password
+          description: |
+            The initial password for the new user. Must meet complexity requirements:
+            at least 8 characters, one uppercase, one lowercase, one digit, one special character.
+          minLength: 8
+          maxLength: 128
+          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"
+          writeOnly: true
+          example: "SecurePassword123!"
+        firstName:
+          type: string
+          description: The first name of the new user.
+          nullable: true
+          minLength: 1
+          maxLength: 100
+          example: "New"
+        lastName:
+          type: string
+          description: The last name of the new user.
+          nullable: true
+          minLength: 1
+          maxLength: 100
+          example: "User"
+        roles:
+          type: array
+          description: Initial roles to assign to the new user. Defaults to `["viewer"]` if not provided.
+          items:
+            type: string
+            enum: [admin, editor, viewer, guest, support, billing, developer]
+          minItems: 1
+          uniqueItems: true
+          default: ["viewer"]
+          example: ["viewer", "guest"]
+        status:
+          type: string
+          description: The initial status of the new user's account. Defaults to `pending_verification`.
+          enum: [active, inactive, suspended, pending_verification, locked]
+          default: "pending_verification"
+          example: "pending_verification"
+        metadata:
+          type: object
+          description: |
+            Optional, flexible object to store additional, unstructured metadata about the user
+            during creation.
+          additionalProperties: true
+          nullable: true
+          example:
+            onboarding_source: "admin_panel"
+            initial_project: "Project Alpha"
+
+    UserUpdateRequest:
+      type: object
+      description: Data used to update an existing user account. All fields are optional for partial updates.
+      properties:
+        username:
+          type: string
+          description: A new unique username for the user.
+          minLength: 3
+          maxLength: 50
+          pattern: "^[a-zA-Z0-9._-]+$"
+          example: "jonathan.ds"
+        email:
+          type: string
+          format: email
+          description: A new primary email address for the user, must be unique.
+          example: "jonathan.ds@example.com"
+        firstName:
+          type: string
+          description: The updated first name of the user.
+          minLength: 1
+          maxLength: 100
+          example: "Jonathan"
+        lastName:
+          type: string
+          description: The updated last name of the user.
+          minLength: 1
+          maxLength: 100
+          example: "Doe-Smith"
+        roles:
+          type: array
+          description: A new list of roles to assign to the user. This will replace existing roles.
+          items:
+            type: string
+            enum: [admin, editor, viewer, guest, support, billing, developer]
+          minItems: 1
+          uniqueItems: true
+          example: ["admin", "support"]
+        status:
+          type: string
+          description: The new operational status of the user's account.
+          enum: [active, inactive, suspended, pending_verification, locked]
+          example: "suspended"
+        reason:
+          type: string
+          description: |
+            An optional reason or note for a status change (e.g., why an account was suspended).
+            This field is typically used for auditing or internal communication.
+          nullable: true
+          maxLength: 500
+          example: "Policy violation: excessive spamming detected."
+        metadata:
+          type: object
+          description: |
+            A flexible object to update or add additional, unstructured metadata about the user.
+            This will typically merge with existing metadata.
+          additionalProperties: true
+          nullable: true
+          example:
+            department: "Operations"
+            suspension_date: "2024-03-05T10:00:00Z"
+
+    UserListResponse:
+      type: object
+      description: A paginated response containing a list of user objects.
+      required:
+        - data
+        - pagination
+      properties:
+        data:
+          type: array
+          description: The list of user objects for the current page.
+          items:
+            $ref: '#/components/schemas/User'
+        pagination:
+          $ref: '#/components/schemas/PaginationMetadata'
+
+    PaginationMetadata:
+      type: object
+      description: Metadata for paginated responses.
+      required:
+        - totalItems
+        - currentPage
+        - pageSize
+        - totalPages
+      properties:
+        totalItems:
+          type: integer
+          format: int64
+          description: The total number of items across all pages.
+          minimum: 0
+          example: 100
+        currentPage:
+          type: integer
+          format: int32
+          description: The current page number (1-indexed).
+          minimum: 1
+          example: 1
+        pageSize:
+          type: integer
+          format: int32
+          description: The number of items per page.
+          minimum: 1
+          maximum: 100
+          example: 10
+        totalPages:
+          type: integer
+          format: int32
+          description: The total number of pages available.
+          minimum: 1
+          example: 10
+        nextPage:
+          type: integer
+          format: int32
+          description: The next page number, or null if on the last page.
+          nullable: true
+          minimum: 1
+          example: 2
+        prevPage:
+          type: integer
+          format: int32
+          description: The previous page number, or null if on the first page.
+          nullable: true
+          minimum: 1
+          example: null
+
+    ErrorResponse:
+      type: object
+      description: Standard error response format for API errors.
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: A unique, machine-readable error code.
+          example: "BAD_REQUEST"
+        message:
+          type: string
+          description: A human-readable explanation of the error.
+          example: "Invalid input provided for user creation."
+        details:
+          type: object
+          description: |
+            Optional, additional details about the error, often used for validation errors
+            or specific contextual information.
+          additionalProperties: true
+          nullable: true
+          example:
+            field: "email"
+            value: "invalid-email"
+            issue: "Must be a valid email format."
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      description: The page number to retrieve (1-indexed).
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+      example: 1
+    PageSizeParam:
+      name: pageSize
+      in: query
+      description: The number of items to return per page.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 10
+      example: 10
+    SortByParam:
+      name: sortBy
+      in: query
+      description: The field to sort the results by.
+      required: false
+      schema:
+        type: string
+        enum: [username, email, createdAt, updatedAt, status]
+        default: "createdAt"
+      example: "username"
+    SortOrderParam:
+      name: sortOrder
+      in: query
+      description: The order to sort the results in.
+      required: false
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: "asc"
+      example: "asc"
+
+  responses:
+    BadRequest:
+      description: Bad Request - The request was malformed or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            invalidInput:
+              summary: Example of invalid input error
+              value:
+                code: "VALIDATION_ERROR"
+                message: "One or more fields in the request body are invalid."
+                details:
+                  field: "email"
+                  value: "not-an-email"
+                  issue: "Invalid email format."
+    Unauthorized:
+      description: Unauthorized - Authentication required or failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            missingToken:
+              summary: Example of missing authentication token
+              value:
+                code: "UNAUTHORIZED"
+                message: "Authentication token is missing or invalid."
+    Forbidden:
+      description: Forbidden - The authenticated user does not have the necessary permissions.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            insufficientPermissions:
+              summary: Example of insufficient permissions error
+              value:
+                code: "FORBIDDEN"
+                message: "You do not have the required permissions to perform this action."
+    NotFound:
+      description: Not Found - The requested resource could not be found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            userNotFound:
+              summary: Example of user not found error
+              value:
+                code: "USER_NOT_FOUND"
+                message: "The user with the specified ID was not found."
+                details:
+                  userId: "usr_nonexistent"
+    InternalServerError:
+      description: Internal Server Error - An unexpected error occurred on the server.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            serverError:
+              summary: Example of a generic internal server error
+              value:
+                code: "INTERNAL_SERVER_ERROR"
+                message: "An unexpected error occurred. Please try again later."
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Bearer token authentication using a JSON Web Token (JWT).
+        The token should be included in the `Authorization` header as `Bearer <token>`.
+        This is typically issued after a successful login or OAuth flow.
