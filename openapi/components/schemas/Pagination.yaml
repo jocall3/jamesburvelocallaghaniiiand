@@ -1,0 +1,101 @@
+title: Pagination
+type: object
+description: >-
+  A comprehensive pagination object providing metadata for navigating through a
+  paginated list of resources. It supports both traditional page/offset-based
+  pagination and modern cursor-based pagination, offering clients flexibility in
+  how they consume large datasets. This object is typically embedded in the `meta`
+  or a similar top-level key of a list response.
+properties:
+  total_items:
+    type: integer
+    format: int64
+    description: The total number of items available across all pages that match the query criteria.
+    example: 4521
+    minimum: 0
+  per_page:
+    type: integer
+    format: int32
+    description: The maximum number of items requested to be returned per page. This corresponds to the `limit` or `per_page` query parameter from the request.
+    example: 50
+    minimum: 1
+    maximum: 1000
+  current_page:
+    type: integer
+    format: int32
+    description: The current page number being displayed. This corresponds to the `page` query parameter from the request.
+    example: 3
+    minimum: 1
+  total_pages:
+    type: integer
+    format: int32
+    description: The total number of pages available, calculated as `ceil(total_items / per_page)`.
+    example: 91
+    minimum: 0
+  links:
+    type: object
+    description: HATEOAS-style links for navigating through the paginated results using page-based offsets.
+    properties:
+      first:
+        type: string
+        format: uri
+        nullable: true
+        description: The URL for the first page of results.
+        example: "https://api.example.com/v1/items?page=1&limit=50"
+      last:
+        type: string
+        format: uri
+        nullable: true
+        description: The URL for the last page of results.
+        example: "https://api.example.com/v1/items?page=91&limit=50"
+      prev:
+        type: string
+        format: uri
+        nullable: true
+        description: The URL for the previous page of results. This is `null` if on the first page.
+        example: "https://api.example.com/v1/items?page=2&limit=50"
+      next:
+        type: string
+        format: uri
+        nullable: true
+        description: The URL for the next page of results. This is `null` if on the last page.
+        example: "https://api.example.com/v1/items?page=4&limit=50"
+    required:
+      - first
+      - last
+      - prev
+      - next
+  cursors:
+    type: object
+    description: >-
+      Cursors for efficient, stateless pagination. Cursors are opaque strings
+      that point to a specific item in the dataset. This method is generally
+      more performant for very large datasets than page/offset pagination as it
+      avoids table scans.
+    properties:
+      next:
+        type: string
+        nullable: true
+        description: >-
+          An opaque cursor that points to the start of the next page of results.
+          Include this value in the `after` or `cursor` query parameter to fetch the next page.
+          It is `null` if there are no more results.
+        example: "cGFnZT00JmxpbWl0PTUw"
+      prev:
+        type: string
+        nullable: true
+        description: >-
+          An opaque cursor that points to the start of the previous page of results.
+          Include this value in the `before` query parameter to fetch the previous page.
+          It is `null` if on the first page.
+        example: "cGFnZT0yJmxpbWl0PTUw"
+    required:
+      - next
+      - prev
+  has_more:
+    type: boolean
+    description: >-
+      A boolean flag indicating if there are more pages of results after the current one.
+      This is often used with cursor-based pagination to know when to stop fetching,
+      for example, in an infinite scrolling UI.
+    example: true
