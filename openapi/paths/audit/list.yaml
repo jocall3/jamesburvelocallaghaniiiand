@@ -1,0 +1,466 @@
+get:
+  summary: Retrieve a comprehensive list of system audit logs
+  description: |
+    This endpoint provides access to a detailed, system-wide audit trail.
+    It allows administrators and authorized users to track all significant
+    actions performed within the system, including user logins, data modifications,
+    resource creations/deletions, and system events.
+    The logs can be filtered, paginated, and sorted to facilitate forensic analysis,
+    compliance auditing, and operational monitoring.
+
+    Each audit log entry captures critical information such as:
+    - **Actor:** The user or system responsible for the action (`user_id`, `username`).
+    - **Action:** The type of event that occurred (`event_type`).
+    - **Resource:** The specific entity or data affected (`resource_type`, `resource_id`).
+    - **Timestamp:** When the event took place.
+    - **Contextual Details:** Additional information like IP address, user agent,
+      and a flexible `details` object containing event-specific data.
+    - **Correlation ID:** A unique identifier to link related operations across services.
+    - **Status:** The outcome of the operation (e.g., `SUCCESS`, `FAILED`).
+
+    This endpoint is crucial for maintaining security, ensuring compliance with regulatory
+    requirements, and debugging system behavior by providing a chronological record
+    of all key activities.
+  operationId: listAuditLogs
+  tags:
+    - Audit
+    - System Monitoring
+    - Logs
+  parameters:
+    - name: page
+      in: query
+      description: |
+        The page number to retrieve for paginated results.
+        Results are 1-indexed, meaning the first page is `1`.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+      examples:
+        default:
+          value: 1
+        secondPage:
+          value: 2
+    - name: pageSize
+      in: query
+      description: |
+        The maximum number of audit log entries to return per page.
+        This parameter controls the granularity of pagination.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 25
+      examples:
+        default:
+          value: 25
+        largePage:
+          value: 50
+    - name: sort_by
+      in: query
+      description: |
+        Specifies the field by which the audit log entries should be sorted.
+        Commonly used fields include `timestamp` (for chronological order),
+        `user_id` (to group actions by user), `event_type` (to group similar events),
+        or `resource_type` (to group actions affecting specific resource types).
+      required: false
+      schema:
+        type: string
+        enum:
+          - timestamp
+          - user_id
+          - username
+          - event_type
+          - resource_type
+          - resource_id
+          - ip_address
+          - status
+        default: timestamp
+      examples:
+        sortByTimestamp:
+          value: timestamp
+        sortByEventType:
+          value: event_type
+        sortByUserId:
+          value: user_id
+    - name: sort_order
+      in: query
+      description: |
+        Determines the order of sorting.
+        `asc` for ascending order (e.g., oldest first for `timestamp`),
+        `desc` for descending order (e.g., newest first for `timestamp`).
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        default: desc
+      examples:
+        descending:
+          value: desc
+        ascending:
+          value: asc
+    - name: user_id
+      in: query
+      description: |
+        Filters audit logs to include only entries associated with a specific user ID.
+        This is useful for tracking all actions performed by a particular user.
+      required: false
+      schema:
+        type: string
+        format: uuid
+      examples:
+        specificUser:
+          value: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+    - name: event_type
+      in: query
+      description: |
+        Filters audit logs by the type of event that occurred.
+        This allows for focused analysis on specific categories of actions,
+        such as `LOGIN` attempts, `CREATE_PRODUCT` operations, or `SYSTEM_ERROR` events.
+      required: false
+      schema:
+        type: string
+        enum:
+          - LOGIN
+          - LOGOUT
+          - CREATE_USER
+          - UPDATE_USER
+          - DELETE_USER
+          - CREATE_PRODUCT
+          - UPDATE_PRODUCT
+          - DELETE_PRODUCT
+          - CREATE_ORDER
+          - UPDATE_ORDER
+          - DELETE_ORDER
+          - VIEW_REPORT
+          - SYSTEM_ERROR
+          - CONFIG_CHANGE
+          - PASSWORD_RESET
+          - ACCESS_DENIED
+          - DATA_EXPORT
+          - API_CALL
+      examples:
+        userLogin:
+          value: LOGIN
+        productUpdate:
+          value: UPDATE_PRODUCT
+        systemError:
+          value: SYSTEM_ERROR
+    - name: resource_type
+      in: query
+      description: |
+        Filters audit logs by the type of resource that was affected by the action.
+        Examples include `USER`, `PRODUCT`, `ORDER`, `REPORT`, `SYSTEM`, or `CONFIGURATION`.
+        This helps in understanding activities related to specific data domains.
+      required: false
+      schema:
+        type: string
+        enum:
+          - USER
+          - PRODUCT
+          - ORDER
+          - REPORT
+          - SYSTEM
+          - CONFIGURATION
+          - API_KEY
+          - ROLE
+      examples:
+        userResource:
+          value: USER
+        productResource:
+          value: PRODUCT
+        systemResource:
+          value: SYSTEM
+    - name: resource_id
+      in: query
+      description: |
+        Filters audit logs by the unique identifier of the specific resource affected.
+        This allows for granular tracking of changes or interactions with a single entity.
+      required: false
+      schema:
+        type: string
+        format: uuid
+      examples:
+        specificResource:
+          value: "f1e2d3c4-b5a6-9876-5432-10fedcba9876"
+    - name: start_date
+      in: query
+      description: |
+        Filters audit logs to include events that occurred on or after this specified date and time.
+        The value must be provided in ISO 8601 format (e.g., `2023-01-01T00:00:00Z`).
+        This is useful for defining a start boundary for time-based searches.
+      required: false
+      schema:
+        type: string
+        format: date-time
+      examples:
+        startOfJan:
+          value: "2023-01-01T00:00:00Z"
+        yesterday:
+          value: "2023-10-25T12:00:00Z"
+    - name: end_date
+      in: query
+      description: |
+        Filters audit logs to include events that occurred on or before this specified date and time.
+        The value must be provided in ISO 8601 format (e.g., `2023-01-31T23:59:59Z`).
+        This is useful for defining an end boundary for time-based searches.
+      required: false
+      schema:
+        type: string
+        format: date-time
+      examples:
+        endOfJan:
+          value: "2023-01-31T23:59:59Z"
+        now:
+          value: "2023-10-26T12:00:00Z"
+    - name: ip_address
+      in: query
+      description: |
+        Filters audit logs by the source IP address from which the action originated.
+        This helps in identifying activities from specific network locations.
+      required: false
+      schema:
+        type: string
+        format: ipv4
+      examples:
+        specificIp:
+          value: "192.168.1.100"
+        publicIp:
+          value: "203.0.113.45"
+    - name: correlation_id
+      in: query
+      description: |
+        Filters audit logs by a specific correlation ID. This ID is often used to link
+        a series of related operations or requests across different services or components
+        within a distributed system, making it invaluable for end-to-end tracing.
+      required: false
+      schema:
+        type: string
+        format: uuid
+      examples:
+        specificCorrelation:
+          value: "c0a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5"
+    - name: status
+      in: query
+      description: |
+        Filters audit logs by the outcome status of the operation.
+        `SUCCESS` indicates the operation completed without errors.
+        `FAILED` indicates the operation encountered an error or was denied.
+        `PENDING` might indicate an operation that is still in progress or awaiting approval.
+      required: false
+      schema:
+        type: string
+        enum:
+          - SUCCESS
+          - FAILED
+          - PENDING
+      examples:
+        successStatus:
+          value: SUCCESS
+        failedStatus:
+          value: FAILED
+  responses:
+    '200':
+      description: A paginated list of audit log entries successfully retrieved.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                description: An array containing the retrieved audit log entries.
+                items:
+                  $ref: '#/components/schemas/AuditLogEntry'
+              pagination:
+                type: object
+                description: Metadata providing details about the current pagination state.
+                properties:
+                  totalItems:
+                    type: integer
+                    description: The total number of audit log entries available across all pages.
+                    example: 12345
+                  totalPages:
+                    type: integer
+                    description: The total number of pages available based on the `pageSize`.
+                    example: 124
+                  currentPage:
+                    type: integer
+                    description: The current page number being returned in this response.
+                    example: 1
+                  pageSize:
+                    type: integer
+                    description: The number of items requested per page.
+                    example: 100
+                required:
+                  - totalItems
+                  - totalPages
+                  - currentPage
+                  - pageSize
+            required:
+              - data
+              - pagination
+          examples:
+            default:
+              summary: Example of a successful audit log retrieval with various event types
+              value:
+                data:
+                  - id: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                    timestamp: "2023-10-26T10:00:00Z"
+                    user_id: "usr_001"
+                    username: "admin_user"
+                    event_type: "LOGIN"
+                    resource_type: "USER"
+                    resource_id: "usr_001"
+                    details:
+                      message: "User logged in successfully from web interface."
+                      login_method: "password"
+                      session_id: "sess_xyz123"
+                    ip_address: "203.0.113.45"
+                    user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
+                    correlation_id: "corr_login_12345"
+                    status: "SUCCESS"
+                  - id: "b2c3d4e5-f6a7-8901-2345-67890abcdef0"
+                    timestamp: "2023-10-26T10:05:30Z"
+                    user_id: "svc_api_gateway"
+                    username: "api_service_account"
+                    event_type: "UPDATE_PRODUCT"
+                    resource_type: "PRODUCT"
+                    resource_id: "prod_789"
+                    details:
+                      message: "Product price updated via API."
+                      field_changed: "price"
+                      old_value: 99.99
+                      new_value: 109.99
+                      currency: "USD"
+                    ip_address: "198.51.100.10"
+                    user_agent: "PostmanRuntime/7.33.0"
+                    correlation_id: "corr_prod_update_12346"
+                    status: "SUCCESS"
+                  - id: "c3d4e5f6-a7b8-9012-3456-7890abcdef12"
+                    timestamp: "2023-10-26T10:15:00Z"
+                    user_id: "usr_001"
+                    username: "admin_user"
+                    event_type: "DELETE_USER"
+                    resource_type: "USER"
+                    resource_id: "usr_789"
+                    details:
+                      message: "User account 'john.doe' deleted by administrator."
+                      reason: "Account no longer active, requested by HR."
+                      deleted_by_role: "Administrator"
+                    ip_address: "203.0.113.45"
+                    user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
+                    correlation_id: "corr_user_delete_12347"
+                    status: "SUCCESS"
+                  - id: "d4e5f6a7-b8c9-0123-4567-890abcdef34"
+                    timestamp: "2023-10-26T10:20:15Z"
+                    user_id: "usr_guest"
+                    username: "guest_user"
+                    event_type: "ACCESS_DENIED"
+                    resource_type: "REPORT"
+                    resource_id: "rpt_finance_q3"
+                    details:
+                      message: "Attempted to access restricted finance report."
+                      reason: "Insufficient permissions for 'Finance' role."
+                      required_permission: "report:finance:read"
+                    ip_address: "192.0.2.1"
+                    user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
+                    correlation_id: "corr_access_denied_12348"
+                    status: "FAILED"
+                  - id: "e5f6a7b8-c9d0-1234-5678-90abcdef56"
+                    timestamp: "2023-10-26T10:30:00Z"
+                    user_id: "sys_scheduler"
+                    username: "system_scheduler"
+                    event_type: "SYSTEM_ERROR"
+                    resource_type: "SYSTEM"
+                    resource_id: "job_cleanup_old_data"
+                    details:
+                      message: "Scheduled job 'cleanup_old_data' failed to complete."
+                      error_code: "DB_CONN_TIMEOUT"
+                      stack_trace_summary: "java.sql.SQLTimeoutException: Connection timed out..."
+                      severity: "HIGH"
+                    ip_address: "10.0.0.5"
+                    user_agent: "System-Agent/1.0"
+                    correlation_id: "corr_sys_error_12349"
+                    status: "FAILED"
+                pagination:
+                  totalItems: 12345
+                  totalPages: 124
+                  currentPage: 1
+                  pageSize: 100
+    '400':
+      $ref: '#/components/responses/BadRequest'
+    '401':
+      $ref: '#/components/responses/Unauthorized'
+    '403':
+      $ref: '#/components/responses/Forbidden'
+    '500':
+      $ref: '#/components/responses/InternalServerError'
+  security:
+    - BearerAuth: []
+    - ApiKeyAuth: []
+  x-code-samples:
+    - lang: curl
+      label: "Fetch Audit Logs (cURL)"
+      source: |
+        curl -X GET "https://api.example.com/v1/audit-logs?page=1&pageSize=50&sort_by=timestamp&sort_order=desc&event_type=LOGIN&start_date=2023-10-01T00:00:00Z" \
+          -H "Accept: application/json" \
+          -H "Authorization: Bearer YOUR_AUTH_TOKEN"
+    - lang: python
+      label: "Fetch Audit Logs (Python Requests)"
+      source: |
+        import requests
+        import json
+
+        url = "https://api.example.com/v1/audit-logs"
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer YOUR_AUTH_TOKEN"
+        }
+        params = {
+            "page": 1,
+            "pageSize": 50,
+            "sort_by": "timestamp",
+            "sort_order": "desc",
+            "event_type": "LOGIN",
+            "start_date": "2023-10-01T00:00:00Z"
+        }
+
+        try:
+            response = requests.get(url, headers=headers, params=params)
+            response.raise_for_status() # Raise an exception for HTTP errors
+            print(json.dumps(response.json(), indent=2))
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching audit logs: {e}")
+    - lang: javascript
+      label: "Fetch Audit Logs (JavaScript Fetch API)"
+      source: |
+        const url = new URL('https://api.example.com/v1/audit-logs');
+        url.searchParams.append('page', '1');
+        url.searchParams.append('pageSize', '50');
+        url.searchParams.append('sort_by', 'timestamp');
+        url.searchParams.append('sort_order', 'desc');
+        url.searchParams.append('event_type', 'LOGIN');
+        url.searchParams.append('start_date', '2023-10-01T00:00:00Z');
+
+        fetch(url.toString(), {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer YOUR_AUTH_TOKEN'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => console.log(JSON.stringify(data, null, 2)))
+        .catch(error => console.error('Error fetching audit logs:', error));
