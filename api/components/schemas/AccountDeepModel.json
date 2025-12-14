@@ -1,0 +1,110 @@
+{
+  "type": "object",
+  "description": "A comprehensive and deep representation of an account entity within the financial system, mapped to 'I_Account_Deep_Model'. This model encapsulates high-fidelity data points including unique identifiers, institutional classifications, liquidity metrics, historical ledger data, audit logs, and complex risk profiling. It is designed for high-precision financial operations, regulatory reporting, and deep-tier data analysis.",
+  "required": [
+    "primaryKey",
+    "designation",
+    "institutionalVector",
+    "liquidityPool",
+    "historicalLedger",
+    "auditTrail",
+    "riskProfile"
+  ],
+  "properties": {
+    "primaryKey": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The immutable, universally unique identifier (UUID v4) assigned to this account upon creation. This key serves as the primary index for referential integrity across the distributed ledger and relational database systems.",
+      "example": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+    },
+    "designation": {
+      "type": "string",
+      "description": "The official human-readable designation, title, or label of the account. This often corresponds to the legal entity name, the specific fund allocation title, or the internal operational handle used by account managers.",
+      "example": "Global Equity Alpha Fund - Series A - Institutional"
+    },
+    "institutionalVector": {
+      "type": "string",
+      "description": "A specialized vector string representing the institutional classification, routing logic, and segment identification. Used by internal clearing mechanisms to determine settlement pathways and reporting hierarchies.",
+      "example": "IV-9928-X-ALPHA-US-NY-TIER1"
+    },
+    "liquidityPool": {
+      "type": "number",
+      "format": "double",
+      "description": "The current aggregate value of liquid assets available in the associated pool, expressed in the base currency unit. High precision is required for fractional reserve calculations and real-time solvency checks.",
+      "example": 4500230.5592
+    },
+    "historicalLedger": {
+      "type": "array",
+      "description": "An ordered chronological sequence of financial ledger entries associated with this account. This array provides a complete, immutable transaction history used for reconciliation, auditing, and performance analysis.",
+      "items": {
+        "$ref": "./FinancialLedgerEntry.json"
+      }
+    },
+    "auditTrail": {
+      "type": "array",
+      "description": "A sequential list of cryptographic hashes or verbose log strings representing the immutable audit trail of all state changes made to this account record. Ensures non-repudiation and traceability.",
+      "items": {
+        "type": "string",
+        "description": "A single audit log entry containing timestamp, actor, action, and integrity hash.",
+        "example": "2023-10-27T10:00:00Z: UPDATE_LIQUIDITY by SYS_ADMIN_01 [Hash: 8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4]"
+      }
+    },
+    "riskProfile": {
+      "type": "object",
+      "description": "A complex nested object detailing the calculated risk metrics, compliance standing, and regulatory exposure associated with this account. Used by the risk engine to approve or deny transactions.",
+      "required": [
+        "volatilityIndex",
+        "complianceScore",
+        "jurisdiction",
+        "lastAssessmentDate",
+        "exposureLimit"
+      ],
+      "properties": {
+        "volatilityIndex": {
+          "type": "number",
+          "format": "float",
+          "description": "A calculated coefficient representing the historical volatility of the account's assets (0.0 to 1.0 scale). Higher values indicate greater variance in asset value.",
+          "example": 0.125
+        },
+        "complianceScore": {
+          "type": "integer",
+          "description": "An integer score (0-100) reflecting the account's adherence to KYC/AML regulations and internal policy frameworks. 100 represents perfect compliance.",
+          "example": 98
+        },
+        "jurisdiction": {
+          "type": "string",
+          "description": "The primary legal jurisdiction governing the account's assets, formatted as an ISO 3166-2 code where applicable.",
+          "example": "US-DE"
+        },
+        "lastAssessmentDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The ISO 8601 timestamp indicating when the last automated risk assessment and compliance check was executed for this profile.",
+          "example": "2023-11-15T14:30:00.000Z"
+        },
+        "exposureLimit": {
+          "type": "number",
+          "format": "double",
+          "description": "The maximum allowable financial exposure for this account before automatic circuit breakers are triggered.",
+          "example": 10000000.00
+        },
+        "flags": {
+          "type": "array",
+          "description": "A list of active risk flags or warnings associated with the account.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "PEP_ASSOCIATION",
+              "HIGH_VOLUME_TURNOVER",
+              "CROSS_BORDER_ACTIVITY",
+              "DORMANT_REACTIVATION"
+            ]
+          },
+          "example": [
+            "CROSS_BORDER_ACTIVITY"
+          ]
+        }
+      }
+    }
+  }
+}
