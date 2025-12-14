@@ -1,0 +1,209 @@
+{
+  "get": {
+    "summary": "Retrieve System State Vector",
+    "description": "Retrieves the current `SystemStateVector`, a high-dimensional representation of the system's runtime status. This endpoint is critical for monitoring the `activeContext` and ensuring the coherence of the distributed processing graph.\n\nThe response aggregates real-time telemetry from the kernel, application layer, and external interfaces. It is primarily used by the Watchdog service and the Auto-Scaling Orchestrator to make heuristic decisions about resource allocation and context switching.\n\n**Performance Note:** Requesting a `contextDepth` greater than 5 may result in significant latency due to the recursive traversal of the context graph.",
+    "operationId": "getSystemState",
+    "tags": [
+      "System",
+      "Monitoring",
+      "Context Awareness"
+    ],
+    "parameters": [
+      {
+        "name": "detailed",
+        "in": "query",
+        "description": "If set to `true`, the response includes granular metrics for every subsystem involved in the state vector calculation, including raw memory pointers and thread stack traces.",
+        "schema": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      {
+        "name": "contextDepth",
+        "in": "query",
+        "description": "Defines the recursion depth for the `activeContext` analysis. Higher values provide a more comprehensive view of the context tree but increase computational load.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "default": 1
+        }
+      },
+      {
+        "name": "vectorFormat",
+        "in": "query",
+        "description": "Specifies the serialization format of the numerical vector data. 'dense' returns a standard array, 'sparse' returns index-value pairs, and 'binary' returns a base64 encoded byte stream.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dense",
+            "sparse",
+            "binary"
+          ],
+          "default": "dense"
+        }
+      },
+      {
+        "name": "X-Correlation-ID",
+        "in": "header",
+        "description": "A unique identifier used to trace the request across distributed system components.",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Successful retrieval of the System State Vector.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SystemStateVector"
+            },
+            "examples": {
+              "nominalState": {
+                "summary": "Nominal System State",
+                "description": "Example of a healthy system state with a shallow context depth.",
+                "value": {
+                  "timestamp": "2023-10-27T14:30:00.000Z",
+                  "vectorId": "vec-88472-alpha",
+                  "systemHealth": "NOMINAL",
+                  "coherenceScore": 0.998,
+                  "activeContext": {
+                    "contextId": "ctx-main-01",
+                    "type": "processing_graph",
+                    "depth": 1,
+                    "nodeCount": 154,
+                    "status": "active"
+                  },
+                  "vectorData": [
+                    0.12,
+                    0.45,
+                    0.0,
+                    0.98,
+                    0.33,
+                    0.11
+                  ],
+                  "metrics": {
+                    "cpuLoad": 45.2,
+                    "memoryUsageMb": 1024.5,
+                    "activeThreads": 64,
+                    "ioThroughput": "120MB/s"
+                  },
+                  "flags": [
+                    "SYNCED",
+                    "OPTIMIZED"
+                  ]
+                }
+              },
+              "highLoadState": {
+                "summary": "High Load State",
+                "description": "Example of a system under heavy load with degraded coherence.",
+                "value": {
+                  "timestamp": "2023-10-27T14:35:00.000Z",
+                  "vectorId": "vec-88479-beta",
+                  "systemHealth": "DEGRADED",
+                  "coherenceScore": 0.75,
+                  "activeContext": {
+                    "contextId": "ctx-main-01",
+                    "type": "processing_graph",
+                    "depth": 3,
+                    "nodeCount": 4096,
+                    "status": "congested"
+                  },
+                  "vectorData": [
+                    0.88,
+                    0.95,
+                    0.12,
+                    0.44,
+                    0.10,
+                    0.05
+                  ],
+                  "metrics": {
+                    "cpuLoad": 98.5,
+                    "memoryUsageMb": 8192.0,
+                    "activeThreads": 256,
+                    "ioThroughput": "1.2GB/s"
+                  },
+                  "flags": [
+                    "THROTTLING",
+                    "GC_PENDING"
+                  ]
+                }
+              }
+            }
+          },
+          "application/x-protobuf": {
+            "schema": {
+              "type": "string",
+              "format": "binary",
+              "description": "Protocol Buffers binary stream of the SystemStateVector."
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request. Invalid parameters provided, such as a negative context depth.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized. The request lacks valid authentication credentials.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden. The authenticated user does not have permission to view system state vectors.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "429": {
+        "description": "Too Many Requests. The system is currently calculating a state vector for another high-priority process and cannot accept new requests.",
+        "headers": {
+          "Retry-After": {
+            "description": "The number of seconds to wait before making a new request.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal Server Error. Failed to aggregate state vector due to a subsystem failure.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    },
+    "security": [
+      {
+        "bearerAuth": []
+      },
+      {
+        "apiKeyAuth": []
+      }
+    ]
+  }
+}
