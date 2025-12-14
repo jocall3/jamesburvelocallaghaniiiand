@@ -1,0 +1,157 @@
+type: object
+title: Asset Update Request
+description: >-
+  Schema for updating an existing asset. All fields are optional. Only the
+  fields provided in the request will be updated, allowing for partial modifications.
+properties:
+  name:
+    type: string
+    description: >-
+      A new, human-readable name for the asset. If provided, it will replace the
+      existing name. Must be unique within the scope of the user's assets if not otherwise specified.
+    example: "Updated Annual Report Q4 2024.pdf"
+    minLength: 1
+    maxLength: 255
+  description:
+    type: string
+    description: >-
+      A detailed description of the asset's content or purpose. Providing an empty
+      string can be used to clear the existing description.
+    example: "Final version of the Q4 2024 annual report, including all appendices and financial statements."
+    maxLength: 4096
+  asset_type:
+    type: string
+    description: >-
+      The new type of the asset. Changing the asset type might trigger
+      re-processing or re-validation workflows.
+    enum:
+      - image
+      - video
+      - audio
+      - document
+      - archive
+      - 3d_model
+      - code
+      - presentation
+      - spreadsheet
+      - other
+    example: "document"
+  status:
+    type: string
+    description: >-
+      The new status of the asset. This controls its visibility and lifecycle
+      within the system. For example, moving an asset to 'archived' might make it
+      inaccessible via standard search queries.
+    enum:
+      - draft
+      - pending_review
+      - active
+      - archived
+      - expired
+      - processing_failed
+    example: "active"
+  tags:
+    type: array
+    description: >-
+      A new set of tags to associate with the asset. This will replace the
+      entire existing list of tags. To add or remove tags incrementally, the
+      client should first fetch the asset, modify the tag list, and then submit
+      the full updated list.
+    items:
+      type: string
+      minLength: 1
+      maxLength: 64
+      pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+      description: A tag string, typically in kebab-case, used for categorization and filtering.
+      example: "financial-report"
+    example:
+      - "annual-report"
+      - "q4-2024"
+      - "finance"
+      - "public"
+    minItems: 0
+    maxItems: 50
+    uniqueItems: true
+  metadata:
+    type: object
+    description: >-
+      A set of key-value pairs for custom, unstructured metadata. This operation performs a
+      shallow merge: new keys are added, existing keys are updated. To remove a key,
+      set its value to `null`.
+    additionalProperties:
+      oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: 'null'
+    example:
+      author: "Jane Doe"
+      department: "Finance"
+      review_status: "approved"
+      confidentiality_level: 3
+      source_system_id: null # This would remove the source_system_id key
+  access_control:
+    type: object
+    description: >-
+      Defines the access control list (ACL) for the asset. This replaces the
+      entire existing ACL. If only a partial ACL is provided (e.g., only `policy`),
+      other fields like `allowed_users` may be cleared.
+    properties:
+      policy:
+        type: string
+        enum:
+          - public
+          - private
+          - restricted
+        description: The high-level access policy for the asset. 'public' means accessible to anyone with the link, 'private' means only to the owner, and 'restricted' uses the `allowed_users` and `allowed_groups` lists.
+        example: "restricted"
+      allowed_users:
+        type: array
+        description: >-
+          A list of user IDs that are explicitly allowed to access this asset.
+          Only applicable when the policy is 'restricted'.
+        items:
+          type: string
+          format: uuid
+          description: The unique identifier for a user.
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        uniqueItems: true
+      allowed_groups:
+        type: array
+        description: >-
+          A list of group IDs that are explicitly allowed to access this asset.
+          Only applicable when the policy is 'restricted'.
+        items:
+          type: string
+          format: uuid
+          description: The unique identifier for a user group.
+          example: "987e6543-e21b-32d1-b456-556614174999"
+        uniqueItems: true
+    example:
+      policy: "restricted"
+      allowed_users:
+        - "123e4567-e89b-12d3-a456-426614174000"
+        - "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+      allowed_groups:
+        - "987e6543-e21b-32d1-b456-556614174999"
+  expires_at:
+    type: string
+    format: date-time
+    description: >-
+      An optional ISO 8601 timestamp indicating when the asset should expire.
+      After this time, the asset may be automatically archived or deleted based
+      on system policies. Set to `null` to remove an existing expiration date.
+    nullable: true
+    example: "2025-12-31T23:59:59Z"
+  custom_fields:
+    type: object
+    description: >-
+      A flexible object for storing structured custom data that is defined by
+      the organization's schema. This operation performs a shallow merge. To
+      remove a key, set its value to `null`.
+    additionalProperties: true
+    example:
+      project_id: "PROJ-123"
+      review_cycle: 4
+      is_final_version: true
+      related_ticket: null # Removes the related_ticket field
