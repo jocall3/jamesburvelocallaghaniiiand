@@ -1,0 +1,192 @@
+get:
+  tags:
+    - System
+  summary: Get System Health Status
+  description: |
+    Provides a detailed health status of the entire system and its core components.
+    This endpoint is a vital part of the system's monitoring and observability infrastructure, used by automated health checkers, load balancers, and operational dashboards to assess service availability and performance.
+
+    The overall system status is determined by aggregating the health of its individual components.
+    - `ok`: All systems are functioning within their expected operational parameters.
+    - `degraded`: One or more non-critical components are experiencing issues, or a critical component is showing signs of stress (e.g., high latency). The system is still operational but may have reduced performance or functionality.
+    - `down`: A critical component is non-operational, and the system is considered unavailable. Client applications should implement retry logic or failover procedures.
+  operationId: getSystemHealth
+  security: [] # This endpoint is public and requires no authentication.
+  parameters:
+    - name: verbose
+      in: query
+      description: If set to `true`, the response will include a detailed breakdown of all monitored components and their individual health statuses and metrics.
+      required: false
+      schema:
+        type: boolean
+        default: false
+      example: true
+  responses:
+    '200':
+      description: The system's health status was successfully retrieved. The `status` field in the response body indicates the overall health.
+      content:
+        application/json:
+          schema:
+            type: object
+            title: SystemHealthResponse
+            description: A detailed representation of the system's health.
+            required:
+              - status
+              - uptime
+              - version
+              - timestamp
+            properties:
+              status:
+                type: string
+                enum: [ok, degraded, down]
+                description: The overall aggregated health status of the system.
+                example: "ok"
+              uptime:
+                type: number
+                format: double
+                description: The total time in seconds that the service has been running since its last restart.
+                example: 86400.5
+              version:
+                type: string
+                description: The semantic version of the running application.
+                example: "2.1.3"
+              timestamp:
+                type: string
+                format: date-time
+                description: The ISO 8601 timestamp of when the health check was performed.
+                example: "2023-10-27T10:00:00Z"
+              components:
+                type: object
+                description: An object containing the health status of individual downstream components and dependencies. This field is only present if the `verbose` query parameter is set to `true`.
+                additionalProperties:
+                  type: object
+                  title: ComponentHealth
+                  required:
+                    - status
+                  properties:
+                    status:
+                      type: string
+                      enum: [ok, degraded, down]
+                      description: The health status of the individual component.
+                    details:
+                      type: string
+                      description: A human-readable message providing more details about the component's status, especially in a `degraded` or `down` state.
+                      example: "Response time is above the 500ms threshold."
+                    metrics:
+                      type: object
+                      description: A collection of key performance indicators and metrics for the component.
+                      properties:
+                        responseTime:
+                          type: number
+                          format: double
+                          description: The response time of the component in milliseconds.
+                          example: 45.5
+                        errorRate:
+                          type: number
+                          format: float
+                          description: The percentage of failed requests to the component over the last minute.
+                          example: 0.01
+                      additionalProperties: true
+          examples:
+            healthy:
+              summary: Healthy System Status (Simple)
+              description: A standard response for a healthy system when `verbose=false`.
+              value:
+                status: "ok"
+                uptime: 86400.5
+                version: "2.1.3"
+                timestamp: "2023-10-27T10:00:00Z"
+            healthy_verbose:
+              summary: Healthy System Status (Verbose)
+              description: A detailed response for a healthy system when `verbose=true`.
+              value:
+                status: "ok"
+                uptime: 86400.5
+                version: "2.1.3"
+                timestamp: "2023-10-27T10:00:00Z"
+                components:
+                  database:
+                    status: "ok"
+                    details: "Connection successful."
+                    metrics:
+                      responseTime: 15.2
+                      errorRate: 0.0
+                      activeConnections: 12
+                  cache:
+                    status: "ok"
+                    details: "Connection successful."
+                    metrics:
+                      responseTime: 1.8
+                      errorRate: 0.0
+                      hitRate: 0.98
+                  messagingQueue:
+                    status: "ok"
+                    details: "Connection successful."
+                    metrics:
+                      responseTime: 5.1
+                      errorRate: 0.0
+                      messagesInQueue: 4
+            degraded_verbose:
+              summary: Degraded System Status (Verbose)
+              description: A detailed response for a system in a degraded state when `verbose=true`.
+              value:
+                status: "degraded"
+                uptime: 172800.2
+                version: "2.1.3"
+                timestamp: "2023-10-27T10:05:00Z"
+                components:
+                  database:
+                    status: "ok"
+                    details: "Connection successful."
+                    metrics:
+                      responseTime: 88.9
+                      errorRate: 0.0
+                      activeConnections: 45
+                  cache:
+                    status: "degraded"
+                    details: "High eviction rate detected, response times are elevated."
+                    metrics:
+                      responseTime: 52.3
+                      errorRate: 0.0
+                      hitRate: 0.71
+                  messagingQueue:
+                    status: "ok"
+                    details: "Connection successful."
+                    metrics:
+                      responseTime: 6.0
+                      errorRate: 0.0
+                      messagesInQueue: 1502
+    '503':
+      description: Service Unavailable. The health check endpoint itself is unable to process the request, indicating a critical failure within the service hosting the API. This is distinct from a `200 OK` with a `down` status, which indicates a dependency has failed.
+      content:
+        application/json:
+          schema:
+            type: object
+            title: ErrorResponse
+            required:
+              - code
+              - message
+            properties:
+              code:
+                type: string
+                description: A unique, machine-readable error code.
+                example: "SERVICE_UNAVAILABLE"
+              message:
+                type: string
+                description: A human-readable description of the error.
+                example: "The health check service is currently unavailable. Please try again later."
+              timestamp:
+                type: string
+                format: date-time
+                description: The ISO 8601 timestamp of when the error occurred.
+                example: "2023-10-27T10:06:00Z"
+              traceId:
+                type: string
+                format: uuid
+                description: A unique identifier for the request, useful for tracing and debugging.
+                example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          example:
+            code: "SERVICE_UNAVAILABLE"
+            message: "The health check service is currently unavailable. Please try again later."
+            timestamp: "2023-10-27T10:06:00Z"
+            traceId: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
