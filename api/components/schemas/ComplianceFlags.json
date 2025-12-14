@@ -1,0 +1,40 @@
+{
+  "title": "ComplianceFlags",
+  "type": "string",
+  "description": "Enumeration of compliance flags indicating the status of a transaction, account, or entity with respect to regulatory and internal compliance policies. These flags are used by automated systems to trigger reviews, block actions, or simply record potential issues for auditing and reporting purposes.",
+  "enum": [
+    "AML_WARNING",
+    "THRESHOLD_BREACH",
+    "CLEARED",
+    "PENDING_REVIEW",
+    "SANCTIONS_HIT",
+    "PEP_MATCH",
+    "HIGH_RISK_JURISDICTION",
+    "UNUSUAL_ACTIVITY",
+    "STRUCTURED_TRANSACTION",
+    "ID_VERIFICATION_FAILED",
+    "FRAUD_SUSPECTED",
+    "NO_FLAGS",
+    "SAR_FILED",
+    "ACCOUNT_FROZEN",
+    "ENHANCED_DUE_DILIGENCE_REQUIRED"
+  ],
+  "x-enum-descriptions": {
+    "AML_WARNING": "A potential Anti-Money Laundering (AML) risk has been detected based on transaction patterns or counterparty information.",
+    "THRESHOLD_BREACH": "A transaction or a series of transactions has breached a predefined monetary or frequency threshold, requiring further scrutiny.",
+    "CLEARED": "The transaction or account has been manually or automatically reviewed and cleared of any previously raised flags.",
+    "PENDING_REVIEW": "The item is flagged and is currently in a queue awaiting manual review by a compliance officer.",
+    "SANCTIONS_HIT": "A potential match has been found against a global or local sanctions list (e.g., OFAC, UN, EU).",
+    "PEP_MATCH": "An individual or entity associated with the transaction is a potential match for a Politically Exposed Person (PEP).",
+    "HIGH_RISK_JURISDICTION": "The transaction originates from or is destined for a jurisdiction identified as high-risk for financial crime.",
+    "UNUSUAL_ACTIVITY": "The activity pattern deviates significantly from the established historical norm for the account or entity.",
+    "STRUCTURED_TRANSACTION": "Activity suggests potential structuring of transactions to intentionally avoid regulatory reporting thresholds.",
+    "ID_VERIFICATION_FAILED": "The identity verification process (KYC/KYB) for an associated party has failed or is incomplete.",
+    "FRAUD_SUSPECTED": "Automated systems or manual review have identified indicators of potential fraudulent activity.",
+    "NO_FLAGS": "No compliance issues have been detected for this item. This is the default clean state.",
+    "SAR_FILED": "A Suspicious Activity Report (SAR) has been filed with the relevant financial intelligence unit for this item.",
+    "ACCOUNT_FROZEN": "The associated account has been frozen due to severe compliance or fraud concerns.",
+    "ENHANCED_DUE_DILIGENCE_REQUIRED": "The risk profile requires Enhanced Due Diligence (EDD) to be performed before proceeding."
+  },
+  "example": "SANCTIONS_HIT"
+}
