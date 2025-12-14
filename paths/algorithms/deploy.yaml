@@ -1,0 +1,178 @@
+post:
+  operationId: deployAlgorithm
+  summary: Deploy a Specific Algorithm
+  description: |
+    Initiates the deployment of a registered algorithm to a specified compute target. This is an asynchronous operation. The API immediately returns a deployment ID, which can be used to track the status of the deployment process via the GET /deployments/{deploymentId} endpoint.
+
+    The deployment process involves:
+    1. Validating the algorithm and target compatibility.
+    2. Provisioning necessary compute and storage resources.
+    3. Transferring the algorithm package to the target environment.
+    4. Initializing and starting the execution environment.
+  tags:
+    - Algorithms
+  parameters:
+    - name: id
+      in: path
+      description: The unique identifier (UUID) for the algorithm to be deployed.
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: "alg-a1b2c3d4-e5f6-7890-1234-567890abcdef"
+  requestBody:
+    description: Specifies the target environment and priority for the algorithm deployment.
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          title: AlgorithmDeploymentRequest
+          description: Configuration for a new algorithm deployment.
+          required:
+            - target
+          properties:
+            target:
+              type: string
+              description: |
+                The identifier of the target compute environment for the deployment.
+                - `cloud-cluster-a`: A general-purpose, high-availability cloud cluster.
+                - `edge-node-tokyo`: A low-latency edge computing node located in Tokyo.
+                - `quantum-fabric-1`: A specialized backend for quantum algorithms.
+              enum: ["cloud-cluster-a", "edge-node-tokyo", "quantum-fabric-1"]
+              example: "cloud-cluster-a"
+            priority:
+              type: string
+              description: |
+                The scheduling priority for the deployment and its subsequent executions.
+                - `normal`: Standard priority for non-critical workloads.
+                - `high`: Elevated priority for time-sensitive or critical workloads.
+                - `quantum`: Reserved for deployments to quantum hardware, may involve special queuing.
+              enum: ["normal", "high", "quantum"]
+              default: "normal"
+              example: "high"
+        examples:
+          deployToCloud:
+            summary: Standard Cloud Deployment
+            description: A typical request to deploy an algorithm to a high-availability cloud cluster with normal priority.
+            value:
+              target: "cloud-cluster-a"
+              priority: "normal"
+          deployToEdge:
+            summary: High Priority Edge Deployment
+            description: A request to deploy an algorithm to a specific edge node with high priority for low-latency processing.
+            value:
+              target: "edge-node-tokyo"
+              priority: "high"
+          deployToQuantum:
+            summary: Quantum Fabric Deployment
+            description: A specialized request to deploy a quantum-compatible algorithm to a quantum fabric backend.
+            value:
+              target: "quantum-fabric-1"
+              priority: "quantum"
+  responses:
+    '202':
+      description: |
+        Accepted. The deployment request has been successfully received and queued for processing.
+        The response body contains the initial status and a unique ID to track the deployment's progress.
+      content:
+        application/json:
+          schema:
+            type: object
+            title: AlgorithmDeploymentStatus
+            description: Represents the status of an asynchronous algorithm deployment operation.
+            properties:
+              deploymentId:
+                type: string
+                format: uuid
+                description: The unique identifier for this specific deployment instance.
+                example: "dep-f47ac10b-58cc-4372-a567-0e02b2c3d479"
+              algorithmId:
+                type: string
+                format: uuid
+                description: The ID of the algorithm being deployed.
+                example: "alg-a1b2c3d4-e5f6-7890-1234-567890abcdef"
+              target:
+                type: string
+                description: The deployment target environment that was requested.
+                example: "cloud-cluster-a"
+              status:
+                type: string
+                description: The current status of the deployment process.
+                enum: [PENDING, PROVISIONING, RUNNING, FAILED, COMPLETED]
+                example: "PENDING"
+              message:
+                type: string
+                description: A human-readable message providing more details about the current status.
+                example: "Deployment has been queued and is awaiting resource allocation."
+              createdAt:
+                type: string
+                format: date-time
+                description: The timestamp (ISO 8601) when the deployment request was accepted.
+                example: "2023-10-27T10:00:00Z"
+              estimatedCompletionTime:
+                type: string
+                format: date-time
+                description: An estimated timestamp (ISO 8601) for when the deployment is expected to be complete. This is a best-effort estimate and may change.
+                example: "2023-10-27T10:05:00Z"
+          examples:
+            deploymentInitiated:
+              summary: Deployment Initiated Example
+              value:
+                deploymentId: "dep-f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                algorithmId: "alg-a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                target: "cloud-cluster-a"
+                status: "PENDING"
+                message: "Deployment has been queued and is awaiting resource allocation."
+                createdAt: "2023-10-27T10:00:00Z"
+                estimatedCompletionTime: "2023-10-27T10:05:00Z"
+    '400':
+      description: Bad Request. The request body is malformed, or the specified target/priority is invalid or incompatible with the algorithm.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "INVALID_PARAMETER"
+            message: "Invalid deployment target specified: 'unknown-target'. Must be one of ['cloud-cluster-a', 'edge-node-tokyo', 'quantum-fabric-1']."
+            requestId: "req-a1b2c3d4-e5f6-7890-1234-567890abcdef"
+    '401':
+      description: Unauthorized. The client is not authenticated or lacks the necessary permissions to deploy algorithms.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "UNAUTHORIZED"
+            message: "Authentication token is missing or invalid."
+            requestId: "req-b2c3d4e5-f6a7-8901-2345-67890abcdef1"
+    '404':
+      description: Not Found. The algorithm with the specified ID does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "RESOURCE_NOT_FOUND"
+            message: "Algorithm with ID 'alg-00000000-0000-0000-0000-000000000000' not found."
+            requestId: "req-c3d4e5f6-a7b8-9012-3456-7890abcdef12"
+    '409':
+      description: Conflict. The algorithm is already in a state that prevents a new deployment (e.g., it is currently being deployed, or it has reached its maximum deployment limit).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "DEPLOYMENT_CONFLICT"
+            message: "Algorithm 'alg-a1b2c3d4-e5f6-7890-1234-567890abcdef' is already undergoing deployment 'dep-e9d8c7b6-a5b4-c3d2-e1f0-a9b8c7d6e5f4'."
+            requestId: "req-d4e5f6a7-b8c9-0123-4567-890abcdef123"
+    '500':
+      description: Internal Server Error. An unexpected error occurred on the server while attempting to initiate the deployment.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: "INTERNAL_SERVER_ERROR"
+            message: "An unexpected error occurred. Please contact support and provide the request ID."
+            requestId: "req-e5f6a7b8-c9d0-1234-5678-90abcdef1234"
