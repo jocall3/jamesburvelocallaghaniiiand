@@ -1,0 +1,63 @@
+{
+  "description": "Unauthorized. The request lacks valid authentication credentials for the target resource. This may be due to a missing, invalid, or expired session token, or an incorrect audit signature.",
+  "content": {
+    "application/json": {
+      "schema": {
+        "$ref": "../schemas/Error.json"
+      },
+      "examples": {
+        "invalidToken": {
+          "summary": "Invalid Session Token",
+          "description": "Example response for when the provided session token is invalid or expired.",
+          "value": {
+            "error": {
+              "code": "UNAUTHORIZED",
+              "message": "Authentication failed: The provided session token is invalid or has expired.",
+              "target": "Authorization",
+              "details": [
+                {
+                  "code": "INVALID_TOKEN",
+                  "message": "Session token is not valid."
+                }
+              ]
+            }
+          }
+        },
+        "missingToken": {
+          "summary": "Missing Session Token",
+          "description": "Example response for when the Authorization header is missing.",
+          "value": {
+            "error": {
+              "code": "UNAUTHORIZED",
+              "message": "Authentication failed: Authorization header with a valid session token is required.",
+              "target": "Authorization",
+              "details": [
+                {
+                  "code": "MISSING_HEADER",
+                  "message": "Authorization header is required."
+                }
+              ]
+            }
+          }
+        },
+        "invalidSignature": {
+          "summary": "Invalid Audit Signature",
+          "description": "Example response for when the provided audit signature is incorrect, indicating a potential tampering attempt or misconfiguration.",
+          "value": {
+            "error": {
+              "code": "UNAUTHORIZED",
+              "message": "Authentication failed: The provided audit signature is invalid.",
+              "target": "X-Audit-Signature",
+              "details": [
+                {
+                  "code": "INVALID_SIGNATURE",
+                  "message": "The signature provided in the X-Audit-Signature header does not match the expected value."
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
