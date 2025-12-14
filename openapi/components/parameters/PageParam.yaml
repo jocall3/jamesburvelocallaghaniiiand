@@ -1,0 +1,11 @@
+name: page
+in: query
+description: The page number to retrieve from the paginated list of results. The first page is 1.
+required: false
+schema:
+  type: integer
+  format: int32
+  minimum: 1
+  default: 1
+  description: Specifies the page number of the result set to be returned.
+example: 1
