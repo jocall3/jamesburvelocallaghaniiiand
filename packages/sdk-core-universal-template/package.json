@@ -45,7 +45,7 @@
     "pino": "^8.19.0",
     "prom-client": "^15.1.0",
     "rxjs": "^7.8.1",
-    "uuid": "^9.0.1",
+    "uuid": "^14.0.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -59,7 +59,7 @@
     "rimraf": "^5.0.5",
     "tsup": "^8.0.2",
     "typescript": "^5.4.3",
-    "vitest": "^1.4.0"
+    "vitest": "^4.1.10"
   },
   "engines": {
     "node": ">=18.18.0"

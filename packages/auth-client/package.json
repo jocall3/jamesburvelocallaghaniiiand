@@ -34,7 +34,7 @@
     "jose": "^5.2.2",
     "zod": "^3.22.4",
     "jwt-decode": "^4.0.0",
-    "uuid": "^9.0.1"
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.11.19",
@@ -47,7 +47,7 @@
     "rimraf": "^5.0.5",
     "tsup": "^8.0.2",
     "typescript": "^5.3.3",
-    "vitest": "^1.2.2"
+    "vitest": "^4.1.10"
   },
   "peerDependencies": {
     "react": ">=18.0.0"
